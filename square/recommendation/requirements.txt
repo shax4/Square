@@ -1,0 +1,9 @@
+# Python에 이용되는 필수 패키지 목록
+
+mysql-connector-python
+pandas
+numpy
+scikit-learn
+fastapi
+uvicorn
+redis
