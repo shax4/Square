@@ -7,8 +7,8 @@ public class CustomException extends RuntimeException{
 	int code;
 	String message;
 
-	public CustomException(int code, String message) {
-		this.code = code;
-		this.message = message;
+	public CustomException(ExceptionCode exceptionCode) {
+		this.code = exceptionCode.getCode();
+		this.message = exceptionCode.getMessage();
 	}
 }
