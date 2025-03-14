@@ -1,6 +1,6 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator  } from "@react-navigation/bottom-tabs";
-import {Ionicons} from '@expo/vector-icons'
+import {Ionicons} from '@expo/vector-icons';
 
 import {BoardScreen, MainScreen, MypageScreen, NotificationScreen} from '../../pages'
 
@@ -15,25 +15,37 @@ export default function BottomNav(){
     return(
         <NavigationContainer>
             <Tab.Navigator
-            initialRouteName={mainName}
-            screenOptions={({route}) => ({
-                tabBarIcon: ({focused, color, size} : {focused: boolean; color : string; size: number}) => {
-                    let iconName = 'key';
-                    let routeName = route.name;
+                initialRouteName={mainName}
+                screenOptions={({ route }) => ({
+                    tabBarIcon: ({ focused, color, size }) => {
+                    return (
+                        <Ionicons
+                        name={
+                            route.name === boardName
+                            ? focused
+                                ? "chatbox"
+                                : "chatbox-outline"
+                            : route.name === mainName
+                            ? "home"
+                            : route.name === notificationName
+                            ? focused
+                                ? "notifications"
+                                : "notifications-outline"
+                            : route.name === mypageName
+                            ? focused
+                                ? "person"
+                                : "person-outline"
+                            : "help-circle"
+                        }
+                        size={size}
+                        color={color}
+                        />
+                    );
+                    },
+                    headerShown: false,
+                })}
+                >
 
-                    if(routeName === boardName){
-                        iconName = focused ? 'key' : 'key-outline';
-                    }else if(routeName === mainName){
-                        iconName = focused ? 'key' : 'key-outline';
-                    }else if(routeName === notificationName){
-                        iconName = focused ? 'key' : 'key-outline';
-                    }else if(routeName === mypageName){
-                        iconName = focused ? 'key' : 'key-outline';
-                    }
-
-                    return <Ionicons name={'key'} size={size} color={color}/>
-                },
-            })}>
                 <Tab.Screen name={boardName} component={BoardScreen}/>
                 <Tab.Screen name={mainName} component={MainScreen}/>
                 <Tab.Screen name={notificationName} component={NotificationScreen}/>
