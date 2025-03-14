@@ -6,9 +6,9 @@ import { SampleButton } from "../components";
 export default function App() {
   return (
     <>
+      <StatusBar style="auto" />
       <View style={styles.appContainer}>
         <Text>헬로우!</Text>
-        <StatusBar style="auto" />
       </View>
       <View style={styles.screenContainer}>
         <SampleScreen />
