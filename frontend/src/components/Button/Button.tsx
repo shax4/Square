@@ -37,11 +37,12 @@ const Button = ({
 
   return (
     <TouchableOpacity
+      activeOpacity={0.7}
       style={getContainerStyle()}
       onPress={onPress}
       disabled={disabled}
     >
-      <Text style={styles.label}>{label}</Text>
+      <Text style={getLabelStyle()}>{label}</Text>
     </TouchableOpacity>
   );
 };

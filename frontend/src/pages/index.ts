@@ -1,1 +1,0 @@
-export {default as SampleScreen} from "./sample-screen/SampleScreen";

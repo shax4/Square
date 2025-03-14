@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
-import { SampleScreen } from "../pages";
+import { SampleScreen, UiTestScreen } from "../screens";
 import { SampleButton } from "../components";
 
 export default function App() {
@@ -11,8 +11,7 @@ export default function App() {
         <Text>헬로우!</Text>
       </View>
       <View style={styles.screenContainer}>
-        <SampleScreen />
-        <SampleButton title="Sample Button" onPress={() => {}} />
+        <UiTestScreen />
       </View>
     </>
   );
@@ -26,7 +25,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   screenContainer: {
-    flex: 3,
+    flex: 5,
     flexDirection: "row",
     backgroundColor: "#fff",
     alignItems: "center",
