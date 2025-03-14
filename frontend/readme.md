@@ -10,6 +10,8 @@
 #### 전역 설치 (추천)
 ```sh
 npm install -g expo-cli
+또는
+npm install expo
 ```
 또는
 ```sh
