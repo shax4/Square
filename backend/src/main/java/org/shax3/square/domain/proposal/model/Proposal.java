@@ -2,6 +2,9 @@ package org.shax3.square.domain.proposal.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.shax3.square.domain.user.model.User;
+
+import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Getter
@@ -9,7 +12,8 @@ import lombok.*;
 @AllArgsConstructor
 @Table(name = "proposal")
 public class Proposal {
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id
+    @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
