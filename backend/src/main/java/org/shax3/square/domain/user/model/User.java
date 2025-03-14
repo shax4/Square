@@ -85,7 +85,7 @@ public class User extends BaseTimeEntity {
     public User(
             String email,
             String nickname,
-            String profileUrl,
+            String s3Key,
             Region region,
             Gender gender,
             int yearOfBirth,
@@ -95,7 +95,7 @@ public class User extends BaseTimeEntity {
     ) {
         this.email = email;
         this.nickname = nickname;
-        this.s3Key = profileUrl;
+        this.s3Key = s3Key;
         this.region = region;
         this.gender = gender;
         this.yearOfBirth = yearOfBirth;
