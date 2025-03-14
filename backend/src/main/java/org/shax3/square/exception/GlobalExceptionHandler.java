@@ -41,10 +41,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@Override
 	protected ResponseEntity<Object> handleMissingServletRequestParameter(
-		MissingServletRequestParameterException ex,
-		HttpHeaders headers,
-		HttpStatusCode status,
-		WebRequest request)
+			MissingServletRequestParameterException ex,
+			HttpHeaders headers,
+			HttpStatusCode status,
+			WebRequest request)
 	{
 		String paramName = ex.getParameterName();
 		String message = String.format("필수 파라미터 '%s'가 누락되었습니다.", paramName);

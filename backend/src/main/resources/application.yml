@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: square
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DB_ID}
+    password: ${DB_PASSWORD}
+    url: jdbc:mysql://${DB_URL}/square
+    hikari:
+      connection-timeout: 3000
+      maximum-pool-size: 20
+      minimum-idle: 10
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: false
+        use_sql_comments: false
+    database-platform: org.hibernate.dialect.MySQLDialect
