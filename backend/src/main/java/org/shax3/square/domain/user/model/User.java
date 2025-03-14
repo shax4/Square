@@ -4,6 +4,7 @@ import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 import static org.shax3.square.domain.user.model.UserStatus.ACTIVE;
+import static org.shax3.square.exception.ExceptionCode.AGE_LIMIT_FROM_TEN;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,6 +21,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.shax3.square.exception.CustomException;
+import org.shax3.square.exception.ExceptionCode;
+
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -42,8 +47,8 @@ public class User extends BaseTimeEntity {
     @Pattern(regexp = "^[a-zA-Z0-9가-힣]{2,8}$", message = "닉네임은 영문, 숫자, 한글로만 구성되어 있으며, 길이는 2자리 이상 8자리 이하이어야 합니다.")
     private String nickname;
 
-    @Column(name = "profile_url", nullable = false)
-    private String profileUrl;
+    @Column(name = "s3_key", nullable = false)
+    private String s3Key;
 
     @Enumerated(STRING)
     @Column(name = "region", nullable = false)
@@ -83,17 +88,18 @@ public class User extends BaseTimeEntity {
             String profileUrl,
             Region region,
             Gender gender,
-            AgeRange ageRange,
+            int yearOfBirth,
             Religion religion,
             Type type,
             SocialType socialType
     ) {
         this.email = email;
         this.nickname = nickname;
-        this.profileUrl = profileUrl;
+        this.s3Key = profileUrl;
         this.region = region;
         this.gender = gender;
-        this.ageRange = ageRange;
+        this.yearOfBirth = yearOfBirth;
+        this.ageRange = catculateAgeRange(yearOfBirth);
         this.religion = religion;
         this.type = type;
         this.socialType = socialType;
@@ -103,5 +109,19 @@ public class User extends BaseTimeEntity {
     public boolean updateNickname(String nickname) {
         java.util.regex.Pattern p = java.util.regex.Pattern.compile("^[a-zA-Z0-9가-힣]{2,8}$");
         return p.matcher(nickname).matches();
+    }
+
+    private AgeRange catculateAgeRange(int yearOfBirth) {
+        int age = LocalDate.now().getYear() - yearOfBirth;
+        age /= 10;
+
+        return switch (age) {
+            case 0 -> throw new CustomException(AGE_LIMIT_FROM_TEN);
+            case 1 -> AgeRange.TEN;
+            case 2 -> AgeRange.TWENTY;
+            case 3 -> AgeRange.THIRTY;
+            case 4 -> AgeRange.FORTY;
+            default -> AgeRange.FIFTY;
+        };
     }
 }
