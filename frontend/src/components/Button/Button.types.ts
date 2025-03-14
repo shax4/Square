@@ -18,5 +18,5 @@ export interface ButtonProps {
    * 스타일 변형을 위해 variant를 둘 수도 있습니다.
    * 예: "primary", "secondary", "check" 등
    */
-  variant?: "primary" | "secondary" | "check";
+  variant?: "primary" | "check";
 }

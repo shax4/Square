@@ -17,11 +17,11 @@ const Button = ({
     // 비활성화 상태
     if (disabled) {
       containerStyles.push(styles.containerDisabled);
-    } else if (variant === "secondary") {
-      // variant가 secondary이면 다른 배경색
-        containerStyles.push(styles.containerSecondary);
-      }
-      // 다른 variant가 있다면 여기에 추가
+    } else if (variant === "check") {
+      // 중복 확인 버튼
+      containerStyles.push(styles.containerCheck);
+    }
+    // 다른 variant가 있다면 여기에 추가
     return containerStyles;
   };
   const getLabelStyle = (): TextStyle[] => {

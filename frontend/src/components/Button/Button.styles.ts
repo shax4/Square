@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
-  // 기본 상태
+  // variant: primary(기본) 활성화 컨테이너
   container: {
     width: 335,
     height: 54,
@@ -10,6 +10,7 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#0066FF",
   },
+  // primary 활성화 라벨
   label: {
     color: "#FFFFFF",
     fontSize: 16,
@@ -17,15 +18,21 @@ export const styles = StyleSheet.create({
     letterSpacing: -0.32,
     textAlign: "center",
   },
-  // 비활성화 상태
+  // primary 비활성화 컨테이너
   containerDisabled: {
     backgroundColor: "#434750",
   },
+  // primary 비활성화 라벨
   labelDisabled: {
     color: "#666a73",
   },
-  // variant가 다를 때를 위한 예시
-  containerSecondary: {
-    backgroundColor: "#444444",
+  // variant: check(중복 확인) 컨테이너
+  containerCheck: {
+    width: 81,
+    height: 51,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#0066FF",
   },
 });

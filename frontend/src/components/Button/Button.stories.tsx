@@ -1,9 +1,9 @@
-import React from 'react';
-import { ComponentMeta, ComponentStory } from '@storybook/react-native';
-import Button from './Button';
+import React from "react";
+import { ComponentMeta, ComponentStory } from "@storybook/react-native";
+import Button from "./Button";
 
 const ButtonMeta: ComponentMeta<typeof Button> = {
-  title: 'Atoms/Button',
+  title: "Atoms/Button",
   component: Button,
 };
 
