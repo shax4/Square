@@ -16,7 +16,7 @@ public class Proposal {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
@@ -34,6 +34,6 @@ public class Proposal {
         this.user = user;
         this.topic = topic;
         this.likeCount = 0;
-        this.isValid = false;
+        this.isValid = true;
     }
 }
