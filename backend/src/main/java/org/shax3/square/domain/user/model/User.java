@@ -42,8 +42,8 @@ public class User extends BaseTimeEntity {
     @Pattern(regexp = "^[a-zA-Z0-9가-힣]{2,8}$", message = "닉네임은 영문, 숫자, 한글로만 구성되어 있으며, 길이는 2자리 이상 8자리 이하이어야 합니다.")
     private String nickname;
 
-    @Column(name = "profile_uri", nullable = false)
-    private String profileUri;
+    @Column(name = "profile_url", nullable = false)
+    private String profileUrl;
 
     @Enumerated(STRING)
     @Column(name = "region", nullable = false)
@@ -80,7 +80,7 @@ public class User extends BaseTimeEntity {
     public User(
             String email,
             String nickname,
-            String profileUri,
+            String profileUrl,
             Region region,
             Gender gender,
             AgeRange ageRange,
@@ -90,7 +90,7 @@ public class User extends BaseTimeEntity {
     ) {
         this.email = email;
         this.nickname = nickname;
-        this.profileUri = profileUri;
+        this.profileUrl = profileUrl;
         this.region = region;
         this.gender = gender;
         this.ageRange = ageRange;
