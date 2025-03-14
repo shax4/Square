@@ -27,7 +27,10 @@ public enum ExceptionCode {
 	BOARD_LIMIT(4003, "게시판의 최대 게시글 수를 초과했습니다."),
 	BOARD_NOT_FOUND(4004, "게시글을 찾을 수 없습니다."),
 	COMMENT_NOT_FOUND(4005, "댓글을 찾을 수 없습니다."),
-	TEAM_BOARD_NOT_FOUND(4006, "게시판을 찾을 수 없습니다.");
+	TEAM_BOARD_NOT_FOUND(4006, "게시판을 찾을 수 없습니다."),
+
+
+	PROPOSAL_NOT_FOUND(5004, "청원을 찾을 수 없습니다.");
 
 	private final int code;
 	private final String message;

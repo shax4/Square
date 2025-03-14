@@ -1,17 +1,16 @@
 package org.shax3.square.domain.proposal.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Table(name = "proposal")
-
 public class Proposal {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
-    Long id;
+    private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -21,9 +20,16 @@ public class Proposal {
     private String topic;
 
     @Column(name = "like_count", nullable = false)
-    private int likeCount = 0;
+    private int likeCount;
 
     @Column(name ="is_valid",nullable = false)
-    boolean isValid = false;
+    private boolean isValid;
 
+    @Builder
+    public Proposal(User user, String topic) {
+        this.user = user;
+        this.topic = topic;
+        this.likeCount = 0;
+        this.isValid = false;
+    }
 }
