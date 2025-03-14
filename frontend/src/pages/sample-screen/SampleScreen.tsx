@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import {View, Text, StyleSheet} from "react-native";
-import {fetchHomeData} from "./API";
+import { fetchHomeData } from "./Api";
 
 export default function SampleScreen() {
     const [data, setData] = useState<string | null>(null);
