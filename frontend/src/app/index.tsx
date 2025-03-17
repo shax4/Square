@@ -1,24 +1,19 @@
 import { StyleSheet, Text, View } from 'react-native';
-import BottomNav from './navigation/BottomNav';
 
 export default function App() {
   return (
-    <BottomNav/>
+    <View style={styles.container}>
+      <Text>헬로우!</Text>
+      <StatusBar style="auto" />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  appContainer: {
+  container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  screenContainer: {
-    flex: 5,
-    flexDirection: "row",
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
