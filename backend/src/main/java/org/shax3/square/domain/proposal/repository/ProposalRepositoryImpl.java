@@ -6,8 +6,10 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.proposal.model.Proposal;
 import org.shax3.square.domain.proposal.model.QProposal;
-import java.util.List;
+import org.springframework.stereotype.Repository;
 
+import java.util.List;
+@Repository
 @RequiredArgsConstructor
 public class ProposalRepositoryImpl implements ProposalRepositoryCustom {
     private final JPAQueryFactory queryFactory;
