@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
-import { SampleScreen, UiTestScreen } from "../screens";
+import { SampleScreen, UiTestScreen } from "../pages";
 import { SampleButton } from "../components";
 
 export default function App() {
