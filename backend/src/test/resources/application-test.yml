@@ -1,4 +1,7 @@
 spring:
+  application:
+    name: ${SERVICE_NAME:test-service}
+
   datasource:
     url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
     username: sa
