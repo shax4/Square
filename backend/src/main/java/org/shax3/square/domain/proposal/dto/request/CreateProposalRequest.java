@@ -10,7 +10,7 @@ import org.shax3.square.domain.user.model.User;
 
 @Getter
 @AllArgsConstructor
-public class CreatePropsalRequest {
+public class CreateProposalRequest {
 
     @NotBlank(message = "주제는 비어 있을 수 없습니다.")
     @Size(min = 3, max = 100, message = "주제는 최소 3자 이상, 최대 100자 이하이어야 합니다.")

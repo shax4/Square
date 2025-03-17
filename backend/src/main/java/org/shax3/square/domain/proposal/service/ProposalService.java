@@ -1,7 +1,7 @@
 package org.shax3.square.domain.proposal.service;
 
 import lombok.RequiredArgsConstructor;
-import org.shax3.square.domain.proposal.dto.request.CreatePropsalRequest;
+import org.shax3.square.domain.proposal.dto.request.CreateProposalRequest;
 import org.shax3.square.domain.proposal.dto.response.ProposalResponse;
 import org.shax3.square.domain.proposal.model.Proposal;
 import org.shax3.square.domain.proposal.repository.ProposalRepository;
@@ -22,7 +22,11 @@ public class ProposalService {
     private final ProposalRepository proposalRepository;
 
     @Transactional
-    public ProposalResponse save(CreatePropsalRequest request, String token) {
+    public ProposalResponse save(CreateProposalRequest request, String token) {
+
+        if (request == null || request.getTopic() == null || request.getTopic().trim().isEmpty()) {
+            throw new CustomException(INVALID_REQUEST);
+        }
 
         User user = User.builder().build();
 //      User user = 토큰추출기.getuserId(token);
