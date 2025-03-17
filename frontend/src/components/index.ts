@@ -1,1 +1,2 @@
-export {default as SampleButton} from "./sample-button/SampleButton";
+export {default as Button} from "./Button";
+export {default as ProfileImage} from "./ProfileImage";
