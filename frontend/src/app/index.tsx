@@ -1,19 +1,9 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
-import { SampleScreen, UiTestScreen } from "../pages";
-import { SampleButton } from "../components";
+import { StyleSheet, Text, View } from 'react-native';
+import BottomNav from './navigation/BottomNav';
 
 export default function App() {
   return (
-    <>
-      <StatusBar style="auto" />
-      <View style={styles.appContainer}>
-        <Text>헬로우!</Text>
-      </View>
-      <View style={styles.screenContainer}>
-        <UiTestScreen />
-      </View>
-    </>
+    <BottomNav/>
   );
 }
 
