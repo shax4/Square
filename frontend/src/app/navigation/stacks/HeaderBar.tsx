@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import NevTestPage1 from '../../../pages/StackSampleScreen/NevTestPage1';
 import NevTestPage2 from '../../../pages/StackSampleScreen/NevTestPage2';
+import UiTestScreen from '../../../pages/ui-test-screen/UiTestScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -48,6 +49,22 @@ export default function HeaderBar() {
                 }}
                 name="NevTestPage2"
                 component={NevTestPage2}
+            />
+            <Stack.Screen
+                options={{
+                    headerBackButtonDisplayMode: "minimal",
+                    headerRight: () => {
+                        return (
+                            <View style={styles.headerRightItems}>
+                                <TouchableOpacity onPress={() => console.log("상단 탭 우측 아이콘 메서드")}>
+                                    <Ionicons name='person-add' size={24} />
+                                </TouchableOpacity>
+                            </View>
+                        )
+                    }
+                }}
+                name="UiTestScreen"
+                component={UiTestScreen}
             />
         </Stack.Navigator>
     )
