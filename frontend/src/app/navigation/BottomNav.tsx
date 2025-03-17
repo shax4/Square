@@ -57,7 +57,7 @@ export default function BottomNav(){
                         shadowOpacity: 0.1,
                         shadowRadius: 10,
                         elevation: 5, // 안드로이드 그림자 효과
-                      },
+                    },
                     tabBarActiveTintColor: "black",
                     tabBarInactiveTintColor: "gray",
                     headerShown: false,
