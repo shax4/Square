@@ -1,12 +1,16 @@
+server:
+  servlet:
+    context-path: /api
+
 spring:
   application:
-    name: square
+    name: ${SERVICE_NAME}
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: ${DB_ID}
-    password: ${DB_PASSWORD}
-    url: jdbc:mysql://${DB_URL}/square
+    username: ${DB_MYSQL_ID}
+    password: ${DB_MYSQL_PASSWORD}
+    url: jdbc:mysql://${DB_MYSQL_URL}/${SERVICE_NAME}
     hikari:
       connection-timeout: 3000
       maximum-pool-size: 20
