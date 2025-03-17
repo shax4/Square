@@ -46,6 +46,9 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
+    //QueryDSL
+    implementation 'com.querydsl:querydsl-jpa:5.1.0'
+    annotationProcessor 'com.querydsl:querydsl-apt:5.1.0:jpa'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
