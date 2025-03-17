@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 
-import ProfileImage from '../../components/ProfileImage'
+import {ProfileImage} from '../../components';
 
 export default function MypageScreen() {
     return (
