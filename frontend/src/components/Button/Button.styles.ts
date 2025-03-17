@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import colors from "../../../assets/colors";
 
 export const styles = StyleSheet.create({
   // variant: primary(기본) 활성화 컨테이너
@@ -8,11 +9,11 @@ export const styles = StyleSheet.create({
     borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#0066FF",
+    backgroundColor: colors.primary,
   },
   // primary 활성화 라벨
   label: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: 16,
     fontWeight: "700",
     letterSpacing: -0.32,
@@ -20,11 +21,11 @@ export const styles = StyleSheet.create({
   },
   // primary 비활성화 컨테이너
   containerDisabled: {
-    backgroundColor: "#434750",
+    backgroundColor: colors.disabledBg,
   },
   // primary 비활성화 라벨
   labelDisabled: {
-    color: "#666a73",
+    color: colors.disabledText,
   },
   // variant: check(중복 확인) 컨테이너
   containerCheck: {
@@ -33,6 +34,6 @@ export const styles = StyleSheet.create({
     borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#0066FF",
+    backgroundColor: colors.primary,
   },
 });
