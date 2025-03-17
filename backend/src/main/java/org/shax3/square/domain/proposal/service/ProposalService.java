@@ -2,8 +2,10 @@ package org.shax3.square.domain.proposal.service;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.shax3.square.domain.proposal.dto.ProposalDto;
 import org.shax3.square.domain.proposal.dto.request.CreateProposalRequest;
-import org.shax3.square.domain.proposal.dto.response.ProposalResponse;
+import org.shax3.square.domain.proposal.dto.response.CreateProposalsResponse;
+import org.shax3.square.domain.proposal.dto.response.ProposalsResponse;
 import org.shax3.square.domain.proposal.model.Proposal;
 import org.shax3.square.domain.proposal.repository.ProposalRepository;
 import org.shax3.square.domain.user.model.User;
@@ -11,22 +13,20 @@ import org.shax3.square.exception.CustomException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.shax3.square.domain.proposal.model.QProposal.proposal;
 import static org.shax3.square.exception.ExceptionCode.*;
 
 @Service
 @RequiredArgsConstructor
 public class ProposalService {
-
     private final ProposalRepository proposalRepository;
-    private final JPAQueryFactory queryFactory;
 
 
     @Transactional
-    public ProposalResponse save(CreateProposalRequest request, String token) {
+    public CreateProposalsResponse save(CreateProposalRequest request, String token) {
 
         if (request == null || request.getTopic() == null || request.getTopic().trim().isEmpty()) {
             throw new CustomException(INVALID_REQUEST);
@@ -38,7 +38,7 @@ public class ProposalService {
         Proposal proposal = request.toEntity(user);
         proposalRepository.save(proposal);
 
-        return new ProposalResponse(proposal.getId());
+        return new CreateProposalsResponse(proposal.getId());
     }
 
     @Transactional(readOnly = true)
@@ -53,50 +53,27 @@ public class ProposalService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProposalResponse> getProposals(String sort, Long nextCursorId, Integer nextCursorLikes, String category, int limit) {
-        if (limit < 1 || limit > 50) {
-            limit = 10;
-        }
-
-        var query = queryFactory
-                .selectFrom(proposal)
-                .where(
-                        cursorFilter(nextCursorId, nextCursorLikes, sort),
-                        categoryEq(category))
-                .limit(limit + 1);
-
+    public ProposalsResponse getProposals(String sort, Long nextCursorId, Integer nextCursorLikes, int limit) {
+        List<Proposal> proposals;
         if ("likes".equals(sort)) {
-            return query.orderBy(proposal.likeCount.desc(), proposal.id.desc())
-                    .fetch()
-                    .stream()
-                    .map(p -> new ProposalResponse(p.getId()))
-                    .collect(Collectors.toList());
+            proposals = proposalRepository.findProposalsByLikes(nextCursorId, nextCursorLikes, limit);
+        } else {
+            proposals = proposalRepository.findProposalsByLatest(nextCursorId, limit);
         }
 
-        return query.orderBy(proposal.id.desc())
-                .fetch()
-                .stream()
-                .map(p -> new ProposalResponse(p.getId()))
-                .collect(Collectors.toList());
-    }
+        Long newNextCursorId = proposals.isEmpty() ? null : proposals.get(proposals.size() - 1).getId();
+        Integer newNextCursorLikes = (proposals.isEmpty() || !"likes".equals(sort))
+                ? null  // 기본값을 null로 설정
+                : proposals.get(proposals.size() - 1).getLikeCount();
 
-    private com.querydsl.core.types.dsl.BooleanExpression cursorFilter(Long nextCursorId, Integer nextCursorLikes, String sort) {
-        if ("likes".equals(sort)) {
-            if (nextCursorId == null || nextCursorLikes == null) return null;
-            return proposal.likeCount.eq(nextCursorLikes)
-                    .and(proposal.id.lt(nextCursorId))
-                    .or(proposal.likeCount.lt(nextCursorLikes));
+        List<ProposalDto> proposalDtos = new ArrayList<>();
+        for (Proposal proposal : proposals) {
+            proposalDtos.add(ProposalDto.fromEntity(proposal));
         }
-        return ltProposalId(nextCursorId);
+
+        return new ProposalsResponse(proposalDtos, newNextCursorId, newNextCursorLikes);
     }
 
-    private com.querydsl.core.types.dsl.BooleanExpression ltProposalId(Long nextCursorId) {
-        return nextCursorId == null ? null : proposal.id.lt(nextCursorId);
-    }
-
-    private com.querydsl.core.types.dsl.BooleanExpression categoryEq(String category) {
-        return "all".equals(category) ? null : proposal.category.eq(category);
-    }
 }
 
 
