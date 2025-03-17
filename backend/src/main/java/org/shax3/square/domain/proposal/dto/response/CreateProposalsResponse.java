@@ -5,6 +5,6 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class ProposalResponse {
+public class CreateProposalsResponse {
     public Long proposalId;
 }

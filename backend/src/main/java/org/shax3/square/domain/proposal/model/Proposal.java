@@ -36,4 +36,5 @@ public class Proposal {
         this.likeCount = 0;
         this.isValid = true;
     }
+
 }
