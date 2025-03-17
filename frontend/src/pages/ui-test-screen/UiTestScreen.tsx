@@ -1,6 +1,7 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import Button from "../../components/Button";
+import { ButtonVariant } from "../../components/Button";
 
 const UiTestScreen = () => {
   return (
@@ -20,8 +21,30 @@ const UiTestScreen = () => {
       {/* 'check' variant: "중복 확인" 버튼 */}
       <Button
         label="중복 확인"
-        variant="check"
+        variant={ButtonVariant.Check}
         onPress={() => console.log("중복 확인 버튼 클릭")}
+      />
+
+      {/* 'warning' variant: "경고" 활성화 버튼 */}
+      <Button
+        label="신고"
+        variant={ButtonVariant.Warning}
+        onPress={() => console.log("신고 활성화 버튼 클릭")}
+      />
+
+      {/* 'delete-id' variant: "회원 탈퇴" 활성화 버튼 */}
+      <Button
+        label="회원 탈퇴"
+        variant={ButtonVariant.DeleteId}
+        onPress={() => console.log("회원 탈퇴 활성화 버튼 클릭")}
+      />
+
+      {/* 'delete-id' variant && disabled: "회원 탈퇴" 비활성화 버튼 */}
+      <Button
+        label="회원 탈퇴"
+        disabled
+        variant={ButtonVariant.DeleteId}
+        onPress={() => console.log("회원 탈퇴 비활성화 버튼 클릭")}
       />
     </View>
   );
