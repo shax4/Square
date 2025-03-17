@@ -30,17 +30,20 @@ class ProposalServiceTest {
     @InjectMocks
     private ProposalService proposalService;
 
+    private User mockUser;
+    private Proposal mockProposal;
+
     @BeforeEach
     void setUp() {
-        User mockUser = User.builder()
+        mockUser = User.builder()
                 .nickname("TestUser")
                 .build();
-
-        Proposal mockProposal = Proposal.builder()
-                .topic("Sample Proposal")
-                .build();
-
         ReflectionTestUtils.setField(mockUser, "id", 1L);
+
+        mockProposal = Proposal.builder()
+                .topic("Sample Proposal")
+                .user(mockUser)
+                .build();
         ReflectionTestUtils.setField(mockProposal, "id", 1L);
     }
 
@@ -54,7 +57,7 @@ class ProposalServiceTest {
         verify(proposalRepository, times(1)).save(any(Proposal.class));
     }
     @Test
-    @DisplayName("request null test")
+    @DisplayName("save 예외 테스트 - request가 null일 때")
     void save_ShouldThrowException_WhenRequestIsNull() {
         assertThatThrownBy(() -> proposalService.save(null, "mock-token"))
                 .isInstanceOf(CustomException.class)
@@ -63,7 +66,7 @@ class ProposalServiceTest {
     }
 
     @Test
-    @DisplayName("request.topic null test")
+    @DisplayName("save 예외 테스트 - topic이 null일 때")
     void save_ShouldThrowException_WhenTopicIsNull() {
         CreateProposalRequest request = new CreateProposalRequest(null);
 
@@ -74,7 +77,7 @@ class ProposalServiceTest {
     }
 
     @Test
-    @DisplayName("request topic null test")
+    @DisplayName("save 예외 테스트 - topic이 빈 문자열일 때")
     void save_ShouldThrowException_WhenTopicIsEmpty() {
         CreateProposalRequest request = new CreateProposalRequest("");
 
@@ -85,7 +88,7 @@ class ProposalServiceTest {
     }
 
     @Test
-    @DisplayName("request topic blank test")
+    @DisplayName("save 예외 테스트 - topic이 공백 문자열일 때")
     void save_ShouldThrowException_WhenTopicIsBlankString() {
         CreateProposalRequest request = new CreateProposalRequest("   ");
 
