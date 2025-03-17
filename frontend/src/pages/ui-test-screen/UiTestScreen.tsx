@@ -1,10 +1,10 @@
 import React from "react";
-import { View } from "react-native";
+import { View, StyleSheet } from "react-native";
 import Button from "../../components/Button";
 
 const UiTestScreen = () => {
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+    <View style={styles.container}>
       {/* 활성화된 다음 버튼 */}
       <Button label="다음" onPress={() => console.log("활성화 버튼 클릭")} />
 
@@ -26,5 +26,13 @@ const UiTestScreen = () => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});
 
 export default UiTestScreen;
