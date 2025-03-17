@@ -1,6 +1,5 @@
 package org.shax3.square.domain.proposal.service;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.proposal.dto.ProposalDto;
 import org.shax3.square.domain.proposal.dto.request.CreateProposalRequest;
@@ -15,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.shax3.square.exception.ExceptionCode.*;
 
@@ -23,7 +21,6 @@ import static org.shax3.square.exception.ExceptionCode.*;
 @RequiredArgsConstructor
 public class ProposalService {
     private final ProposalRepository proposalRepository;
-
 
     @Transactional
     public CreateProposalsResponse save(CreateProposalRequest request, String token) {
@@ -54,12 +51,8 @@ public class ProposalService {
 
     @Transactional(readOnly = true)
     public ProposalsResponse getProposals(String sort, Long nextCursorId, Integer nextCursorLikes, int limit) {
-        List<Proposal> proposals;
-        if ("likes".equals(sort)) {
-            proposals = proposalRepository.findProposalsByLikes(nextCursorId, nextCursorLikes, limit);
-        } else {
-            proposals = proposalRepository.findProposalsByLatest(nextCursorId, limit);
-        }
+
+        List<Proposal> proposals = findProposalsBySort(sort, nextCursorId, nextCursorLikes, limit);
 
         Long newNextCursorId = proposals.isEmpty() ? null : proposals.get(proposals.size() - 1).getId();
         Integer newNextCursorLikes = (proposals.isEmpty() || !"likes".equals(sort))
@@ -71,9 +64,20 @@ public class ProposalService {
             proposalDtos.add(ProposalDto.fromEntity(proposal));
         }
 
-        return new ProposalsResponse(proposalDtos, newNextCursorId, newNextCursorLikes);
+        return ProposalsResponse.builder()
+                .proposals(proposalDtos)
+                .nextCursorId(newNextCursorId)
+                .nextCursorLikes(newNextCursorLikes)
+                .build();
+
     }
 
+    private List<Proposal> findProposalsBySort(String sort, Long nextCursorId, Integer nextCursorLikes, int limit) {
+        if ("likes".equals(sort)) {
+            return proposalRepository.findProposalsByLikes(nextCursorId, nextCursorLikes, limit);
+        }
+        return proposalRepository.findProposalsByLatest(nextCursorId, limit);
+    }
 }
 
 
