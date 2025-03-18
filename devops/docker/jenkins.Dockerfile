@@ -13,14 +13,6 @@ RUN apt-get update && apt-get install -y \
 # Jenkins 유저를 Docker 그룹에 추가
 RUN usermod -aG docker jenkins
 
-# Jenkins 플러그인 설치
-RUN jenkins-plugin-cli --plugins \
-    pipeline-stage-view \
-    docker-plugin \
-    blueocean \
-    git \
-    job-dsl
-
 # Jenkins에서 sudo 사용 가능하게 설정
 RUN echo "jenkins ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
