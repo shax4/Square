@@ -1,5 +1,7 @@
 package org.shax3.square.domain.auth.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -15,10 +17,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Tag(name = "Auth", description = "인증 관련 API")
 public class AuthController {
     private final AuthService authService;
 
-    //임시 로그인
+    @Operation(
+            summary = "임시 로그인 API",
+            description = "email을 입력하면 Access Token과 Refresh Token을 반환합니다."
+    )
     @GetMapping("/test")
     public ResponseEntity<UserInfoResponse> loginTest(
             @RequestParam String email,
