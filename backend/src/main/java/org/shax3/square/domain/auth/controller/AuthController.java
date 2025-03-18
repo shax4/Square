@@ -27,13 +27,13 @@ public class AuthController {
         System.out.println("email:" + email);
         UserLoginDto userLoginDto = authService.loginTest(email);
 
-        if (userLoginDto.getRefreshToken() != null) {
-            Cookie cookie = new Cookie("refresh-token", userLoginDto.getRefreshToken().getToken());
+        if (userLoginDto.refreshToken() != null) {
+            Cookie cookie = new Cookie("refresh-token", userLoginDto.refreshToken().getToken());
             cookie.setHttpOnly(true);
             cookie.setSecure(false);
             cookie.setPath("/");
             response.addCookie(cookie);
-            response.setHeader("Authorization", "Bearer " + userLoginDto.getAccessToken());
+            response.setHeader("Authorization", userLoginDto.accessToken());
         }
 
         return ResponseEntity.ok().body(UserInfoResponse.from(userLoginDto));

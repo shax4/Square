@@ -1,7 +1,6 @@
 package org.shax3.square.domain.auth.dto;
 
 import lombok.Builder;
-import lombok.Getter;
 import org.shax3.square.domain.auth.domain.RefreshToken;
 import org.shax3.square.domain.user.model.SocialType;
 import org.shax3.square.domain.user.model.Type;
@@ -9,16 +8,15 @@ import org.shax3.square.domain.user.model.User;
 import org.shax3.square.domain.user.model.State;
 
 @Builder
-@Getter
-public class UserLoginDto {
-    private final String accessToken;
-    private final RefreshToken refreshToken;
-    private final String nickname;
-    private final Type userType;
-    private final State state;
-    private final SocialType socialType;
-    private boolean isMember;
-
+public record UserLoginDto(
+        String accessToken,
+        RefreshToken refreshToken,
+        String nickname,
+        Type userType,
+        State state,
+        SocialType socialType,
+        boolean isMember
+) {
     public static UserLoginDto createMemberLoginDto(UserTokenDto userTokenDto, User user) {
         return UserLoginDto.builder()
                 .accessToken(userTokenDto.accessToken())
