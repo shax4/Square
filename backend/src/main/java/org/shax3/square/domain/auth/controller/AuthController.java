@@ -24,16 +24,16 @@ public class AuthController {
             @RequestParam String email,
             HttpServletResponse response
     ) {
-        System.out.println("email:" + email);
         UserLoginDto userLoginDto = authService.loginTest(email);
 
-        Cookie cookie = new Cookie("refresh-token", userLoginDto.getRefreshToken().getToken());
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
-        cookie.setPath("/");
-
-        response.addCookie(cookie);
-        response.setHeader("Authorization", "Bearer " + userLoginDto.getAccessToken());
+        if (userLoginDto.refreshToken() != null) {
+            Cookie cookie = new Cookie("refresh-token", userLoginDto.refreshToken().getToken());
+            cookie.setHttpOnly(true);
+            cookie.setSecure(false);
+            cookie.setPath("/");
+            response.addCookie(cookie);
+            response.setHeader("Authorization", userLoginDto.accessToken());
+        }
 
         return ResponseEntity.ok().body(UserInfoResponse.from(userLoginDto));
     }

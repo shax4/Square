@@ -11,7 +11,7 @@ import org.shax3.square.domain.auth.dto.UserLoginDto;
 import org.shax3.square.domain.auth.dto.UserTokenDto;
 import org.shax3.square.domain.auth.repository.RefreshTokenJpaRepository;
 import org.shax3.square.domain.user.model.User;
-import org.shax3.square.domain.user.repository.UserJpaRepository;
+import org.shax3.square.domain.user.repository.UserRepository;
 
 import java.util.Optional;
 
@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*;
 class AuthServiceTest {
 
     @Mock
-    private UserJpaRepository userJpaRepository;
+    private UserRepository userRepository;
 
     @Mock
     private RefreshTokenJpaRepository refreshTokenJpaRepository;
@@ -41,7 +41,7 @@ class AuthServiceTest {
                 .email(email)
                 .build();
 
-        when(userJpaRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
 
         UserTokenDto userTokenDto = mock(UserTokenDto.class);
         RefreshToken refreshToken = RefreshToken.builder().build();
@@ -52,7 +52,7 @@ class AuthServiceTest {
         UserLoginDto result = authService.loginTest(email);
 
         // Then
-        verify(userJpaRepository, times(1)).findByEmail(email);
+        verify(userRepository, times(1)).findByEmail(email);
         verify(tokenUtil, times(1)).createLoginToken(user.getId());
         verify(refreshTokenJpaRepository, times(1)).save(refreshToken);
 
@@ -63,13 +63,13 @@ class AuthServiceTest {
     void loginTest_whenUserDoesNotExist_thenReturnNotMemberLoginDto() {
         // Given
         String email = "notfound@example.com";
-        when(userJpaRepository.findByEmail(email)).thenReturn(Optional.empty());
+        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
 
         // When
         UserLoginDto result = authService.loginTest(email);
 
         // Then
-        verify(userJpaRepository, times(1)).findByEmail(email);
+        verify(userRepository, times(1)).findByEmail(email);
         verifyNoInteractions(tokenUtil);
         verifyNoInteractions(refreshTokenJpaRepository);
 
