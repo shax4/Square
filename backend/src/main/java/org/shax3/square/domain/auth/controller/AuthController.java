@@ -79,7 +79,7 @@ public class AuthController {
             cookie.setSecure(false);
             cookie.setPath("/");
             response.addCookie(cookie);
-            response.setHeader("Authorization", userLoginDto.accessToken());
+            response.setHeader("Authorization", "Bearer " + userLoginDto.accessToken());
 
             return ResponseEntity.ok().body(UserInfoResponse.from(userLoginDto));
         }
