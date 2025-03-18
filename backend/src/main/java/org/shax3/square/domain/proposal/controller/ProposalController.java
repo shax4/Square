@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.proposal.dto.request.CreateProposalRequest;
 import org.shax3.square.domain.proposal.dto.response.CreateProposalsResponse;
-import org.shax3.square.domain.proposal.dto.response.CreateProposalsResponse;
 import org.shax3.square.domain.proposal.dto.response.ProposalsResponse;
 import org.shax3.square.domain.proposal.service.ProposalService;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +30,12 @@ public class ProposalController {
     ) {
         ProposalsResponse response = proposalService.getProposals(sort, nextCursorId, nextCursorLikes, limit);
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{proposalId}")
+    public ResponseEntity<Void> deleteProposal(@PathVariable Long proposalId) {
+        proposalService.deleteProposal(proposalId);
+        return ResponseEntity.ok().build();
     }
 
 }

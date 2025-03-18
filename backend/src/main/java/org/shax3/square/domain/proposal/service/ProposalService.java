@@ -25,14 +25,10 @@ public class ProposalService {
     @Transactional
     public CreateProposalsResponse save(CreateProposalRequest request, String token) {
 
-        if (request == null || request.getTopic() == null || request.getTopic().trim().isEmpty()) {
-            throw new CustomException(INVALID_REQUEST);
-        }
-
         User user = User.builder().build();
 //      User user = 토큰추출기.getuserId(token);
 
-        Proposal proposal = request.toEntity(user);
+        Proposal proposal = request.to(user);
         proposalRepository.save(proposal);
 
         return new CreateProposalsResponse(proposal.getId());
@@ -61,15 +57,10 @@ public class ProposalService {
 
         List<ProposalDto> proposalDtos = new ArrayList<>();
         for (Proposal proposal : proposals) {
-            proposalDtos.add(ProposalDto.fromEntity(proposal));
+            proposalDtos.add(ProposalDto.from(proposal));
         }
 
-        return ProposalsResponse.builder()
-                .proposals(proposalDtos)
-                .nextCursorId(newNextCursorId)
-                .nextCursorLikes(newNextCursorLikes)
-                .build();
-
+        return new ProposalsResponse(proposalDtos, newNextCursorId, newNextCursorLikes);
     }
 
     private List<Proposal> findProposalsBySort(String sort, Long nextCursorId, Integer nextCursorLikes, int limit) {
@@ -77,6 +68,14 @@ public class ProposalService {
             return proposalRepository.findProposalsByLikes(nextCursorId, nextCursorLikes, limit);
         }
         return proposalRepository.findProposalsByLatest(nextCursorId, limit);
+    }
+
+    @Transactional
+    public void deleteProposal(Long id) {
+        Proposal proposal = proposalRepository.findById(id)
+                .orElseThrow(() -> new CustomException(PROPOSAL_NOT_FOUND));
+
+        proposal.softDelete();
     }
 }
 

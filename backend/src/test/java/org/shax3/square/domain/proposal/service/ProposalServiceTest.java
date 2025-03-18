@@ -16,6 +16,7 @@ import org.shax3.square.domain.user.model.User;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -56,11 +57,18 @@ class ProposalServiceTest {
                 Proposal.builder().user(mockUser).topic("Topic 5").build()
         );
 
+        ReflectionTestUtils.setField(mockProposals.get(0), "id", 1L);
+        ReflectionTestUtils.setField(mockProposals.get(1), "id", 2L);
+        ReflectionTestUtils.setField(mockProposals.get(2), "id", 3L);
+        ReflectionTestUtils.setField(mockProposals.get(3), "id", 4L);
+        ReflectionTestUtils.setField(mockProposals.get(4), "id", 5L);
+
         ReflectionTestUtils.setField(mockProposals.get(0), "likeCount", 4);
         ReflectionTestUtils.setField(mockProposals.get(1), "likeCount", 3);
         ReflectionTestUtils.setField(mockProposals.get(2), "likeCount", 5);
         ReflectionTestUtils.setField(mockProposals.get(3), "likeCount", 2);
         ReflectionTestUtils.setField(mockProposals.get(4), "likeCount", 1);
+
     }
 
     @Test
@@ -78,13 +86,13 @@ class ProposalServiceTest {
     @DisplayName("최신순 목록 조회 테스트")
     void getProposals_sort_latest(){
 
-        when(proposalRepository.findProposalsByLatest(null, 3))
+        when(proposalRepository.findProposalsByLatest(null, 5))
                 .thenReturn(mockProposals);
 
-        ProposalsResponse response = proposalService.getProposals("latest", null, null, 3);
+        ProposalsResponse response = proposalService.getProposals("latest", null, null, 5);
 
-        assertThat(response.getProposals()).hasSize(3);
-        assertThat(response.getNextCursorId()).isEqualTo(mockProposals.get(2).getId());
+        assertThat(response.proposals()).hasSize(5);
+        assertThat(response.nextCursorId()).isEqualTo(mockProposals.get(4).getId());
 
     }
 
@@ -102,10 +110,10 @@ class ProposalServiceTest {
 
         ProposalsResponse response = proposalService.getProposals("likes", null, null, 3);
 
-        assertThat(response.getProposals()).hasSize(3);
-        assertThat(response.getProposals().get(0).getLikeCount()).isEqualTo(5);
-        assertThat(response.getProposals().get(1).getLikeCount()).isEqualTo(4);
-        assertThat(response.getProposals().get(2).getLikeCount()).isEqualTo(3);
+        assertThat(response.proposals()).hasSize(3);
+        assertThat(response.proposals().get(0).likeCount()).isEqualTo(5);
+        assertThat(response.proposals().get(1).likeCount()).isEqualTo(4);
+        assertThat(response.proposals().get(2).likeCount()).isEqualTo(3);
     }
 
     @Test
@@ -121,9 +129,27 @@ class ProposalServiceTest {
 
         ProposalsResponse response = proposalService.getProposals("likes", null, 3, 3);
 
-        assertThat(response.getProposals()).hasSize(2);
-        assertThat(response.getProposals().get(0).getLikeCount()).isEqualTo(5);
-        assertThat(response.getProposals().get(1).getLikeCount()).isEqualTo(4);
+        assertThat(response.proposals()).hasSize(2);
+        assertThat(response.proposals().get(0).likeCount()).isEqualTo(5);
+        assertThat(response.proposals().get(1).likeCount()).isEqualTo(4);
     }
 
+    @Test
+    @DisplayName("소프트 딜리트 테스트 - 한번만 호출되는지 검증")
+    void softDeleteProposal() {
+        Proposal proposal = Proposal.builder()
+                .user(mockUser)
+                .topic("Test Proposal")
+                .build();
+        ReflectionTestUtils.setField(proposal, "id", 1L);
+
+        when(proposalRepository.findById(1L)).thenReturn(Optional.of(proposal));
+
+        proposalService.deleteProposal(1L);
+
+        assertThat(proposal.isValid()).isFalse();
+        verify(proposalRepository, times(1)).findById(1L);
+
+    }
 }
+
