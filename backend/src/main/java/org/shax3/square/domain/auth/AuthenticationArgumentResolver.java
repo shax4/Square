@@ -36,13 +36,14 @@ public class AuthenticationArgumentResolver implements HandlerMethodArgumentReso
     public Object resolveArgument(MethodParameter parameter,
                                   ModelAndViewContainer mavContainer,
                                   NativeWebRequest webRequest,
-                                  WebDataBinderFactory binderFactory) throws Exception {
+                                  WebDataBinderFactory binderFactory) {
         HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
 
         if (request == null) {
             throw new CustomException(FAILED_TO_VALIDATE_TOKEN);
         }
 
+        String refreshToken = extractRefreshToken(request);
         String accessToken = extractAccessToken(request);
 
         if (tokenUtil.isAccessTokenValid(accessToken)) {
