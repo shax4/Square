@@ -11,20 +11,22 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerConfig {
 
+    private static final String JWT_SCHEME_NAME = "JWT";
+
     @Bean
     public OpenAPI openAPI() {
-        String jwtSchemeName = "JWT";
+
 
         SecurityScheme securityScheme = new SecurityScheme()
-                .name(jwtSchemeName)
+                .name(JWT_SCHEME_NAME)
                 .type(SecurityScheme.Type.HTTP) // HTTP 인증 방식
                 .scheme("bearer") // Bearer Token 방식
                 .bearerFormat("JWT"); // JWT 형식
 
         return new OpenAPI()
                 .info(apiInfo())
-                .components(new Components().addSecuritySchemes(jwtSchemeName, securityScheme)) // 보안 스키마 추가
-                .addSecurityItem(new SecurityRequirement().addList(jwtSchemeName)); // 보안 요구사항 적용
+                .components(new Components().addSecuritySchemes(JWT_SCHEME_NAME, securityScheme)) // 보안 스키마 추가
+                .addSecurityItem(new SecurityRequirement().addList(JWT_SCHEME_NAME)); // 보안 요구사항 적용
     }
 
 
