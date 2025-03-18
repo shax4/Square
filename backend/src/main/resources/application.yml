@@ -10,7 +10,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ${DB_MYSQL_ID}
     password: ${DB_MYSQL_PASSWORD}
-    url: jdbc:mysql://${DB_MYSQL_URL}/${SERVICE_NAME}
+    url: jdbc:mysql://${DB_MYSQL_HOST}:${DB_MYSQL_PORT}/${SERVICE_NAME}
     hikari:
       connection-timeout: 3000
       maximum-pool-size: 20
