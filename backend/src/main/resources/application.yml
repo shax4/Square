@@ -31,6 +31,7 @@ spring:
       secret-key: ${JWT_SECRET_KEY}
       access-token-expiry: ${JWT_ACCESS_TOKEN_EXPIRY}
       refresh-token-expiry: ${JWT_REFRESH_TOKEN_EXPIRY}
+      sign-up-token-expiry: ${JWT_SIGN_UP_TOKEN_EXPIRY}
 
 springdoc:
   api-docs:
@@ -48,3 +49,9 @@ springdoc:
     disable-swagger-default-url: true
     persist-authorization: true
 
+
+oauth2:
+  google:
+    client-id: ${GOOGLE_CLIENT_ID}
+    client-secret: ${GOOGLE_CLIENT_SECRET}
+    redirect-uri: ${GOOGLE_REDIRECT_URI}
