@@ -36,5 +36,7 @@ public class Proposal {
         this.likeCount = 0;
         this.isValid = true;
     }
-
+    public void softDelete() {
+        this.isValid = false;
+    }
 }

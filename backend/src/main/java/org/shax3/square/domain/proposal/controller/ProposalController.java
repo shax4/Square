@@ -44,4 +44,10 @@ public class ProposalController {
         return ResponseEntity.ok(response);
     }
 
+    @DeleteMapping("/{proposalId}")
+    public ResponseEntity<Void> deleteProposal(@PathVariable Long proposalId) {
+        proposalService.deleteProposal(proposalId);
+        return ResponseEntity.ok().build();
+    }
+
 }
