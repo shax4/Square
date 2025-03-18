@@ -23,10 +23,10 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class AuthController {
 
-    @Value("${GOOGLE_REDIRECT_URI}")
+    @Value("${oauth2.google.redirect-uri}")
     private String googleRedirectUri;
 
-    @Value("${GOOGLE_CLIENT_ID}")
+    @Value("${oauth2.google.client-id}")
     private String googleClientId;
 
     private final AuthService authService;
