@@ -28,6 +28,9 @@ class AuthServiceTest {
     private RefreshTokenJpaRepository refreshTokenJpaRepository;
 
     @Mock
+    private GoogleAuthService googleAuthService;
+
+    @Mock
     private TokenUtil tokenUtil;
 
     @InjectMocks
@@ -36,16 +39,17 @@ class AuthServiceTest {
     @Test
     void loginTest_whenUserExists_thenReturnMemberLoginDto() {
         // Given
-        String email = "test";
+        String email = "test@example.com";
         User user = User.builder()
                 .email(email)
                 .build();
 
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
 
-        UserTokenDto userTokenDto = mock(UserTokenDto.class);
+        // DTO는 Mock이 아니라 실제 객체 생성
         RefreshToken refreshToken = RefreshToken.builder().build();
-        when(userTokenDto.refreshToken()).thenReturn(refreshToken);
+        UserTokenDto userTokenDto = new UserTokenDto("accessToken", refreshToken);
+
         when(tokenUtil.createLoginToken(user.getId())).thenReturn(userTokenDto);
 
         // When
@@ -56,7 +60,10 @@ class AuthServiceTest {
         verify(tokenUtil, times(1)).createLoginToken(user.getId());
         verify(refreshTokenJpaRepository, times(1)).save(refreshToken);
 
+        // 명확한 값 검증
         assertThat(result).isNotNull();
+        assertThat(result.accessToken()).isEqualTo("accessToken");
+        assertThat(result.email()).isNull();
     }
 
     @Test
@@ -74,5 +81,61 @@ class AuthServiceTest {
         verifyNoInteractions(refreshTokenJpaRepository);
 
         assertThat(result).isNotNull();
+        assertThat(result.accessToken()).isNull();
+        assertThat(result.email()).isEqualTo(email);
+    }
+
+    @Test
+    void googleLogin_whenUserExists_thenReturnMemberLoginDto() {
+        // Given
+        String code = "authCode";
+        String email = "test@example.com";
+        User user = User.builder()
+                .email(email)
+                .build();
+
+        when(googleAuthService.googleCallback(code)).thenReturn(email);
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+
+        RefreshToken refreshToken = RefreshToken.builder().build();
+        UserTokenDto userTokenDto = new UserTokenDto("accessToken", refreshToken);
+
+        when(tokenUtil.createLoginToken(user.getId())).thenReturn(userTokenDto);
+
+        // When
+        UserLoginDto result = authService.googleLogin(code);
+
+        // Then
+        verify(googleAuthService, times(1)).googleCallback(code);
+        verify(userRepository, times(1)).findByEmail(email);
+        verify(tokenUtil, times(1)).createLoginToken(user.getId());
+        verify(refreshTokenJpaRepository, times(1)).save(refreshToken);
+
+        assertThat(result).isNotNull();
+        assertThat(result.accessToken()).isEqualTo("accessToken");
+        assertThat(result.email()).isNull();
+    }
+
+    @Test
+    void googleLogin_whenUserDoesNotExist_thenReturnNotMemberLoginDto() {
+        // Given
+        String code = "authCode";
+        String email = "newuser@example.com";
+
+        when(googleAuthService.googleCallback(code)).thenReturn(email);
+        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+
+        // When
+        UserLoginDto result = authService.googleLogin(code);
+
+        // Then
+        verify(googleAuthService, times(1)).googleCallback(code);
+        verify(userRepository, times(1)).findByEmail(email);
+        verifyNoInteractions(tokenUtil);
+        verifyNoInteractions(refreshTokenJpaRepository);
+
+        assertThat(result).isNotNull();
+        assertThat(result.accessToken()).isNull();
+        assertThat(result.email()).isEqualTo(email);
     }
 }
