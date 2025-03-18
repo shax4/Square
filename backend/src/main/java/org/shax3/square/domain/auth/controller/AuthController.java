@@ -24,7 +24,6 @@ public class AuthController {
             @RequestParam String email,
             HttpServletResponse response
     ) {
-        System.out.println("email:" + email);
         UserLoginDto userLoginDto = authService.loginTest(email);
 
         if (userLoginDto.refreshToken() != null) {

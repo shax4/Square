@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.shax3.square.domain.auth.annotation.AuthUser;
 import org.shax3.square.domain.user.model.User;
-import org.shax3.square.domain.user.repository.UserJpaRepository;
+import org.shax3.square.domain.user.repository.UserRepository;
 import org.shax3.square.exception.CustomException;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
@@ -24,7 +24,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 @RequiredArgsConstructor
 @Slf4j
 public class AuthenticationArgumentResolver implements HandlerMethodArgumentResolver {
-    private final UserJpaRepository userJpaRepository;
+    private final UserRepository userRepository;
     private final TokenUtil tokenUtil;
 
     @Override
@@ -78,7 +78,7 @@ public class AuthenticationArgumentResolver implements HandlerMethodArgumentReso
     private User extractUser(String accessToken) {
         Long userId = Long.valueOf(tokenUtil.getSubject(accessToken));
 
-        return userJpaRepository.findById(userId)
+        return userRepository.findById(userId)
             .orElseThrow(() -> new CustomException(INVALID_REQUEST));
     }
 }
