@@ -10,7 +10,7 @@ const BlueBarChart = (data:BarChartComponentProps) => {
         return data.map((item, idx) => ({
           value: item.value,
           label: item.label,
-          frontColor: idx === highlightIdx ? "#0066FF" : "#EAF2FE",
+          frontColor: idx === highlightIdx ? "#0066FF" : "#DCEAFF",
           labelTextStyle: { color: "gray", fontWeight: "bold" },
           topLabelComponent: () => (
             <Text
@@ -32,10 +32,15 @@ const BlueBarChart = (data:BarChartComponentProps) => {
     return (
         <BarChart
             barWidth={35}
-            noOfSections={3}
-            barBorderRadius={12}
-            frontColor="#EAF2FE"
+            noOfSections={2}
+            barBorderTopLeftRadius={12}
+            barBorderTopRightRadius={12}
+            barBorderBottomLeftRadius={3}
+            barBorderBottomRightRadius={3}
+            yAxisLabelSuffix={'%'}
+            frontColor="#DCEAFF"
             data={barData}
+            hideRules
             yAxisThickness={0}
             xAxisThickness={0}
             height={120}
