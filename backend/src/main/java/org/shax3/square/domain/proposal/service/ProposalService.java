@@ -23,10 +23,7 @@ public class ProposalService {
     private final ProposalRepository proposalRepository;
 
     @Transactional
-    public CreateProposalsResponse save(CreateProposalRequest request, String token) {
-
-        User user = User.builder().build();
-//      User user = 토큰추출기.getuserId(token);
+    public CreateProposalsResponse save(CreateProposalRequest request, User user) {
 
         Proposal proposal = request.to(user);
         proposalRepository.save(proposal);
