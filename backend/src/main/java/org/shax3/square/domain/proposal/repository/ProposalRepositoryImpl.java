@@ -22,6 +22,8 @@ public class ProposalRepositoryImpl implements ProposalRepositoryCustom {
             builder.and(proposal.id.lt(nextCursorId));
         }
 
+        builder.and(proposal.isValid.isTrue());
+
         return queryFactory
                 .selectFrom(proposal)
                 .where(builder)
@@ -43,6 +45,7 @@ public class ProposalRepositoryImpl implements ProposalRepositoryCustom {
                                     .and(proposal.id.lt(nextCursorId)))
             );
         }
+        builder.and(proposal.isValid.isTrue());
 
         return queryFactory
                 .selectFrom(proposal)
