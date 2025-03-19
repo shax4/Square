@@ -9,6 +9,7 @@ import org.shax3.square.domain.debate.repository.VoteRepository;
 import org.shax3.square.domain.user.model.User;
 import org.shax3.square.exception.CustomException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.shax3.square.exception.ExceptionCode.*;
 
@@ -19,7 +20,7 @@ public class VoteService {
     private final VoteRepository voteRepository;
     private final DebateService debateService;
 
-
+    @Transactional
     public VoteResponse vote(VoteRequest request, Long debateId, User user) {
         Debate debate = debateService.findDebateById(debateId);
 

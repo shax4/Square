@@ -10,7 +10,7 @@ public record VoteResponse(
 {
         public static VoteResponse of(int leftCount, int rightCount,int totalVoteCount) {
 
-                int leftPercent = (totalVoteCount == 0) ? 0 : (int) ((leftCount * 100) / totalVoteCount);
+                int leftPercent = (int) Math.round((leftCount * 100.0) / totalVoteCount);
                 int rightPercent = 100 - leftPercent;
 
                 return new VoteResponse(leftCount, rightCount, leftPercent, rightPercent, totalVoteCount);
