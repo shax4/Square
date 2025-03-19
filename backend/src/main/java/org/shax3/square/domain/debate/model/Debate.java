@@ -18,7 +18,7 @@ public class Debate {
     private String Topic;
 
     @Column(name ="is_valid",nullable = false)
-    private boolean isValid;
+    private boolean valid;
 
     @Column (nullable = false)
     private String leftOption;
