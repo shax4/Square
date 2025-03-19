@@ -25,3 +25,9 @@ spring:
         format_sql: false
         use_sql_comments: false
     database-platform: org.hibernate.dialect.MySQLDialect
+
+  auth:
+    jwt:
+      secret-key: ${JWT_SECRET_KEY}
+      access-token-expiry: ${JWT_ACCESS_TOKEN_EXPIRY}
+      refresh-token-expiry: ${JWT_REFRESH_TOKEN_EXPIRY}
