@@ -1,10 +1,7 @@
 package org.shax3.square.domain.debate.model;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.shax3.square.domain.user.model.*;
 
 import static jakarta.persistence.EnumType.STRING;
@@ -12,7 +9,7 @@ import static jakarta.persistence.EnumType.STRING;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "vote")
 public class Vote {
 
@@ -48,7 +45,20 @@ public class Vote {
     @Column(name = "type")
     private Type type;
 
-    @Column(nullable = false)
-    private boolean isLeft;
+    @Column(name = "is_left", nullable = false) // 명시적으로 컬럼 이름 지정
+    private boolean left;
 
+
+    @Builder
+    public Vote(Debate debate, User user, Region region, Gender gender, AgeRange ageRange, Religion religion, Type type, boolean left) {
+        this.debate = debate;
+        this.user = user;
+        this.region = region;
+        this.gender = gender;
+        this.ageRange = ageRange;
+        this.religion = religion;
+        this.type = type;
+        this.left = left;
+    }
 }
+
