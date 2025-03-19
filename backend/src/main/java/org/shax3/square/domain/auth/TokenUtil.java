@@ -22,19 +22,22 @@ public class TokenUtil {
     private final SecretKey secretKey;
     private final Long accessTokenExpiry;
     private final Long refreshTokenExpiry;
+    private final Long signUpTokenExpiry;
 
     public TokenUtil(
             @Value("${spring.auth.jwt.secret-key}") final String secretKey,
             @Value("${spring.auth.jwt.access-token-expiry}") final Long accessTokenExpiry,
-            @Value("${spring.auth.jwt.refresh-token-expiry}") final Long refreshTokenExpiry
+            @Value("${spring.auth.jwt.refresh-token-expiry}") final Long refreshTokenExpiry,
+            @Value("${spring.auth.jwt.sign-up-token-expiry}") final Long signUpTokenExpiry
     ) {
         this.secretKey = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
         this.accessTokenExpiry = accessTokenExpiry;
         this.refreshTokenExpiry = refreshTokenExpiry;
+        this.signUpTokenExpiry = signUpTokenExpiry;
     }
 
     public UserTokenDto createLoginToken(Long subject) {
-        String accessToken = createAccessToken(subject.toString(), accessTokenExpiry);
+        String accessToken = createToken(subject.toString(), accessTokenExpiry);
         String refreshToken = generateRefreshToken();
         RefreshToken userRefreshToken = RefreshToken.createRefreshToken(
                 subject,
@@ -44,7 +47,13 @@ public class TokenUtil {
         return new UserTokenDto(accessToken, userRefreshToken);
     }
 
-    private String createAccessToken(String subject, Long expiredMs) {
+    public String createSignUpToken(String email, String socialType) {
+        String subject = email + ":" + socialType;
+
+        return createToken(subject, signUpTokenExpiry);
+    }
+
+    private String createToken(String subject, Long expiredMs) {
         return Jwts.builder()
                 .setSubject(subject) // 주체 (유저 ID 또는 이메일 등)
                 .setIssuedAt(new Date(System.currentTimeMillis())) // 발급 시간

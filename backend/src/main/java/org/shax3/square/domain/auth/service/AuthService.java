@@ -14,23 +14,42 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
+
     private final UserRepository userRepository;
     private final RefreshTokenJpaRepository refreshTokenJpaRepository;
     private final TokenUtil tokenUtil;
+    private final GoogleAuthService googleAuthService;
+
 
     public UserLoginDto loginTest(String email) {
         Optional<User> user = userRepository.findByEmail(email);
 
-        User loginUser;
         if (user.isPresent()) {
-            loginUser = user.get();
+            User loginUser = user.get();
             UserTokenDto userTokens = tokenUtil.createLoginToken(loginUser.getId());
             refreshTokenJpaRepository.save(userTokens.refreshToken());
 
             return UserLoginDto.createMemberLoginDto(userTokens, loginUser);
         }
 
-        return UserLoginDto.createNotMemberLoginDto();
+        return UserLoginDto.createNotMemberLoginDto(email);
+    }
+
+    public UserLoginDto googleLogin(String code) {
+
+        String email = googleAuthService.googleCallback(code);
+
+        Optional<User> user = userRepository.findByEmail(email);
+
+        if (user.isPresent()) {
+            User loginUser = user.get();
+            UserTokenDto userTokens = tokenUtil.createLoginToken(loginUser.getId());
+            refreshTokenJpaRepository.save(userTokens.refreshToken());
+
+            return UserLoginDto.createMemberLoginDto(userTokens, loginUser);
+        }
+
+        return UserLoginDto.createNotMemberLoginDto(email);
     }
 
 
