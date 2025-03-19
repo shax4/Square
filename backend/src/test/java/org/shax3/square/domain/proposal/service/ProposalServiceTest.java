@@ -75,7 +75,7 @@ class ProposalServiceTest {
     @DisplayName("청원 저장 성공 테스트")
     void save_success() {
         CreateProposalRequest request = new CreateProposalRequest("Sample Proposal");
-        CreateProposalsResponse response = proposalService.save(request, "mock-token");
+        CreateProposalsResponse response = proposalService.save(request, mockUser);
 
         assertThat(response).isNotNull();
         verify(proposalRepository, times(1)).save(any(Proposal.class));
