@@ -61,7 +61,6 @@ public class AuthController {
     @GetMapping("/google")
     public void loginWithGoogle(HttpServletResponse response) throws IOException {
         String encodedRedirectUri = URLEncoder.encode(googleRedirectUri, StandardCharsets.UTF_8);
-        System.out.println(encodedRedirectUri);
         String googleAuthUrl = "https://accounts.google.com/o/oauth2/v2/auth"
                 + "?client_id=" + googleClientId
                 + "&redirect_uri=" + encodedRedirectUri
