@@ -17,6 +17,12 @@ public enum Category {
         this.koreanName = koreanName;
     }
 
+    static {
+        for (Category category : Category.values()) {
+            KOREAN_NAME_TO_CATEGORY_MAP.put(category.koreanName, category);
+        }
+    }
+
     public static Category fromKoreanName(String koreanName) {
         return KOREAN_NAME_TO_CATEGORY_MAP.get(koreanName);
     }
