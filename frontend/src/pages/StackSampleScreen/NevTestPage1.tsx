@@ -7,6 +7,7 @@ type StackParamList = {
     NevTestPage1: undefined;
     NevTestPage2: undefined;
     NevTestPage3: undefined;
+    UiTestScreen: undefined;
 };
 
 export default function NevTestPage1() {
@@ -17,6 +18,9 @@ export default function NevTestPage1() {
             <Text>Page 1</Text>
             <TouchableOpacity onPress={() => navigation.navigate('NevTestPage2')}>
                 <Text>Go to Page 2</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('UiTestScreen')}>
+                <Text>Go to UI Test Page</Text>
             </TouchableOpacity>
         </View>
     );

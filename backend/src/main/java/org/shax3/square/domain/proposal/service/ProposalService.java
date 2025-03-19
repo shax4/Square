@@ -1,8 +1,10 @@
 package org.shax3.square.domain.proposal.service;
 
 import lombok.RequiredArgsConstructor;
+import org.shax3.square.domain.proposal.dto.ProposalDto;
 import org.shax3.square.domain.proposal.dto.request.CreateProposalRequest;
-import org.shax3.square.domain.proposal.dto.response.ProposalResponse;
+import org.shax3.square.domain.proposal.dto.response.CreateProposalsResponse;
+import org.shax3.square.domain.proposal.dto.response.ProposalsResponse;
 import org.shax3.square.domain.proposal.model.Proposal;
 import org.shax3.square.domain.proposal.repository.ProposalRepository;
 import org.shax3.square.domain.user.model.User;
@@ -10,19 +12,18 @@ import org.shax3.square.exception.CustomException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import static org.shax3.square.exception.ExceptionCode.INVALID_REQUEST;
-import static org.shax3.square.exception.ExceptionCode.PROPOSAL_NOT_FOUND;
+import static org.shax3.square.exception.ExceptionCode.*;
 
 @Service
 @RequiredArgsConstructor
 public class ProposalService {
-
     private final ProposalRepository proposalRepository;
 
     @Transactional
-    public ProposalResponse save(CreateProposalRequest request, String token) {
+    public CreateProposalsResponse save(CreateProposalRequest request, String token) {
 
         if (request == null || request.getTopic() == null || request.getTopic().trim().isEmpty()) {
             throw new CustomException(INVALID_REQUEST);
@@ -34,7 +35,7 @@ public class ProposalService {
         Proposal proposal = request.toEntity(user);
         proposalRepository.save(proposal);
 
-        return new ProposalResponse(proposal.getId());
+        return new CreateProposalsResponse(proposal.getId());
     }
 
     @Transactional(readOnly = true)
@@ -48,5 +49,36 @@ public class ProposalService {
                 .orElseThrow(() -> new CustomException(PROPOSAL_NOT_FOUND));
     }
 
+    @Transactional(readOnly = true)
+    public ProposalsResponse getProposals(String sort, Long nextCursorId, Integer nextCursorLikes, int limit) {
 
+        List<Proposal> proposals = findProposalsBySort(sort, nextCursorId, nextCursorLikes, limit);
+
+        Long newNextCursorId = proposals.isEmpty() ? null : proposals.get(proposals.size() - 1).getId();
+        Integer newNextCursorLikes = (proposals.isEmpty() || !"likes".equals(sort))
+                ? null  // 기본값을 null로 설정
+                : proposals.get(proposals.size() - 1).getLikeCount();
+
+        List<ProposalDto> proposalDtos = new ArrayList<>();
+        for (Proposal proposal : proposals) {
+            proposalDtos.add(ProposalDto.fromEntity(proposal));
+        }
+
+        return ProposalsResponse.builder()
+                .proposals(proposalDtos)
+                .nextCursorId(newNextCursorId)
+                .nextCursorLikes(newNextCursorLikes)
+                .build();
+
+    }
+
+    private List<Proposal> findProposalsBySort(String sort, Long nextCursorId, Integer nextCursorLikes, int limit) {
+        if ("likes".equals(sort)) {
+            return proposalRepository.findProposalsByLikes(nextCursorId, nextCursorLikes, limit);
+        }
+        return proposalRepository.findProposalsByLatest(nextCursorId, limit);
+    }
 }
+
+
+
