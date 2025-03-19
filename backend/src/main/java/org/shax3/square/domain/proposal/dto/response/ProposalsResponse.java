@@ -1,5 +1,8 @@
 package org.shax3.square.domain.proposal.dto.response;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 import org.shax3.square.domain.proposal.dto.ProposalDto;
 import org.shax3.square.domain.proposal.model.Proposal;
 
@@ -23,3 +26,4 @@ public record ProposalsResponse(
         return new ProposalsResponse(proposalDtos, newNextCursorId, newNextCursorLikes);
     }
 }
+

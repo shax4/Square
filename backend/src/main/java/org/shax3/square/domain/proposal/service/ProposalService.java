@@ -12,6 +12,7 @@ import org.shax3.square.exception.CustomException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.shax3.square.exception.ExceptionCode.*;
@@ -35,6 +36,7 @@ public class ProposalService {
 
     @Transactional(readOnly = true)
     public ProposalsResponse getProposals(String sort, Long nextCursorId, Integer nextCursorLikes, int limit) {
+
         List<Proposal> proposals = findProposalsBySort(sort, nextCursorId, nextCursorLikes, limit);
         return ProposalsResponse.of(proposals, sort);
     }
