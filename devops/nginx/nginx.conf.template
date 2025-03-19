@@ -8,10 +8,6 @@ http {
     include       mime.types;
     default_type  application/octet-stream;
 
-    upstream backend {
-        server backend-service:8080;
-    }
-
     server {
         listen 80;
         server_name ${SERVER_DOMAIN};
