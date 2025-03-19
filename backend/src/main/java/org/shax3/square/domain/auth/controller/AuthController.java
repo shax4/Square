@@ -72,7 +72,7 @@ public class AuthController {
     }
 
     @GetMapping("/callback/google")
-    public ResponseEntity<UserInfoResponse> redirectGoole(
+    public ResponseEntity<UserInfoResponse> redirectGoogle(
             @RequestParam("code") String code,
             HttpServletResponse response
     ) {
