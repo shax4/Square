@@ -44,6 +44,10 @@ public class ProposalController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+            summary = "청원 삭제",
+            description = "청원을 삭제하는 API입니다. JWT 토큰이 필요합니다."
+    )
     @DeleteMapping("/{proposalId}")
     public ResponseEntity<Void> deleteProposal(@PathVariable Long proposalId) {
         proposalService.deleteProposal(proposalId);
