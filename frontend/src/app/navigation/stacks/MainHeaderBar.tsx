@@ -1,7 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
-import { Ionicons, MaterialCommunityIcons, MaterialIcons, Feather } from '@expo/vector-icons';
+import { Icons } from '../../../../assets/icons/Icons';
 
 import NevTestPage1 from '../../../pages/StackSampleScreen/NevTestPage1';
 import NevTestPage2 from '../../../pages/StackSampleScreen/NevTestPage2';
@@ -40,7 +40,7 @@ export default function HeaderBar() {
                         return (
                             <View style={styles.headerRightItems}>
                                 <TouchableOpacity onPress={() => console.log("주제 청원으로 이동 메서드")}>
-                                    <MaterialIcons name="add-circle-outline" size={24} color="black" />
+                                    <Icons.add/>
                                 </TouchableOpacity>
                             </View>
 
@@ -59,10 +59,10 @@ export default function HeaderBar() {
                         return (
                             <View style={styles.headerRightItems}>
                                 <TouchableOpacity onPress={() => console.log("공유")}>
-                                    <Feather name="share" size={24} color="black" />
+                                    <Icons.share/>
                                 </TouchableOpacity>
-                                <TouchableOpacity onPress={() => console.log("북마크ㅗ")}>
-                                    <Ionicons name="bookmark" size={24} />
+                                <TouchableOpacity onPress={() => console.log("북마크")}>
+                                    <Icons.bookmark/>
                                 </TouchableOpacity>
                             </View>
 
@@ -96,16 +96,16 @@ function HeaderRightIcons({ isAuthor }: { isAuthor: boolean }) {
             {isAuthor ? (
                 <>
                     <TouchableOpacity onPress={() => console.log('수정')}>
-                        <Ionicons name="pencil" size={24} />
+                        <Icons.edit/>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => console.log('삭제')}>
-                        <Ionicons name="trash" size={24} />
+                        <Icons.delete/>
                     </TouchableOpacity>
                 </>
             ) : (
                 <>
                     <TouchableOpacity onPress={() => console.log('신고')}>
-                        <MaterialCommunityIcons name="alarm-light" size={24} />
+                        <Icons.report/>
                     </TouchableOpacity>
                 </>
             )}
