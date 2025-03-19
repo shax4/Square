@@ -1,6 +1,7 @@
 package org.shax3.square.domain.auth;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -72,10 +73,21 @@ public class TokenUtil {
     public boolean isAccessTokenValid(String accessToken) {
         try {
             parseToken(accessToken);
-            return true;
         } catch (JwtException e) {
             return false;
         }
+        return true;
+    }
+
+    public Long isAccessTokenExpired(String accessToken) {
+        try {
+            parseToken(accessToken);
+        } catch (ExpiredJwtException e) {
+            return Long.parseLong(e.getClaims().getSubject());
+        } catch (JwtException e) {
+            return null;
+        }
+        return null;
     }
 
     private Jws<Claims> parseToken(String accessToken) {

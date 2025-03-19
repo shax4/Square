@@ -11,7 +11,10 @@ import org.shax3.square.domain.auth.dto.response.UserInfoResponse;
 import org.shax3.square.domain.auth.service.AuthService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -99,5 +102,17 @@ public class AuthController {
         response.addCookie(cookie);
 
         return ResponseEntity.ok().body(UserInfoResponse.from(userLoginDto));
+    }
+
+    @PostMapping("/reissue")
+    public ResponseEntity<Void> reissueToken(
+            @CookieValue("refresh-token") String refreshToken,
+            @RequestHeader("Authorization") String authHeader,
+            HttpServletResponse response
+    ) {
+        String reissuedToken = authService.reissueAccessToken(refreshToken, authHeader);
+
+        response.setHeader("Authorization", "Bearer " + reissuedToken);
+        return ResponseEntity.ok().build();
     }
 }
