@@ -25,4 +25,12 @@ public class Debate {
 
     @Column (nullable = false)
     private String rightOption;
+
+    @Builder
+    public Debate(String topic, String leftOption, String rightOption) {
+        this.Topic = topic;
+        this.leftOption = leftOption;
+        this.rightOption = rightOption;
+        this.valid = true;
+    }
 }
