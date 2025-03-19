@@ -61,6 +61,10 @@ public class AuthController {
         return ResponseEntity.ok().body(UserInfoResponse.from(userLoginDto));
     }
 
+    @Operation(
+            summary = "구글 로그인 API",
+            description = "구글 로그인으로 연결되는 api입니다."
+    )
     @GetMapping("/google")
     public void loginWithGoogle(HttpServletResponse response) throws IOException {
         String encodedRedirectUri = URLEncoder.encode(googleRedirectUri, StandardCharsets.UTF_8);
@@ -104,6 +108,10 @@ public class AuthController {
         return ResponseEntity.ok().body(UserInfoResponse.from(userLoginDto));
     }
 
+    @Operation(
+            summary = "엑세스 토큰 재발급 api",
+            description = "엑세스 토큰을 재발급해 header에 넣어줍니다."
+    )
     @PostMapping("/reissue")
     public ResponseEntity<Void> reissueToken(
             @CookieValue("refresh-token") String refreshToken,
