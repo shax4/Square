@@ -10,6 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.shax3.square.exception.ExceptionCode.*;
 
+
+import static org.shax3.square.exception.ExceptionCode.*;
+
 @Service
 @RequiredArgsConstructor
 public class DebateService {
