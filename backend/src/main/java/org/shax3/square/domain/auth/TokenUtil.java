@@ -28,7 +28,7 @@ public class TokenUtil {
             @Value("${spring.auth.jwt.secret-key}") final String secretKey,
             @Value("${spring.auth.jwt.access-token-expiry}") final Long accessTokenExpiry,
             @Value("${spring.auth.jwt.refresh-token-expiry}") final Long refreshTokenExpiry,
-            @Value("${JWT_SIGN_UP_TOKEN_EXPIRY}") final Long signUpTokenExpiry
+            @Value("${spring.auth.jwt.sign-up-token-expiry}") final Long signUpTokenExpiry
     ) {
         this.secretKey = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
         this.accessTokenExpiry = accessTokenExpiry;
