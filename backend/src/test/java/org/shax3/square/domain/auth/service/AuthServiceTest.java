@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.shax3.square.domain.auth.TokenUtil;
-import org.shax3.square.domain.auth.domain.RefreshToken;
+import org.shax3.square.domain.auth.model.RefreshToken;
 import org.shax3.square.domain.auth.dto.UserLoginDto;
 import org.shax3.square.domain.auth.dto.UserTokenDto;
 import org.shax3.square.domain.auth.repository.RefreshTokenJpaRepository;

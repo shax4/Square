@@ -3,7 +3,7 @@ package org.shax3.square.domain.auth.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.TokenUtil;
-import org.shax3.square.domain.auth.domain.RefreshToken;
+import org.shax3.square.domain.auth.model.RefreshToken;
 import org.shax3.square.domain.auth.dto.UserLoginDto;
 import org.shax3.square.domain.auth.dto.UserTokenDto;
 import org.shax3.square.domain.auth.repository.RefreshTokenJpaRepository;

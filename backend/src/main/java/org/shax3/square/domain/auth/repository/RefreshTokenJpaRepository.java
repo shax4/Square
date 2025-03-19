@@ -1,6 +1,6 @@
 package org.shax3.square.domain.auth.repository;
 
-import org.shax3.square.domain.auth.domain.RefreshToken;
+import org.shax3.square.domain.auth.model.RefreshToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

@@ -6,7 +6,7 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import org.shax3.square.domain.auth.domain.RefreshToken;
+import org.shax3.square.domain.auth.model.RefreshToken;
 import org.shax3.square.domain.auth.dto.UserTokenDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

@@ -1,4 +1,4 @@
-package org.shax3.square.domain.auth.domain;
+package org.shax3.square.domain.auth.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
