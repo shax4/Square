@@ -1,5 +1,6 @@
 package org.shax3.square.domain.auth.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.TokenUtil;
 import org.shax3.square.domain.auth.dto.UserLoginDto;
@@ -35,6 +36,7 @@ public class AuthService {
         return UserLoginDto.createNotMemberLoginDto(email);
     }
 
+    @Transactional
     public UserLoginDto googleLogin(String code) {
 
         String email = googleAuthService.googleCallback(code);
@@ -43,7 +45,9 @@ public class AuthService {
 
         if (user.isPresent()) {
             User loginUser = user.get();
-            UserTokenDto userTokens = tokenUtil.createLoginToken(loginUser.getId());
+            Long userId = loginUser.getId();
+            UserTokenDto userTokens = tokenUtil.createLoginToken(userId);
+            refreshTokenJpaRepository.deleteById(userId.toString());
             refreshTokenJpaRepository.save(userTokens.refreshToken());
 
             return UserLoginDto.createMemberLoginDto(userTokens, loginUser);

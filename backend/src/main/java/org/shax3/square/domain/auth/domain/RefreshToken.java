@@ -23,10 +23,10 @@ import static lombok.AccessLevel.PROTECTED;
 )
 public class RefreshToken {
 
-    @Column(name = "user_id", nullable = false)
+    @Id
+    @Column(name = "user_id", nullable = false, unique = true)
     private Long userId;
 
-    @Id
     @Column(name = "token", nullable = false)
     private String token;
 
