@@ -9,15 +9,12 @@ type StackParamList = {
     NevTestPage3: undefined;
 };
 
-export default function NevTestPage2() {
+export default function NevTestPage3() {
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
 
     return (
         <View>
-            <Text>Page 2</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('NevTestPage3')}>
-                <Text>Go to Page 3</Text>
-            </TouchableOpacity>
+            <Text>Page 3</Text>
         </View>
     );
 }
