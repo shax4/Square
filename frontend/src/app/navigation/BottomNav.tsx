@@ -3,7 +3,10 @@ import { createBottomTabNavigator  } from "@react-navigation/bottom-tabs";
 import {Ionicons} from '@expo/vector-icons';
 
 import {BoardScreen, MainScreen, MypageScreen, NotificationScreen} from '../../pages'
-import HeaderBar from './stacks/HeaderBar'
+import BoardHeaderBar from './stacks/BoardHeaderBar'
+import NotificationHeaderBar from './stacks/NotificationHeaderBar'
+import MainHeaderBar from './stacks/MainHeaderBar'
+import MyPageHeaderBar from './stacks/MyPageHeaderBar'
 
 // 하단에 표시되는 탭 이름.
 const boardName = '게시판';
@@ -64,10 +67,10 @@ export default function BottomNav(){
                 })}
                 >
 
-                <Tab.Screen name={boardName} component={HeaderBar}/>
-                <Tab.Screen name={mainName} component={MainScreen}/>
-                <Tab.Screen name={notificationName} component={NotificationScreen}/>
-                <Tab.Screen name={mypageName} component={MypageScreen}/>
+                <Tab.Screen name={boardName} component={BoardHeaderBar}/>
+                <Tab.Screen name={mainName} component={MainHeaderBar}/>
+                <Tab.Screen name={notificationName} component={NotificationHeaderBar}/>
+                <Tab.Screen name={mypageName} component={MyPageHeaderBar}/>
             </Tab.Navigator>
         </NavigationContainer>
     )
