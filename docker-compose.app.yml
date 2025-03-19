@@ -8,10 +8,10 @@ services:
     container_name: nginx
     ports:
       - "80:80"
+    environment:
+      SERVER_DOMAIN: ${SERVER_DOMAIN}
     networks:
       - app-network
-    env_file:
-      - ../.env
 
 networks:
   app-network:
