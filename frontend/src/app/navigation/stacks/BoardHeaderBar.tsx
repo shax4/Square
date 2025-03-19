@@ -1,7 +1,8 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+
+import { Icons } from '../../../../assets/icons/Icons';
 
 import NevTestPage1 from '../../../pages/StackSampleScreen/NevTestPage1';
 import NevTestPage2 from '../../../pages/StackSampleScreen/NevTestPage2';
@@ -15,7 +16,7 @@ const currentUser = {
 };
 // 테스트용 예시 게시물 정보(api에서 받아오도록 수정 필요)
 const post = {
-    nickname: '반짝이는하마',
+    nickname: '반짝이는하마1',
 }
 
 // 게시판 상단 탭
@@ -57,19 +58,19 @@ function HeaderRightIcons({ isAuthor }: { isAuthor: boolean }) {
             {isAuthor ? (
                 <>
                     <TouchableOpacity onPress={() => console.log('수정')}>
-                        <Ionicons name="pencil" size={24} />
+                        <Icons.edit/>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => console.log('삭제')}>
-                        <Ionicons name="trash" size={24} />
+                        <Icons.delete/>
                     </TouchableOpacity>
                 </>
             ) : (
                 <>
                     <TouchableOpacity onPress={() => console.log('북마크')}>
-                        <Ionicons name="bookmark" size={24} />
+                        <Icons.bookmark/>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => console.log('신고')}>
-                        <MaterialCommunityIcons name="alarm-light" size={24} />
+                        <Icons.report/>
                     </TouchableOpacity>
                 </>
             )}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
-import { Ionicons, MaterialCommunityIcons, MaterialIcons, Feather } from '@expo/vector-icons';
+import { Icons } from '../../../../assets/icons/Icons';
 
 // 환경설정 탭으로 네비게이션 사용 시
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -36,10 +36,10 @@ export default function HeaderBar() {
                                 console.log("환경 설정으로 이동")
                                 navigation.navigate('NevTestPage2');
                             }}>
-                                <Feather name="settings" size={24} color="black" />
+                                <Icons.settings/>
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => console.log("로그아웃")}>
-                                <Ionicons name="exit-outline" size={24} color="black" />
+                                <Icons.logout/>
                             </TouchableOpacity>
                         </View>
                     ),
