@@ -6,6 +6,8 @@ COPY backend/gradlew backend/gradlew
 COPY backend/gradle backend/gradle
 COPY backend/build.gradle backend/settings.gradle backend/
 
+RUN chmod +x backend/gradlew
+
 # 종속성 캐싱을 위해 dependencies만 먼저 빌드
 RUN cd backend && ./gradlew dependencies --no-daemon
 
