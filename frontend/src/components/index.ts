@@ -18,3 +18,6 @@ export {default as DonutChart} from "./DonutChart"
 
 // 버블 차트 컴포넌트.
 export {default as BubbleChart} from "./BubbleChart"
+
+// 성별 차트 컴포넌트.
+export {default as GenderChart} from "./GenderChart"
