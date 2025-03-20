@@ -7,6 +7,7 @@ import org.shax3.square.domain.auth.model.RefreshToken;
 import org.shax3.square.domain.auth.dto.UserLoginDto;
 import org.shax3.square.domain.auth.dto.UserTokenDto;
 import org.shax3.square.domain.auth.repository.RefreshTokenJpaRepository;
+import org.shax3.square.domain.user.model.SocialType;
 import org.shax3.square.domain.user.model.User;
 import org.shax3.square.domain.user.repository.UserRepository;
 import org.shax3.square.exception.CustomException;
@@ -49,6 +50,8 @@ public class AuthService {
 
         if (user.isPresent()) {
             User loginUser = user.get();
+            checkSocialType(loginUser.getSocialType(), SocialType.GOOGLE);
+
             Long userId = loginUser.getId();
             UserTokenDto userTokens = tokenUtil.createLoginToken(userId);
             refreshTokenJpaRepository.deleteByUserId(userId);
@@ -89,5 +92,12 @@ public class AuthService {
             return;
         }
         throw new CustomException(INVALID_REQUEST);
+    }
+
+    private void checkSocialType (SocialType userSocialType, SocialType loginType) {
+        if (userSocialType == loginType) {
+            return;
+        }
+        throw new CustomException(SOCIAL_TYPE_MISMATCH);
     }
 }
