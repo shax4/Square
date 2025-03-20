@@ -36,21 +36,21 @@ const DonutChart = (data:DonutChartComponentProps) => {
         <View style={{ flexDirection: "row", justifyContent: "center", marginBottom: 10 }}>
           <View style={{ flexDirection: "row", alignItems: "center", width: 120, marginRight: 30 }}>
             {renderDot(colors[0])}
-            <Text style={{ color: "black", fontSize: 16 }}>{dataArray[0].label}: {dataArray[0].value}%</Text>
+            <Text style={{ color: "black", fontSize: 16, fontWeight: "bold" }}>{dataArray[0].label}: {dataArray[0].value}%</Text>
           </View>
           <View style={{ flexDirection: "row", alignItems: "center", width: 120 }}>
             {renderDot(colors[1])}
-            <Text style={{ color: "black", fontSize: 16 }}>{dataArray[1].label}: {dataArray[1].value}%</Text>
+            <Text style={{ color: "black", fontSize: 16, fontWeight: "bold" }}>{dataArray[1].label}: {dataArray[1].value}%</Text>
           </View>
         </View>
         <View style={{ flexDirection: "row", justifyContent: "center" }}>
           <View style={{ flexDirection: "row", alignItems: "center", width: 120, marginRight: 30 }}>
             {renderDot(colors[2])}
-            <Text style={{ color: "black", fontSize: 16 }}>{dataArray[2].label}: {dataArray[2].value}%</Text>
+            <Text style={{ color: "black", fontSize: 16, fontWeight: "bold" }}>{dataArray[2].label}: {dataArray[2].value}%</Text>
           </View>
           <View style={{ flexDirection: "row", alignItems: "center", width: 120 }}>
             {renderDot(colors[3])}
-            <Text style={{ color: "black", fontSize: 16 }}>{dataArray[3].label}: {dataArray[3].value}%</Text>
+            <Text style={{ color: "black", fontSize: 16, fontWeight: "bold" }}>{dataArray[3].label}: {dataArray[3].value}%</Text>
           </View>
         </View>
       </View>
