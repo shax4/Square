@@ -3,13 +3,23 @@ import { StyleSheet, Dimensions } from 'react-native';
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get("window");
 
 export const styles = StyleSheet.create({
+    CardContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
     Card: {
         width: SCREEN_WIDTH * 0.9,
-        height: SCREEN_HEIGHT * 0.5,
+        height: SCREEN_HEIGHT * 0.6,
         backgroundColor: 'white',
         borderRadius: 15,
         overflow: 'hidden',
-        marginBottom: SCREEN_HEIGHT * 0.1,
+    },
+    CardMarginTop: {
+        height: SCREEN_HEIGHT * 0.1,
+    },
+    CardMarginBottom: {
+        height: SCREEN_HEIGHT * 0.3,
     },
     CardHeader: {
         flexDirection: 'row',
@@ -66,5 +76,9 @@ export const styles = StyleSheet.create({
     },
     CardFooterText: {
         color: 'white',
+    },
+    CardListView: {
+        alignItems: 'center',
+        justifyContent: 'center',
     },
 });

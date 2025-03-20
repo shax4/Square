@@ -2,6 +2,8 @@ import React from 'react';
 import { View } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
+import DebateCardList from '../../components/DebateCard/DebateCardList';
+
 
 type StackParamList = {
     DebateCardsScreen: undefined;
@@ -14,7 +16,7 @@ export default function DebateCardsScreen() {
 
     return (
         <View>
-            
+            <DebateCardList />
         </View>
     );
 }

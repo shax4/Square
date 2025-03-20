@@ -1,6 +1,6 @@
 import { CardProps } from "./DebateCard.types";
 
-const cardData: CardProps[] = [
+export const cardData: CardProps[] = [
     {
         debateId: 1,
         category: "연애",
