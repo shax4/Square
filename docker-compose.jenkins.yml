@@ -20,10 +20,9 @@ services:
       - JENKINS_ADMIN_ID=${JENKINS_ADMIN_ID}
       - JENKINS_ADMIN_PASSWORD=${JENKINS_ADMIN_PASSWORD}
       - JENKINS_OPTS=--prefix=/jenkins
+    command: java -jar /usr/share/jenkins/jenkins.war --prefix=/jenkins
     networks:
       - app-network
-    command: >
-      - java -jar /usr/share/jenkins/jenkins.war --prefix=/jenkins
 
 volumes:
   jenkins-home:
