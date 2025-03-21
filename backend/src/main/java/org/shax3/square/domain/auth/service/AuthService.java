@@ -67,7 +67,7 @@ public class AuthService {
     public String reissueAccessToken(String refreshToken, String authHeader) {
         String accessToken = authHeader.split(" ")[1];
 
-        if (tokenUtil.isAccessTokenValid(accessToken)) {
+        if (tokenUtil.isTokenValid(accessToken)) {
             return accessToken;
         }
 
