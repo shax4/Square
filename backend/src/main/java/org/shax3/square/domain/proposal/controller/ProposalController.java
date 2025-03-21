@@ -4,10 +4,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.shax3.square.domain.auth.annotation.AuthUser;
 import org.shax3.square.domain.proposal.dto.request.CreateProposalRequest;
 import org.shax3.square.domain.proposal.dto.response.CreateProposalsResponse;
 import org.shax3.square.domain.proposal.dto.response.ProposalsResponse;
 import org.shax3.square.domain.proposal.service.ProposalService;
+import org.shax3.square.domain.user.model.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,12 +22,12 @@ public class ProposalController {
 
     @Operation(
             summary = "논쟁 주제 제안",
-            description = "사용자가 새로운 논쟁 주제를 제안하는 API입니다. JWT 토큰이 필요합니다."
+            description = "사용자가 새로운 논쟁 주제를 제안하는 API입니다. 인증을 필요로 합니다."
     )
     @PostMapping
     public ResponseEntity<CreateProposalsResponse> createProposal(@Valid @RequestBody CreateProposalRequest request,
-                                                           @RequestHeader("Authorization") String token) {
-        CreateProposalsResponse response = proposalService.save(request, token);
+                                                           @AuthUser User user) {
+        CreateProposalsResponse response = proposalService.save(request, user);
         return ResponseEntity.ok(response);
     }
 
@@ -46,7 +48,8 @@ public class ProposalController {
 
     @Operation(
             summary = "청원 삭제",
-            description = "청원을 삭제하는 API입니다. JWT 토큰이 필요합니다."
+            description = "등록된 청원을 삭제하는 API입니다. 인증을 필요로 합니다."
+
     )
     @DeleteMapping("/{proposalId}")
     public ResponseEntity<Void> deleteProposal(@PathVariable Long proposalId) {

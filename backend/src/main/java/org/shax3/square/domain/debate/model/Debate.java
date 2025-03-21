@@ -17,12 +17,24 @@ public class Debate {
     @Column(nullable = false)
     private String Topic;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
+
     @Column(name ="is_valid",nullable = false)
-    private boolean isValid;
+    private boolean valid;
 
     @Column (nullable = false)
     private String leftOption;
 
     @Column (nullable = false)
     private String rightOption;
+
+    @Builder
+    public Debate(String topic, String leftOption, String rightOption) {
+        this.Topic = topic;
+        this.leftOption = leftOption;
+        this.rightOption = rightOption;
+        this.valid = true;
+    }
 }
