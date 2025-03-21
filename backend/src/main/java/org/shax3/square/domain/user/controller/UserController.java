@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.user.dto.UserSignUpDto;
 import org.shax3.square.domain.user.dto.request.SignUpRequest;
@@ -32,7 +33,7 @@ public class UserController {
     public ResponseEntity<SignUpUserInfoResponse> userSignUp(
             HttpServletResponse response,
             @CookieValue("sign-up-token") String signUpToken,
-            @RequestBody SignUpRequest signUpRequest
+            @Valid @RequestBody SignUpRequest signUpRequest
     ) {
         UserSignUpDto userSignUpDto = userService.signUp(signUpRequest,signUpToken);
 
