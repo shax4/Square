@@ -22,6 +22,8 @@ services:
       - JENKINS_OPTS=--prefix=/jenkins
     networks:
       - app-network
+    command: >
+      - java -jar /usr/share/jenkins/jenkins.war --prefix=/jenkins
 
 volumes:
   jenkins-home:
