@@ -1,6 +1,7 @@
 package org.shax3.square.domain.debate.service;
 
 import lombok.RequiredArgsConstructor;
+import org.shax3.square.domain.debate.dto.VoteResultDto;
 import org.shax3.square.domain.debate.dto.request.VoteRequest;
 import org.shax3.square.domain.debate.dto.response.VoteResponse;
 import org.shax3.square.domain.debate.model.Debate;
@@ -31,10 +32,14 @@ public class VoteService {
         Vote vote = request.to(debate, user);
         voteRepository.save(vote);
 
-        int totalVotes = voteRepository.countByDebate(debate);
-        int leftVotes = voteRepository.countByDebateAndLeftTrue(debate);
-        int rightVotes = totalVotes - leftVotes;
+        VoteResultDto result = calculateVoteResult(debate);
+        return VoteResponse.of(result);
+    }
 
-        return VoteResponse.of(leftVotes, rightVotes, totalVotes);
+    @Transactional(readOnly = true)
+    public VoteResultDto calculateVoteResult(Debate debate) {
+        int total = voteRepository.countByDebate(debate);
+        int left = voteRepository.countByDebateAndLeftTrue(debate);
+        return new VoteResultDto(left, total - left);
     }
 }
