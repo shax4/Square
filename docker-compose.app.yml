@@ -15,33 +15,33 @@ services:
     depends_on:
       - backend
 
-  backend:
-    build:
-      context: .
-      dockerfile: devops/docker/backend.Dockerfile
-    container_name: backend
-    ports:
-      - "8080:8080"
-    environment:
-      # JWT 설정
-      JWT_ACCESS_TOKEN_EXPIRY: ${JWT_ACCESS_TOKEN_EXPIRY}
-      JWT_REFRESH_TOKEN_EXPIRY: ${JWT_REFRESH_TOKEN_EXPIRY}
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
-      JWT_SIGN_UP_TOKEN_EXPIRY: ${JWT_SIGN_UP_TOKEN_EXPIRY}
-
-      # MySQL 설정
-      SPRING_DATASOURCE_URL: jdbc:mysql://${DB_MYSQL_HOST}:${DB_MYSQL_PORT}/${DB_MYSQL_DATABASE}
-      SPRING_DATASOURCE_USERNAME: ${DB_MYSQL_ID}
-      SPRING_DATASOURCE_PASSWORD: ${DB_MYSQL_PASSWORD}
-
-      # Google 로그인 설정
-      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
-      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
-    depends_on:
-      - mysql
-    networks:
-      - app-network
+#  backend:
+#    build:
+#      context: .
+#      dockerfile: devops/docker/backend.Dockerfile
+#    container_name: backend
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      # JWT 설정
+#      JWT_ACCESS_TOKEN_EXPIRY: ${JWT_ACCESS_TOKEN_EXPIRY}
+#      JWT_REFRESH_TOKEN_EXPIRY: ${JWT_REFRESH_TOKEN_EXPIRY}
+#      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+#      JWT_SIGN_UP_TOKEN_EXPIRY: ${JWT_SIGN_UP_TOKEN_EXPIRY}
+#
+#      # MySQL 설정
+#      SPRING_DATASOURCE_URL: jdbc:mysql://${DB_MYSQL_HOST}:${DB_MYSQL_PORT}/${DB_MYSQL_DATABASE}
+#      SPRING_DATASOURCE_USERNAME: ${DB_MYSQL_ID}
+#      SPRING_DATASOURCE_PASSWORD: ${DB_MYSQL_PASSWORD}
+#
+#      # Google 로그인 설정
+#      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
+#      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+#      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+#    depends_on:
+#      - mysql
+#    networks:
+#      - app-network
 
 networks:
   app-network:
