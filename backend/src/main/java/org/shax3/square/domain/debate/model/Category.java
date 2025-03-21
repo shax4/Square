@@ -1,30 +1,24 @@
 package org.shax3.square.domain.debate.model;
 
-import java.util.HashMap;
-import java.util.Map;
 
-public enum Category {
-    POLITICS("정치"),
-    ECONOMY("경제"),
-    TECHNOLOGY("기술"),
-    SOCIETY("사회"),
-    ENVIRONMENT("환경");
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-    private final String koreanName;
-    private static final Map<String, Category> KOREAN_NAME_TO_CATEGORY_MAP = new HashMap<>();
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Table(name = "category")
+public class Category {
 
-    Category(String koreanName) {
-        this.koreanName = koreanName;
-    }
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    static {
-        for (Category category : Category.values()) {
-            KOREAN_NAME_TO_CATEGORY_MAP.put(category.koreanName, category);
-        }
-    }
-
-    public static Category fromKoreanName(String koreanName) {
-        return KOREAN_NAME_TO_CATEGORY_MAP.get(koreanName);
-    }
-
+    @Column(nullable = false, unique = true)
+    private String name;
 }
+

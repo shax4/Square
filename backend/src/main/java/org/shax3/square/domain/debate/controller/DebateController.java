@@ -21,11 +21,11 @@ public class DebateController {
 
 
     @Operation(summary = "토론 투표 API ",
-    description = "해당 토론 주제에 대해 투표를 할 수 있는 기능입니다. 인증을 필요로 합니다."
+            description = "해당 토론 주제에 대해 투표를 할 수 있는 기능입니다. 인증을 필요로 합니다."
     )
     @PostMapping("/vote/{debateId}")
     public ResponseEntity<VoteResponse> vote(@Valid @RequestBody VoteRequest request, @AuthUser User user, @PathVariable Long debateId) {
-        VoteResponse response = voteService.vote(request,debateId,user);
+        VoteResponse response = voteService.vote(request, debateId, user);
         return ResponseEntity.ok(response);
     }
 }

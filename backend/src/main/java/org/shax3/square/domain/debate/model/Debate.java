@@ -17,6 +17,10 @@ public class Debate {
     @Column(nullable = false)
     private String Topic;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
+
     @Column(name ="is_valid",nullable = false)
     private boolean valid;
 
