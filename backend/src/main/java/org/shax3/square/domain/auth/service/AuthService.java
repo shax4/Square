@@ -6,7 +6,7 @@ import org.shax3.square.domain.auth.TokenUtil;
 import org.shax3.square.domain.auth.model.RefreshToken;
 import org.shax3.square.domain.auth.dto.UserLoginDto;
 import org.shax3.square.domain.auth.dto.UserTokenDto;
-import org.shax3.square.domain.auth.repository.RefreshTokenJpaRepository;
+import org.shax3.square.domain.auth.repository.RefreshTokenRepository;
 import org.shax3.square.domain.user.model.SocialType;
 import org.shax3.square.domain.user.model.User;
 import org.shax3.square.domain.user.repository.UserRepository;
@@ -22,7 +22,7 @@ import static org.shax3.square.exception.ExceptionCode.*;
 public class AuthService {
 
     private final UserRepository userRepository;
-    private final RefreshTokenJpaRepository refreshTokenJpaRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final TokenUtil tokenUtil;
     private final GoogleAuthService googleAuthService;
 
@@ -33,7 +33,7 @@ public class AuthService {
         if (user.isPresent()) {
             User loginUser = user.get();
             UserTokenDto userTokens = tokenUtil.createLoginToken(loginUser.getId());
-            refreshTokenJpaRepository.save(userTokens.refreshToken());
+            refreshTokenRepository.save(userTokens.refreshToken());
 
             return UserLoginDto.createMemberLoginDto(userTokens, loginUser);
         }
@@ -54,8 +54,8 @@ public class AuthService {
 
             Long userId = loginUser.getId();
             UserTokenDto userTokens = tokenUtil.createLoginToken(userId);
-            refreshTokenJpaRepository.deleteByUserId(userId);
-            refreshTokenJpaRepository.save(userTokens.refreshToken());
+            refreshTokenRepository.deleteByUserId(userId);
+            refreshTokenRepository.save(userTokens.refreshToken());
 
             return UserLoginDto.createMemberLoginDto(userTokens, loginUser);
         }
@@ -73,7 +73,7 @@ public class AuthService {
 
         Long userId = tokenUtil.isAccessTokenExpired(accessToken);
         if (userId != null) {
-            RefreshToken foundRefreshToken = refreshTokenJpaRepository.findByUserId(userId)
+            RefreshToken foundRefreshToken = refreshTokenRepository.findByUserId(userId)
                     .orElseThrow(() -> new CustomException(INVALID_REFRESH_TOKEN));
 
             validateRefreshToken(refreshToken, foundRefreshToken.getToken());

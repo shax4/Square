@@ -9,7 +9,7 @@ import org.shax3.square.domain.auth.TokenUtil;
 import org.shax3.square.domain.auth.model.RefreshToken;
 import org.shax3.square.domain.auth.dto.UserLoginDto;
 import org.shax3.square.domain.auth.dto.UserTokenDto;
-import org.shax3.square.domain.auth.repository.RefreshTokenJpaRepository;
+import org.shax3.square.domain.auth.repository.RefreshTokenRepository;
 import org.shax3.square.domain.user.model.SocialType;
 import org.shax3.square.domain.user.model.User;
 import org.shax3.square.domain.user.repository.UserRepository;
@@ -28,7 +28,7 @@ class AuthServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private RefreshTokenJpaRepository refreshTokenJpaRepository;
+    private RefreshTokenRepository refreshTokenRepository;
 
     @Mock
     private GoogleAuthService googleAuthService;
@@ -61,7 +61,7 @@ class AuthServiceTest {
         // Then
         verify(userRepository, times(1)).findByEmail(email);
         verify(tokenUtil, times(1)).createLoginToken(user.getId());
-        verify(refreshTokenJpaRepository, times(1)).save(refreshToken);
+        verify(refreshTokenRepository, times(1)).save(refreshToken);
 
         // 명확한 값 검증
         assertThat(result).isNotNull();
@@ -81,7 +81,7 @@ class AuthServiceTest {
         // Then
         verify(userRepository, times(1)).findByEmail(email);
         verifyNoInteractions(tokenUtil);
-        verifyNoInteractions(refreshTokenJpaRepository);
+        verifyNoInteractions(refreshTokenRepository);
 
         assertThat(result).isNotNull();
         assertThat(result.accessToken()).isNull();
@@ -113,7 +113,7 @@ class AuthServiceTest {
         verify(googleAuthService, times(1)).googleCallback(code);
         verify(userRepository, times(1)).findByEmail(email);
         verify(tokenUtil, times(1)).createLoginToken(user.getId());
-        verify(refreshTokenJpaRepository, times(1)).save(refreshToken);
+        verify(refreshTokenRepository, times(1)).save(refreshToken);
 
         assertThat(result).isNotNull();
         assertThat(result.accessToken()).isEqualTo("accessToken");
@@ -136,7 +136,7 @@ class AuthServiceTest {
         verify(googleAuthService, times(1)).googleCallback(code);
         verify(userRepository, times(1)).findByEmail(email);
         verifyNoInteractions(tokenUtil);
-        verifyNoInteractions(refreshTokenJpaRepository);
+        verifyNoInteractions(refreshTokenRepository);
 
         assertThat(result).isNotNull();
         assertThat(result.accessToken()).isNull();
@@ -160,7 +160,7 @@ class AuthServiceTest {
         assertThat(result).isEqualTo(validAccessToken);
         verify(tokenUtil, times(1)).isTokenValid(validAccessToken);
         verify(tokenUtil, never()).isAccessTokenExpired(anyString());
-        verify(refreshTokenJpaRepository, never()).findByUserId(anyLong());
+        verify(refreshTokenRepository, never()).findByUserId(anyLong());
         verify(tokenUtil, never()).createLoginToken(anyLong());
     }
 
@@ -178,7 +178,7 @@ class AuthServiceTest {
 
         RefreshToken foundRefreshToken = mock(RefreshToken.class);
         when(foundRefreshToken.getToken()).thenReturn(providedRefreshToken);
-        when(refreshTokenJpaRepository.findByUserId(userId)).thenReturn(Optional.of(foundRefreshToken));
+        when(refreshTokenRepository.findByUserId(userId)).thenReturn(Optional.of(foundRefreshToken));
 
         UserTokenDto newTokens = mock(UserTokenDto.class);
         String newAccessToken = "newAccessToken";
@@ -194,7 +194,7 @@ class AuthServiceTest {
         assertThat(result).isEqualTo(newAccessToken);
         verify(tokenUtil, times(1)).isTokenValid(expiredAccessToken);
         verify(tokenUtil, times(1)).isAccessTokenExpired(expiredAccessToken);
-        verify(refreshTokenJpaRepository, times(1)).findByUserId(userId);
+        verify(refreshTokenRepository, times(1)).findByUserId(userId);
         verify(tokenUtil, times(1)).createLoginToken(userId);
         verify(foundRefreshToken, times(1)).reissueRefreshToken(newRefreshToken);
     }
@@ -231,7 +231,7 @@ class AuthServiceTest {
         RefreshToken foundRefreshToken = mock(RefreshToken.class);
         // DB에 저장된 refresh token과 전달받은 값이 다름
         when(foundRefreshToken.getToken()).thenReturn("differentRefreshToken");
-        when(refreshTokenJpaRepository.findByUserId(userId)).thenReturn(Optional.of(foundRefreshToken));
+        when(refreshTokenRepository.findByUserId(userId)).thenReturn(Optional.of(foundRefreshToken));
 
         // When & Then
         assertThatThrownBy(() -> authService.reissueAccessToken(providedRefreshToken, authHeader))
@@ -250,7 +250,7 @@ class AuthServiceTest {
 
         when(tokenUtil.isTokenValid(expiredAccessToken)).thenReturn(false);
         when(tokenUtil.isAccessTokenExpired(expiredAccessToken)).thenReturn(userId);
-        when(refreshTokenJpaRepository.findByUserId(userId)).thenReturn(Optional.empty());
+        when(refreshTokenRepository.findByUserId(userId)).thenReturn(Optional.empty());
 
         // When & Then
         assertThatThrownBy(() -> authService.reissueAccessToken(providedRefreshToken, authHeader))
