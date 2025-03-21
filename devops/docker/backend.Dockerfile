@@ -21,5 +21,6 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 COPY --from=builder /app/backend/build/libs/*.jar app.jar
+RUN test -f app.jar
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
