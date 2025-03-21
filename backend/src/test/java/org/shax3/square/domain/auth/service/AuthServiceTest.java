@@ -10,6 +10,7 @@ import org.shax3.square.domain.auth.model.RefreshToken;
 import org.shax3.square.domain.auth.dto.UserLoginDto;
 import org.shax3.square.domain.auth.dto.UserTokenDto;
 import org.shax3.square.domain.auth.repository.RefreshTokenJpaRepository;
+import org.shax3.square.domain.user.model.SocialType;
 import org.shax3.square.domain.user.model.User;
 import org.shax3.square.domain.user.repository.UserRepository;
 import org.shax3.square.exception.CustomException;
@@ -93,6 +94,7 @@ class AuthServiceTest {
         String code = "authCode";
         String email = "test@example.com";
         User user = User.builder()
+                .socialType(SocialType.GOOGLE)
                 .email(email)
                 .build();
 
