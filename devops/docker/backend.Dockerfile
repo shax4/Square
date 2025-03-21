@@ -20,6 +20,8 @@ FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y curl iputils-ping
+
 COPY --from=builder /app/backend/build/libs/*.jar app.jar
 RUN test -f app.jar
 
