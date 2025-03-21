@@ -17,3 +17,6 @@ RUN usermod -aG docker jenkins
 RUN echo "jenkins ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 USER jenkins
+
+CMD ["/usr/bin/tini", "--", "/usr/local/bin/jenkins.sh"]
+
