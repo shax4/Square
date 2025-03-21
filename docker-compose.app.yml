@@ -10,7 +10,8 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /var/lib/letsencrypt:/var/lib/letsencrypt
     environment:
       SERVER_DOMAIN: ${SERVER_DOMAIN}
     networks:
