@@ -1,5 +1,5 @@
 import { StyleSheet, Dimensions } from 'react-native';
-
+import colors from '../../../assets/colors';
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get("window");
 
 export const styles = StyleSheet.create({
@@ -46,16 +46,32 @@ export const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-around',
     },
-    CardVoteProsButton: {
-        backgroundColor: '#bddaf3',
+    CardUnvotedLeftButton: {
+        backgroundColor: colors.yesLight,
         width: '45%',
         height: '80%',
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 15,
     },
-    CardVoteConsButton: {
-        backgroundColor: '#f5c5c5',
+    CardUnvotedRightButton: {
+        backgroundColor: colors.noLight,
+        width: '45%',
+        height: '80%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 15,
+    },
+    CardVotedLeftButton: {
+        backgroundColor: colors.yesDark,
+        width: '45%',
+        height: '80%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 15,
+    },
+    CardVotedRightButton: {
+        backgroundColor: colors.noDark,
         width: '45%',
         height: '80%',
         justifyContent: 'center',
@@ -72,7 +88,7 @@ export const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#2372fa',
+        backgroundColor: colors.yesDark,
     },
     CardFooterText: {
         color: 'white',
