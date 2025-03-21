@@ -7,6 +7,8 @@ import NevTestPage1 from '../../../pages/StackSampleScreen/NevTestPage1';
 import NevTestPage2 from '../../../pages/StackSampleScreen/NevTestPage2';
 import NevTestPage3 from '../../../pages/StackSampleScreen/NevTestPage3';
 
+import DebateCardsScreen from '../../../pages/DebateCardsScreen/DebateCardsScreen';
+
 // 스택 네비게이터
 const Stack = createNativeStackNavigator();
 
@@ -31,8 +33,8 @@ export default function HeaderBar() {
         <Stack.Navigator>
             {/* 토론 카드 목록 */}
             <Stack.Screen
-                name="NevTestPage1"
-                component={NevTestPage1}
+                name="DebateCardsScreen"
+                component={DebateCardsScreen}
                 options={{
                     title: '오늘의 주제',
                     headerBackButtonDisplayMode: 'minimal',
