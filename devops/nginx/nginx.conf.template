@@ -12,6 +12,16 @@ http {
         listen 80;
         server_name ${SERVER_DOMAIN};
 
+        return 301 https://$host$request_uri;
+    }
+
+    server {
+        listen 443 ssl;
+        server_name ${SERVER_DOMAIN};
+
+        ssl_certificate     /etc/letsencrypt/live/${SERVER_DOMAIN}/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/${SERVER_DOMAIN}/privkey.pem;
+
         # Jenkins 프록시 설정 추가
         location /jenkins/ {
             proxy_pass http://jenkins:8080/jenkins/;
