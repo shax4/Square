@@ -1,7 +1,5 @@
 package org.shax3.square.domain.debate.dto.response;
 
-import org.shax3.square.domain.debate.dto.VoteResultDto;
-
 public record VoteResponse(
         int leftCount,
         int rightCount,
@@ -10,11 +8,8 @@ public record VoteResponse(
         int totalVoteCount
         )
 {
-        public static VoteResponse of(VoteResultDto dto) {
+        public static VoteResponse of(int leftCount, int rightCount,int totalVoteCount) {
 
-                int leftCount = dto.leftVotes();
-                int rightCount = dto.rightVotes();
-                int totalVoteCount = dto.totalVotes();
                 int leftPercent = (int) Math.round((leftCount * 100.0) / totalVoteCount);
                 int rightPercent = 100 - leftPercent;
 
