@@ -1,19 +1,21 @@
 package org.shax3.square.domain.auth.service;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.shax3.square.domain.auth.TokenUtil;
-import org.shax3.square.domain.auth.model.RefreshToken;
 import org.shax3.square.domain.auth.dto.UserLoginDto;
 import org.shax3.square.domain.auth.dto.UserTokenDto;
+import org.shax3.square.domain.auth.model.RefreshToken;
 import org.shax3.square.domain.auth.repository.RefreshTokenRepository;
 import org.shax3.square.domain.user.model.SocialType;
 import org.shax3.square.domain.user.model.User;
 import org.shax3.square.domain.user.repository.UserRepository;
 import org.shax3.square.exception.CustomException;
+import org.shax3.square.exception.ExceptionCode;
 
 import java.util.Optional;
 
@@ -40,6 +42,7 @@ class AuthServiceTest {
     private AuthService authService;
 
     @Test
+    @DisplayName("loginTest - 유저가 존재하는 경우 MemberLoginDto 반환")
     void loginTest_whenUserExists_thenReturnMemberLoginDto() {
         // Given
         String email = "test@example.com";
@@ -49,10 +52,8 @@ class AuthServiceTest {
 
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
 
-        // DTO는 Mock이 아니라 실제 객체 생성
         RefreshToken refreshToken = RefreshToken.builder().build();
         UserTokenDto userTokenDto = new UserTokenDto("accessToken", refreshToken);
-
         when(tokenUtil.createLoginToken(user.getId())).thenReturn(userTokenDto);
 
         // When
@@ -63,13 +64,13 @@ class AuthServiceTest {
         verify(tokenUtil, times(1)).createLoginToken(user.getId());
         verify(refreshTokenRepository, times(1)).save(refreshToken);
 
-        // 명확한 값 검증
         assertThat(result).isNotNull();
         assertThat(result.accessToken()).isEqualTo("accessToken");
         assertThat(result.email()).isNull();
     }
 
     @Test
+    @DisplayName("loginTest - 유저가 존재하지 않는 경우 NotMemberLoginDto 반환")
     void loginTest_whenUserDoesNotExist_thenReturnNotMemberLoginDto() {
         // Given
         String email = "notfound@example.com";
@@ -89,6 +90,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("googleLogin - 유저가 존재하는 경우 MemberLoginDto 반환")
     void googleLogin_whenUserExists_thenReturnMemberLoginDto() {
         // Given
         String code = "authCode";
@@ -103,7 +105,6 @@ class AuthServiceTest {
 
         RefreshToken refreshToken = RefreshToken.builder().build();
         UserTokenDto userTokenDto = new UserTokenDto("accessToken", refreshToken);
-
         when(tokenUtil.createLoginToken(user.getId())).thenReturn(userTokenDto);
 
         // When
@@ -121,6 +122,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("googleLogin - 유저가 존재하지 않는 경우 NotMemberLoginDto 반환")
     void googleLogin_whenUserDoesNotExist_thenReturnNotMemberLoginDto() {
         // Given
         String code = "authCode";
@@ -143,8 +145,8 @@ class AuthServiceTest {
         assertThat(result.email()).isEqualTo(email);
     }
 
-    // 1. 액세스 토큰이 유효한 경우
     @Test
+    @DisplayName("reissueAccessToken - 유효한 액세스 토큰일 경우 그대로 반환")
     void reissueAccessToken_whenAccessTokenIsValid_thenReturnAccessToken() {
         // Given
         String validAccessToken = "validAccessToken";
@@ -164,8 +166,8 @@ class AuthServiceTest {
         verify(tokenUtil, never()).createLoginToken(anyLong());
     }
 
-    // 2. 액세스 토큰이 만료되어 새 토큰을 발급하는 경우
     @Test
+    @DisplayName("reissueAccessToken - 액세스 토큰이 만료된 경우 새 토큰 발급")
     void reissueAccessToken_whenAccessTokenExpired_thenReturnNewAccessToken() {
         // Given
         String expiredAccessToken = "expiredAccessToken";
@@ -199,8 +201,8 @@ class AuthServiceTest {
         verify(foundRefreshToken, times(1)).reissueRefreshToken(newRefreshToken);
     }
 
-    // 3. 액세스 토큰이 유효하지 않고, 만료 토큰에서 userId가 null인 경우 => FAILED_TO_VALIDATE_TOKEN 예외 발생
     @Test
+    @DisplayName("reissueAccessToken - 액세스 토큰이 유효하지 않고 만료된 것도 아닐 경우 FAILED_TO_VALIDATE_TOKEN 예외 발생")
     void reissueAccessToken_whenAccessTokenNotValidAndNotExpired_thenThrowFailedToValidateToken() {
         // Given
         String invalidAccessToken = "invalidAccessToken";
@@ -213,11 +215,11 @@ class AuthServiceTest {
         // When & Then
         assertThatThrownBy(() -> authService.reissueAccessToken(dummyRefreshToken, authHeader))
                 .isInstanceOf(CustomException.class)
-                .hasMessageContaining("토큰 검증에 실패했습니다.");
+                .hasMessageContaining(ExceptionCode.FAILED_TO_VALIDATE_TOKEN.getMessage());
     }
 
-    // 4. refresh token 불일치 => INVALID_REQUEST 예외 발생
     @Test
+    @DisplayName("reissueAccessToken - DB에 저장된 refresh token과 전달받은 값이 다를 경우 INVALID_REQUEST 예외 발생")
     void reissueAccessToken_whenRefreshTokenMismatch_thenThrowInvalidRequest() {
         // Given
         String expiredAccessToken = "expiredAccessToken";
@@ -229,18 +231,17 @@ class AuthServiceTest {
         when(tokenUtil.isAccessTokenExpired(expiredAccessToken)).thenReturn(userId);
 
         RefreshToken foundRefreshToken = mock(RefreshToken.class);
-        // DB에 저장된 refresh token과 전달받은 값이 다름
         when(foundRefreshToken.getToken()).thenReturn("differentRefreshToken");
         when(refreshTokenRepository.findByUserId(userId)).thenReturn(Optional.of(foundRefreshToken));
 
         // When & Then
         assertThatThrownBy(() -> authService.reissueAccessToken(providedRefreshToken, authHeader))
                 .isInstanceOf(CustomException.class)
-                .hasMessageContaining("유효하지 않은 요청입니다.");
+                .hasMessageContaining(ExceptionCode.INVALID_REQUEST.getMessage());
     }
 
-    // 5. 해당 userId로 DB에서 refresh token을 찾지 못한 경우 => INVALID_REFRESH_TOKEN 예외 발생
     @Test
+    @DisplayName("reissueAccessToken - 해당 userId로 refresh token을 찾지 못한 경우 INVALID_REFRESH_TOKEN 예외 발생")
     void reissueAccessToken_whenNoRefreshTokenFound_thenThrowInvalidRefreshToken() {
         // Given
         String expiredAccessToken = "expiredAccessToken";
@@ -255,6 +256,6 @@ class AuthServiceTest {
         // When & Then
         assertThatThrownBy(() -> authService.reissueAccessToken(providedRefreshToken, authHeader))
                 .isInstanceOf(CustomException.class)
-                .hasMessageContaining("사용자 식별에 실패했습니다. 다시 로그인해주세요.");
+                .hasMessageContaining(ExceptionCode.INVALID_REFRESH_TOKEN.getMessage());
     }
 }
