@@ -39,12 +39,13 @@ http {
             proxy_set_header X-Forwarded-Proto $scheme;
         }
 
-        location /swagger-ui/ {
-            proxy_pass http://backend:8080/swagger-ui/;
+        # Swagger
+        location /api-test/ {
+            proxy_pass http://backend:8080/api-test/;
         }
 
-        location /v3/api-docs {
-            proxy_pass http://backend:8080/v3/api-docs;
+        location /api-docs {
+            proxy_pass http://backend:8080/api-docs;
         }
     }
 }
