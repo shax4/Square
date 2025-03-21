@@ -16,7 +16,6 @@ public class DebateService {
 
     private final DebateRepository debateRepository;
 
-    @Transactional(readOnly = true)
     public Debate findDebateById(Long debateId) {
         return debateRepository.findById(debateId)
                 .orElseThrow(() -> new CustomException(DEBATE_NOT_FOUND));
