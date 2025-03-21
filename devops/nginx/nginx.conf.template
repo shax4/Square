@@ -41,11 +41,11 @@ http {
 
         # Swagger
         location /api-test/ {
-            proxy_pass http://backend:8080/api-test/;
+            proxy_pass http://backend:8080/api/api-test/;
         }
 
         location /api-docs {
-            proxy_pass http://backend:8080/api-docs;
+            proxy_pass http://backend:8080/api/api-docs;
         }
     }
 }
