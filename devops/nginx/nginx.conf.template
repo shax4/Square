@@ -12,11 +12,6 @@ http {
         listen 80;
         server_name ${SERVER_DOMAIN};
 
-        location / {
-            default_type text/html;
-            return 200 "<h1>Nginx is running successfully!</h1>";
-        }
-
         # Jenkins 프록시 설정 추가
         location /jenkins/ {
             proxy_pass http://jenkins:8080/;
