@@ -30,7 +30,7 @@ export default function MypageScreen() {
         <View style={styles.container}>
             <Text>This Is Mypage Screen.</Text>
             <ProfileImage variant='small'/>
-            <PersonalityTag personality='PNTB' onPress={onPressType}/>
+            <PersonalityTag personality='PNTB' onPress={() => navigation.navigate('PersonalityResultScreen')}/>
             <LikeButton initialCount={100}/>
             <TouchableOpacity onPress={() => navigation.navigate('PersonalitySurveyPage')}>
                 <Text>Go to PersonalitySurveyPage</Text>
