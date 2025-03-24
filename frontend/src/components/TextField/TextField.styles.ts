@@ -26,8 +26,8 @@ export const styles = StyleSheet.create({
   containerMultiline: {
     height: undefined,
     minHeight: 51,
-    maxHeight: 90,
-    textAlignVertical: "top", // android 옵션, iOS에서는 기본 옵션이기에 무시됨: 내부의 텍스트를 수직 방향으로 정렬 (top: 상단)
+    maxHeight: 110,
+    textAlignVertical: "center", // android 옵션, iOS에서는 기본 옵션이기에 무시됨: 내부의 텍스트를 수직 방향으로 정렬 (top: 상단)
   },
   // 비활성화된 TextField 컨테이너 스타일
   containerDisabled: {

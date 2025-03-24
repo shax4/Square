@@ -52,7 +52,7 @@ const TextField = ({
 
   const handleContentSizeChange = (event: any) => {
     const newHeight = event.nativeEvent.contentSize.height;
-    const maxHeight = 90; // 최대 높이 제한
+    const maxHeight = 110; // 최대 높이 제한
     const minHeight = 51; // 최소 높이 제한
     // 최소 높이와 최대 높이를 고려하여 동적 높이 설정
     setInputHeight(Math.max(minHeight, Math.min(newHeight, maxHeight)));
@@ -97,9 +97,7 @@ const TextField = ({
               ? handleContentSizeChange
               : undefined
           } // Multiline일 때만 크기 변경 핸들러 사용
-          textAlignVertical={
-            variant === TextFieldVariant.Multiline ? "top" : "center"
-          } // Multiline 일 때 상단 정렬 (Android 옵션, iOS는 기본적용 되어있음)
+          textAlignVertical="center" // Multiline 일 때 중앙 정렬 (Android 옵션)
         />
       </View>
       {error ? (
