@@ -2,7 +2,7 @@ import type React from "react"
 import { StyleSheet, Text, SafeAreaView, ScrollView, View } from "react-native"
 import Question from "./Components/Question"
 import {Button} from '../../components'
-import { SurveyProvider } from "./SurveyContext"
+import { SurveyProvider} from "./SurveyContext"
 
 // Sample questions and options
 const questions = [
@@ -39,6 +39,11 @@ const questions = [
 ]
 
 const PersonalitySurveyPage: React.FC = () => {
+
+
+    const onPressConfirm = () => {
+        console.log('확인 버튼을 눌렀습니다! 설문조사 결과를 전송합니다!');
+    }
   return (
     <SurveyProvider>
       <SafeAreaView style={styles.container}>
@@ -49,7 +54,7 @@ const PersonalitySurveyPage: React.FC = () => {
             <Question key={q.id} id={q.id} question={q.question} options={q.options} />
           ))}
             <View style={styles.buttonContainer}>
-                <Button label="확인" />
+                <Button label="확인" onPress={onPressConfirm}/>
             </View>
         </ScrollView>
       </SafeAreaView>
