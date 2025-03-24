@@ -22,6 +22,9 @@ services:
       -Djenkins.model.Jenkins.crumbIssuerProxyCompatibility=true
       -jar /usr/share/jenkins/jenkins.war
       --prefix=/jenkins
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     networks:
       - app-network
       - default
