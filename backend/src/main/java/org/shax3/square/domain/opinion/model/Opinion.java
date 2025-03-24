@@ -16,8 +16,8 @@ public class Opinion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name ="debate_id",nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "debate_id", nullable = false)
     private Debate debate;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -30,10 +30,20 @@ public class Opinion {
     @Column(name = "like_count", nullable = false)
     private int likeCount;
 
-    @Column(name ="is_valid",nullable = false)
-    private boolean isValid;
+    @Column(name = "is_valid", nullable = false)
+    private boolean valid;
 
-    @Column(name ="is_left",nullable = false)
-    private boolean isLeft;
+    @Column(name = "is_left", nullable = false)
+    private boolean left;
 
+    @Builder
+    public Opinion(User user, Debate debate, boolean left, String content) {
+        this.debate = debate;
+        this.user = user;
+        this.content = content;
+        this.likeCount = 0;
+        this.left = left;
+        this.valid = true;
+    }
 }
+
