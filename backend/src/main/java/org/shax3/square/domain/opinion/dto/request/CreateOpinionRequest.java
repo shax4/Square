@@ -1,4 +1,4 @@
-package org.shax3.square.domain.opinion.dto;
+package org.shax3.square.domain.opinion.dto.request;
 
 
 import jakarta.validation.constraints.NotNull;
@@ -15,7 +15,7 @@ public record CreateOpinionRequest(
         @Size(min = 10, max = 150, message = "의견은 최소 10자 이상, 최대 150자 이하이어야 합니다.")
         String content) {
 
-    public Opinion to(User user, Debate debate){
+    public Opinion to(User user, Debate debate) {
         return Opinion.builder()
                 .user(user)
                 .debate(debate)
