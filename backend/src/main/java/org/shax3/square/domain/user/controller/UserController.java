@@ -9,10 +9,12 @@ import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.user.dto.UserSignUpDto;
 import org.shax3.square.domain.user.dto.request.SignUpRequest;
 import org.shax3.square.domain.user.dto.response.SignUpUserInfoResponse;
+import org.shax3.square.domain.user.dto.response.UserChoiceResponse;
 import org.shax3.square.domain.user.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,4 +48,15 @@ public class UserController {
 
         return ResponseEntity.ok().body(SignUpUserInfoResponse.from(userSignUpDto));
     }
+
+    @Operation(
+            summary = "유저정보 선택지 조회 api",
+            description = "회원가입 또는 회원 정보 수정 시 필요한 선택지를 제공합니다."
+    )
+    @GetMapping("/choices")
+    public ResponseEntity<UserChoiceResponse> getChoices() {
+        UserChoiceResponse userChoiceResponse = userService.getUserChoices();
+        return ResponseEntity.ok(userChoiceResponse);
+    }
+
 }

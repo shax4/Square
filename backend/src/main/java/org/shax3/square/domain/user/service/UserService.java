@@ -7,6 +7,7 @@ import org.shax3.square.domain.auth.dto.UserTokenDto;
 import org.shax3.square.domain.auth.repository.RefreshTokenRepository;
 import org.shax3.square.domain.user.dto.UserSignUpDto;
 import org.shax3.square.domain.user.dto.request.SignUpRequest;
+import org.shax3.square.domain.user.dto.response.UserChoiceResponse;
 import org.shax3.square.domain.user.model.AgeRange;
 import org.shax3.square.domain.user.model.SocialType;
 import org.shax3.square.domain.user.model.User;
@@ -75,5 +76,9 @@ public class UserService {
             case 4 -> AgeRange.FORTY;
             default -> AgeRange.FIFTY;
         };
+    }
+
+    public UserChoiceResponse getUserChoices() {
+        return UserChoiceResponseFactory.getUserChoiceResponse();
     }
 }
