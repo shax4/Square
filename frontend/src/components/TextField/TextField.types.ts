@@ -2,7 +2,6 @@ import { KeyboardTypeOptions } from 'react-native';
 
 export enum TextFieldVariant {
   Default = 'default',
-  Search = 'search',
   Multiline = 'multiline'
 }
 
@@ -51,4 +50,9 @@ export interface TextFieldProps {
    * 스타일 변형
    */
   variant?: TextFieldVariant;
+
+  /**
+   * 가이드 텍스트 추가
+   */
+  guide?: string;
 }

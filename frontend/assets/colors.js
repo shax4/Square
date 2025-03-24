@@ -10,6 +10,7 @@ const colors = {
     disabledText: "#666A73",
     warnRed: "#FF4848",
     disabledWarn: "#FFCBCB",
+    placeholderText: "#A0A0A8",
 }
 
 export default colors;
