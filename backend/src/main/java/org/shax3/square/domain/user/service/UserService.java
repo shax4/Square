@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.TokenUtil;
 import org.shax3.square.domain.auth.dto.UserTokenDto;
-import org.shax3.square.domain.auth.repository.RefreshTokenJpaRepository;
+import org.shax3.square.domain.auth.repository.RefreshTokenRepository;
 import org.shax3.square.domain.user.dto.UserSignUpDto;
 import org.shax3.square.domain.user.dto.request.SignUpRequest;
 import org.shax3.square.domain.user.model.AgeRange;
@@ -25,7 +25,7 @@ public class UserService {
 
     private final TokenUtil tokenUtil;
     private final UserRepository userRepository;
-    private final RefreshTokenJpaRepository refreshTokenJpaRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
     public UserSignUpDto signUp(SignUpRequest signUpRequest, String signUpToken) {
@@ -48,7 +48,7 @@ public class UserService {
         userRepository.save(signUpUser);
 
         UserTokenDto userTokens = tokenUtil.createLoginToken(signUpUser.getId());
-        refreshTokenJpaRepository.save(userTokens.refreshToken());
+        refreshTokenRepository.save(userTokens.refreshToken());
 
         return UserSignUpDto.createSignUpDto(userTokens, signUpUser);
     }

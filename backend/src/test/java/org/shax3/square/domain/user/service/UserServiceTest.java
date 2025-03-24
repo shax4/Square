@@ -7,7 +7,7 @@ import org.mockito.*;
 import org.shax3.square.domain.auth.TokenUtil;
 import org.shax3.square.domain.auth.dto.UserTokenDto;
 import org.shax3.square.domain.auth.model.RefreshToken;
-import org.shax3.square.domain.auth.repository.RefreshTokenJpaRepository;
+import org.shax3.square.domain.auth.repository.RefreshTokenRepository;
 import org.shax3.square.domain.user.dto.UserSignUpDto;
 import org.shax3.square.domain.user.dto.request.SignUpRequest;
 import org.shax3.square.domain.user.model.*;
@@ -29,7 +29,7 @@ class UserServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private RefreshTokenJpaRepository refreshTokenJpaRepository;
+    private RefreshTokenRepository refreshTokenRepository;
 
     @InjectMocks
     private UserService userService;
@@ -78,7 +78,7 @@ class UserServiceTest {
 
         // verify
         verify(userRepository, times(1)).save(any(User.class));
-        verify(refreshTokenJpaRepository, times(1)).save(refreshToken);
+        verify(refreshTokenRepository, times(1)).save(refreshToken);
         verify(tokenUtil, times(1)).createLoginToken(nullable(Long.class));
     }
 
@@ -105,7 +105,7 @@ class UserServiceTest {
                 .isEqualTo(2006);
 
         verify(userRepository, never()).save(any(User.class));
-        verify(refreshTokenJpaRepository, never()).save(any(RefreshToken.class));
+        verify(refreshTokenRepository, never()).save(any(RefreshToken.class));
         verify(tokenUtil, never()).createLoginToken(anyLong());
     }
 
@@ -139,7 +139,7 @@ class UserServiceTest {
                 .isEqualTo(2007);
 
         verify(userRepository, never()).save(any(User.class));
-        verify(refreshTokenJpaRepository, never()).save(any(RefreshToken.class));
+        verify(refreshTokenRepository, never()).save(any(RefreshToken.class));
         verify(tokenUtil, never()).createLoginToken(anyLong());
     }
 
@@ -170,7 +170,7 @@ class UserServiceTest {
                 .isEqualTo(2004);
 
         verify(userRepository, never()).save(any(User.class));
-        verify(refreshTokenJpaRepository, never()).save(any(RefreshToken.class));
+        verify(refreshTokenRepository, never()).save(any(RefreshToken.class));
         verify(tokenUtil, never()).createLoginToken(anyLong());
     }
 }
