@@ -10,6 +10,5 @@ import org.springframework.stereotype.Component;
 public class BatchRedisProperties {
     private String host;
     private int port;
-    private String username;
     private String password;
 }

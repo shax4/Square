@@ -37,7 +37,6 @@ public class RedisConfig {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
         config.setHostName(props.getHost());
         config.setPort(props.getPort());
-        config.setUsername(props.getUsername());
         config.setPassword(RedisPassword.of(props.getPassword()));
 
         LettucePoolingClientConfiguration poolingConfig = LettucePoolingClientConfiguration.builder()
@@ -55,11 +54,9 @@ public class RedisConfig {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(factory);
 
-        // Key는 문자열 직렬화
         template.setKeySerializer(new StringRedisSerializer());
         template.setHashKeySerializer(new StringRedisSerializer());
 
-        // Value는 JSON 직렬화
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
 
