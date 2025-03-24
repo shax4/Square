@@ -1,6 +1,7 @@
 package org.shax3.square.domain.opinion.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -54,6 +55,7 @@ class OpinionCommentServiceTest {
 
 
     @Test
+    @DisplayName("댓글을 성공적으로 반환하는지 테스트")
     void getOpinionComments_success() {
         // Given
         OpinionComment mockComment = new OpinionComment(1L, null, mockUser, "Nice!", 5, true);
@@ -73,4 +75,19 @@ class OpinionCommentServiceTest {
         assertEquals("TestUser", responses.get(0).nickname());
         assertEquals("presigned-url", responses.get(0).profileUrl());
     }
+
+    @Test
+    @DisplayName("댓글이 없는 경우 빈 리스트 반환 테스트")
+    void getOpinionComments_emptyList() {
+        // Given
+        when(opinionCommentRepository.findByOpinionIdAndValidTrue(1L)).thenReturn(List.of());
+
+        // When
+        List<CommentResponse> responses = opinionCommentService.getOpinionComments(mockUser, 1L);
+
+        // Then
+        assertNotNull(responses);
+        assertTrue(responses.isEmpty());
+    }
 }
+
