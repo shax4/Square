@@ -2,15 +2,25 @@ pipeline {
     agent any
 
     environment {
-        COMPOSE_PATH = "docker-compose.app.yml"
-        BACKEND_IMAGE_NAME = "backend:latest"
+        GIT_REPO = "https://52.141.26.96/s12-bigdata-recom-sub1/square.git"
+        GIT_HOST = "lab.ssafy.com"
+        GIT_BRANCH = "deploy" // 또는 dev/BE 등
+        TOKEN = credentials('gitlab-credentials') // Personal Access Token
     }
 
     stages {
-        stage('Checkout') {
+        stage('Manual Clone') {
             steps {
-                echo "GitLab에서 코드 클론 중..."
-                checkout scm
+                echo "Git 저장소 직접 clone 시도"
+                sh '''
+                    rm -rf square || true
+                    git -c http.extraHeader="Authorization: Bearer ${TOKEN}" \
+                        -c http.sslVerify=false \
+                        clone --branch ${GIT_BRANCH} ${GIT_REPO} square
+
+                    cd square
+                    ls -al
+                '''
             }
         }
 
