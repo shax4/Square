@@ -11,6 +11,7 @@ type StackParamList = {
     NevTestPage3: undefined;
     UiTestScreen: undefined;
     PersonalitySurveyPage: undefined;
+    PersonalityResultScreen: undefined;
 };
 
 export default function MypageScreen() {
@@ -29,10 +30,13 @@ export default function MypageScreen() {
         <View style={styles.container}>
             <Text>This Is Mypage Screen.</Text>
             <ProfileImage variant='small'/>
-            <PersonalityTag personality='PNTB' onPress={onPressType}/>
+            <PersonalityTag personality='PNTB' onPress={() => navigation.navigate('PersonalityResultScreen')}/>
             <LikeButton initialCount={100}/>
             <TouchableOpacity onPress={() => navigation.navigate('PersonalitySurveyPage')}>
                 <Text>Go to PersonalitySurveyPage</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('PersonalityResultScreen')}>
+                <Text>Go to PersonalityResultScreen</Text>
             </TouchableOpacity>
         </View>
     )

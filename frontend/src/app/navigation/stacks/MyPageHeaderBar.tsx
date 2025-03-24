@@ -10,6 +10,7 @@ import { useNavigation } from '@react-navigation/native';
 import MypageScreen from '../../../pages/MypageScreen/MypageScreen';
 import NevTestPage2 from '../../../pages/StackSampleScreen/NevTestPage2';
 import PersonalitySurveyPage from '../../../pages/PersonalitySurveyPage/PersonalitySurveyPage';
+import PersonalityResultScreen from '../../../pages/PersonalityResultScreen/PersonalityResultScreen';
 
 // 스택 네비게이터
 const Stack = createNativeStackNavigator();
@@ -19,6 +20,7 @@ type StackParamList = {
     MypageScreen: undefined;
     NevTestPage2: undefined;
     PersonalitySurveyPage: undefined;
+    PersonalityResultScreen: undefined;
 };
 
 // 마이 페이지 상단 탭
@@ -61,6 +63,14 @@ export default function HeaderBar() {
                 component={PersonalitySurveyPage}
                 options={{
                     title: '설문 조사',
+                    headerBackButtonDisplayMode: 'minimal',
+                }}
+            />
+            <Stack.Screen
+                name="PersonalityResultScreen"
+                component={PersonalityResultScreen}
+                options={{
+                    title: '성향 테스트 확인',
                     headerBackButtonDisplayMode: 'minimal',
                 }}
             />
