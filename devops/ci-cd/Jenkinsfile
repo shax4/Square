@@ -39,8 +39,8 @@ pipeline {
             steps {
                 echo "앱 재배포 (docker-compose.app.yml)"
                 sh '''
-                    docker compose -f ${COMPOSE_PATH} down
-                    docker compose -f ${COMPOSE_PATH} up -d --build
+                  docker-compose -f ${COMPOSE_PATH} down
+                  docker-compose -f ${COMPOSE_PATH} up -d --build
                 '''
             }
         }
