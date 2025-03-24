@@ -126,6 +126,30 @@ class OpinionServiceTest {
 
         verify(opinionCommentService, never()).getOpinionComments(any(), any());
     }
-}
 
+    @Test
+    @DisplayName("댓글이 없는 경우 의견 상세 조회 성공 테스트")
+    void getOpinionDetails_noComments() {
+        // Given
+        Opinion mockOpinion = Opinion.builder()
+                .user(mockUser)
+                .content("Sample Content")
+                .build();
+        ReflectionTestUtils.setField(mockOpinion, "id", 1L);
+        ReflectionTestUtils.setField(mockOpinion, "likeCount", 10);
+        ReflectionTestUtils.setField(mockOpinion, "createdAt", LocalDateTime.now());
+
+        when(opinionRepository.findById(1L)).thenReturn(Optional.of(mockOpinion));
+        when(opinionCommentService.getOpinionComments(mockUser, 1L)).thenReturn(List.of());
+        when(s3Service.generatePresignedGetUrl("test-key")).thenReturn("presigned-url");
+
+        // When
+        OpinionDetailsResponse response = opinionService.getOpinionDetails(mockUser, 1L);
+
+        // Then
+        assertThat(response).isNotNull();
+        assertThat(response.opinionId()).isEqualTo(1L);
+        assertThat(response.comments()).isEmpty();
+    }
+}
 

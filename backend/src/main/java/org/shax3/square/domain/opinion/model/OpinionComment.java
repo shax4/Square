@@ -34,7 +34,7 @@ public class OpinionComment extends BaseTimeEntity {
     private int likeCount;
 
     @Column(name = "is_valid", nullable = false)
-    private boolean valid;
+    private boolean valid = true;
 
 
 }
