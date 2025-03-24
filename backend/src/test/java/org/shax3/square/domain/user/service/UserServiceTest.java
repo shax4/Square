@@ -17,6 +17,7 @@ import org.shax3.square.exception.CustomException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -172,5 +173,44 @@ class UserServiceTest {
         verify(userRepository, never()).save(any(User.class));
         verify(refreshTokenRepository, never()).save(any(RefreshToken.class));
         verify(tokenUtil, never()).createLoginToken(anyLong());
+    }
+
+    @Test
+    @DisplayName("회원탈퇴 성공")
+    void deleteAccount_ShouldDeleteTokenAndCallUserDeleteAccount() {
+        // given
+        String refreshToken = "sample-refresh-token";
+        // spy를 사용하여 deleteAccount() 호출을 검증할 수 있도록 함
+        User user = spy(User.builder().build());
+
+        when(userRepository.findById(nullable(Long.class)))
+                .thenReturn(Optional.of(user));
+
+        // when
+        userService.deleteAccount(user, refreshToken);
+
+        // then
+        verify(refreshTokenRepository, times(1)).deleteByToken(refreshToken);
+        verify(userRepository, times(1)).findById(user.getId());
+        verify(user, times(1)).deleteAccount();
+    }
+
+    @Test
+    @DisplayName("회원탈퇴 실패 - 유저가 존재하지 않음")
+    void deleteAccount_WhenUserNotFound_ShouldThrowCustomException() {
+        // given
+        String refreshToken = "sample-refresh-token";
+        User user = User.builder().build();
+
+        when(userRepository.findById(user.getId()))
+                .thenReturn(Optional.empty());
+
+        // when & then: 존재하지 않는 경우 CustomException이 발생함을 검증
+        assertThrows(CustomException.class, () -> {
+            userService.deleteAccount(user, refreshToken);
+        });
+
+        verify(refreshTokenRepository, times(1)).deleteByToken(refreshToken);
+        verify(userRepository, times(1)).findById(user.getId());
     }
 }
