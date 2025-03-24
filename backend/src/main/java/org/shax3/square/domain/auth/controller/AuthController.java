@@ -11,7 +11,10 @@ import org.shax3.square.domain.auth.dto.response.UserInfoResponse;
 import org.shax3.square.domain.auth.service.AuthService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -58,6 +61,10 @@ public class AuthController {
         return ResponseEntity.ok().body(UserInfoResponse.from(userLoginDto));
     }
 
+    @Operation(
+            summary = "구글 로그인 API",
+            description = "구글 로그인으로 연결되는 api입니다."
+    )
     @GetMapping("/google")
     public void loginWithGoogle(HttpServletResponse response) throws IOException {
         String encodedRedirectUri = URLEncoder.encode(googleRedirectUri, StandardCharsets.UTF_8);
@@ -72,7 +79,7 @@ public class AuthController {
     }
 
     @GetMapping("/callback/google")
-    public ResponseEntity<UserInfoResponse> redirectGoole(
+    public ResponseEntity<UserInfoResponse> redirectGoogle(
             @RequestParam("code") String code,
             HttpServletResponse response
     ) {
@@ -99,5 +106,21 @@ public class AuthController {
         response.addCookie(cookie);
 
         return ResponseEntity.ok().body(UserInfoResponse.from(userLoginDto));
+    }
+
+    @Operation(
+            summary = "엑세스 토큰 재발급 api",
+            description = "엑세스 토큰을 재발급해 header에 넣어줍니다."
+    )
+    @PostMapping("/reissue")
+    public ResponseEntity<Void> reissueToken(
+            @CookieValue("refresh-token") String refreshToken,
+            @RequestHeader("Authorization") String authHeader,
+            HttpServletResponse response
+    ) {
+        String reissuedToken = authService.reissueAccessToken(refreshToken, authHeader);
+
+        response.setHeader("Authorization", "Bearer " + reissuedToken);
+        return ResponseEntity.ok().build();
     }
 }

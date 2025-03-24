@@ -1,7 +1,8 @@
-package org.shax3.square.domain.auth.domain;
+package org.shax3.square.domain.auth.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
+import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity
@@ -23,10 +25,13 @@ import static lombok.AccessLevel.PROTECTED;
 )
 public class RefreshToken {
 
+    @Id
+    @GeneratedValue(strategy = IDENTITY)
+    private Long id;
+
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Id
     @Column(name = "token", nullable = false)
     private String token;
 
@@ -39,5 +44,10 @@ public class RefreshToken {
                 .token(refreshToken)
                 .expiry(expiry)
                 .build();
+    }
+
+    public void reissueRefreshToken(RefreshToken newRefreshToken) {
+        this.token = newRefreshToken.getToken();
+        this.expiry = newRefreshToken.getExpiry();
     }
 }
