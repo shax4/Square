@@ -9,6 +9,7 @@ services:
     restart: unless-stopped
     privileged: true
     user: root
+    network_mode: "host"
     ports:
       - "8081:8080"
       - "50000:50000"
