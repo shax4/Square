@@ -45,7 +45,6 @@ springdoc:
     path: /api-docs
 
   swagger-ui:
-    path: /api-test
     display-request-duration: true
     filter: true
     doc-expansion: none
