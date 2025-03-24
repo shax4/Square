@@ -20,6 +20,7 @@ public enum ExceptionCode {
 	SOCIAL_TYPE_MISMATCH(2005, "이미 다른 소셜 계정이 존재합니다."),
 	SIGN_UP_TOKEN_INVALID(2006, "회원가입 페이지가 만료되었습니다. 다시 시도해주세요."),
 	DUPLICATE_EMAIL(2007, "해당 이메일로 회원가입한 계정이 이미 존재합니다."),
+	NOT_PROFILE_IMG(2008, "사진이 유효하지 않습니다."),
 
 	UNAUTHORIZED_ACCESS(3000, "접근할 수 없는 리소스입니다."),
 	INVALID_REFRESH_TOKEN(3001, "사용자 식별에 실패했습니다. 다시 로그인해주세요."),

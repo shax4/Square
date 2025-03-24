@@ -47,7 +47,7 @@ class UserServiceTest {
         String signUpToken = "validToken";
         SignUpRequest request = new SignUpRequest(
                 "닉네임",
-                "s3KeyPath",
+                "profile/s3KeyPath",
                 Region.SEOUL,
                 Gender.MALE,
                 1992,
@@ -89,7 +89,7 @@ class UserServiceTest {
         String signUpToken = "invalidToken";
         SignUpRequest request = new SignUpRequest(
                 "닉네임",
-                "s3KeyPath",
+                "profile/s3KeyPath",
                 Region.SEOUL,
                 Gender.MALE,
                 1992,
@@ -116,7 +116,7 @@ class UserServiceTest {
         String signUpToken = "validToken";
         SignUpRequest request = new SignUpRequest(
                 "닉네임",
-                "s3KeyPath",
+                "profile/s3KeyPath",
                 Region.SEOUL,
                 Gender.MALE,
                 1990,
@@ -150,7 +150,7 @@ class UserServiceTest {
         String signUpToken = "validToken";
         SignUpRequest request = new SignUpRequest(
                 "아기",
-                "someS3Key",
+                "profile/someS3Key",
                 Region.BUSAN,
                 Gender.FEMALE,
                 2020,

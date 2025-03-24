@@ -49,6 +49,10 @@ public class UserService {
         if (s3Key == null) {
             s3Key = DEFAULT_PROFILE_IMG;
         }
+        if (!s3Key.startsWith("profile/")) {
+            throw new CustomException(NOT_PROFILE_IMG);
+        }
+
         AgeRange ageRange = calculateAgeRange(signUpRequest.yearOfBirth());
         User signUpUser = signUpRequest.to(email, socialType, ageRange, s3Key);
         userRepository.save(signUpUser);

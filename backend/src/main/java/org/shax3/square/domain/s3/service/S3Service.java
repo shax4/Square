@@ -58,10 +58,10 @@ public class S3Service {
         return PresignedPutUrlResponse.of(presignedUrl, generatedFileName);
     }
 
-    public String generatePresignedGetUrl(String fileName) {
+    public String generatePresignedGetUrl(String s3Key) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)
-                .key(fileName)
+                .key(s3Key)
                 .build();
 
         GetObjectPresignRequest getObjectPresignRequest = GetObjectPresignRequest.builder()
