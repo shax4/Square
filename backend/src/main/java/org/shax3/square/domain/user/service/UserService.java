@@ -27,6 +27,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
 
+    private static final String DEFAULT_PROFILE_IMG = "5bc4ed82-cdc5-4d6e-b0f0-28940e96b985.png";
+
     @Transactional
     public UserSignUpDto signUp(SignUpRequest signUpRequest, String signUpToken) {
 
@@ -43,8 +45,12 @@ public class UserService {
             throw new CustomException(DUPLICATE_EMAIL);
         }
 
+        String fileName = signUpRequest.fileName();
+        if (fileName == null) {
+            fileName = DEFAULT_PROFILE_IMG;
+        }
         AgeRange ageRange = calculateAgeRange(signUpRequest.yearOfBirth());
-        User signUpUser = signUpRequest.to(email, socialType, ageRange);
+        User signUpUser = signUpRequest.to(email, socialType, ageRange, fileName);
         userRepository.save(signUpUser);
 
         UserTokenDto userTokens = tokenUtil.createLoginToken(signUpUser.getId());
