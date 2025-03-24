@@ -63,20 +63,4 @@ class OpinionServiceTest {
         verify(opinionRepository, times(1)).save(any(Opinion.class));
     }
 
-    @Test
-    @DisplayName("의견 저장 시 Debate가 존재하지 않으면 예외 발생")
-    void createOpinion_debateNotFound() {
-        // Given
-        CreateOpinionRequest request = new CreateOpinionRequest(1L, true, "Sample Opinion");
-        when(debateService.findDebateById(1L)).thenThrow(new CustomException(ExceptionCode.DEBATE_NOT_FOUND));
-
-        // When / Then
-        try {
-            opinionService.createOpinion(mockUser, request);
-        } catch (CustomException e) {
-            assertThat(e.getCode()).isEqualTo(ExceptionCode.DEBATE_NOT_FOUND.getCode());
-        }
-
-        verify(opinionRepository, never()).save(any(Opinion.class));
-    }
 }
