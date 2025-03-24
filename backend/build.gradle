@@ -69,8 +69,9 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5'
     implementation 'org.springdoc:springdoc-openapi-starter-common:2.8.5'
 
-    //s3 설정
-    implementation 'software.amazon.awssdk:s3:2.20.26'
+    //커넥션 풀 관련 설정
+    implementation 'org.apache.commons:commons-pool2:2.11.1'
+
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
