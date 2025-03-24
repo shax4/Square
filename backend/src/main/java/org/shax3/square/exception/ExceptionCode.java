@@ -11,6 +11,7 @@ public enum ExceptionCode {
 	UNSUPPORTED_EXTENSIONS(1002, "지원하지 않는 파일 형식입니다."
 		+ " 지원하는 파일 양식(\"jpg\", \"png\", \"gif\", \"jpeg\", \"webp\""),
 	DUPLICATED_SOURCE(1003, "입력하는 요소에 중복이 존재합니다. 요소의 명칭을 변경해주세요."),
+	ALREADY_DELETED(1004,"이미 삭제된 항목입니다."),
 
 	UNABLE_TO_GET_USER_INFO(2001, "소셜 로그인 공급자로부터 유저 정보를 받아올 수 없습니다."),
 	UNABLE_TO_GET_ACCESS_TOKEN(2002, "소셜 로그인 공급자로부터 인증 토큰을 받아올 수 없습니다."),
@@ -31,7 +32,6 @@ public enum ExceptionCode {
 
 
 	PROPOSAL_NOT_FOUND(5004, "청원을 찾을 수 없습니다.");
-
 	private final int code;
 	private final String message;
 }

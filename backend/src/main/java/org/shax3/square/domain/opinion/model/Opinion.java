@@ -1,27 +1,31 @@
-package org.shax3.square.domain.proposal.model;
+package org.shax3.square.domain.opinion.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.shax3.square.domain.debate.model.Debate;
 import org.shax3.square.domain.user.model.User;
-
-import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Table(name = "proposal")
-public class Proposal {
+@Table(name = "opinion")
+public class Opinion {
+
     @Id
-    @GeneratedValue(strategy = IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @OneToOne
+    @JoinColumn(name ="debate_id",nullable = false)
+    private Debate debate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Column(nullable = false)
-    private String topic;
+    private String content;
 
     @Column(name = "like_count", nullable = false)
     private int likeCount;
@@ -29,14 +33,7 @@ public class Proposal {
     @Column(name ="is_valid",nullable = false)
     private boolean isValid;
 
-    @Builder
-    public Proposal(User user, String topic) {
-        this.user = user;
-        this.topic = topic;
-        this.likeCount = 0;
-        this.isValid = true;
-    }
-    public void softDelete() {
-        this.isValid = false;
-    }
+    @Column(name ="is_left",nullable = false)
+    private boolean isLeft;
+
 }

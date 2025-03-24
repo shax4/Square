@@ -25,51 +25,20 @@ public class ProposalService {
     @Transactional
     public CreateProposalsResponse save(CreateProposalRequest request, String token) {
 
-        if (request == null || request.getTopic() == null || request.getTopic().trim().isEmpty()) {
-            throw new CustomException(INVALID_REQUEST);
-        }
-
         User user = User.builder().build();
 //      User user = 토큰추출기.getuserId(token);
 
-        Proposal proposal = request.toEntity(user);
+        Proposal proposal = request.to(user);
         proposalRepository.save(proposal);
 
-        return new CreateProposalsResponse(proposal.getId());
-    }
-
-    @Transactional(readOnly = true)
-    public List<Proposal> findAll() {
-        return proposalRepository.findAll();
-    }
-
-    @Transactional(readOnly = true)
-    public Proposal findOne(Long id) {
-        return proposalRepository.findById(id)
-                .orElseThrow(() -> new CustomException(PROPOSAL_NOT_FOUND));
+        return CreateProposalsResponse.of(proposal.getId());
     }
 
     @Transactional(readOnly = true)
     public ProposalsResponse getProposals(String sort, Long nextCursorId, Integer nextCursorLikes, int limit) {
 
         List<Proposal> proposals = findProposalsBySort(sort, nextCursorId, nextCursorLikes, limit);
-
-        Long newNextCursorId = proposals.isEmpty() ? null : proposals.get(proposals.size() - 1).getId();
-        Integer newNextCursorLikes = (proposals.isEmpty() || !"likes".equals(sort))
-                ? null  // 기본값을 null로 설정
-                : proposals.get(proposals.size() - 1).getLikeCount();
-
-        List<ProposalDto> proposalDtos = new ArrayList<>();
-        for (Proposal proposal : proposals) {
-            proposalDtos.add(ProposalDto.fromEntity(proposal));
-        }
-
-        return ProposalsResponse.builder()
-                .proposals(proposalDtos)
-                .nextCursorId(newNextCursorId)
-                .nextCursorLikes(newNextCursorLikes)
-                .build();
-
+        return ProposalsResponse.of(proposals, sort);
     }
 
     private List<Proposal> findProposalsBySort(String sort, Long nextCursorId, Integer nextCursorLikes, int limit) {
@@ -77,6 +46,17 @@ public class ProposalService {
             return proposalRepository.findProposalsByLikes(nextCursorId, nextCursorLikes, limit);
         }
         return proposalRepository.findProposalsByLatest(nextCursorId, limit);
+    }
+
+    @Transactional
+    public void deleteProposal(Long id) {
+        Proposal proposal = proposalRepository.findById(id)
+                .orElseThrow(() -> new CustomException(PROPOSAL_NOT_FOUND));
+
+        if (!proposal.isValid()) {
+            throw new CustomException(ALREADY_DELETED);
+        }
+        proposal.softDelete();
     }
 }
 
