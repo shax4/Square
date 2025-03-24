@@ -5,14 +5,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.annotation.AuthUser;
-import org.shax3.square.domain.opinion.dto.CreateOpinionRequest;
+import org.shax3.square.domain.opinion.dto.request.CreateOpinionRequest;
+import org.shax3.square.domain.opinion.dto.response.OpinionDetailsResponse;
 import org.shax3.square.domain.opinion.service.OpinionService;
 import org.shax3.square.domain.user.model.User;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Opinion", description = "의견 API")
 @RestController
@@ -29,5 +27,19 @@ public class OpinionController {
     public ResponseEntity<Void> create(@AuthUser User user, @Valid @RequestBody CreateOpinionRequest request) {
         opinionService.createOpinion(user, request);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "의견 상세 조회",
+            description = """
+                        특정 의견 ID(opinionId)에 대한 상세 정보를 조회하는 API입니다.
+                        사용자 인증이 필요하며, 의견 작성자 정보와 댓글 목록을 포함한 데이터를 반환합니다.
+                        댓글 목록에는 사용자의 좋아요 여부가 포함됩니다.
+                    """
+    )
+    @GetMapping("/{opinionId}")
+    public ResponseEntity<OpinionDetailsResponse> read(@AuthUser User user, @PathVariable Long opinionId) {
+        OpinionDetailsResponse response = opinionService.getOpinionDetails(user, opinionId);
+        return ResponseEntity.ok(response);
     }
 }
