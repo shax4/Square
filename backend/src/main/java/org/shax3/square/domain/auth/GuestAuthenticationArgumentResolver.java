@@ -48,7 +48,7 @@ public class GuestAuthenticationArgumentResolver implements HandlerMethodArgumen
         String refreshToken = extractRefreshToken(request);
         String accessToken = extractAccessToken(request);
 
-        if (tokenUtil.isAccessTokenValid(accessToken)) {
+        if (tokenUtil.isTokenValid(accessToken)) {
             return extractUser(accessToken);
         }
 

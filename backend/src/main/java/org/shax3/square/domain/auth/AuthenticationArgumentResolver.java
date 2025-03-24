@@ -46,7 +46,7 @@ public class AuthenticationArgumentResolver implements HandlerMethodArgumentReso
         String refreshToken = extractRefreshToken(request);
         String accessToken = extractAccessToken(request);
 
-        if (tokenUtil.isAccessTokenValid(accessToken)) {
+        if (tokenUtil.isTokenValid(accessToken)) {
             return extractUser(accessToken);
         }
 

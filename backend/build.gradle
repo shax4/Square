@@ -72,6 +72,9 @@ dependencies {
     //커넥션 풀 관련 설정
     implementation 'org.apache.commons:commons-pool2:2.11.1'
 
+    //s3 관련 설정
+    implementation 'software.amazon.awssdk:s3:2.20.26'
+
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

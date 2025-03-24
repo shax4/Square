@@ -70,7 +70,7 @@ public class TokenUtil {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(tokenBytes);
     }
 
-    public boolean isAccessTokenValid(String accessToken) {
+    public boolean isTokenValid(String accessToken) {
         try {
             parseToken(accessToken);
         } catch (JwtException e) {

@@ -153,14 +153,14 @@ class AuthServiceTest {
         String authHeader = "Bearer " + validAccessToken;
         String dummyRefreshToken = "dummyRefreshToken"; // 사용되지 않음
 
-        when(tokenUtil.isAccessTokenValid(validAccessToken)).thenReturn(true);
+        when(tokenUtil.isTokenValid(validAccessToken)).thenReturn(true);
 
         // When
         String result = authService.reissueAccessToken(dummyRefreshToken, authHeader);
 
         // Then
         assertThat(result).isEqualTo(validAccessToken);
-        verify(tokenUtil, times(1)).isAccessTokenValid(validAccessToken);
+        verify(tokenUtil, times(1)).isTokenValid(validAccessToken);
         verify(tokenUtil, never()).isAccessTokenExpired(anyString());
         verify(refreshTokenRepository, never()).findByUserId(anyLong());
         verify(tokenUtil, never()).createLoginToken(anyLong());
@@ -175,7 +175,7 @@ class AuthServiceTest {
         String providedRefreshToken = "providedRefreshToken";
         Long userId = 1L;
 
-        when(tokenUtil.isAccessTokenValid(expiredAccessToken)).thenReturn(false);
+        when(tokenUtil.isTokenValid(expiredAccessToken)).thenReturn(false);
         when(tokenUtil.isAccessTokenExpired(expiredAccessToken)).thenReturn(userId);
 
         RefreshToken foundRefreshToken = mock(RefreshToken.class);
@@ -194,7 +194,7 @@ class AuthServiceTest {
 
         // Then
         assertThat(result).isEqualTo(newAccessToken);
-        verify(tokenUtil, times(1)).isAccessTokenValid(expiredAccessToken);
+        verify(tokenUtil, times(1)).isTokenValid(expiredAccessToken);
         verify(tokenUtil, times(1)).isAccessTokenExpired(expiredAccessToken);
         verify(refreshTokenRepository, times(1)).findByUserId(userId);
         verify(tokenUtil, times(1)).createLoginToken(userId);
@@ -209,7 +209,7 @@ class AuthServiceTest {
         String authHeader = "Bearer " + invalidAccessToken;
         String dummyRefreshToken = "dummyRefreshToken";
 
-        when(tokenUtil.isAccessTokenValid(invalidAccessToken)).thenReturn(false);
+        when(tokenUtil.isTokenValid(invalidAccessToken)).thenReturn(false);
         when(tokenUtil.isAccessTokenExpired(invalidAccessToken)).thenReturn(null);
 
         // When & Then
@@ -227,7 +227,7 @@ class AuthServiceTest {
         String providedRefreshToken = "providedRefreshToken";
         Long userId = 1L;
 
-        when(tokenUtil.isAccessTokenValid(expiredAccessToken)).thenReturn(false);
+        when(tokenUtil.isTokenValid(expiredAccessToken)).thenReturn(false);
         when(tokenUtil.isAccessTokenExpired(expiredAccessToken)).thenReturn(userId);
 
         RefreshToken foundRefreshToken = mock(RefreshToken.class);
@@ -249,7 +249,7 @@ class AuthServiceTest {
         String providedRefreshToken = "providedRefreshToken";
         Long userId = 1L;
 
-        when(tokenUtil.isAccessTokenValid(expiredAccessToken)).thenReturn(false);
+        when(tokenUtil.isTokenValid(expiredAccessToken)).thenReturn(false);
         when(tokenUtil.isAccessTokenExpired(expiredAccessToken)).thenReturn(userId);
         when(refreshTokenRepository.findByUserId(userId)).thenReturn(Optional.empty());
 

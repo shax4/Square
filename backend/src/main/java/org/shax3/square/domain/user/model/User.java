@@ -12,7 +12,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Pattern;
 
 import org.shax3.square.common.entity.BaseTimeEntity;
 
@@ -38,8 +37,7 @@ public class User extends BaseTimeEntity {
     @Column(name = "email", length = 40, unique = true)
     private String email;
 
-    @Column(name = "nickname", nullable = false, length = 30, unique = true)
-    @Pattern(regexp = "^[a-zA-Z0-9가-힣]{2,8}$", message = "닉네임은 영문, 숫자, 한글로만 구성되어 있으며, 길이는 2자리 이상 8자리 이하이어야 합니다.")
+    @Column(name = "nickname", nullable = false, length = 10, unique = true)
     private String nickname;
 
     @Column(name = "s3_key", nullable = false)
@@ -101,10 +99,4 @@ public class User extends BaseTimeEntity {
         this.socialType = socialType;
         this.state = ACTIVE;
     }
-
-    public boolean updateNickname(String nickname) {
-        java.util.regex.Pattern p = java.util.regex.Pattern.compile("^[a-zA-Z0-9가-힣]{2,8}$");
-        return p.matcher(nickname).matches();
-    }
-
 }
