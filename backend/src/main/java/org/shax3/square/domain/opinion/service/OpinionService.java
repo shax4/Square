@@ -40,18 +40,8 @@ public class OpinionService {
                 .orElseThrow(() -> new CustomException(ExceptionCode.OPINION_NOTFOUND));
 
         List<CommentResponse> comments = opinionCommentService.getOpinionComments(user, opinionId);
+        String opinionUserPresignedUrl = s3Service.generatePresignedGetUrl(opinion.getUser().getS3Key());
 
-        return new OpinionDetailsResponse(
-                opinion.getId(),
-                opinion.getUser().getNickname(),
-                s3Service.generatePresignedGetUrl(opinion.getUser().getS3Key()),
-                opinion.getUser().getType().name(),
-                opinion.getCreatedAt(),
-                opinion.getContent(),
-                opinion.getLikeCount(),
-                comments.size(),
-                false,
-                comments
-        );
+        return OpinionDetailsResponse.of(opinion, comments, opinionUserPresignedUrl);
     }
 }
