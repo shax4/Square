@@ -100,4 +100,8 @@ public class AuthService {
         }
         throw new CustomException(SOCIAL_TYPE_MISMATCH);
     }
+
+    public void logout(String refreshToken) {
+        refreshTokenRepository.deleteByToken(refreshToken);
+    }
 }
