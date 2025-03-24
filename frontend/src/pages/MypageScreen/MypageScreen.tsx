@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 
-import {ProfileImage, PersonalityTag, LikeButton, BlueBarChart} from '../../components';
+import {ProfileImage, PersonalityTag, LikeButton} from '../../components';
 
 export default function MypageScreen() {
     const onPressType = () => {
@@ -20,7 +20,6 @@ export default function MypageScreen() {
             <ProfileImage variant='small'/>
             <PersonalityTag personality='PNTB' onPress={onPressType}/>
             <LikeButton initialCount={100}/>
-            <BlueBarChart data={chartData} highlightIdx={1}/>
         </View>
     )
 }
