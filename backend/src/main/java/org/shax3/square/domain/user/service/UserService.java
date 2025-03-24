@@ -86,7 +86,7 @@ public class UserService {
     public void deleteAccount(User user, String refreshToken) {
         refreshTokenRepository.deleteByToken(refreshToken);
         User foundUser = userRepository.findById(user.getId())
-                .orElseThrow(() -> new CustomException(NOT_FOUND));
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         foundUser.deleteAccount();
     }
 }

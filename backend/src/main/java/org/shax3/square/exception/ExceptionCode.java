@@ -23,6 +23,7 @@ public enum ExceptionCode {
 	NOT_PROFILE_IMG(2008, "사진이 유효하지 않습니다."),
 	USER_DELETED(2009, "탈퇴한 회원입니다."),
 	USER_INACTIVE(2010, "비활성 회원입니다."),
+	USER_NOT_FOUND(2011, "유저를 찾을 수 없습니다."),
 
 	UNAUTHORIZED_ACCESS(3000, "접근할 수 없는 리소스입니다."),
 	INVALID_REFRESH_TOKEN(3001, "사용자 식별에 실패했습니다. 다시 로그인해주세요."),
