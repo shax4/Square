@@ -16,6 +16,18 @@ spring:
       maximum-pool-size: 20
       minimum-idle: 10
 
+  data:
+
+#    mongodb:
+#      database: ${MONGODB_DATABASE}
+#      uri: ${MONGODB_URI}
+
+    redis:
+      host: ${REDIS_CACHE_HOST}
+      port: ${REDIS_CACHE_PORT}
+      password: ${REDIS_CACHE_PASSWORD}
+      ttl-minutes: 1440
+
   jpa:
     show-sql: true
     hibernate:
@@ -38,6 +50,11 @@ oauth2:
     client-id: ${GOOGLE_CLIENT_ID}
     client-secret: ${GOOGLE_CLIENT_SECRET}
     redirect-uri: ${GOOGLE_REDIRECT_URI}
+
+batch-redis:
+  host: ${REDIS_BATCH_HOST}
+  port: ${REDIS_BATCH_PORT}
+  password: ${REDIS_BATCH_PASSWORD}
 
 springdoc:
   api-docs:
