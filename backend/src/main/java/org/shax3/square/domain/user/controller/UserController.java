@@ -6,14 +6,17 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.shax3.square.domain.auth.annotation.AuthUser;
 import org.shax3.square.domain.user.dto.UserSignUpDto;
 import org.shax3.square.domain.user.dto.request.SignUpRequest;
 import org.shax3.square.domain.user.dto.response.SignUpUserInfoResponse;
 import org.shax3.square.domain.user.dto.response.UserChoiceResponse;
+import org.shax3.square.domain.user.model.User;
 import org.shax3.square.domain.user.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,6 +50,28 @@ public class UserController {
         response.setHeader("Authorization", "Bearer " + userSignUpDto.accessToken());
 
         return ResponseEntity.ok().body(SignUpUserInfoResponse.from(userSignUpDto));
+    }
+
+    @Operation(
+            summary = "유저 탈퇴 api",
+            description = "유저를 탈퇴처리 시키고 refreshToken을 만료시킵니다."
+    )
+    @DeleteMapping
+    public ResponseEntity<Void> deleteAccount(
+            @AuthUser User user,
+            @CookieValue("refresh-token") String refreshToken,
+            HttpServletResponse response
+    ) {
+        userService.deleteAccount(user, refreshToken);
+
+        Cookie cookie = new Cookie("refresh-token", null);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(0);
+
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok().build();
     }
 
     @Operation(

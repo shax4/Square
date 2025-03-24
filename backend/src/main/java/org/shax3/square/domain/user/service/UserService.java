@@ -81,4 +81,12 @@ public class UserService {
     public UserChoiceResponse getUserChoices() {
         return UserChoiceResponseFactory.getUserChoiceResponse();
     }
+
+    @Transactional
+    public void deleteAccount(User user, String refreshToken) {
+        refreshTokenRepository.deleteByToken(refreshToken);
+        User foundUser = userRepository.findById(user.getId())
+                .orElseThrow(() -> new CustomException(NOT_FOUND));
+        foundUser.deleteAccount();
+    }
 }

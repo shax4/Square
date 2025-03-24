@@ -3,7 +3,7 @@ package org.shax3.square.domain.user.model;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
-import static org.shax3.square.domain.user.model.State.ACTIVE;
+import static org.shax3.square.domain.user.model.State.*;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -98,5 +98,9 @@ public class User extends BaseTimeEntity {
         this.type = type;
         this.socialType = socialType;
         this.state = ACTIVE;
+    }
+
+    public void deleteAccount() {
+        this.state = LEAVE;
     }
 }
