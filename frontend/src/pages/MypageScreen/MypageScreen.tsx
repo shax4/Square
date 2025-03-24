@@ -31,7 +31,6 @@ export default function MypageScreen() {
             <ProfileImage variant='small'/>
             <PersonalityTag personality='PNTB' onPress={onPressType}/>
             <LikeButton initialCount={100}/>
-            <BlueBarChart data={chartData} highlightIdx={1}/>
             <TouchableOpacity onPress={() => navigation.navigate('PersonalitySurveyPage')}>
                 <Text>Go to PersonalitySurveyPage</Text>
             </TouchableOpacity>
