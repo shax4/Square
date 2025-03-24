@@ -18,14 +18,7 @@ public class OpinionService {
     public void createOpinion(User user, CreateOpinionRequest request) {
         Debate debate = debateService.findDebateById(request.debateId());
 
-        Opinion opinion = Opinion.builder()
-                .user(user)
-                .debate(debate)
-                .left(request.left())
-                .content(request.content())
-                .build();
-
-
+        Opinion opinion = request.to(user,debate);
 
         opinionRepository.save(opinion);
     }

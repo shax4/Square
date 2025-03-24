@@ -36,7 +36,6 @@ public class Opinion {
     @Column(name = "is_left", nullable = false)
     private boolean left;
 
-
     @Builder
     public Opinion(User user, Debate debate, boolean left, String content) {
         this.debate = debate;

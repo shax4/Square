@@ -1,9 +1,9 @@
 package org.shax3.square.domain.opinion.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.annotation.AuthUser;
 import org.shax3.square.domain.opinion.dto.CreateOpinionRequest;
-import org.shax3.square.domain.opinion.model.Opinion;
 import org.shax3.square.domain.opinion.service.OpinionService;
 import org.shax3.square.domain.user.model.User;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ public class OpinionController {
 
 
     @PostMapping
-    public ResponseEntity<Void> create(@AuthUser User user, @RequestBody CreateOpinionRequest request) {
+    public ResponseEntity<Void> create(@AuthUser User user, @Valid @RequestBody CreateOpinionRequest request) {
         opinionService.createOpinion(user,request);
 
         return ResponseEntity.ok().build();
