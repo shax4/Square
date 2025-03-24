@@ -14,7 +14,7 @@ public class UserChoiceResponseFactory {
 
     static {
         List<String> genderList = Arrays.stream(Gender.values())
-                .map(Gender::getValue)
+                .map(Gender::name)
                 .collect(Collectors.toList());
         List<String> regionList = Arrays.stream(Region.values())
                 .map(Region::getKoreanName)
