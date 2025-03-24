@@ -1,9 +1,20 @@
 import * as React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet,TouchableOpacity} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import {ProfileImage, PersonalityTag, LikeButton, BlueBarChart} from '../../components';
 
+type StackParamList = {
+    NevTestPage1: undefined;
+    NevTestPage2: undefined;
+    NevTestPage3: undefined;
+    UiTestScreen: undefined;
+    PersonalitySurveyPage: undefined;
+};
+
 export default function MypageScreen() {
+    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
     const onPressType = () => {
         alert("You Pressed PersonalityType!");
     }
@@ -21,6 +32,9 @@ export default function MypageScreen() {
             <PersonalityTag personality='PNTB' onPress={onPressType}/>
             <LikeButton initialCount={100}/>
             <BlueBarChart data={chartData} highlightIdx={1}/>
+            <TouchableOpacity onPress={() => navigation.navigate('PersonalitySurveyPage')}>
+                <Text>Go to PersonalitySurveyPage</Text>
+            </TouchableOpacity>
         </View>
     )
 }
