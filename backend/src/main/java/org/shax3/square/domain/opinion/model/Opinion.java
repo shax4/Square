@@ -2,6 +2,7 @@ package org.shax3.square.domain.opinion.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.shax3.square.common.entity.BaseTimeEntity;
 import org.shax3.square.domain.debate.model.Debate;
 import org.shax3.square.domain.user.model.User;
 
@@ -10,7 +11,7 @@ import org.shax3.square.domain.user.model.User;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "opinion")
-public class Opinion {
+public class Opinion extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
