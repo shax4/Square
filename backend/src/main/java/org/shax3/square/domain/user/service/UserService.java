@@ -27,7 +27,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
 
-    private static final String DEFAULT_PROFILE_IMG = "5bc4ed82-cdc5-4d6e-b0f0-28940e96b985.png";
+    private static final String DEFAULT_PROFILE_IMG = "profile/0c643827-c958-465b-875d-918c8a22fe01.png";
 
     @Transactional
     public UserSignUpDto signUp(SignUpRequest signUpRequest, String signUpToken) {
@@ -45,12 +45,12 @@ public class UserService {
             throw new CustomException(DUPLICATE_EMAIL);
         }
 
-        String fileName = signUpRequest.fileName();
-        if (fileName == null) {
-            fileName = DEFAULT_PROFILE_IMG;
+        String s3Key = signUpRequest.s3Key();
+        if (s3Key == null) {
+            s3Key = DEFAULT_PROFILE_IMG;
         }
         AgeRange ageRange = calculateAgeRange(signUpRequest.yearOfBirth());
-        User signUpUser = signUpRequest.to(email, socialType, ageRange, fileName);
+        User signUpUser = signUpRequest.to(email, socialType, ageRange, s3Key);
         userRepository.save(signUpUser);
 
         UserTokenDto userTokens = tokenUtil.createLoginToken(signUpUser.getId());

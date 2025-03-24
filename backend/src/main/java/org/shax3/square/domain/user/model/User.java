@@ -40,8 +40,8 @@ public class User extends BaseTimeEntity {
     @Column(name = "nickname", nullable = false, length = 10, unique = true)
     private String nickname;
 
-    @Column(name = "file_name", nullable = false)
-    private String fileName;
+    @Column(name = "s3_key", nullable = false)
+    private String s3Key;
 
     @Enumerated(STRING)
     @Column(name = "region", nullable = false)
@@ -78,7 +78,7 @@ public class User extends BaseTimeEntity {
     public User(
             String email,
             String nickname,
-            String fileName,
+            String s3Key,
             Region region,
             Gender gender,
             int yearOfBirth,
@@ -89,7 +89,7 @@ public class User extends BaseTimeEntity {
     ) {
         this.email = email;
         this.nickname = nickname;
-        this.fileName = fileName;
+        this.s3Key = s3Key;
         this.region = region;
         this.gender = gender;
         this.yearOfBirth = yearOfBirth;

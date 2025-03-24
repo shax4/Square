@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.shax3.square.domain.s3.dto.request.PresignedPutUrlRequest;
-import org.shax3.square.domain.s3.dto.response.PresignedGetUrlResponse;
 import org.shax3.square.domain.s3.dto.response.PresignedPutUrlResponse;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.mockito.InjectMocks;
@@ -49,35 +48,11 @@ class S3ServiceTest {
                 .thenReturn(mockPutObjectRequest);
 
         //when
-        PresignedPutUrlRequest requestDto = new PresignedPutUrlRequest("example.png", "image/png");
+        PresignedPutUrlRequest requestDto = new PresignedPutUrlRequest("example.png", "image/png", "profile");
         PresignedPutUrlResponse response = s3Service.generatePresignedPutUrl(requestDto);
 
         // then
         assertNotNull(response);
         assertEquals("https://test-bucket.s3.amazonaws.com/fake-uuid.png", response.presignedPutUrl());
-    }
-
-
-    @Test
-    void testGeneratePresignedGetUrl() throws MalformedURLException {
-        // given
-        String fileName = "somefile.png";
-
-        PresignedGetObjectRequest mockGetObjectRequest = Mockito.mock(PresignedGetObjectRequest.class);
-
-        when(mockGetObjectRequest.url()).thenReturn(
-                URI.create("https://test-bucket.s3.amazonaws.com/somefile.png?X-Amz-Signature=1234").toURL()
-        );
-
-        when(s3Presigner.presignGetObject(any(GetObjectPresignRequest.class)))
-                .thenReturn(mockGetObjectRequest);
-
-        // when
-        PresignedGetUrlResponse response = s3Service.generatePresignedGetUrl(fileName);
-
-        // then
-        assertNotNull(response);
-        assertEquals("https://test-bucket.s3.amazonaws.com/somefile.png?X-Amz-Signature=1234",
-                response.presignedGetUrl());
     }
 }

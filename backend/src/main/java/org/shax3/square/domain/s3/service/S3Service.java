@@ -2,7 +2,6 @@ package org.shax3.square.domain.s3.service;
 
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.s3.dto.request.PresignedPutUrlRequest;
-import org.shax3.square.domain.s3.dto.response.PresignedGetUrlResponse;
 import org.shax3.square.domain.s3.dto.response.PresignedPutUrlResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -27,7 +26,7 @@ public class S3Service {
     private String bucketName;
 
     public PresignedPutUrlResponse generatePresignedPutUrl(PresignedPutUrlRequest presignedPutUrlRequest) {
-        String fileName = generateFileName(presignedPutUrlRequest.fileName());
+        String fileName = generateFileName(presignedPutUrlRequest.fileName(), presignedPutUrlRequest.folder());
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
@@ -48,7 +47,7 @@ public class S3Service {
         return PresignedPutUrlResponse.of(presignedUrl,fileName);
     }
 
-    public PresignedGetUrlResponse generatePresignedGetUrl(String fileName) {
+    public String generatePresignedGetUrl(String fileName) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)
                 .key(fileName)
@@ -62,12 +61,10 @@ public class S3Service {
         PresignedGetObjectRequest presignedGetObjectRequest =
                 s3Presigner.presignGetObject(getObjectPresignRequest);
 
-        String presignedUrl = presignedGetObjectRequest.url().toString();
-
-        return PresignedGetUrlResponse.of(presignedUrl);
+        return presignedGetObjectRequest.url().toString();
     }
 
-    private String generateFileName(String originalFileName) {
+    private String generateFileName(String originalFileName, String folder) {
         String extension = "";
         int dotIndex = originalFileName.lastIndexOf(".");
         if (dotIndex != -1) {
@@ -76,6 +73,6 @@ public class S3Service {
 
         String uuid = UUID.randomUUID().toString();
 
-        return uuid + extension;
+        return folder + "/" + uuid + extension;
     }
 }

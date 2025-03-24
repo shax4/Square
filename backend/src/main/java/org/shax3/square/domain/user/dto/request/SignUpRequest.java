@@ -15,7 +15,7 @@ public record SignUpRequest(
         @NotBlank(message = "닉네임은 필수 요소입니다.")
         @Pattern(regexp = "^[a-zA-Z0-9가-힣]{2,8}$", message = "닉네임은 영문, 숫자, 한글로만 구성되어 있으며, 길이는 2자리 이상 8자리 이하이어야 합니다.")
         String nickname,
-        String fileName,
+        String s3Key,
         @NotNull(message = "지역을 입력해주세요.")
         Region region,
         @NotNull(message = "성별을 입력해주세요.")
@@ -25,11 +25,11 @@ public record SignUpRequest(
         @NotNull(message = "종교를 입력해주세요.")
         Religion religion
 ) {
-    public User to(String email, SocialType socialType, AgeRange ageRange, String fileName) {
+    public User to(String email, SocialType socialType, AgeRange ageRange, String s3Key) {
         return User.builder()
                 .email(email)
                 .nickname(this.nickname)
-                .fileName(fileName)
+                .s3Key(s3Key)
                 .region(this.region)
                 .gender(this.gender)
                 .yearOfBirth(this.yearOfBirth)
