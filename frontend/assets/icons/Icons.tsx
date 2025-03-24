@@ -11,4 +11,5 @@ export const Icons = {
     share: (props: any) => <Feather name="share" size={24} color="black" {...props} />,
     settings: (props: any) => <Feather name="settings" size={24} color="black" {...props} />,
     logout: (props: any) => <Ionicons name="exit-outline" size={24} color="black" {...props} />,
+    send: (props: any) => <MaterialCommunityIcons name="send" size={24} {...props} />,
 };
