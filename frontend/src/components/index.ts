@@ -9,3 +9,6 @@ export {default as PersonalityTag} from "./PersonalityTag";
 
 // 좋아요 버튼 컴포넌트.
 export {default as LikeButton} from "./LikeButton"
+
+// 텍스트 필드 컴포넌트.
+export {default as TextField} from "./TextField";
