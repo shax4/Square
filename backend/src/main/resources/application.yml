@@ -25,7 +25,6 @@ spring:
     redis:
       host: ${REDIS_CACHE_HOST}
       port: ${REDIS_CACHE_PORT}
-      username: ${REDIS_CACHE_USERNAME}
       password: ${REDIS_CACHE_PASSWORD}
       ttl-minutes: 1440
 
@@ -55,7 +54,6 @@ oauth2:
 batch-redis:
   host: ${REDIS_BATCH_HOST}
   port: ${REDIS_BATCH_PORT}
-  username: ${REDIS_BATCH_USERNAME}
   password: ${REDIS_BATCH_PASSWORD}
 
 springdoc:
