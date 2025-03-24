@@ -1,5 +1,6 @@
 package org.shax3.square.config;
 
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,11 +15,19 @@ import org.springframework.data.redis.connection.lettuce.LettucePoolingClientCon
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-
 import java.time.Duration;
 
 @Configuration
 public class RedisConfig {
+
+    @Bean
+    public GenericObjectPoolConfig genericObjectPoolConfig() {
+        GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
+        poolConfig.setMaxTotal(100); // 최대 연결 수
+        poolConfig.setMaxIdle(10);  // 최대 유휴 연결 수
+        poolConfig.setMinIdle(5);   // 최소 유휴 연결 수
+        return poolConfig;
+    }
 
     @Bean
     public RedisCacheManager cacheManager(
