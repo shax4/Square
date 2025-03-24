@@ -5,15 +5,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.s3.dto.request.PresignedPutUrlRequest;
-import org.shax3.square.domain.s3.dto.response.PresignedGetUrlResponse;
 import org.shax3.square.domain.s3.dto.response.PresignedPutUrlResponse;
 import org.shax3.square.domain.s3.service.S3Service;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -34,16 +31,6 @@ public class S3Controller {
     ) {
         PresignedPutUrlResponse response = s3Service.generatePresignedPutUrl(presignedPutUrlRequest);
 
-        return ResponseEntity.ok(response);
-    }
-
-    @Operation(
-            summary = "이미지 조회용 API",
-            description = "fileName을 입력하면 presignedGetUrl을 반환해줍니다."
-    )
-    @GetMapping("/presigned-get")
-    public ResponseEntity<PresignedGetUrlResponse> getPresignedGetUrl(@RequestParam String fileName) {
-        PresignedGetUrlResponse response = s3Service.generatePresignedGetUrl(fileName);
         return ResponseEntity.ok(response);
     }
 }
