@@ -123,4 +123,25 @@ public class AuthController {
         response.setHeader("Authorization", "Bearer " + reissuedToken);
         return ResponseEntity.ok().build();
     }
+
+    @Operation(
+            summary = "로그아웃 api",
+            description = "쿠키를 지워주고 refreshToken을 만료시킵니다."
+    )
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(
+            @CookieValue("refresh-token") String refreshToken,
+            HttpServletResponse response
+    ) {
+        authService.logout(refreshToken);
+
+        Cookie cookie = new Cookie("refresh-token", null);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(0);
+
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok().build();
+    }
 }

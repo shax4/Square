@@ -258,4 +258,17 @@ class AuthServiceTest {
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ExceptionCode.INVALID_REFRESH_TOKEN.getMessage());
     }
+
+    @Test
+    @DisplayName("로그아웃 - 잘 작동하는지 확인")
+    void logout_ShouldCallDeleteByToken() {
+        // given
+        String refreshToken = "sample-refresh-token";
+
+        // when
+        authService.logout(refreshToken);
+
+        // then
+        verify(refreshTokenRepository, times(1)).deleteByToken(refreshToken);
+    }
 }
