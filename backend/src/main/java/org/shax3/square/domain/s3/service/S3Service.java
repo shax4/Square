@@ -3,6 +3,7 @@ package org.shax3.square.domain.s3.service;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.s3.dto.request.PresignedPutUrlRequest;
 import org.shax3.square.domain.s3.dto.response.PresignedPutUrlResponse;
+import org.shax3.square.exception.CustomException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
@@ -14,7 +15,11 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequ
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
+
+import static org.shax3.square.exception.ExceptionCode.UNSUPPORTED_EXTENSIONS;
 
 @Service
 @RequiredArgsConstructor
@@ -25,13 +30,20 @@ public class S3Service {
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
 
+    private static final List<String> ALLOWED_EXTENSIONS = Arrays.asList(".jpg", ".jpeg", ".png", ".gif", ".webp");
+
     public PresignedPutUrlResponse generatePresignedPutUrl(PresignedPutUrlRequest presignedPutUrlRequest) {
-        String fileName = generateFileName(presignedPutUrlRequest.fileName(), presignedPutUrlRequest.folder());
+
+        String fileName = presignedPutUrlRequest.fileName();
+        String contentType = presignedPutUrlRequest.contentType();
+
+        validateImage(fileName, contentType);
+        String generatedFileName = generateFileName(fileName, presignedPutUrlRequest.folder());
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
-                .key(fileName)
-                .contentType(presignedPutUrlRequest.contentType())
+                .key(generatedFileName)
+                .contentType(contentType)
                 .build();
 
         PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
@@ -39,12 +51,11 @@ public class S3Service {
                 .putObjectRequest(putObjectRequest)
                 .build();
 
-        PresignedPutObjectRequest presignedPutObjectRequest =
-                s3Presigner.presignPutObject(presignRequest);
+        PresignedPutObjectRequest presignedPutObjectRequest = s3Presigner.presignPutObject(presignRequest);
 
         String presignedUrl = presignedPutObjectRequest.url().toString();
 
-        return PresignedPutUrlResponse.of(presignedUrl,fileName);
+        return PresignedPutUrlResponse.of(presignedUrl, generatedFileName);
     }
 
     public String generatePresignedGetUrl(String fileName) {
@@ -58,8 +69,7 @@ public class S3Service {
                 .getObjectRequest(getObjectRequest)
                 .build();
 
-        PresignedGetObjectRequest presignedGetObjectRequest =
-                s3Presigner.presignGetObject(getObjectPresignRequest);
+        PresignedGetObjectRequest presignedGetObjectRequest = s3Presigner.presignGetObject(getObjectPresignRequest);
 
         return presignedGetObjectRequest.url().toString();
     }
@@ -74,5 +84,19 @@ public class S3Service {
         String uuid = UUID.randomUUID().toString();
 
         return folder + "/" + uuid + extension;
+    }
+
+    private void validateImage(String originalFileName, String contentType) {
+        if (contentType == null || !contentType.toLowerCase().startsWith("image/")) {
+            throw new IllegalArgumentException("Only image content types are allowed.");
+        }
+
+        int dotIndex = originalFileName.lastIndexOf(".");
+        if (dotIndex != -1) {
+            String extension = originalFileName.substring(dotIndex).toLowerCase();
+            if (!ALLOWED_EXTENSIONS.contains(extension)) {
+                throw new CustomException(UNSUPPORTED_EXTENSIONS);
+            }
+        }
     }
 }
