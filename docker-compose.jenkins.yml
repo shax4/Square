@@ -22,10 +22,6 @@ services:
       -Djenkins.model.Jenkins.crumbIssuerProxyCompatibility=true
       -jar /usr/share/jenkins/jenkins.war
       --prefix=/jenkins
-    dns:
-      - 168.126.63.1   # KT DNS
-      - 8.8.8.8        # Google DNS
-      - 8.8.4.4        # Google DNS
     networks:
       - app-network
 
