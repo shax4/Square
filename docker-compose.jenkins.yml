@@ -23,12 +23,7 @@ services:
       - JENKINS_OPTS=--prefix=/jenkins
       - JAVA_OPTS=-Djenkins.model.Jenkins.crumbIssuerProxyCompatibility=true -Dhudson.security.csrf.GlobalCrumbIssuerConfiguration.DISABLE_CSRF_PROTECTION=true
     command: java -Djenkins.model.Jenkins.crumbIssuerProxyCompatibility=true -Dhudson.security.csrf.GlobalCrumbIssuerConfiguration.DISABLE_CSRF_PROTECTION=true -jar /usr/share/jenkins/jenkins.war --prefix=/jenkins
-    networks:
-      - app-network
 
 volumes:
   jenkins-home:
 
-networks:
-  app-network:
-    external: true
