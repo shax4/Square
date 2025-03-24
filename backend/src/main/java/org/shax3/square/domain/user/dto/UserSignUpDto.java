@@ -12,7 +12,6 @@ import org.shax3.square.domain.user.model.User;
 public record UserSignUpDto(
         String accessToken,
         RefreshToken refreshToken,
-        String email,
         String nickname,
         Type userType,
         State state,
@@ -22,7 +21,6 @@ public record UserSignUpDto(
         return UserSignUpDto.builder()
                 .accessToken(userTokenDto.accessToken())
                 .refreshToken(userTokenDto.refreshToken())
-                .email(null)
                 .nickname(user.getNickname())
                 .userType(user.getType())
                 .state(user.getState())
