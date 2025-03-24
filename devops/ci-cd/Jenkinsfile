@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        COMPOSE_PATH = "devops/docker/docker-compose.app.yml"
+        COMPOSE_PATH = "docker-compose.app.yml"
         BACKEND_IMAGE_NAME = "backend:latest"
     }
 
