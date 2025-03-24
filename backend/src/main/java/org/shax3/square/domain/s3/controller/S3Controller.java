@@ -1,5 +1,7 @@
 package org.shax3.square.domain.s3.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.s3.dto.request.PresignedPutUrlRequest;
@@ -17,10 +19,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/s3")
+@Tag(name = "S3", description = "s3 관련 API")
 public class S3Controller {
 
     private final S3Service s3Service;
 
+    @Operation(
+            summary = "이미지 등록용 API",
+            description = "fileName과 contentType을 입력하면 presignedPutUrl과 새로운 fileName을 반환해줍니다."
+    )
     @PostMapping("/presigned-put")
     public ResponseEntity<PresignedPutUrlResponse> getPresignedPutUrl(
             @Valid @RequestBody PresignedPutUrlRequest presignedPutUrlRequest
@@ -30,6 +37,10 @@ public class S3Controller {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+            summary = "이미지 조회용 API",
+            description = "fileName을 입력하면 presignedGetUrl을 반환해줍니다."
+    )
     @GetMapping("/presigned-get")
     public ResponseEntity<PresignedGetUrlResponse> getPresignedGetUrl(@RequestParam String fileName) {
         PresignedGetUrlResponse response = s3Service.generatePresignedGetUrl(fileName);
