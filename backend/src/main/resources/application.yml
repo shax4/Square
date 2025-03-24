@@ -33,6 +33,16 @@ spring:
       refresh-token-expiry: ${JWT_REFRESH_TOKEN_EXPIRY}
       sign-up-token-expiry: ${JWT_SIGN_UP_TOKEN_EXPIRY}
 
+cloud:
+  aws:
+    s3:
+      bucket: ${S3_BUCKET}
+    region:
+      static: ap-northeast-1
+    credentials:
+      access-key: ${S3_ACCESS_KEY}
+      secret-key: ${S3_SECRET_KEY}
+
 oauth2:
   google:
     client-id: ${GOOGLE_CLIENT_ID}
