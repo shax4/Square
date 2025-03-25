@@ -23,7 +23,6 @@ import java.util.List;
 public class OpinionService {
     private final OpinionRepository opinionRepository;
     private final DebateService debateService;
-    private final OpinionCommentService opinionCommentService;
     private final S3Service s3Service;
 
     @Transactional
@@ -33,17 +32,6 @@ public class OpinionService {
         Opinion opinion = request.to(user, debate);
 
         opinionRepository.save(opinion);
-    }
-
-    @Transactional(readOnly = true)
-    public OpinionDetailsResponse getOpinionDetails(User user, Long opinionId) {
-        Opinion opinion = opinionRepository.findById(opinionId)
-                .orElseThrow(() -> new CustomException(ExceptionCode.OPINION_NOT_FOUND));
-
-        List<CommentResponse> comments = opinionCommentService.getOpinionComments(user, opinionId);
-        String opinionUserPresignedUrl = s3Service.generatePresignedGetUrl(opinion.getUser().getS3Key());
-
-        return OpinionDetailsResponse.of(opinion, comments, opinionUserPresignedUrl);
     }
 
     @Transactional
@@ -75,4 +63,6 @@ public class OpinionService {
         return opinionRepository.findById(opinionId)
                 .orElseThrow(() -> new CustomException(ExceptionCode.OPINION_NOT_FOUND));
     }
+
+
 }

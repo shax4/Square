@@ -10,6 +10,7 @@ import org.shax3.square.domain.opinion.dto.request.CreateOpinionCommentRequest;
 import org.shax3.square.domain.opinion.dto.request.UpdateOpinionRequest;
 import org.shax3.square.domain.opinion.dto.response.CreateOpinionCommentResponse;
 import org.shax3.square.domain.opinion.service.OpinionCommentService;
+import org.shax3.square.domain.opinion.service.OpinionFacadeService;
 import org.shax3.square.domain.user.model.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 public class OpinionCommentController {
     private final OpinionCommentService opinionCommentService;
+    private final OpinionFacadeService opinionFacadeService;
 
     @Operation(
             summary = "답글 생성",
@@ -28,7 +30,7 @@ public class OpinionCommentController {
     )
     @PostMapping
     public ResponseEntity<CreateOpinionCommentResponse> create(@AuthUser User user, @Valid @RequestBody CreateOpinionCommentRequest request) {
-        CreateOpinionCommentResponse response = opinionCommentService.createOpinionComment(user, request);
+        CreateOpinionCommentResponse response = opinionFacadeService.createOpinionComment(user, request);
         return ResponseEntity.ok(response);
     }
 
