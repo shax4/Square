@@ -42,8 +42,8 @@ pipeline {
                   echo "기존 백엔드 컨테이너 제거"
                   docker-compose --env-file .env -f ${COMPOSE_PATH} rm -f backend || true
 
-                  echo "app.yml  재빌드 및 실행"
-                  docker-compose --env-file .env -f ${COMPOSE_PATH} up -d --build
+                  echo "백엔드 컨테이너만 재빌드 및 실행"
+                  docker-compose --env-file .env -f ${COMPOSE_PATH} up -d --build backend
                 '''
             }
         }
