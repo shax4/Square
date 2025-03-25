@@ -7,10 +7,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.shax3.square.domain.debate.model.Debate;
 import org.shax3.square.domain.opinion.dto.response.CommentResponse;
 import org.shax3.square.domain.opinion.model.OpinionComment;
 import org.shax3.square.domain.opinion.repository.OpinionCommentRepository;
+import org.shax3.square.domain.opinion.service.OpinionCommentService;
 import org.shax3.square.domain.s3.service.S3Service;
 import org.shax3.square.domain.user.model.Type;
 import org.shax3.square.domain.user.model.User;
@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class OpinionCommentServiceTest {
@@ -35,7 +35,6 @@ class OpinionCommentServiceTest {
     private OpinionCommentService opinionCommentService;
 
     private User mockUser;
-    private Debate mockDebate;
 
     @BeforeEach
     void setUp() {
@@ -45,14 +44,7 @@ class OpinionCommentServiceTest {
                 .s3Key("test-key")
                 .build();
         ReflectionTestUtils.setField(mockUser, "id", 1L);
-
-        mockDebate = Debate.builder()
-                .topic("Sample Debate")
-                .build();
-        ReflectionTestUtils.setField(mockDebate, "id", 1L);
     }
-
-
 
     @Test
     @DisplayName("댓글을 성공적으로 반환하는지 테스트")
@@ -68,12 +60,11 @@ class OpinionCommentServiceTest {
         List<CommentResponse> responses = opinionCommentService.getOpinionComments(mockUser, 1L);
 
         // Then
-        assertNotNull(responses);
-        assertEquals(1, responses.size());
-        assertEquals("Nice!", responses.get(0).content());
-        assertEquals(5, responses.get(0).likeCount());
-        assertEquals("TestUser", responses.get(0).nickname());
-        assertEquals("presigned-url", responses.get(0).profileUrl());
+        assertThat(responses).isNotNull().hasSize(1);
+        assertThat(responses.get(0).content()).isEqualTo("Nice!");
+        assertThat(responses.get(0).likeCount()).isEqualTo(5);
+        assertThat(responses.get(0).nickname()).isEqualTo("TestUser");
+        assertThat(responses.get(0).profileUrl()).isEqualTo("presigned-url");
     }
 
     @Test
@@ -86,8 +77,6 @@ class OpinionCommentServiceTest {
         List<CommentResponse> responses = opinionCommentService.getOpinionComments(mockUser, 1L);
 
         // Then
-        assertNotNull(responses);
-        assertTrue(responses.isEmpty());
+        assertThat(responses).isNotNull().isEmpty();
     }
 }
-
