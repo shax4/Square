@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.annotation.AuthUser;
 import org.shax3.square.domain.opinion.dto.request.CreateOpinionRequest;
+import org.shax3.square.domain.opinion.dto.request.UpdateOpinionRequest;
 import org.shax3.square.domain.opinion.dto.response.OpinionDetailsResponse;
 import org.shax3.square.domain.opinion.service.OpinionService;
 import org.shax3.square.domain.user.model.User;
@@ -41,5 +42,20 @@ public class OpinionController {
     public ResponseEntity<OpinionDetailsResponse> read(@AuthUser User user, @PathVariable Long opinionId) {
         OpinionDetailsResponse response = opinionService.getOpinionDetails(user, opinionId);
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "의견 수정", description = "사용자가 작성한 의견 내용을 수정하는 API입니다.")
+    @PutMapping("/{opinionId}")
+    public ResponseEntity<Void> update(@AuthUser User user, @PathVariable Long opinionId, @Valid @RequestBody UpdateOpinionRequest request) {
+        opinionService.updateOpinion(request,user,opinionId);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "의견 삭제", description = "사용자가 작성한 의견을 삭제하는 API입니다.")
+    @DeleteMapping("/{opinionId}")
+    public ResponseEntity<Void> delete(@AuthUser User user, @PathVariable Long opinionId) {
+        opinionService.deleteOpinion(user,opinionId);
+        return ResponseEntity.ok().build();
     }
 }
