@@ -12,6 +12,7 @@ public record CreateOpinionRequest(
         Long debateId,
         @NotNull
         boolean isLeft,
+        @NotNull
         @Size(min = 10, max = 150, message = "의견은 최소 10자 이상, 최대 150자 이하이어야 합니다.")
         String content) {
 
