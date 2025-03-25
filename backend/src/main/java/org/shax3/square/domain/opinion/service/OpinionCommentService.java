@@ -24,7 +24,6 @@ import static org.shax3.square.exception.ExceptionCode.OPINION_COMMENT_NOT_FOUND
 @RequiredArgsConstructor
 public class OpinionCommentService {
     private final OpinionCommentRepository opinionCommentRepository;
-    private final OpinionService opinionService;
     private final S3Service s3Service;
 
     @Transactional(readOnly = true)
@@ -39,16 +38,14 @@ public class OpinionCommentService {
                 .toList();
     }
 
-    @Transactional
-    public CreateOpinionCommentResponse createOpinionComment(User user, CreateOpinionCommentRequest request) {
-
-        Opinion opinion = opinionService.getOpinion(request.opinionId());
-        String profileUrl = s3Service.generatePresignedGetUrl(user.getS3Key());
-
-        OpinionComment savedComment = opinionCommentRepository.save(request.to(opinion,user));
-
-        return CreateOpinionCommentResponse.of(savedComment,profileUrl);
+    public OpinionComment createComment(
+            CreateOpinionCommentRequest request,
+            Opinion opinion,
+            User user
+    ) {
+        return opinionCommentRepository.save(request.to(opinion, user));
     }
+
 
     @Transactional
     public void deleteOpinionComment(User user, Long commentId) {
