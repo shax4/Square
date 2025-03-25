@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.TokenUtil;
 import org.shax3.square.domain.auth.dto.UserLoginDto;
+import org.shax3.square.domain.auth.dto.response.TestUserInfoResponse;
 import org.shax3.square.domain.auth.dto.response.UserInfoResponse;
 import org.shax3.square.domain.auth.service.AuthService;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,22 +44,10 @@ public class AuthController {
             description = "email을 입력하면 Access Token과 Refresh Token을 반환합니다."
     )
     @GetMapping("/test")
-    public ResponseEntity<UserInfoResponse> loginTest(
-            @RequestParam String email,
-            HttpServletResponse response
-    ) {
-        UserLoginDto userLoginDto = authService.loginTest(email);
+    public ResponseEntity<TestUserInfoResponse> loginTest() {
+        UserLoginDto userLoginDto = authService.loginTest("test@test.com");
 
-        if (userLoginDto.refreshToken() != null) {
-            Cookie cookie = new Cookie("refresh-token", userLoginDto.refreshToken().getToken());
-            cookie.setHttpOnly(true);
-            cookie.setSecure(false);
-            cookie.setPath("/");
-            response.addCookie(cookie);
-            response.setHeader("Authorization", userLoginDto.accessToken());
-        }
-
-        return ResponseEntity.ok().body(UserInfoResponse.from(userLoginDto));
+        return ResponseEntity.ok().body(TestUserInfoResponse.from(userLoginDto, userLoginDto.accessToken(), userLoginDto.refreshToken().getToken()));
     }
 
     @Operation(
