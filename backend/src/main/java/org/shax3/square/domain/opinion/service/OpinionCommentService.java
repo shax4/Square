@@ -27,6 +27,7 @@ public class OpinionCommentService {
     private final OpinionService opinionService;
     private final S3Service s3Service;
 
+    @Transactional(readOnly = true)
     public List<CommentResponse> getOpinionComments(User user, Long opinionId) {
         List<OpinionComment> comments = opinionCommentRepository.findByOpinionIdAndValidTrue(opinionId);
 
@@ -42,17 +43,17 @@ public class OpinionCommentService {
     public CreateOpinionCommentResponse createOpinionComment(User user, CreateOpinionCommentRequest request) {
 
         Opinion opinion = opinionService.getOpinion(request.opinionId());
-        String profileUrl = s3Service .generatePresignedGetUrl(user.getS3Key());
+        String profileUrl = s3Service.generatePresignedGetUrl(user.getS3Key());
 
         OpinionComment savedComment = opinionCommentRepository.save(request.to(opinion,user));
 
         return CreateOpinionCommentResponse.of(savedComment,profileUrl);
     }
 
+    @Transactional
     public void deleteOpinionComment(User user, Long commentId) {
         OpinionComment comment = opinionCommentRepository.findById(commentId)
                 .orElseThrow(() -> new CustomException(OPINION_COMMENT_NOT_FOUND));
-
 
         if (!comment.getUser().getId().equals(user.getId())) {
             throw new CustomException(ExceptionCode.NOT_AUTHOR);
@@ -61,6 +62,7 @@ public class OpinionCommentService {
         comment.softDelete();
     }
 
+    @Transactional
     public void updateOpinionComment(User user, UpdateOpinionRequest request, Long commentId) {
         OpinionComment comment = opinionCommentRepository.findById(commentId)
                 .orElseThrow(() -> new CustomException(OPINION_COMMENT_NOT_FOUND));
