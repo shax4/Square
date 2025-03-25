@@ -9,8 +9,6 @@ import org.shax3.square.domain.opinion.model.Opinion;
 import org.shax3.square.domain.opinion.model.OpinionComment;
 import org.shax3.square.domain.s3.service.S3Service;
 import org.shax3.square.domain.user.model.User;
-import org.shax3.square.exception.CustomException;
-import org.shax3.square.exception.ExceptionCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,10 +23,10 @@ public class OpinionFacadeService {
 
     @Transactional
     public CreateOpinionCommentResponse createOpinionComment(User user, CreateOpinionCommentRequest request) {
-        Opinion opinion = opinionService.getOpinion(request.opinionId()); // OpinionService 호출
+        Opinion opinion = opinionService.getOpinion(request.opinionId());
         String profileUrl = s3Service.generatePresignedGetUrl(user.getS3Key());
 
-        OpinionComment newComment = commentService.createComment(request, opinion, user); // Opinion 전달
+        OpinionComment newComment = commentService.createComment(request, opinion, user);
         return CreateOpinionCommentResponse.of(newComment, profileUrl);
     }
 
@@ -36,7 +34,7 @@ public class OpinionFacadeService {
     public OpinionDetailsResponse getOpinionDetails(User user, Long opinionId) {
         Opinion opinion = opinionService.getOpinion(opinionId);
         List<CommentResponse> comments = commentService.getOpinionComments(user, opinionId);
-        String profileUrl = s3Service.generatePresignedGetUrl(opinion.getUser().getS3Key());
+        String profileUrl = s3Service.generatePresignedGetUrl(user.getS3Key());
 
         return OpinionDetailsResponse.of(opinion, comments, profileUrl);
     }
