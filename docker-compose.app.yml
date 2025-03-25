@@ -16,8 +16,6 @@ services:
       SERVER_DOMAIN: ${SERVER_DOMAIN}
     networks:
       - app-network
-    depends_on:
-      - backend
 
   backend:
     build:
