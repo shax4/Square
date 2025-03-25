@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 import DebateCardList from '../../components/DebateCard/DebateCardList';
 
 
@@ -13,10 +13,11 @@ type StackParamList = {
 
 export default function DebateCardsScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
-
+    const isFocused = useIsFocused();
     return (
         <View>
-            <DebateCardList />
+            {isFocused && <DebateCardList />}
+            {/* <DebateCardList /> */}
         </View>
     );
 }

@@ -1,5 +1,5 @@
 import { StyleSheet, Dimensions } from 'react-native';
-
+import colors from '../../../assets/colors';
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get("window");
 
 export const styles = StyleSheet.create({
@@ -25,12 +25,24 @@ export const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         padding: 10,
+        marginLeft: 15,
     },
     CardHeaderText: {
         fontSize: 20,
     },
     CardHashtag: {
+        marginLeft: 15,
         paddingLeft: 10,
+        justifyContent: 'center',
+    },
+    CardHashtagText: {
+        height: 30,
+        backgroundColor: colors.hashtag,
+        fontSize: 15,
+        borderRadius: 15,
+        lineHeight: 30,
+        alignSelf: 'flex-start',
+        paddingHorizontal: 12,
     },
     CardTopic: {
         flex: 4,
@@ -38,25 +50,58 @@ export const styles = StyleSheet.create({
         paddingLeft: 10,
     },
     CardTopicText: {
+        marginLeft: 15,
+        marginRight: 15,
         fontSize: 40,
+        fontWeight: '500',
     },
     CardVote: {
+        marginLeft: 15,
+        marginRight: 15,
         flex: 3,
         alignItems: 'center',
         flexDirection: 'row',
         justifyContent: 'space-around',
     },
-    CardVoteProsButton: {
-        backgroundColor: '#bddaf3',
+    CardVoteButtonBeforeVoteLeft: {
+        backgroundColor: colors.yesLight,
         width: '45%',
         height: '80%',
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 15,
     },
-    CardVoteConsButton: {
-        backgroundColor: '#f5c5c5',
+    CardVoteButtonBeforeVoteRight: {
+        backgroundColor: colors.noLight,
         width: '45%',
+        height: '80%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 15,
+    },
+    CardVoteButtonSelectedLeft: {
+        backgroundColor: colors.yesDark,
+        height: '80%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 15,
+    },
+    CardVoteButtonSelectedRight: {
+        backgroundColor: colors.noDark,
+        height: '80%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 15,
+    },
+    CardVoteButtonNotSelectedLeft: {
+        backgroundColor: colors.yesLight,
+        height: '80%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 15,
+    },
+    CardVoteButtonNotSelectedRight: {
+        backgroundColor: colors.noLight,
         height: '80%',
         justifyContent: 'center',
         alignItems: 'center',
@@ -72,7 +117,7 @@ export const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#2372fa',
+        backgroundColor: colors.yesDark,
     },
     CardFooterText: {
         color: 'white',
@@ -81,4 +126,61 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+
+    // modal
+    overlay: {
+        flex: 1,
+        backgroundColor: colors.blurbackgroundColor,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    modalContainer: {
+        backgroundColor: colors.white,
+        padding: 24,
+        borderRadius: 12,
+        width: '80%',
+        alignItems: 'center'
+    },
+    title: {
+        fontSize: 25,
+        fontWeight: 'bold',
+        marginBottom: 40
+    },
+    message: {
+        fontSize: 15,
+        textAlign: 'center',
+        marginBottom: 15
+    },
+    buttonGroup: {
+        flexDirection: 'row',
+        gap: 12
+    },
+    cancelButton: {
+        width: '45%',
+        height: 70,
+        backgroundColor: colors.cancelButton,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    cancelText: {
+        fontSize: 15,
+        color: colors.black,
+    },
+    confirmButton: {
+        width: '45%',
+        height: 70,
+        backgroundColor: colors.yesDark,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    confirmText: {
+        fontSize: 15,
+        color: colors.white,
+    }
 });
