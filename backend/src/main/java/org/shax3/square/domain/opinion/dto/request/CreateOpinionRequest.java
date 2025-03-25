@@ -20,8 +20,8 @@ public record CreateOpinionRequest(
         return Opinion.builder()
                 .user(user)
                 .debate(debate)
-                .left(this.isLeft)
-                .content(this.content)
+                .left(isLeft)
+                .content(content)
                 .build();
     }
 }
