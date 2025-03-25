@@ -12,8 +12,10 @@ import org.shax3.square.domain.s3.service.S3Service;
 import org.shax3.square.domain.user.dto.UserSignUpDto;
 import org.shax3.square.domain.user.dto.request.CheckNicknameRequest;
 import org.shax3.square.domain.user.dto.request.SignUpRequest;
+import org.shax3.square.domain.user.dto.request.UpdateProfileRequest;
 import org.shax3.square.domain.user.dto.response.CheckNicknameResponse;
 import org.shax3.square.domain.user.dto.response.ProfileInfoResponse;
+import org.shax3.square.domain.user.dto.response.ProfileUrlResponse;
 import org.shax3.square.domain.user.model.*;
 import org.shax3.square.domain.user.repository.UserRedisRepository;
 import org.shax3.square.domain.user.repository.UserRepository;
@@ -300,5 +302,55 @@ class UserServiceTest {
         assertThat(response.region()).isEqualTo(Region.BUSAN.getKoreanName());
         assertThat(response.religion()).isEqualTo(Religion.CATHOLICISM.getKoreanName());
         assertThat(response.profileUrl()).isEqualTo(expectedUrl);
+    }
+
+    @Test
+    @DisplayName("프로필 정보 수정 테스트(프로필 이미지도 수정)")
+    void testUpdateProfileInfo_withProvidedS3Key() {
+        // given
+        User user = spy(User
+                .builder()
+                .s3Key("oldS3Key")
+                .build());
+        UpdateProfileRequest updateProfileRequest = mock(UpdateProfileRequest.class);
+
+        when(userRepository.findById(nullable(Long.class))).thenReturn(Optional.of(user));
+        String newS3Key = "newS3Key";
+        when(updateProfileRequest.s3Key()).thenReturn(newS3Key);
+
+        String expectedUrl = "http://example.com/" + newS3Key;
+        when(s3Service.generatePresignedGetUrl(newS3Key)).thenReturn(expectedUrl);
+
+        // when
+        ProfileUrlResponse response = userService.updateProfileInfo(user, updateProfileRequest);
+
+        // then
+        assertThat(response.profileUrl()).isEqualTo(expectedUrl);
+        // User 객체의 updateProfileInfo 메서드가 올바른 파라미터로 호출되었는지 검증
+        verify(user).updateProfileInfo(updateProfileRequest, newS3Key);
+    }
+
+    @Test
+    @DisplayName("프로필 정보 수정 테스트(프로필 이미지는 수정x)")
+    void testUpdateProfileInfo_withoutProvidedS3Key() {
+        // given
+        User user = spy(User
+                .builder()
+                .s3Key("existingS3Key")
+                .build());
+        UpdateProfileRequest updateProfileRequest = mock(UpdateProfileRequest.class);
+
+        when(userRepository.findById(nullable(Long.class))).thenReturn(Optional.of(user));
+        when(updateProfileRequest.s3Key()).thenReturn(null);
+
+        String expectedUrl = "http://example.com/" + user.getS3Key();
+        when(s3Service.generatePresignedGetUrl(user.getS3Key())).thenReturn(expectedUrl);
+
+        // when
+        ProfileUrlResponse response = userService.updateProfileInfo(user, updateProfileRequest);
+
+        // then
+        assertThat(response.profileUrl()).isEqualTo(expectedUrl);
+        verify(user).updateProfileInfo(eq(updateProfileRequest), eq("existingS3Key"));
     }
 }

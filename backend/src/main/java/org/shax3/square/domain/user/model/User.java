@@ -19,6 +19,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.shax3.square.domain.user.dto.request.UpdateProfileRequest;
 
 @Entity
 @Getter
@@ -98,6 +99,13 @@ public class User extends BaseTimeEntity {
         this.type = type;
         this.socialType = socialType;
         this.state = ACTIVE;
+    }
+
+    public void updateProfileInfo(UpdateProfileRequest updateProfileRequest, String s3Key) {
+        this.nickname = updateProfileRequest.nickname();
+        this.s3Key = s3Key;
+        this.region = updateProfileRequest.region();
+        this.religion = updateProfileRequest.religion();
     }
 
     public void deleteAccount() {

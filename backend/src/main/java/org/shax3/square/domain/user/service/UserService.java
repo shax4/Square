@@ -10,8 +10,10 @@ import org.shax3.square.domain.s3.service.S3Service;
 import org.shax3.square.domain.user.dto.UserSignUpDto;
 import org.shax3.square.domain.user.dto.request.CheckNicknameRequest;
 import org.shax3.square.domain.user.dto.request.SignUpRequest;
+import org.shax3.square.domain.user.dto.request.UpdateProfileRequest;
 import org.shax3.square.domain.user.dto.response.CheckNicknameResponse;
 import org.shax3.square.domain.user.dto.response.ProfileInfoResponse;
+import org.shax3.square.domain.user.dto.response.ProfileUrlResponse;
 import org.shax3.square.domain.user.dto.response.UserChoiceResponse;
 import org.shax3.square.domain.user.model.AgeRange;
 import org.shax3.square.domain.user.model.SocialType;
@@ -114,5 +116,20 @@ public class UserService {
     public ProfileInfoResponse getProfileInfo(User user) {
         String profileUrl = s3Service.generatePresignedGetUrl(user.getS3Key());
         return ProfileInfoResponse.of(user, profileUrl);
+    }
+
+    @Transactional
+    public ProfileUrlResponse updateProfileInfo(User user, UpdateProfileRequest updateProfileRequest) {
+        User foundUser = userRepository.findById(user.getId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        String s3Key = updateProfileRequest.s3Key();
+        if (s3Key == null) {
+            s3Key = foundUser.getS3Key();
+        }
+        foundUser.updateProfileInfo(updateProfileRequest, s3Key);
+
+        String profileUrl = s3Service.generatePresignedGetUrl(s3Key);
+        return ProfileUrlResponse.from(profileUrl);
     }
 }
