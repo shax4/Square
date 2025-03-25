@@ -26,14 +26,14 @@ services:
       - 8.8.8.8
       - 1.1.1.1
     networks:
-#      - app-network
-      - default
+      - app-network
+#      - default
 
 volumes:
   jenkins-home:
 
 networks:
-#  app-network:
-#    external: true
-  default:
-    driver: bridge
+  app-network:
+    external: true
+#  default:
+#    driver: bridge
