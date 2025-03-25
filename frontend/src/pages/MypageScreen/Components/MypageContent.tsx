@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, FlatList } from "react-native";
 import PostCard from "./PostCard"
 import CommentCard from "./CommentCard";
 import VotingCard from "./VotingCard";
+import OpinionCard from "./OpinionCard";
 
 interface Props {
     activeTab: string;
@@ -139,6 +140,40 @@ const mockVotes = [
     },
   ]
 
+  // Mock data for opinions
+const mockOpinions = [
+    {
+      id: "1",
+      topic: "투표 주제 글 입니다.. 일정 글자 수를 넘기면..",
+      content: "투표에 달린 의견글입니다. 두 줄이 넘어갈 경우, 이런 식으로 ...",
+      likeCount: 1203,
+      isLiked: true,
+    },
+    {
+      id: "2",
+      topic: "인공지능이 인간의 일자리를 대체할까요?",
+      content:
+        "저는 인공지능이 일부 직업을 대체할 수는 있지만, 새로운 직업을 창출할 것이라고 생각합니다. 기술 발전은 항상 그래왔습니다.",
+      likeCount: 87,
+      isLiked: false,
+    },
+    {
+      id: "3",
+      topic: "재택근무가 사무실 근무보다 효율적일까요?",
+      content: "개인적으로는 재택근무가 집중력을 높이고 출퇴근 시간을 절약할 수 있어서 더 효율적이라고 생각합니다.",
+      likeCount: 45,
+      isLiked: true,
+    },
+    {
+      id: "4",
+      topic: "대학 교육은 미래에도 필수적일까요?",
+      content:
+        "대학 교육보다는 실무 경험과 전문 기술 교육이 더 중요해질 것 같습니다. 온라인 교육 플랫폼의 발전으로 대학의 역할이 줄어들 수 있습니다.",
+      likeCount: 32,
+      isLiked: false,
+    },
+  ]
+
 const MypageContent = ({ activeTab, activePostSection, activeVoteSection}: Props) => {
     const renderContent = () => {
         if (activeTab === "게시글") {
@@ -272,7 +307,21 @@ const MypageContent = ({ activeTab, activePostSection, activeVoteSection}: Props
             case "의견":
               return (
                 <View style={styles.contentContainer}>
-                  <Text style={styles.placeholderText}>의견 내용</Text>
+                    <FlatList
+                        data={mockOpinions}
+                        keyExtractor={(item) => item.id}
+                        renderItem={({ item }) => (
+                        <OpinionCard
+                            topic={item.topic}
+                            content={item.content}
+                            likeCount={item.likeCount}
+                            isLiked={item.isLiked}
+                            onLikeToggle={(isLiked) => console.log(`Like toggled to ${isLiked} for opinion ${item.id}`)}
+                            onCardPress={() => console.log(`Opinion card pressed: ${item.id}`)}
+                        />
+                        )}
+                        contentContainerStyle={styles.listContent}
+                    />
                 </View>
               )
             case "스크랩":
