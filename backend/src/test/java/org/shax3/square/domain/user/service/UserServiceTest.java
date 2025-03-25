@@ -289,7 +289,7 @@ class UserServiceTest {
         User user = User.builder()
                 .s3Key("dummyKey")
                 .region(Region.BUSAN)
-                .religion(Religion.CATHOLICISM)
+                .religion(Religion.CATHOLIC)
                 .build();
 
         String expectedUrl = "http://example.com/dummyKey";
@@ -300,57 +300,80 @@ class UserServiceTest {
 
         // then
         assertThat(response.region()).isEqualTo(Region.BUSAN.getKoreanName());
-        assertThat(response.religion()).isEqualTo(Religion.CATHOLICISM.getKoreanName());
+        assertThat(response.religion()).isEqualTo(Religion.CATHOLIC.getKoreanName());
         assertThat(response.profileUrl()).isEqualTo(expectedUrl);
-    }
-
-    @Test
-    @DisplayName("프로필 정보 수정 테스트(프로필 이미지도 수정)")
-    void testUpdateProfileInfo_withProvidedS3Key() {
-        // given
-        User user = spy(User
-                .builder()
-                .s3Key("oldS3Key")
-                .build());
-        UpdateProfileRequest updateProfileRequest = mock(UpdateProfileRequest.class);
-
-        when(userRepository.findById(nullable(Long.class))).thenReturn(Optional.of(user));
-        String newS3Key = "newS3Key";
-        when(updateProfileRequest.s3Key()).thenReturn(newS3Key);
-
-        String expectedUrl = "http://example.com/" + newS3Key;
-        when(s3Service.generatePresignedGetUrl(newS3Key)).thenReturn(expectedUrl);
-
-        // when
-        ProfileUrlResponse response = userService.updateProfileInfo(user, updateProfileRequest);
-
-        // then
-        assertThat(response.profileUrl()).isEqualTo(expectedUrl);
-        // User 객체의 updateProfileInfo 메서드가 올바른 파라미터로 호출되었는지 검증
-        verify(user).updateProfileInfo(updateProfileRequest, newS3Key);
     }
 
     @Test
     @DisplayName("프로필 정보 수정 테스트(프로필 이미지는 수정x)")
     void testUpdateProfileInfo_withoutProvidedS3Key() {
         // given
-        User user = spy(User
-                .builder()
-                .s3Key("existingS3Key")
-                .build());
-        UpdateProfileRequest updateProfileRequest = mock(UpdateProfileRequest.class);
+        User user = User.builder()
+                .nickname("oldNickname")
+                .s3Key("oldS3Key")
+                .region(Region.SEOUL)
+                .religion(Religion.CHRISTIAN)
+                .build();
+
+        UpdateProfileRequest updateProfileRequest = new UpdateProfileRequest(
+                "newNickname",
+                null,
+                Region.BUSAN,
+                Religion.BUDDHISM
+        );
 
         when(userRepository.findById(nullable(Long.class))).thenReturn(Optional.of(user));
-        when(updateProfileRequest.s3Key()).thenReturn(null);
 
-        String expectedUrl = "http://example.com/" + user.getS3Key();
+        String expectedUrl = "http://example.com/oldS3Key";
         when(s3Service.generatePresignedGetUrl(user.getS3Key())).thenReturn(expectedUrl);
 
         // when
         ProfileUrlResponse response = userService.updateProfileInfo(user, updateProfileRequest);
 
         // then
+        // 사용자의 프로필 정보가 변경되었는지 검증
+        assertThat(user.getNickname()).isEqualTo("newNickname");
+        assertThat(user.getS3Key()).isEqualTo("oldS3Key");
+        assertThat(user.getRegion()).isEqualTo(Region.BUSAN);
+        assertThat(user.getReligion()).isEqualTo(Religion.BUDDHISM);
+        // 반환된 프로필 URL 검증
         assertThat(response.profileUrl()).isEqualTo(expectedUrl);
-        verify(user).updateProfileInfo(eq(updateProfileRequest), eq("existingS3Key"));
     }
+
+    @Test
+    @DisplayName("프로필 정보 업데이트 시 사용자 프로필 정보가 실제로 변경되는지 확인")
+    void testUpdateProfileInfo_actualUserProfileUpdate() {
+        // given
+        User user = User.builder()
+                .nickname("oldNickname")
+                .s3Key("oldS3Key")
+                .region(Region.SEOUL)
+                .religion(Religion.CHRISTIAN)
+                .build();
+
+        UpdateProfileRequest updateProfileRequest = new UpdateProfileRequest(
+                "newNickname",
+                "newS3Key",
+                Region.BUSAN,
+                Religion.BUDDHISM
+        );
+
+        when(userRepository.findById(nullable(Long.class))).thenReturn(Optional.of(user));
+
+        String expectedUrl = "http://example.com/newS3Key";
+        when(s3Service.generatePresignedGetUrl("newS3Key")).thenReturn(expectedUrl);
+
+        // when
+        ProfileUrlResponse response = userService.updateProfileInfo(user, updateProfileRequest);
+
+        // then
+        // 사용자의 프로필 정보가 변경되었는지 검증
+        assertThat(user.getNickname()).isEqualTo("newNickname");
+        assertThat(user.getS3Key()).isEqualTo("newS3Key");
+        assertThat(user.getRegion()).isEqualTo(Region.BUSAN);
+        assertThat(user.getReligion()).isEqualTo(Religion.BUDDHISM);
+        // 반환된 프로필 URL 검증
+        assertThat(response.profileUrl()).isEqualTo(expectedUrl);
+    }
+
 }
