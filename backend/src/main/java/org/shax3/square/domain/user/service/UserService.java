@@ -102,9 +102,9 @@ public class UserService {
             return CheckNicknameResponse.createFalse();
         }
 
-        if (userRedisRepository.reserveNickname(nickname)) {
-            return CheckNicknameResponse.createTrue();
+        if (!userRedisRepository.reserveNickname(nickname)) {
+            return CheckNicknameResponse.createFalse();
         }
-        return CheckNicknameResponse.createFalse();
+        return CheckNicknameResponse.createTrue();
     }
 }
