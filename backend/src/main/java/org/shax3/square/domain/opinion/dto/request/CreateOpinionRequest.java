@@ -10,7 +10,7 @@ import org.shax3.square.domain.user.model.User;
 public record CreateOpinionRequest(
         @NotNull
         Long debateId,
-        @NotNull
+
         boolean isLeft,
         @NotNull
         @Size(min = 10, max = 150, message = "의견은 최소 10자 이상, 최대 150자 이하이어야 합니다.")
