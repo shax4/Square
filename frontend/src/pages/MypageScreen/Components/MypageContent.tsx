@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, FlatList } from "react-native";
 import PostCard from "./PostCard"
+import CommentCard from "./CommentCard";
 
 interface Props {
     activeTab: string;
@@ -46,6 +47,52 @@ const mockPosts = [
     },
   ]
 
+  // Mock data for comments
+const mockComments = [
+    {
+      id: "1",
+      title: "게시글 제목입니다.. 한 줄 넘어갈 경우 ... 처리",
+      content: "댓글입니다. 댓글 내용이 두 줄 이상 넘어가면 뒤에 ... 추가...",
+      likeCount: 1203,
+      isLiked: false,
+    },
+    {
+      id: "2",
+      title: "오늘 날씨가 정말 좋네요! 여러분은 어떠신가요?",
+      content: "맞아요! 정말 좋은 날씨네요. 저도 오늘 산책 다녀왔어요. 다음에는 한강 공원에 가볼 생각입니다.",
+      likeCount: 42,
+      isLiked: true,
+    },
+    {
+      id: "3",
+      title: "새로운 영화 추천해주세요",
+      content: '최근에 본 영화 중에 "인셉션"이 정말 좋았어요. 꼭 한번 보세요!',
+      likeCount: 15,
+      isLiked: false,
+    },
+    {
+      id: "4",
+      title: "맛집 추천 부탁드립니다",
+      content: '강남역 근처에 "맛있는 식당"이라는 곳이 새로 생겼는데 분위기도 좋고 음식도 맛있어요.',
+      likeCount: 78,
+      isLiked: true,
+    },
+    {
+        id: "5",
+        title: "새로운 영화 추천해주세요",
+        content: '최근에 본 영화 중에 "인셉션"이 정말 좋았어요. 꼭 한번 보세요!',
+        likeCount: 15,
+        isLiked: false,
+    },
+    {
+        id: "6",
+        title: "맛집 추천 부탁드립니다",
+        content: '강남역 근처에 "맛있는 식당"이라는 곳이 새로 생겼는데 분위기도 좋고 음식도 맛있어요.',
+        likeCount: 78,
+        isLiked: true,
+    },
+  ]
+
 const MypageContent = ({ activeTab, activePostSection, activeVoteSection}: Props) => {
     const renderContent = () => {
         if (activeTab === "게시글") {
@@ -79,7 +126,21 @@ const MypageContent = ({ activeTab, activePostSection, activeVoteSection}: Props
             case "댓글":
               return (
                 <View style={styles.contentContainer}>
-                  <Text style={styles.placeholderText}>댓글 내용이 여기에 표시됩니다.</Text>
+                  <FlatList
+                    data={mockComments}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({ item }) => (
+                    <CommentCard
+                        title={item.title}
+                        content={item.content}
+                        likeCount={item.likeCount}
+                        isLiked={item.isLiked}
+                        onPress={() => console.log(`Comment card pressed: ${item.id}`)}
+                        onLikeToggle={(isLiked) => console.log(`Like toggled to ${isLiked} for comment ${item.id}`)}
+                    />
+                    )}
+                    contentContainerStyle={styles.listContent}
+                />
                 </View>
               )
             case "스크랩":
