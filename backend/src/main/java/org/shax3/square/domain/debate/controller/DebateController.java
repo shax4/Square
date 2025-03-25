@@ -1,6 +1,7 @@
 package org.shax3.square.domain.debate.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.annotation.AuthUser;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/debate")
+@Tag(name = "Debate", description = "논쟁 API")
 @RequiredArgsConstructor
 public class DebateController {
     private final DebateService debateService;

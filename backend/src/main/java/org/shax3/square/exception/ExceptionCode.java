@@ -41,7 +41,9 @@ public enum ExceptionCode {
 
 	DEBATE_NOT_FOUND(6001,"토론을 찾을 수 없습니다."),
 
-	ALREADY_VOTED(7001,"이미 투표한 토론입니다.");
+	ALREADY_VOTED(7001,"이미 투표한 토론입니다."),
+
+	OPINION_NOTFOUND(8001,"해당 의견을 찾을 수 없습니다.");
 	private final int code;
 	private final String message;
 }
