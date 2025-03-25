@@ -20,18 +20,10 @@ public class OpinionCommentService {
         List<OpinionComment> comments = opinionCommentRepository.findByOpinionIdAndValidTrue(opinionId);
 
         return comments.stream()
-                .map(comment -> {
-                    return new CommentResponse(
-                            comment.getId(),
-                            comment.getUser().getNickname(),
-                            s3Service.generatePresignedGetUrl(comment.getUser().getS3Key()),
-                            comment.getUser().getType().name(),
-                            comment.getCreatedAt(),
-                            comment.getLikeCount(),
-                            comment.getContent(),
-                            false // TODO: 좋아요 여부 로직 추가 필요
-                    );
-                })
+                .map(comment -> CommentResponse.of(
+                        comment,
+                        s3Service.generatePresignedGetUrl(comment.getUser().getS3Key())
+                ))
                 .toList();
     }
 }
