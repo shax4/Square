@@ -61,10 +61,10 @@ oauth2:
     client-secret: ${GOOGLE_CLIENT_SECRET}
     redirect-uri: ${GOOGLE_REDIRECT_URI}
 
-batch-redis:
-  host: ${REDIS_BATCH_HOST}
-  port: ${REDIS_BATCH_PORT}
-  password: ${REDIS_BATCH_PASSWORD}
+#batch-redis:
+#  host: ${REDIS_BATCH_HOST}
+#  port: ${REDIS_BATCH_PORT}
+#  password: ${REDIS_BATCH_PASSWORD}
 
 springdoc:
   api-docs:
