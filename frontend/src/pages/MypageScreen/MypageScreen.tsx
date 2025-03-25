@@ -17,6 +17,7 @@ type StackParamList = {
     NevTestPage3: undefined;
     UiTestScreen: undefined;
     PersonalityResultScreen: undefined;
+    ProfileUpdateScreen: undefined;
 };
 
 const MypageScreen = () => {
@@ -53,7 +54,7 @@ const MypageScreen = () => {
           <View style={styles.profileActions}>
             <MypageButton
               title="프로필 수정"
-              onPress={() => console.log("Edit profile")}
+              onPress={() => navigation.navigate('ProfileUpdateScreen')}
               variant="secondary"
               style={styles.actionButton}
             />
