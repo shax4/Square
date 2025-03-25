@@ -1,7 +1,7 @@
 package org.shax3.square.domain.user.dto.response;
 
 public record CheckNicknameResponse(
-        boolean isDuplicate
+        boolean canCreate
 ) {
     public static CheckNicknameResponse createFalse() {
         return new CheckNicknameResponse(false);
