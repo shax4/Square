@@ -34,7 +34,8 @@ public class OpinionService {
 
         opinionRepository.save(opinion);
     }
-
+    
+    @Transactional(readOnly = true)
     public OpinionDetailsResponse getOpinionDetails(User user, Long opinionId) {
         Opinion opinion = opinionRepository.findById(opinionId)
                 .orElseThrow(() -> new CustomException(ExceptionCode.OPINION_NOT_FOUND));
@@ -70,6 +71,7 @@ public class OpinionService {
         opinion.softDelete();
     }
 
+    @Transactional(readOnly = true)
     public Opinion getOpinion(Long opinionId) {
         return opinionRepository.findById(opinionId)
                 .orElseThrow(() -> new CustomException(ExceptionCode.OPINION_NOT_FOUND));

@@ -9,7 +9,6 @@ import org.shax3.square.domain.auth.annotation.AuthUser;
 import org.shax3.square.domain.opinion.dto.request.CreateOpinionCommentRequest;
 import org.shax3.square.domain.opinion.dto.request.UpdateOpinionRequest;
 import org.shax3.square.domain.opinion.dto.response.CreateOpinionCommentResponse;
-import org.shax3.square.domain.opinion.model.OpinionComment;
 import org.shax3.square.domain.opinion.service.OpinionCommentService;
 import org.shax3.square.domain.user.model.User;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 public class OpinionCommentController {
     private final OpinionCommentService opinionCommentService;
 
-
     @Operation(
             summary = "답글 생성",
             description = "사용자가 특정 의견에 답글을 작성합니다."
@@ -33,14 +31,14 @@ public class OpinionCommentController {
         CreateOpinionCommentResponse response = opinionCommentService.createOpinionComment(user, request);
         return ResponseEntity.ok(response);
     }
+
     @Operation(
             summary = "답글 삭제",
             description = "사용자가 의견에 달린 자신의 답글을 삭제합니다."
     )
     @DeleteMapping("/{commentId}")
     public ResponseEntity<Void> delete(@AuthUser User user, @PathVariable Long commentId) {
-
-        opinionCommentService.deleteOpinionComment(user,commentId);
+        opinionCommentService.deleteOpinionComment(user, commentId);
         return ResponseEntity.ok().build();
     }
 
@@ -49,9 +47,8 @@ public class OpinionCommentController {
             description = "사용자가 자신의 답글 내용을 수정합니다."
     )
     @PutMapping("/{commentId}")
-    public ResponseEntity<Void> update(@AuthUser User user, @Valid @RequestBody UpdateOpinionRequest request, @PathVariable Long commentId){
-
-        opinionCommentService.updateOpinionComment(user,request, commentId);
+    public ResponseEntity<Void> update(@AuthUser User user, @Valid @RequestBody UpdateOpinionRequest request, @PathVariable Long commentId) {
+        opinionCommentService.updateOpinionComment(user, request, commentId);
         return ResponseEntity.ok().build();
     }
 
