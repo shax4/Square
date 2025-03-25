@@ -99,12 +99,12 @@ public class UserService {
         String nickname = checkNicknameRequest.nickname();
         Optional<User> user = userRepository.findByNickname(nickname);
         if (user.isPresent()) {
-            return CheckNicknameResponse.createFalse();
+            return CheckNicknameResponse.canCreate(false);
         }
 
         if (!userRedisRepository.reserveNickname(nickname)) {
-            return CheckNicknameResponse.createFalse();
+            return CheckNicknameResponse.canCreate(false);
         }
-        return CheckNicknameResponse.createTrue();
+        return CheckNicknameResponse.canCreate(true);
     }
 }

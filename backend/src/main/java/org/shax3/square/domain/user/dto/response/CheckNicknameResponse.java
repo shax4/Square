@@ -1,13 +1,9 @@
 package org.shax3.square.domain.user.dto.response;
 
 public record CheckNicknameResponse(
-        boolean canCreate
+        boolean valid
 ) {
-    public static CheckNicknameResponse createFalse() {
-        return new CheckNicknameResponse(false);
-    }
-
-    public static CheckNicknameResponse createTrue() {
-        return new CheckNicknameResponse(true);
+    public static CheckNicknameResponse canCreate(boolean valid) {
+        return new CheckNicknameResponse(valid);
     }
 }

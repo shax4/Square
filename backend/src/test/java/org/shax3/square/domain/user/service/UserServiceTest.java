@@ -235,7 +235,7 @@ class UserServiceTest {
         CheckNicknameResponse response = userService.checkNicknameDuplication(request);
 
         // then
-        assertThat(response).isEqualTo(CheckNicknameResponse.createFalse());
+        assertThat(response).isEqualTo(CheckNicknameResponse.canCreate(false));
         verify(userRepository).findByNickname(nickname);
     }
 
@@ -252,7 +252,7 @@ class UserServiceTest {
         CheckNicknameResponse response = userService.checkNicknameDuplication(request);
 
         // then
-        assertThat(response).isEqualTo(CheckNicknameResponse.createTrue());
+        assertThat(response).isEqualTo(CheckNicknameResponse.canCreate(true));
         verify(userRepository).findByNickname(nickname);
         verify(userRedisRepository).reserveNickname(nickname);
     }
@@ -270,7 +270,7 @@ class UserServiceTest {
         CheckNicknameResponse response = userService.checkNicknameDuplication(request);
 
         // then
-        assertThat(response).isEqualTo(CheckNicknameResponse.createFalse());
+        assertThat(response).isEqualTo(CheckNicknameResponse.canCreate(false));
         verify(userRepository).findByNickname(nickname);
         verify(userRedisRepository).reserveNickname(nickname);
     }
