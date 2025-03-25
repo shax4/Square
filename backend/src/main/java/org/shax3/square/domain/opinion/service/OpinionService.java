@@ -5,8 +5,6 @@ import org.shax3.square.domain.debate.model.Debate;
 import org.shax3.square.domain.debate.service.DebateService;
 import org.shax3.square.domain.opinion.dto.request.CreateOpinionRequest;
 import org.shax3.square.domain.opinion.dto.request.UpdateOpinionRequest;
-import org.shax3.square.domain.opinion.dto.response.CommentResponse;
-import org.shax3.square.domain.opinion.dto.response.OpinionDetailsResponse;
 import org.shax3.square.domain.opinion.model.Opinion;
 import org.shax3.square.domain.opinion.repository.OpinionRepository;
 import org.shax3.square.domain.s3.service.S3Service;
@@ -15,8 +13,6 @@ import org.shax3.square.exception.CustomException;
 import org.shax3.square.exception.ExceptionCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

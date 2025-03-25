@@ -1,11 +1,9 @@
 package org.shax3.square.domain.opinion.service;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.opinion.dto.request.CreateOpinionCommentRequest;
 import org.shax3.square.domain.opinion.dto.request.UpdateOpinionRequest;
 import org.shax3.square.domain.opinion.dto.response.CommentResponse;
-import org.shax3.square.domain.opinion.dto.response.CreateOpinionCommentResponse;
 import org.shax3.square.domain.opinion.model.Opinion;
 import org.shax3.square.domain.opinion.model.OpinionComment;
 import org.shax3.square.domain.opinion.repository.OpinionCommentRepository;
