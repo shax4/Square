@@ -1,6 +1,5 @@
 package org.shax3.square.domain.user.service;
 
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.TokenUtil;
@@ -22,6 +21,7 @@ import org.shax3.square.domain.user.repository.UserRedisRepository;
 import org.shax3.square.domain.user.repository.UserRepository;
 import org.shax3.square.exception.CustomException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -100,6 +100,7 @@ public class UserService {
         foundUser.deleteAccount();
     }
 
+    @Transactional(readOnly = true)
     public CheckNicknameResponse checkNicknameDuplication(@Valid CheckNicknameRequest checkNicknameRequest) {
         String nickname = checkNicknameRequest.nickname();
         Optional<User> user = userRepository.findByNickname(nickname);

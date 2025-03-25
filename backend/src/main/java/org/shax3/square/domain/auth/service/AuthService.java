@@ -1,6 +1,5 @@
 package org.shax3.square.domain.auth.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.TokenUtil;
 import org.shax3.square.domain.auth.model.RefreshToken;
@@ -12,6 +11,7 @@ import org.shax3.square.domain.user.model.User;
 import org.shax3.square.domain.user.repository.UserRepository;
 import org.shax3.square.exception.CustomException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -101,6 +101,7 @@ public class AuthService {
         throw new CustomException(SOCIAL_TYPE_MISMATCH);
     }
 
+    @Transactional
     public void logout(String refreshToken) {
         refreshTokenRepository.deleteByToken(refreshToken);
     }
