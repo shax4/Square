@@ -4,15 +4,14 @@ pipeline {
     environment {
         COMPOSE_PATH = "docker-compose.app.yml"
         BACKEND_IMAGE_NAME = "backend:latest"
-        GIT_CREDENTIALS_ID = "gitlab-token"
     }
 
     stages {
         stage('Checkout') {
             steps {
                 echo "GitLab에서 코드 클론 중..."
-                git credentialsId: "${GIT_CREDENTIALS_ID}", url: 'https://lab.ssafy.com/s12-bigdata-recom-sub1/square.git', branch: 'dev/INF'
-            }
+                checkout scm
+             }
         }
 
         stage('Build Backend') {
