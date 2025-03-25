@@ -40,10 +40,10 @@ pipeline {
                 echo "앱 재배포 (docker-compose.app.yml)"
                 sh '''
                   echo "기존 백엔드 컨테이너 제거"
-                  docker-compose -f docker-compose.app.yml rm -f backend || true
+                  docker-compose --env-file .env -f docker-compose.app.yml rm -f backend || true
 
                   echo "백엔드 컨테이너만 재빌드 및 실행"
-                  docker-compose -f docker-compose.app.yml up -d --build backend
+                  docker-compose --env-file .env -f docker-compose.app.yml up -d --build backend
                 '''
             }
         }
