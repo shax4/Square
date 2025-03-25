@@ -38,13 +38,11 @@ pipeline {
         stage('Deploy App') {
             steps {
                 echo "앱 재배포 (docker-compose.app.yml)"
-                sh '''
-                  echo "기존 컨테이너 제거"
-                  docker-compose --env-file .env -f ${COMPOSE_PATH} rm -f || true
-
-                  echo "app.yml 재빌드 및 실행"
-                  docker-compose --env-file .env -f ${COMPOSE_PATH} up -d --build
-                '''
+            sh '''
+              docker-compose --env-file .env -f docker-compose.app.yml build backend
+              docker-compose --env-file .env -f docker-compose.app.yml stop backend
+              docker-compose --env-file .env -f docker-compose.app.yml up -d backend
+            '''
             }
         }
     }
