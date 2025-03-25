@@ -1,6 +1,8 @@
 package org.shax3.square.domain.opinion.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.SQLRestriction;
 import org.shax3.square.common.entity.BaseTimeEntity;
@@ -36,5 +38,11 @@ public class OpinionComment extends BaseTimeEntity {
     @Column(name = "is_valid", nullable = false)
     private boolean valid = true;
 
+    public void softDelete(){
+        valid = false;
+    }
 
+    public void updateContent(String content){
+        this.content = content;
+    }
 }

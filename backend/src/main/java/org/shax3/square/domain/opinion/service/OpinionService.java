@@ -37,7 +37,7 @@ public class OpinionService {
 
     public OpinionDetailsResponse getOpinionDetails(User user, Long opinionId) {
         Opinion opinion = opinionRepository.findById(opinionId)
-                .orElseThrow(() -> new CustomException(ExceptionCode.OPINION_NOTFOUND));
+                .orElseThrow(() -> new CustomException(ExceptionCode.OPINION_NOT_FOUND));
 
         List<CommentResponse> comments = opinionCommentService.getOpinionComments(user, opinionId);
         String opinionUserPresignedUrl = s3Service.generatePresignedGetUrl(opinion.getUser().getS3Key());
@@ -48,7 +48,7 @@ public class OpinionService {
     @Transactional
     public void updateOpinion(UpdateOpinionRequest request, User user, Long opinionId) {
         Opinion opinion = opinionRepository.findById(opinionId)
-                .orElseThrow(() -> new CustomException(ExceptionCode.OPINION_NOTFOUND));
+                .orElseThrow(() -> new CustomException(ExceptionCode.OPINION_NOT_FOUND));
 
         if (!opinion.getUser().getId().equals(user.getId())) {
             throw new CustomException(ExceptionCode.NOT_AUTHOR);
@@ -61,7 +61,7 @@ public class OpinionService {
     @Transactional
     public void deleteOpinion(User user, Long opinionId) {
         Opinion opinion = opinionRepository.findById(opinionId)
-                .orElseThrow(() -> new CustomException(ExceptionCode.OPINION_NOTFOUND));
+                .orElseThrow(() -> new CustomException(ExceptionCode.OPINION_NOT_FOUND));
 
         if (!opinion.getUser().getId().equals(user.getId())) {
             throw new CustomException(ExceptionCode.NOT_AUTHOR);
@@ -72,6 +72,6 @@ public class OpinionService {
 
     public Opinion getOpinion(Long opinionId) {
         return opinionRepository.findById(opinionId)
-                .orElseThrow(() -> new CustomException(ExceptionCode.OPINION_NOTFOUND));
+                .orElseThrow(() -> new CustomException(ExceptionCode.OPINION_NOT_FOUND));
     }
 }
