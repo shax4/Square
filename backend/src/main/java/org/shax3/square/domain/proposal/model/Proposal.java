@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.shax3.square.domain.user.model.User;
 
-import static jakarta.persistence.GenerationType.IDENTITY;
-
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -13,7 +11,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Table(name = "proposal")
 public class Proposal {
     @Id
-    @GeneratedValue(strategy = IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -1,8 +1,6 @@
 package org.shax3.square.domain.user.model;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.util.HashMap;
-import java.util.Map;
 
 public enum Region {
     SEOUL("서울특별시"),
@@ -24,13 +22,6 @@ public enum Region {
     JEJU("제주특별자치도");
 
     private final String koreanName;
-    private static final Map<String, Region> KOREAN_NAME_TO_REGION_MAP = new HashMap<>();
-
-    static {
-        for (Region region : values()) {
-            KOREAN_NAME_TO_REGION_MAP.put(region.koreanName, region);
-        }
-    }
 
     Region(String koreanName) {
         this.koreanName = koreanName;
@@ -39,9 +30,5 @@ public enum Region {
     @JsonValue
     public String getKoreanName() {
         return koreanName;
-    }
-
-    public static Region fromKoreanName(String koreanName) {
-        return KOREAN_NAME_TO_REGION_MAP.get(koreanName);
     }
 }
