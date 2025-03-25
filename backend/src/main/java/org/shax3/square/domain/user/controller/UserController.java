@@ -10,8 +10,10 @@ import org.shax3.square.domain.auth.annotation.AuthUser;
 import org.shax3.square.domain.user.dto.UserSignUpDto;
 import org.shax3.square.domain.user.dto.request.CheckNicknameRequest;
 import org.shax3.square.domain.user.dto.request.SignUpRequest;
+import org.shax3.square.domain.user.dto.request.UpdateProfileRequest;
 import org.shax3.square.domain.user.dto.response.CheckNicknameResponse;
 import org.shax3.square.domain.user.dto.response.ProfileInfoResponse;
+import org.shax3.square.domain.user.dto.response.ProfileUrlResponse;
 import org.shax3.square.domain.user.dto.response.SignUpUserInfoResponse;
 import org.shax3.square.domain.user.dto.response.UserChoiceResponse;
 import org.shax3.square.domain.user.model.User;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -88,6 +91,20 @@ public class UserController {
         ProfileInfoResponse profileInfoResponse = userService.getProfileInfo(user);
 
         return ResponseEntity.ok(profileInfoResponse);
+    }
+
+    @Operation(
+            summary = "프로필 정보 수정 api",
+            description = "닉네임, 프로필 사진, 지역, 종교를 수정하면 프로필 사진 url을 반환합니다."
+    )
+    @PutMapping
+    public ResponseEntity<ProfileUrlResponse> updateProfileInfo(
+            @AuthUser User user,
+            @Valid @RequestBody UpdateProfileRequest updateProfileRequest
+    ) {
+        ProfileUrlResponse profileUrlResponse = userService.updateProfileInfo(user, updateProfileRequest);
+
+        return ResponseEntity.ok(profileUrlResponse);
     }
 
     @Operation(

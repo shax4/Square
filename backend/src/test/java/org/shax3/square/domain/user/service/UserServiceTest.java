@@ -12,8 +12,10 @@ import org.shax3.square.domain.s3.service.S3Service;
 import org.shax3.square.domain.user.dto.UserSignUpDto;
 import org.shax3.square.domain.user.dto.request.CheckNicknameRequest;
 import org.shax3.square.domain.user.dto.request.SignUpRequest;
+import org.shax3.square.domain.user.dto.request.UpdateProfileRequest;
 import org.shax3.square.domain.user.dto.response.CheckNicknameResponse;
 import org.shax3.square.domain.user.dto.response.ProfileInfoResponse;
+import org.shax3.square.domain.user.dto.response.ProfileUrlResponse;
 import org.shax3.square.domain.user.model.*;
 import org.shax3.square.domain.user.repository.UserRedisRepository;
 import org.shax3.square.domain.user.repository.UserRepository;
@@ -287,7 +289,7 @@ class UserServiceTest {
         User user = User.builder()
                 .s3Key("dummyKey")
                 .region(Region.BUSAN)
-                .religion(Religion.CATHOLICISM)
+                .religion(Religion.CATHOLIC)
                 .build();
 
         String expectedUrl = "http://example.com/dummyKey";
@@ -298,7 +300,80 @@ class UserServiceTest {
 
         // then
         assertThat(response.region()).isEqualTo(Region.BUSAN.getKoreanName());
-        assertThat(response.religion()).isEqualTo(Religion.CATHOLICISM.getKoreanName());
+        assertThat(response.religion()).isEqualTo(Religion.CATHOLIC.getKoreanName());
         assertThat(response.profileUrl()).isEqualTo(expectedUrl);
     }
+
+    @Test
+    @DisplayName("프로필 정보 수정 테스트(프로필 이미지는 수정x)")
+    void testUpdateProfileInfo_withoutProvidedS3Key() {
+        // given
+        User user = User.builder()
+                .nickname("oldNickname")
+                .s3Key("oldS3Key")
+                .region(Region.SEOUL)
+                .religion(Religion.CHRISTIAN)
+                .build();
+
+        UpdateProfileRequest updateProfileRequest = new UpdateProfileRequest(
+                "newNickname",
+                null,
+                Region.BUSAN,
+                Religion.BUDDHISM
+        );
+
+        when(userRepository.findById(nullable(Long.class))).thenReturn(Optional.of(user));
+
+        String expectedUrl = "http://example.com/oldS3Key";
+        when(s3Service.generatePresignedGetUrl(user.getS3Key())).thenReturn(expectedUrl);
+
+        // when
+        ProfileUrlResponse response = userService.updateProfileInfo(user, updateProfileRequest);
+
+        // then
+        // 사용자의 프로필 정보가 변경되었는지 검증
+        assertThat(user.getNickname()).isEqualTo("newNickname");
+        assertThat(user.getS3Key()).isEqualTo("oldS3Key");
+        assertThat(user.getRegion()).isEqualTo(Region.BUSAN);
+        assertThat(user.getReligion()).isEqualTo(Religion.BUDDHISM);
+        // 반환된 프로필 URL 검증
+        assertThat(response.profileUrl()).isEqualTo(expectedUrl);
+    }
+
+    @Test
+    @DisplayName("프로필 정보 업데이트 시 사용자 프로필 정보가 실제로 변경되는지 확인")
+    void testUpdateProfileInfo_actualUserProfileUpdate() {
+        // given
+        User user = User.builder()
+                .nickname("oldNickname")
+                .s3Key("oldS3Key")
+                .region(Region.SEOUL)
+                .religion(Religion.CHRISTIAN)
+                .build();
+
+        UpdateProfileRequest updateProfileRequest = new UpdateProfileRequest(
+                "newNickname",
+                "newS3Key",
+                Region.BUSAN,
+                Religion.BUDDHISM
+        );
+
+        when(userRepository.findById(nullable(Long.class))).thenReturn(Optional.of(user));
+
+        String expectedUrl = "http://example.com/newS3Key";
+        when(s3Service.generatePresignedGetUrl("newS3Key")).thenReturn(expectedUrl);
+
+        // when
+        ProfileUrlResponse response = userService.updateProfileInfo(user, updateProfileRequest);
+
+        // then
+        // 사용자의 프로필 정보가 변경되었는지 검증
+        assertThat(user.getNickname()).isEqualTo("newNickname");
+        assertThat(user.getS3Key()).isEqualTo("newS3Key");
+        assertThat(user.getRegion()).isEqualTo(Region.BUSAN);
+        assertThat(user.getReligion()).isEqualTo(Religion.BUDDHISM);
+        // 반환된 프로필 URL 검증
+        assertThat(response.profileUrl()).isEqualTo(expectedUrl);
+    }
+
 }
