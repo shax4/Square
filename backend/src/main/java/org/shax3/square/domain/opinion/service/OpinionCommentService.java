@@ -1,11 +1,9 @@
 package org.shax3.square.domain.opinion.service;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.opinion.dto.request.CreateOpinionCommentRequest;
 import org.shax3.square.domain.opinion.dto.request.UpdateOpinionRequest;
 import org.shax3.square.domain.opinion.dto.response.CommentResponse;
-import org.shax3.square.domain.opinion.dto.response.CreateOpinionCommentResponse;
 import org.shax3.square.domain.opinion.model.Opinion;
 import org.shax3.square.domain.opinion.model.OpinionComment;
 import org.shax3.square.domain.opinion.repository.OpinionCommentRepository;
@@ -24,7 +22,6 @@ import static org.shax3.square.exception.ExceptionCode.OPINION_COMMENT_NOT_FOUND
 @RequiredArgsConstructor
 public class OpinionCommentService {
     private final OpinionCommentRepository opinionCommentRepository;
-    private final OpinionService opinionService;
     private final S3Service s3Service;
 
     @Transactional(readOnly = true)
@@ -39,16 +36,14 @@ public class OpinionCommentService {
                 .toList();
     }
 
-    @Transactional
-    public CreateOpinionCommentResponse createOpinionComment(User user, CreateOpinionCommentRequest request) {
-
-        Opinion opinion = opinionService.getOpinion(request.opinionId());
-        String profileUrl = s3Service.generatePresignedGetUrl(user.getS3Key());
-
-        OpinionComment savedComment = opinionCommentRepository.save(request.to(opinion,user));
-
-        return CreateOpinionCommentResponse.of(savedComment,profileUrl);
+    public OpinionComment createComment(
+            CreateOpinionCommentRequest request,
+            Opinion opinion,
+            User user
+    ) {
+        return opinionCommentRepository.save(request.to(opinion, user));
     }
+
 
     @Transactional
     public void deleteOpinionComment(User user, Long commentId) {

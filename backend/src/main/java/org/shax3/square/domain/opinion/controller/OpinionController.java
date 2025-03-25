@@ -7,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.annotation.AuthUser;
 import org.shax3.square.domain.opinion.dto.request.CreateOpinionRequest;
 import org.shax3.square.domain.opinion.dto.request.UpdateOpinionRequest;
+import org.shax3.square.domain.opinion.dto.response.MyOpinionResponse;
 import org.shax3.square.domain.opinion.dto.response.OpinionDetailsResponse;
+import org.shax3.square.domain.opinion.service.OpinionFacadeService;
 import org.shax3.square.domain.opinion.service.OpinionService;
 import org.shax3.square.domain.user.model.User;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class OpinionController {
     private final OpinionService opinionService;
+    private final OpinionFacadeService opinionFacadeService;
 
     @Operation(
             summary = "의견 작성",
@@ -40,7 +43,7 @@ public class OpinionController {
     )
     @GetMapping("/{opinionId}")
     public ResponseEntity<OpinionDetailsResponse> read(@AuthUser User user, @PathVariable Long opinionId) {
-        OpinionDetailsResponse response = opinionService.getOpinionDetails(user, opinionId);
+        OpinionDetailsResponse response = opinionFacadeService.getOpinionDetails(user, opinionId);
         return ResponseEntity.ok(response);
     }
 
@@ -57,5 +60,16 @@ public class OpinionController {
     public ResponseEntity<Void> delete(@AuthUser User user, @PathVariable Long opinionId) {
         opinionService.deleteOpinion(user,opinionId);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<MyOpinionResponse> my(@AuthUser User user,
+                                                @RequestParam int limit,
+                                                @RequestParam int nextCursorId) {
+
+//        MyOpinionResponse response = opinionService.getMyOpinions(user,limit,nextCursorId);
+//        return ResponseEntity.ok(response);
+        return null;
+
     }
 }
