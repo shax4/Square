@@ -8,7 +8,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.annotation.AuthUser;
 import org.shax3.square.domain.user.dto.UserSignUpDto;
+import org.shax3.square.domain.user.dto.request.CheckNicknameRequest;
 import org.shax3.square.domain.user.dto.request.SignUpRequest;
+import org.shax3.square.domain.user.dto.response.CheckNicknameResponse;
 import org.shax3.square.domain.user.dto.response.SignUpUserInfoResponse;
 import org.shax3.square.domain.user.dto.response.UserChoiceResponse;
 import org.shax3.square.domain.user.model.User;
@@ -75,6 +77,18 @@ public class UserController {
     }
 
     @Operation(
+            summary = "닉네임 중복 조회 api",
+            description = "닉네임이 중복되는지 확인하여 true/false를 반환합니다."
+    )
+    @PostMapping("/nickname")
+    public ResponseEntity<CheckNicknameResponse> checkNickname(
+            @Valid @RequestBody CheckNicknameRequest checkNicknameRequest
+    ) {
+        CheckNicknameResponse checkNicknameResponse = userService.checkNicknameDuplication(checkNicknameRequest);
+        return ResponseEntity.ok(checkNicknameResponse);
+    }
+
+    @Operation(
             summary = "유저정보 선택지 조회 api",
             description = "회원가입 또는 회원 정보 수정 시 필요한 선택지를 제공합니다."
     )
@@ -83,5 +97,4 @@ public class UserController {
         UserChoiceResponse userChoiceResponse = userService.getUserChoices();
         return ResponseEntity.ok(userChoiceResponse);
     }
-
 }

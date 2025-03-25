@@ -1,16 +1,20 @@
 package org.shax3.square.domain.user.service;
 
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.TokenUtil;
 import org.shax3.square.domain.auth.dto.UserTokenDto;
 import org.shax3.square.domain.auth.repository.RefreshTokenRepository;
 import org.shax3.square.domain.user.dto.UserSignUpDto;
+import org.shax3.square.domain.user.dto.request.CheckNicknameRequest;
 import org.shax3.square.domain.user.dto.request.SignUpRequest;
+import org.shax3.square.domain.user.dto.response.CheckNicknameResponse;
 import org.shax3.square.domain.user.dto.response.UserChoiceResponse;
 import org.shax3.square.domain.user.model.AgeRange;
 import org.shax3.square.domain.user.model.SocialType;
 import org.shax3.square.domain.user.model.User;
+import org.shax3.square.domain.user.repository.UserRedisRepository;
 import org.shax3.square.domain.user.repository.UserRepository;
 import org.shax3.square.exception.CustomException;
 import org.springframework.stereotype.Service;
@@ -27,6 +31,7 @@ public class UserService {
     private final TokenUtil tokenUtil;
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final UserRedisRepository userRedisRepository;
 
     private static final String DEFAULT_PROFILE_IMG = "profile/0c643827-c958-465b-875d-918c8a22fe01.png";
 
@@ -88,5 +93,18 @@ public class UserService {
         User foundUser = userRepository.findById(user.getId())
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         foundUser.deleteAccount();
+    }
+
+    public CheckNicknameResponse checkNicknameDuplication(@Valid CheckNicknameRequest checkNicknameRequest) {
+        String nickname = checkNicknameRequest.nickname();
+        Optional<User> user = userRepository.findByNickname(nickname);
+        if (user.isPresent()) {
+            return CheckNicknameResponse.createFalse();
+        }
+
+        if (userRedisRepository.reserveNickname(nickname)) {
+            return CheckNicknameResponse.createTrue();
+        }
+        return CheckNicknameResponse.createFalse();
     }
 }
