@@ -6,10 +6,12 @@ import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.TokenUtil;
 import org.shax3.square.domain.auth.dto.UserTokenDto;
 import org.shax3.square.domain.auth.repository.RefreshTokenRepository;
+import org.shax3.square.domain.s3.service.S3Service;
 import org.shax3.square.domain.user.dto.UserSignUpDto;
 import org.shax3.square.domain.user.dto.request.CheckNicknameRequest;
 import org.shax3.square.domain.user.dto.request.SignUpRequest;
 import org.shax3.square.domain.user.dto.response.CheckNicknameResponse;
+import org.shax3.square.domain.user.dto.response.ProfileInfoResponse;
 import org.shax3.square.domain.user.dto.response.UserChoiceResponse;
 import org.shax3.square.domain.user.model.AgeRange;
 import org.shax3.square.domain.user.model.SocialType;
@@ -34,6 +36,7 @@ public class UserService {
     private final UserRedisRepository userRedisRepository;
 
     private static final String DEFAULT_PROFILE_IMG = "profile/0c643827-c958-465b-875d-918c8a22fe01.png";
+    private final S3Service s3Service;
 
     @Transactional
     public UserSignUpDto signUp(SignUpRequest signUpRequest, String signUpToken) {
@@ -106,5 +109,10 @@ public class UserService {
             return CheckNicknameResponse.canCreate(false);
         }
         return CheckNicknameResponse.canCreate(true);
+    }
+
+    public ProfileInfoResponse getProfileInfo(User user) {
+        String profileUrl = s3Service.generatePresignedGetUrl(user.getS3Key());
+        return ProfileInfoResponse.of(user, profileUrl);
     }
 }

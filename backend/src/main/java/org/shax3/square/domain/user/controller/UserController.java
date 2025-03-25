@@ -11,6 +11,7 @@ import org.shax3.square.domain.user.dto.UserSignUpDto;
 import org.shax3.square.domain.user.dto.request.CheckNicknameRequest;
 import org.shax3.square.domain.user.dto.request.SignUpRequest;
 import org.shax3.square.domain.user.dto.response.CheckNicknameResponse;
+import org.shax3.square.domain.user.dto.response.ProfileInfoResponse;
 import org.shax3.square.domain.user.dto.response.SignUpUserInfoResponse;
 import org.shax3.square.domain.user.dto.response.UserChoiceResponse;
 import org.shax3.square.domain.user.model.User;
@@ -74,6 +75,19 @@ public class UserController {
         response.addCookie(cookie);
 
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "프로필 정보 조회 api",
+            description = "프로필 사진, 지역, 종교에 관한 정보를 제공합니다."
+    )
+    @GetMapping
+    public ResponseEntity<ProfileInfoResponse> getProfileInfo(
+            @AuthUser User user
+    ) {
+        ProfileInfoResponse profileInfoResponse = userService.getProfileInfo(user);
+
+        return ResponseEntity.ok(profileInfoResponse);
     }
 
     @Operation(

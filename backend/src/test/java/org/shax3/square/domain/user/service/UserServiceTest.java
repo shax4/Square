@@ -8,10 +8,12 @@ import org.shax3.square.domain.auth.TokenUtil;
 import org.shax3.square.domain.auth.dto.UserTokenDto;
 import org.shax3.square.domain.auth.model.RefreshToken;
 import org.shax3.square.domain.auth.repository.RefreshTokenRepository;
+import org.shax3.square.domain.s3.service.S3Service;
 import org.shax3.square.domain.user.dto.UserSignUpDto;
 import org.shax3.square.domain.user.dto.request.CheckNicknameRequest;
 import org.shax3.square.domain.user.dto.request.SignUpRequest;
 import org.shax3.square.domain.user.dto.response.CheckNicknameResponse;
+import org.shax3.square.domain.user.dto.response.ProfileInfoResponse;
 import org.shax3.square.domain.user.model.*;
 import org.shax3.square.domain.user.repository.UserRedisRepository;
 import org.shax3.square.domain.user.repository.UserRepository;
@@ -38,6 +40,9 @@ class UserServiceTest {
 
     @Mock
     private UserRedisRepository userRedisRepository;
+
+    @Mock
+    private S3Service s3Service;
 
     @InjectMocks
     private UserService userService;
@@ -273,5 +278,27 @@ class UserServiceTest {
         assertThat(response).isEqualTo(CheckNicknameResponse.canCreate(false));
         verify(userRepository).findByNickname(nickname);
         verify(userRedisRepository).reserveNickname(nickname);
+    }
+
+    @Test
+    @DisplayName("프로필 정보 조회 테스트")
+    void testGetProfileInfo() {
+        // given
+        User user = User.builder()
+                .s3Key("dummyKey")
+                .region(Region.BUSAN)
+                .religion(Religion.CATHOLICISM)
+                .build();
+
+        String expectedUrl = "http://example.com/dummyKey";
+        when(s3Service.generatePresignedGetUrl("dummyKey")).thenReturn(expectedUrl);
+
+        // when
+        ProfileInfoResponse response = userService.getProfileInfo(user);
+
+        // then
+        assertThat(response.region()).isEqualTo(Region.BUSAN.getKoreanName());
+        assertThat(response.religion()).isEqualTo(Religion.CATHOLICISM.getKoreanName());
+        assertThat(response.profileUrl()).isEqualTo(expectedUrl);
     }
 }
