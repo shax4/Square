@@ -6,6 +6,7 @@ import { Icons } from "../../../../assets/icons/Icons";
 
 import NevTestPage1 from "../../../pages/StackSampleScreen/NevTestPage1";
 import NevTestPage2 from "../../../pages/StackSampleScreen/NevTestPage2";
+import NevTestPage3 from "../../../pages/StackSampleScreen/NevTestPage3";
 import UiTestScreen from "../../../pages/ui-test-screen/UiTestScreen";
 
 // 스택 네비게이터
