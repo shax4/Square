@@ -11,6 +11,9 @@ const colors = {
     warnRed: "#FF4848",
     disabledWarn: "#FFCBCB",
     placeholderText: "#A0A0A8",
+    blurbackgroundColor: 'rgba(0,0,0,0.5)',
+    cancelButton: '#ccc',
+    hashtag: '#e1e1e1'
 }
 
 export default colors;

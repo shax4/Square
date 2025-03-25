@@ -57,7 +57,7 @@ const DebateCard = ({
 
                     {/* Hashtag */}
                     <View style={styles.CardHashtag}>
-                        <Text>{category}</Text>
+                        <Text style={styles.CardHashtagText}># {category}</Text>
                     </View>
 
                     {/* Topic */}
@@ -123,23 +123,38 @@ const VotedView = ({
     leftCount: number;
     rightCount: number;
     isLeft: boolean
-}): JSX.Element => (
-    <View style={styles.CardVote}>
-        <TouchableOpacity 
-        style={isLeft ? styles.CardVotedLeftButton : styles.CardUnvotedLeftButton}>
-            <Text style={styles.CardVoteIcon}>{leftOptionEmoji}</Text>
-            <Text style={styles.CardVoteText}>{leftPercent}%</Text>
-            <Text style={styles.CardVoteText}>{leftCount}명</Text>
-        </TouchableOpacity>
+}): JSX.Element => {
 
-        <TouchableOpacity 
-            style={!isLeft ? styles.CardVotedRightButton : styles.CardUnvotedRightButton}>
-            <Text style={styles.CardVoteIcon}>{rightOptionEmoji}</Text>
-            <Text style={styles.CardVoteText}>{rightPercent}%</Text>
-            <Text style={styles.CardVoteText}>{rightCount}명</Text>
-        </TouchableOpacity>
-    </View>
-);
+    {/* 최소 30%, 최대 70%로 제한 */ }
+    const widthLeft = Math.max(30, Math.min(leftPercent, 70)) - 10;
+    const widthRight = 100 - widthLeft - 10;
+
+    return (
+        <View style={styles.CardVote}>
+            {/* 좌측 버튼 */}
+            <TouchableOpacity
+                style={[
+                    isLeft ? styles.CardVoteButtonSelectedLeft : styles.CardVoteButtonNotSelectedLeft,
+                    { width: `${widthLeft}%` }
+                ]}>
+                <Text style={styles.CardVoteIcon}>{leftOptionEmoji}</Text>
+                <Text style={styles.CardVoteText}>{leftPercent}%</Text>
+                <Text style={styles.CardVoteText}>{leftCount}명</Text>
+            </TouchableOpacity>
+
+            {/* 우측 버튼 */}
+            <TouchableOpacity
+                style={[
+                    !isLeft ? styles.CardVoteButtonSelectedRight : styles.CardVoteButtonNotSelectedRight,
+                    { width: `${widthRight}%` }
+                ]}>
+                <Text style={styles.CardVoteIcon}>{rightOptionEmoji}</Text>
+                <Text style={styles.CardVoteText}>{rightPercent}%</Text>
+                <Text style={styles.CardVoteText}>{rightCount}명</Text>
+            </TouchableOpacity>
+        </View>
+    );
+};
 
 // 투표 전 상태 컴포넌트
 const UnvotedView = ({
@@ -153,17 +168,20 @@ const UnvotedView = ({
     onSelectLeft: () => void;
     onSelectRight: () => void;
 }): JSX.Element => (
+
     <View style={styles.CardVote}>
+        {/* 좌측 버튼 */}
         <TouchableOpacity
-            style={styles.CardUnvotedLeftButton}
+            style={styles.CardVoteButtonBeforeVoteLeft}
             onPress={onSelectLeft}
         >
             <Text style={styles.CardVoteIcon}>{leftOptionEmoji}</Text>
             <Text style={styles.CardVoteText}>{leftOption}</Text>
         </TouchableOpacity>
 
+        {/* 우측 버튼 */}
         <TouchableOpacity
-            style={styles.CardUnvotedRightButton}
+            style={styles.CardVoteButtonBeforeVoteRight}
             onPress={onSelectRight}
         >
             <Text style={styles.CardVoteIcon}>{rightOptionEmoji}</Text>
