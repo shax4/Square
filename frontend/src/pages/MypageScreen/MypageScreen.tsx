@@ -8,14 +8,14 @@ import TabBar from "./Components/TabBar"
 import Button from "./Components/MypageButton"
 
 const MypageScreen = () => {
-  // Main section toggle (Posts vs Votes)
-  const [activeSection, setActiveSection] = useState("게시글")
+  // Main tab toggle (Posts vs Votes)
+  const [activeTab, setActiveTab] = useState("게시글")
 
-  // Sub-section tabs for Posts
-  const [activePostTab, setActivePostTab] = useState("작성글")
+  // Sub-sections for Posts
+  const [activePostSection, setActivePostSection] = useState("작성글")
 
-  // Sub-section tabs for Votes
-  const [activeVoteTab, setActiveVoteTab] = useState("내가 한 투표")
+  // Sub-sections for Votes
+  const [activeVoteSection, setActiveVoteSection] = useState("내가 한 투표")
 
   // Mock data
   const userProfile = {
@@ -26,8 +26,8 @@ const MypageScreen = () => {
 
   // Render content based on active section and tab
   const renderContent = () => {
-    if (activeSection === "게시글") {
-      switch (activePostTab) {
+    if (activeTab === "게시글") {
+      switch (activePostSection) {
         case "작성글":
           return (
             <View style={styles.contentContainer}>
@@ -56,7 +56,7 @@ const MypageScreen = () => {
           return null
       }
     } else {
-      switch (activeVoteTab) {
+      switch (activeVoteSection) {
         case "내가 한 투표":
           return (
             <View style={styles.contentContainer}>
@@ -111,28 +111,30 @@ const MypageScreen = () => {
         </View>
 
         {/* Main Section Toggle */}
-        <View style={styles.sectionToggleContainer}>
+        <View style={styles.tabContainer}>
             <TabBar
                 tabs={["게시글", "투표"]}
-                activeTab={activeSection}
-                onTabChange={setActiveSection}
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
             />
         </View>
 
         {/* Sub-section Tabs */}
-        {activeSection === "게시글" ? (
+        <View style={styles.sectionToggleContainer}>
+        {activeTab === "게시글" ? (
           <SectionToggle
                 sections={["작성글", "댓글", "스크랩", "좋아요"]}
-                activeSection={activePostTab}
-                onSectionChange={setActivePostTab}
+                activeSection={activePostSection}
+                onSectionChange={setActivePostSection}
             />
         ) : (
           <SectionToggle
                 sections={["내가 한 투표", "의견", "스크랩"]}
-                activeSection={activeVoteTab}
-                onSectionChange={setActiveVoteTab}
+                activeSection={activeVoteSection}
+                onSectionChange={setActiveVoteSection}
             />
         )}
+        </View>
 
         {/* Content Area */}
         {renderContent()}
@@ -169,6 +171,9 @@ const styles = StyleSheet.create({
   actionButton: {
     flex: 1,
     marginHorizontal: 4,
+  },
+  tabContainer: {
+
   },
   sectionToggleContainer: {
     paddingHorizontal: 16,

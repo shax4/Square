@@ -21,7 +21,7 @@ const MypageButton = ({ title, onPress, variant = "primary", style, textStyle }:
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: "#4040B0",
+    backgroundColor: "#0066FF",
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 8,
@@ -31,15 +31,15 @@ const styles = StyleSheet.create({
   secondaryButton: {
     backgroundColor: "transparent",
     borderWidth: 1,
-    borderColor: "#4040B0",
+    borderColor: "#0066FF",
   },
   buttonText: {
-    color: "#FFFFFF",
+    color: "#0066FF",
     fontSize: 14,
     fontWeight: "600",
   },
   secondaryButtonText: {
-    color: "#4040B0",
+    color: "#0066FF",
   },
 })
 

@@ -11,8 +11,10 @@ const TabBar = ({ tabs, activeTab, onTabChange }: TabBarProps) => {
     <View style={styles.container}>
       {tabs.map((tab) => (
         <TouchableOpacity key={tab} style={styles.tabButton} onPress={() => onTabChange(tab)}>
-          <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>{tab}</Text>
-          {activeTab === tab && <View style={styles.activeIndicator} />}
+            <View style={styles.tabContent}>
+                <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>{tab}</Text>
+                {activeTab === tab && <View style={styles.activeIndicator} />}
+            </View>
         </TouchableOpacity>
       ))}
     </View>
@@ -25,13 +27,17 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#EEEEEE",
   },
-  tabButton: {
+  tabContent: {
+    alignItems: "center", // 텍스트 중앙 정렬
+    justifyContent: "center",
     paddingVertical: 12,
-    paddingHorizontal: 16,
     position: "relative",
   },
+  tabButton: {
+    flex:1,
+  },
   tabText: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: "500",
     color: "#888888",
   },
