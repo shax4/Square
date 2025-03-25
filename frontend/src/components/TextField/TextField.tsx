@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TextInput, View, Text, StyleSheet } from "react-native";
 import { TextFieldProps, TextFieldVariant } from "./TextField.types";
 import { styles } from "./TextField.styles";
-import { Icons } from "../../../assets/icons/Icons";
 
 const TextField = ({
   label,
@@ -17,7 +16,13 @@ const TextField = ({
   guide,
 }: TextFieldProps) => {
   const [inputHeight, setInputHeight] = useState(51); // input 창 초기 높이 설정
-  const [isFocused, setIsFocused] = useState(false);
+  const [isFocused, setIsFocused] = useState(false); // 텍스트 필드가 선택되었을 때 테두리 색상 변경
+  // 에러 상태가 변경될 때 isFocused 상태 업데이트
+  useEffect(() => {
+    if (error) {
+      setIsFocused(false);
+    }
+  }, [error]);
 
   const getContainerStyle = () => {
     const containerStyles = [styles.container];
@@ -50,10 +55,14 @@ const TextField = ({
     return StyleSheet.flatten(containerStyles); // 스타일 병합
   };
 
+
+
   const handleContentSizeChange = (event: any) => {
     const newHeight = event.nativeEvent.contentSize.height;
-    const maxHeight = 90; // 최대 높이 제한
     const minHeight = 51; // 최소 높이 제한
+    const lineHeight = 24; // styles.input의 lineHeight값 (텍스트의 높이)
+    const maxLines = 8; // 원하는 최대 줄 수
+    const maxHeight = lineHeight * maxLines; // 최대 높이 계산
     // 최소 높이와 최대 높이를 고려하여 동적 높이 설정
     setInputHeight(Math.max(minHeight, Math.min(newHeight, maxHeight)));
   };
@@ -90,16 +99,18 @@ const TextField = ({
           secureTextEntry={secureTextEntry}
           editable={!disabled}
           multiline={variant === TextFieldVariant.Multiline}
-          onFocus={() => setIsFocused(true)} // 포커스 시 상태 변경
+          onFocus={() => {
+            if (!error && !disabled) {
+              setIsFocused(true);
+            }
+          }} // 포커스 시 상태 변경 (에러, 비활성화 상태에서는 변경 안됨)
           onBlur={() => setIsFocused(false)} // 포커스 해제 시 상태 변경
           onContentSizeChange={
             variant === TextFieldVariant.Multiline
               ? handleContentSizeChange
               : undefined
           } // Multiline일 때만 크기 변경 핸들러 사용
-          textAlignVertical={
-            variant === TextFieldVariant.Multiline ? "top" : "center"
-          } // Multiline 일 때 상단 정렬 (Android 옵션, iOS는 기본적용 되어있음)
+          textAlignVertical="center" // Multiline 일 때 중앙 정렬 (Android 옵션)
         />
       </View>
       {error ? (
