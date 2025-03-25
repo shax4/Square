@@ -10,6 +10,13 @@ import org.shax3.square.domain.user.model.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static org.shax3.square.domain.scrap.model.TargetType.DEBATE;
+import static org.shax3.square.domain.scrap.model.TargetType.POST;
+
 @Service
 @RequiredArgsConstructor
 public class ScrapService {
@@ -26,16 +33,49 @@ public class ScrapService {
 
     @Transactional
     public void deleteScrap(User user, Long targetId, TargetType targetType) {
-        scrapRepository.deleteByUserIdAndTargetIdAndTargetType(user.getId(), targetId, targetType);
+        scrapRepository.deleteByUserAndTargetIdAndTargetType(user, targetId, targetType);
     }
 
     private void findTarget(CreateScrapRequest createScrapRequest) {
         TargetType targetType = createScrapRequest.targetType();
-        if (targetType.equals(TargetType.DEBATE)) {
+        if (targetType.equals(DEBATE)) {
             debateService.findDebateById(createScrapRequest.targetId());
             return;
         }
 
         //TODO: 포스트 서비스에서 찾기
+    }
+
+    @Transactional(readOnly = true)
+    public List<Long> getDebateScrap(User user) {
+        return getScrap(user, DEBATE);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Long> getPostScrap(User user) {
+        return getScrap(user, POST);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isDebateScraped(User user, Long debateId) {
+        return isTargetScraped(user, debateId, DEBATE);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isPotScraped(User user, Long postId) {
+        return isTargetScraped(user, postId, POST);
+    }
+
+    private List<Long> getScrap(User user, TargetType targetType) {
+        List<Scrap> scraps = scrapRepository.findByUserAndTargetType(user, targetType);
+        return scraps
+                .stream()
+                .map(Scrap::getTargetId)
+                .collect(Collectors.toList());
+    }
+
+    private boolean isTargetScraped(User user, Long targetId, TargetType targetType) {
+        Optional<Scrap> scrap = scrapRepository.findByUserAndTargetIdAndTargetType(user, targetId, targetType);
+        return scrap.isPresent();
     }
 }
