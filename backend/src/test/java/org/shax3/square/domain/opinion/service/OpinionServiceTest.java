@@ -123,7 +123,7 @@ class OpinionServiceTest {
         // When / Then
         assertThatThrownBy(() -> opinionService.getOpinionDetails(mockUser, 1L))
                 .isInstanceOf(CustomException.class)
-                .hasMessage(ExceptionCode.OPINION_NOTFOUND.getMessage());
+                .hasMessage(ExceptionCode.OPINION_NOT_FOUND.getMessage());
 
         verify(opinionCommentService, never()).getOpinionComments(any(), any());
     }
@@ -216,7 +216,7 @@ class OpinionServiceTest {
         // When / Then
         assertThatThrownBy(() -> opinionService.updateOpinion(request, mockUser, opinionId))
                 .isInstanceOf(CustomException.class)
-                .hasMessage(ExceptionCode.OPINION_NOTFOUND.getMessage());
+                .hasMessage(ExceptionCode.OPINION_NOT_FOUND.getMessage());
 
         verify(opinionRepository, times(1)).findById(opinionId);
     }
@@ -279,7 +279,7 @@ class OpinionServiceTest {
         // When / Then
         assertThatThrownBy(() -> opinionService.deleteOpinion(mockUser, opinionId))
                 .isInstanceOf(CustomException.class)
-                .hasMessage(ExceptionCode.OPINION_NOTFOUND.getMessage());
+                .hasMessage(ExceptionCode.OPINION_NOT_FOUND.getMessage());
 
         verify(opinionRepository, times(1)).findById(opinionId);
     }
