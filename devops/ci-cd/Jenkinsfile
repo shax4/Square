@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         COMPOSE_PATH = "docker-compose.app.yml"
+        DB_COMPOSE_PATH = "docker-compose.db.yml"
         BACKEND_IMAGE_NAME = "backend:latest"
     }
 
@@ -40,7 +41,7 @@ pipeline {
                 echo "앱 재배포 (docker-compose.app.yml)"
                 sh '''
                   docker-compose -f ${COMPOSE_PATH} down
-                  docker-compose -f ${COMPOSE_PATH} up -d --build
+                  docker-compose -f ${DB_COMPOSE_PATH} -f ${COMPOSE_PATH} up -d --build
                 '''
             }
         }
