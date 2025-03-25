@@ -55,10 +55,14 @@ const TextField = ({
     return StyleSheet.flatten(containerStyles); // 스타일 병합
   };
 
+
+
   const handleContentSizeChange = (event: any) => {
     const newHeight = event.nativeEvent.contentSize.height;
-    const maxHeight = 110; // 최대 높이 제한
     const minHeight = 51; // 최소 높이 제한
+    const lineHeight = 24; // styles.input의 lineHeight값 (텍스트의 높이)
+    const maxLines = 8; // 원하는 최대 줄 수
+    const maxHeight = lineHeight * maxLines; // 최대 높이 계산
     // 최소 높이와 최대 높이를 고려하여 동적 높이 설정
     setInputHeight(Math.max(minHeight, Math.min(newHeight, maxHeight)));
   };
