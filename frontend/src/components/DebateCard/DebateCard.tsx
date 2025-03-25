@@ -10,9 +10,7 @@ import { CardProps } from './DebateCard.types';
 import { styles } from './DebateCard.styles';
 import { Icons } from '../../../assets/icons/Icons';
 import VoteConfirmModal from './VoteConfirmModal';
-
-const leftOptionEmoji = "🙆‍♂️";
-const rightOptionEmoji = "🙅";
+import VoteButton from '../VoteButton/VoteButton'
 
 const Stack = createNativeStackNavigator<StackParamList>();
 
@@ -49,6 +47,23 @@ const DebateCard = ({
         setModalVisible(false);
     };
 
+    // 투표 모달 확인 클릭 시 동작하는 메서드
+    const voteConfirm = (
+        debateId: number,
+        isLeft: boolean,
+        navigation: NativeStackNavigationProp<StackParamList>
+    ) => {
+        console.log(`debateId=${debateId}, 선택=${isLeft ? '왼쪽' : '오른쪽'}`);
+        // API 요청 메서드 추가 필요
+
+        // 의견 상세 페이지로 이동
+        navigation.navigate('OpinionListScreen', { debateId });
+    };
+
+    const navigateToOpinionListPage = () => {
+        navigation.navigate('OpinionListScreen', { debateId });
+    }
+
     return (
         <>
             <View style={styles.CardContainer}>
@@ -77,8 +92,9 @@ const DebateCard = ({
                     </TouchableOpacity>
 
                     {/* Vote Buttons: 투표 여부(isLeft에 따라 다르게 렌더링*/}
+                    <View style={styles.CardVote}>
                     {isLeft != null ? (
-                        <VotedView
+                        <VoteButton.VotedView
                             debateId={debateId}
                             leftOption={leftOption}
                             rightOption={rightOption}
@@ -87,9 +103,11 @@ const DebateCard = ({
                             leftCount={leftCount}
                             rightCount={rightCount}
                             isLeft={isLeft}
+                            onSelectLeft={navigateToOpinionListPage}
+                            onSelectRight={navigateToOpinionListPage}
                         />
                     ) : (
-                        <UnvotedView
+                        <VoteButton.UnvotedView
                             debateId={debateId}
                             leftOption={leftOption}
                             rightOption={rightOption}
@@ -103,6 +121,7 @@ const DebateCard = ({
                             }}
                         />
                     )}
+                    </View>
 
                     {/* Footer */}
                     <View style={styles.CardFooter}>
@@ -124,114 +143,5 @@ const DebateCard = ({
     )
 
 }
-
-// 투표 완료 상태 컴포넌트
-const VotedView = ({
-    debateId,
-    leftOption,
-    rightOption,
-    leftPercent,
-    rightPercent,
-    leftCount,
-    rightCount,
-    isLeft,
-}: {
-    debateId: number;
-    leftOption: string;
-    rightOption: string;
-    leftPercent: number;
-    rightPercent: number;
-    leftCount: number;
-    rightCount: number;
-    isLeft: boolean
-}): JSX.Element => {
-
-    {/* 최소 30%, 최대 70%로 제한 */ }
-    const widthLeft = Math.max(30, Math.min(leftPercent, 70)) - 10;
-    const widthRight = 100 - widthLeft - 10;
-    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
-
-    return (
-        <View style={styles.CardVote}>
-            {/* 좌측 버튼 */}
-            <TouchableOpacity
-                style={[
-                    isLeft ? styles.CardVoteButtonSelectedLeft : styles.CardVoteButtonNotSelectedLeft,
-                    { width: `${widthLeft}%` }
-                ]}
-                /* OpinionListScreen 으로 이동 */
-                onPress={() => navigation.navigate('OpinionListScreen', { debateId })}
-            >
-                <Text style={styles.CardVoteIcon}>{leftOptionEmoji}</Text>
-                <Text style={styles.CardVoteText}>{leftOption}</Text>
-                <Text style={styles.CardVoteText}>{leftPercent}% ({leftCount}명)</Text>
-            </TouchableOpacity>
-
-            {/* 우측 버튼 */}
-            <TouchableOpacity
-                style={[
-                    !isLeft ? styles.CardVoteButtonSelectedRight : styles.CardVoteButtonNotSelectedRight,
-                    { width: `${widthRight}%` }
-                ]}
-                /* OpinionListScreen 으로 이동 */
-                onPress={() => navigation.navigate('OpinionListScreen', { debateId })}
-            >
-                <Text style={styles.CardVoteIcon}>{rightOptionEmoji}</Text>
-                <Text style={styles.CardVoteText}>{rightOption}</Text>
-                <Text style={styles.CardVoteText}>{rightPercent}% ({rightCount}명)</Text>
-            </TouchableOpacity>
-        </View>
-    );
-};
-
-// 투표 전 상태 컴포넌트
-const UnvotedView = ({
-    debateId,
-    leftOption,
-    rightOption,
-    onSelectLeft,
-    onSelectRight
-}: {
-    debateId: number;
-    leftOption: string;
-    rightOption: string;
-    onSelectLeft: () => void;
-    onSelectRight: () => void;
-}): JSX.Element => (
-
-    <View style={styles.CardVote}>
-        {/* 좌측 버튼 */}
-        <TouchableOpacity
-            style={styles.CardVoteButtonBeforeVoteLeft}
-            onPress={onSelectLeft}
-        >
-            <Text style={styles.CardVoteIcon}>{leftOptionEmoji}</Text>
-            <Text style={styles.CardVoteText}>{leftOption}</Text>
-        </TouchableOpacity>
-
-        {/* 우측 버튼 */}
-        <TouchableOpacity
-            style={styles.CardVoteButtonBeforeVoteRight}
-            onPress={onSelectRight}
-        >
-            <Text style={styles.CardVoteIcon}>{rightOptionEmoji}</Text>
-            <Text style={styles.CardVoteText}>{rightOption}</Text>
-        </TouchableOpacity>
-    </View>
-);
-
-
-// 투표 모달 확인 클릭 시 동작하는 메서드
-const voteConfirm = (
-    debateId: number,
-    isLeft: boolean,
-    navigation: NativeStackNavigationProp<StackParamList>
-) => {
-    console.log(`debateId=${debateId}, 선택=${isLeft ? '왼쪽' : '오른쪽'}`);
-    // API 요청 메서드 추가 필요
-
-    // 의견 상세 페이지로 이동
-    navigation.navigate('OpinionListScreen', { debateId });
-};
 
 export default DebateCard;

@@ -47,7 +47,6 @@ export const styles = StyleSheet.create({
     CardTopic: {
         flex: 4,
         justifyContent: 'center',
-        paddingLeft: 10,
     },
     CardTopicText: {
         marginLeft: 15,
@@ -56,12 +55,10 @@ export const styles = StyleSheet.create({
         fontWeight: '500',
     },
     CardVote: {
-        marginLeft: 15,
-        marginRight: 15,
         flex: 3,
-        alignItems: 'center',
         flexDirection: 'row',
-        justifyContent: 'space-around',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     CardVoteButtonBeforeVoteLeft: {
         backgroundColor: colors.yesLight,

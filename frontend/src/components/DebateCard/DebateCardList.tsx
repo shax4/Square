@@ -25,7 +25,6 @@ export default function DebateCardList() {
 
         const startIndex = cursorId !== null ? cursorId : 0;
         const newData = cardData.slice(startIndex, startIndex + limit);
-        console.log(newData.length)
         if (newData.length > 0) {
             setDebates(prevData => [...prevData, ...newData]);
             setCursorId(startIndex + limit);
