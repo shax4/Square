@@ -40,7 +40,6 @@ const MypageScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
         {/* Profile Header */}
         <View style={styles.profileHeader}>
           <View style={styles.profileInfo}>
@@ -95,7 +94,6 @@ const MypageScreen = () => {
 
         {/* Content Area */}
         <MypageContent activeTab={activeTab} activePostSection={activePostSection} activeVoteSection={activeVoteSection}/>
-      </ScrollView>
     </SafeAreaView>
   )
 }
@@ -104,6 +102,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
+    paddingBottom: 40,
   },
   profileHeader: {
     padding: 16,
@@ -134,7 +133,7 @@ const styles = StyleSheet.create({
   },
   sectionToggleContainer: {
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 8,
   },
   contentContainer: {
     padding: 16,
