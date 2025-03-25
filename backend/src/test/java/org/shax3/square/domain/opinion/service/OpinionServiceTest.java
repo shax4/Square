@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.shax3.square.domain.debate.model.Debate;
 import org.shax3.square.domain.debate.service.DebateService;
 import org.shax3.square.domain.opinion.dto.request.CreateOpinionRequest;
+import org.shax3.square.domain.opinion.dto.request.UpdateOpinionRequest;
 import org.shax3.square.domain.opinion.dto.response.CommentResponse;
 import org.shax3.square.domain.opinion.dto.response.OpinionDetailsResponse;
 import org.shax3.square.domain.opinion.model.Opinion;
@@ -151,5 +152,138 @@ class OpinionServiceTest {
         assertThat(response.opinionId()).isEqualTo(1L);
         assertThat(response.comments()).isEmpty();
     }
+
+
+    @Test
+    @DisplayName("의견 수정 성공 테스트 - 작성자가 수정")
+    void updateOpinion_success() {
+        // Given
+        Long opinionId = 1L;
+        String updatedContent = "Updated Content";
+        UpdateOpinionRequest request = new UpdateOpinionRequest(updatedContent);
+
+        Opinion mockOpinion = Opinion.builder()
+                .user(mockUser)
+                .content("Original Content")
+                .build();
+        ReflectionTestUtils.setField(mockOpinion, "id", opinionId);
+
+        when(opinionRepository.findById(opinionId)).thenReturn(Optional.of(mockOpinion));
+
+        // When
+        opinionService.updateOpinion(request, mockUser, opinionId);
+
+        // Then
+        verify(opinionRepository, times(1)).findById(opinionId);
+        assertThat(mockOpinion.getContent()).isEqualTo(updatedContent);
+    }
+
+    @Test
+    @DisplayName("의견 수정 실패 테스트 - 작성자가 아닌 사용자가 수정 시도")
+    void updateOpinion_notAuthor() {
+        // Given
+        Long opinionId = 1L;
+        UpdateOpinionRequest request = new UpdateOpinionRequest("Updated Content");
+
+        User otherUser = User.builder().nickname("OtherUser").build();
+        ReflectionTestUtils.setField(otherUser, "id", 2L);
+
+        Opinion mockOpinion = Opinion.builder()
+                .user(mockUser)
+                .content("Original Content")
+                .build();
+        ReflectionTestUtils.setField(mockOpinion, "id", opinionId);
+
+        when(opinionRepository.findById(opinionId)).thenReturn(Optional.of(mockOpinion));
+
+        // When / Then
+        assertThatThrownBy(() -> opinionService.updateOpinion(request, otherUser, opinionId))
+                .isInstanceOf(CustomException.class)
+                .hasMessage(ExceptionCode.NOT_AUTHOR.getMessage());
+
+        verify(opinionRepository, times(1)).findById(opinionId);
+    }
+
+    @Test
+    @DisplayName("의견 수정 실패 테스트 - 의견이 존재하지 않을 경우")
+    void updateOpinion_opinionNotFound() {
+        // Given
+        Long opinionId = 1L;
+        UpdateOpinionRequest request = new UpdateOpinionRequest("Updated Content");
+
+        when(opinionRepository.findById(opinionId)).thenReturn(Optional.empty());
+
+        // When / Then
+        assertThatThrownBy(() -> opinionService.updateOpinion(request, mockUser, opinionId))
+                .isInstanceOf(CustomException.class)
+                .hasMessage(ExceptionCode.OPINION_NOTFOUND.getMessage());
+
+        verify(opinionRepository, times(1)).findById(opinionId);
+    }
+
+    @Test
+    @DisplayName("의견 삭제 성공 테스트 - 작성자가 삭제")
+    void deleteOpinion_success() {
+        // Given
+        Long opinionId = 1L;
+
+        Opinion mockOpinion = Opinion.builder()
+                .user(mockUser)
+                .content("Sample Content")
+                .build();
+        ReflectionTestUtils.setField(mockOpinion, "id", opinionId);
+
+        when(opinionRepository.findById(opinionId)).thenReturn(Optional.of(mockOpinion));
+
+        // When
+        opinionService.deleteOpinion(mockUser, opinionId);
+
+        // Then
+        verify(opinionRepository, times(1)).findById(opinionId);
+        assertThat(mockOpinion.isValid()).isFalse(); // Soft delete 확인
+    }
+
+    @Test
+    @DisplayName("의견 삭제 실패 테스트 - 작성자가 아닌 사용자가 삭제 시도")
+    void deleteOpinion_notAuthor() {
+        // Given
+        Long opinionId = 1L;
+
+        User otherUser = User.builder().nickname("OtherUser").build();
+        ReflectionTestUtils.setField(otherUser, "id", 2L);
+
+        Opinion mockOpinion = Opinion.builder()
+                .user(mockUser)
+                .content("Sample Content")
+                .build();
+        ReflectionTestUtils.setField(mockOpinion, "id", opinionId);
+
+        when(opinionRepository.findById(opinionId)).thenReturn(Optional.of(mockOpinion));
+
+        // When / Then
+        assertThatThrownBy(() -> opinionService.deleteOpinion(otherUser, opinionId))
+                .isInstanceOf(CustomException.class)
+                .hasMessage(ExceptionCode.NOT_AUTHOR.getMessage());
+
+        verify(opinionRepository, times(1)).findById(opinionId);
+    }
+
+    @Test
+    @DisplayName("의견 삭제 실패 테스트 - 의견이 존재하지 않을 경우")
+    void deleteOpinion_opinionNotFound() {
+        // Given
+        Long opinionId = 1L;
+
+        when(opinionRepository.findById(opinionId)).thenReturn(Optional.empty());
+
+        // When / Then
+        assertThatThrownBy(() -> opinionService.deleteOpinion(mockUser, opinionId))
+                .isInstanceOf(CustomException.class)
+                .hasMessage(ExceptionCode.OPINION_NOTFOUND.getMessage());
+
+        verify(opinionRepository, times(1)).findById(opinionId);
+    }
+
+
 }
 

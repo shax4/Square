@@ -43,7 +43,9 @@ public enum ExceptionCode {
 
 	ALREADY_VOTED(7001,"이미 투표한 토론입니다."),
 
-	OPINION_NOTFOUND(8001,"해당 의견을 찾을 수 없습니다.");
+	OPINION_NOTFOUND(8001,"해당 의견을 찾을 수 없습니다."),
+	OPINION_DELETED(8002, "이미 삭제된 의견입니다.")
+	;
 	private final int code;
 	private final String message;
 }

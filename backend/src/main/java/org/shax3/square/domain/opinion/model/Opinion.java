@@ -2,6 +2,7 @@ package org.shax3.square.domain.opinion.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 import org.shax3.square.common.entity.BaseTimeEntity;
 import org.shax3.square.domain.debate.model.Debate;
 import org.shax3.square.domain.user.model.User;
@@ -11,6 +12,7 @@ import org.shax3.square.domain.user.model.User;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "opinion")
+@SQLRestriction("is_valid = true")
 public class Opinion extends BaseTimeEntity {
 
     @Id
@@ -45,6 +47,14 @@ public class Opinion extends BaseTimeEntity {
         this.likeCount = 0;
         this.left = left;
         this.valid = true;
+    }
+
+    public void updateContent(String content){
+        this.content = content;
+    }
+
+    public void softDelete() {
+        this.valid = false;
     }
 }
 

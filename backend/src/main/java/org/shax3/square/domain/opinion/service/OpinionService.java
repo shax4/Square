@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.debate.model.Debate;
 import org.shax3.square.domain.debate.service.DebateService;
 import org.shax3.square.domain.opinion.dto.request.CreateOpinionRequest;
+import org.shax3.square.domain.opinion.dto.request.UpdateOpinionRequest;
 import org.shax3.square.domain.opinion.dto.response.CommentResponse;
 import org.shax3.square.domain.opinion.dto.response.OpinionDetailsResponse;
 import org.shax3.square.domain.opinion.model.Opinion;
@@ -34,7 +35,6 @@ public class OpinionService {
         opinionRepository.save(opinion);
     }
 
-
     public OpinionDetailsResponse getOpinionDetails(User user, Long opinionId) {
         Opinion opinion = opinionRepository.findById(opinionId)
                 .orElseThrow(() -> new CustomException(ExceptionCode.OPINION_NOTFOUND));
@@ -43,5 +43,30 @@ public class OpinionService {
         String opinionUserPresignedUrl = s3Service.generatePresignedGetUrl(opinion.getUser().getS3Key());
 
         return OpinionDetailsResponse.of(opinion, comments, opinionUserPresignedUrl);
+    }
+
+    @Transactional
+    public void updateOpinion(UpdateOpinionRequest request, User user, Long opinionId) {
+        Opinion opinion = opinionRepository.findById(opinionId)
+                .orElseThrow(() -> new CustomException(ExceptionCode.OPINION_NOTFOUND));
+
+        if (!opinion.getUser().getId().equals(user.getId())) {
+            throw new CustomException(ExceptionCode.NOT_AUTHOR);
+        }
+
+        opinion.updateContent(request.content());
+    }
+
+
+    @Transactional
+    public void deleteOpinion(User user, Long opinionId) {
+        Opinion opinion = opinionRepository.findById(opinionId)
+                .orElseThrow(() -> new CustomException(ExceptionCode.OPINION_NOTFOUND));
+
+        if (!opinion.getUser().getId().equals(user.getId())) {
+            throw new CustomException(ExceptionCode.NOT_AUTHOR);
+        }
+
+        opinion.softDelete();
     }
 }
