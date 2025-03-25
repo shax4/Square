@@ -5,7 +5,7 @@ export interface CardProps {
     leftOption: string;
     rightOption: string;
     isScraped: boolean;
-    hasVoted: boolean;
+    isLeft: boolean | null;
     leftCount: number;
     rightCount: number;
     leftPercent: number;

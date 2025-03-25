@@ -9,8 +9,8 @@ import {
 } from "react-native";
 import Button from "../../components/Button";
 import { ButtonVariant } from "../../components/Button";
-import { TextFieldVariant } from "../../components/TextField";
 import TextField from "../../components/TextField";
+import { TextFieldVariant } from "../../components/TextField";
 
 const UiTestScreen = () => {
   // 각 텍스트 필드에 대한 상태 관리
