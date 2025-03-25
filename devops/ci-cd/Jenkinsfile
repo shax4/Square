@@ -42,7 +42,7 @@ pipeline {
                   echo "기존 백엔드 컨테이너 제거"
                   docker-compose -f docker-compose.app.yml rm -f backend || true
 
-                  echo "백엔드만 재빌드 및 실행"
+                  echo "백엔드 컨테이너만 재빌드 및 실행"
                   docker-compose -f docker-compose.app.yml up -d --build backend
                 '''
             }
