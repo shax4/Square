@@ -68,6 +68,8 @@ const DebateCard = ({
                     {/* Vote Buttons: 투표 여부(isLeft에 따라 다르게 렌더링*/}
                     {isLeft != null ? (
                         <VotedView
+                            leftOption={leftOption}
+                            rightOption={rightOption}
                             leftPercent={leftPercent}
                             rightPercent={rightPercent}
                             leftCount={leftCount}
@@ -112,12 +114,16 @@ const DebateCard = ({
 
 // 투표 완료 상태 컴포넌트
 const VotedView = ({
+    leftOption,
+    rightOption,
     leftPercent,
     rightPercent,
     leftCount,
     rightCount,
     isLeft
 }: {
+    leftOption: string;
+    rightOption: string;
     leftPercent: number;
     rightPercent: number;
     leftCount: number;
@@ -138,8 +144,8 @@ const VotedView = ({
                     { width: `${widthLeft}%` }
                 ]}>
                 <Text style={styles.CardVoteIcon}>{leftOptionEmoji}</Text>
-                <Text style={styles.CardVoteText}>{leftPercent}%</Text>
-                <Text style={styles.CardVoteText}>{leftCount}명</Text>
+                <Text style={styles.CardVoteText}>{leftOption}</Text>
+                <Text style={styles.CardVoteText}>{leftPercent}% ({leftCount}명)</Text>
             </TouchableOpacity>
 
             {/* 우측 버튼 */}
@@ -149,8 +155,8 @@ const VotedView = ({
                     { width: `${widthRight}%` }
                 ]}>
                 <Text style={styles.CardVoteIcon}>{rightOptionEmoji}</Text>
-                <Text style={styles.CardVoteText}>{rightPercent}%</Text>
-                <Text style={styles.CardVoteText}>{rightCount}명</Text>
+                <Text style={styles.CardVoteText}>{rightOption}</Text>
+                <Text style={styles.CardVoteText}>{rightPercent}% ({rightCount}명)</Text>
             </TouchableOpacity>
         </View>
     );
