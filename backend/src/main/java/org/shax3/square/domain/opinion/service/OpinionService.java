@@ -69,4 +69,9 @@ public class OpinionService {
 
         opinion.softDelete();
     }
+
+    public Opinion getOpinion(Long opinionId) {
+        return opinionRepository.findById(opinionId)
+                .orElseThrow(() -> new CustomException(ExceptionCode.OPINION_NOTFOUND));
+    }
 }
