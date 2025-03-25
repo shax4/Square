@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TextInput, View, Text, StyleSheet } from "react-native";
 import { TextFieldProps, TextFieldVariant } from "./TextField.types";
 import { styles } from "./TextField.styles";
-import { Icons } from "../../../assets/icons/Icons";
 
 const TextField = ({
   label,
@@ -17,7 +16,13 @@ const TextField = ({
   guide,
 }: TextFieldProps) => {
   const [inputHeight, setInputHeight] = useState(51); // input 창 초기 높이 설정
-  const [isFocused, setIsFocused] = useState(false);
+  const [isFocused, setIsFocused] = useState(false); // 텍스트 필드가 선택되었을 때 테두리 색상 변경
+  // 에러 상태가 변경될 때 isFocused 상태 업데이트
+  useEffect(() => {
+    if (error) {
+      setIsFocused(false);
+    }
+  }, [error]);
 
   const getContainerStyle = () => {
     const containerStyles = [styles.container];
@@ -90,7 +95,11 @@ const TextField = ({
           secureTextEntry={secureTextEntry}
           editable={!disabled}
           multiline={variant === TextFieldVariant.Multiline}
-          onFocus={() => setIsFocused(true)} // 포커스 시 상태 변경
+          onFocus={() => {
+            if (!error && !disabled) {
+              setIsFocused(true);
+            }
+          }} // 포커스 시 상태 변경 (에러, 비활성화 상태에서는 변경 안됨)
           onBlur={() => setIsFocused(false)} // 포커스 해제 시 상태 변경
           onContentSizeChange={
             variant === TextFieldVariant.Multiline
