@@ -2,6 +2,7 @@ package org.shax3.square.domain.proposal.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 import org.shax3.square.domain.user.model.User;
 
 @Entity
@@ -9,6 +10,7 @@ import org.shax3.square.domain.user.model.User;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "proposal")
+@SQLRestriction("is_valid = true")
 public class Proposal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,16 +27,16 @@ public class Proposal {
     private int likeCount;
 
     @Column(name ="is_valid",nullable = false)
-    private boolean isValid;
+    private boolean valid;
 
     @Builder
     public Proposal(User user, String topic) {
         this.user = user;
         this.topic = topic;
         this.likeCount = 0;
-        this.isValid = true;
+        this.valid = true;
     }
     public void softDelete() {
-        this.isValid = false;
+        this.valid = false;
     }
 }
