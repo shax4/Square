@@ -62,7 +62,7 @@ public class ScrapService {
     }
 
     @Transactional(readOnly = true)
-    public boolean isPotScraped(User user, Long postId) {
+    public boolean isPostScraped(User user, Long postId) {
         return isTargetScraped(user, postId, POST);
     }
 
