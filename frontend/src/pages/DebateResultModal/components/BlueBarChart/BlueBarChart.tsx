@@ -43,7 +43,7 @@ const BlueBarChart = (data:BarChartComponentProps) => {
             hideRules
             yAxisThickness={0}
             xAxisThickness={0}
-            height={120}
+            height={160}
         />
     )
 }

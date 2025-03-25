@@ -7,16 +7,20 @@ import { Icons } from '../../../../assets/icons/Icons';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 
-import NevTestPage1 from '../../../pages/StackSampleScreen/NevTestPage1';
+import MypageScreen from '../../../pages/MypageScreen/MypageScreen';
 import NevTestPage2 from '../../../pages/StackSampleScreen/NevTestPage2';
+import PersonalitySurveyPage from '../../../pages/PersonalitySurveyPage/PersonalitySurveyPage';
+import PersonalityResultScreen from '../../../pages/PersonalityResultScreen/PersonalityResultScreen';
 
 // 스택 네비게이터
 const Stack = createNativeStackNavigator();
 
 // 이동할 페이지 스택 타입
 type StackParamList = {
-    NevTestPage1: undefined;
+    MypageScreen: undefined;
     NevTestPage2: undefined;
+    PersonalitySurveyPage: undefined;
+    PersonalityResultScreen: undefined;
 };
 
 // 마이 페이지 상단 탭
@@ -25,8 +29,8 @@ export default function HeaderBar() {
         <Stack.Navigator>
             {/* 마이 페이지 */}
             <Stack.Screen
-                name="NevTestPage1"
-                component={NevTestPage1}
+                name="MypageScreen"
+                component={MypageScreen}
                 options={({ navigation }) => ({
                     title: '마이 페이지',
                     headerBackButtonDisplayMode: 'minimal',
@@ -34,7 +38,7 @@ export default function HeaderBar() {
                         <View style={styles.headerRightItems}>
                             <TouchableOpacity onPress={() => {
                                 console.log("환경 설정으로 이동")
-                                navigation.navigate('NevTestPage2');
+                                navigation.navigate('PersonalitySurveyPage');
                             }}>
                                 <Icons.settings/>
                             </TouchableOpacity>
@@ -51,6 +55,22 @@ export default function HeaderBar() {
                 component={NevTestPage2}
                 options={{
                     title: '환경 설정',
+                    headerBackButtonDisplayMode: 'minimal',
+                }}
+            />
+            <Stack.Screen
+                name="PersonalitySurveyPage"
+                component={PersonalitySurveyPage}
+                options={{
+                    title: '설문 조사',
+                    headerBackButtonDisplayMode: 'minimal',
+                }}
+            />
+            <Stack.Screen
+                name="PersonalityResultScreen"
+                component={PersonalityResultScreen}
+                options={{
+                    title: '성향 테스트 확인',
                     headerBackButtonDisplayMode: 'minimal',
                 }}
             />
