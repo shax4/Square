@@ -52,7 +52,7 @@ const ProfileUpdateScreen = ({ navigation }: any) => {
         {/* Profile Image Section */}
         <View style={styles.profileImageContainer}>
           <View style={styles.profileImageWrapper}>
-            <ProfileImage variant="large" />
+            <ProfileImage variant="extralarge" />
             {/* <ProfileImage imageUrl={profileImageUrl} variant="large" /> */}
             <TouchableOpacity style={styles.cameraButton} onPress={handleProfileImageChange}>
               <View style={styles.cameraIconBackground}>
@@ -209,7 +209,8 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   deleteAccountContainer: {
-    alignSelf: "flex-start",
+    alignItems: "center",
+    alignSelf: "stretch", // 너비를 최대로 설정
     padding: 4,
   },
   deleteAccountText: {
