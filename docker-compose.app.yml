@@ -50,6 +50,10 @@ services:
       - S3_SECRET_KEY=${S3_SECRET_KEY}
       - S3_BUCKET=${S3_BUCKET}
 
+      # Redis 설정
+      - REDIS_BATCH_HOST=${REDIS_BATCH_HOST}
+      - REDIS_BATCH_PORT=${REDIS_BATCH_PORT}
+      - REDIS_BATCH_PASSWORD=${REDIS_BATCH_PASSWORD}
     networks:
       - app-network
 
