@@ -12,8 +12,6 @@ RUN apt-get update && apt-get install -y \
     iputils-ping \
     net-tools
 
-RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf
-
 # Jenkins 유저를 Docker 그룹에 추가
 RUN usermod -aG docker jenkins
 
