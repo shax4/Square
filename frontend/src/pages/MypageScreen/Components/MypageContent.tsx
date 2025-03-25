@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, FlatList } from "react-native";
 import PostCard from "./PostCard"
 import CommentCard from "./CommentCard";
+import VotingCard from "./VotingCard";
 
 interface Props {
     activeTab: string;
@@ -90,6 +91,51 @@ const mockComments = [
         content: '강남역 근처에 "맛있는 식당"이라는 곳이 새로 생겼는데 분위기도 좋고 음식도 맛있어요.',
         likeCount: 78,
         isLiked: true,
+    },
+  ]
+
+
+  // Mock data for votes
+const mockVotes = [
+    {
+      id: "1",
+      topic: "외모가 사회생활에 주는 영향이 있을까?",
+      isLeft: false,
+      leftCount: 49,
+      rightCount: 50,
+      leftPercent: 49,
+      rightPercent: 50,
+      isScraped: true,
+    },
+    {
+      id: "2",
+      topic: "인공지능이 인간의 일자리를 대체할까요?",
+      isLeft: true,
+      leftCount: 75,
+      rightCount: 25,
+      leftPercent: 75,
+      rightPercent: 25,
+      isScraped: false,
+    },
+    {
+      id: "3",
+      topic: "재택근무가 사무실 근무보다 효율적일까요?",
+      isLeft: true,
+      leftCount: 62,
+      rightCount: 38,
+      leftPercent: 62,
+      rightPercent: 38,
+      isScraped: false,
+    },
+    {
+      id: "4",
+      topic: "대학 교육은 미래에도 필수적일까요?",
+      isLeft: false,
+      leftCount: 45,
+      rightCount: 55,
+      leftPercent: 45,
+      rightPercent: 55,
+      isScraped: true,
     },
   ]
 
@@ -203,7 +249,24 @@ const MypageContent = ({ activeTab, activePostSection, activeVoteSection}: Props
             case "내가 한 투표":
               return (
                 <View style={styles.contentContainer}>
-                  <Text style={styles.placeholderText}>내가 한 투표 내용이 여기에 표시됩니다.</Text>
+                    <FlatList
+                        data={mockVotes}
+                        keyExtractor={(item) => item.id}
+                        renderItem={({ item }) => (
+                        <VotingCard
+                            topic={item.topic}
+                            isLeft={item.isLeft}
+                            leftCount={item.leftCount}
+                            rightCount={item.rightCount}
+                            leftPercent={item.leftPercent}
+                            rightPercent={item.rightPercent}
+                            isScraped={item.isScraped}
+                            onScrapToggle={() => console.log(`Scrap toggled for vote ${item.id}`)}
+                            onCardPress={() => console.log(`Vote card pressed: ${item.id}`)}
+                        />
+                        )}
+                        contentContainerStyle={styles.listContent}
+                    />
                 </View>
               )
             case "의견":
@@ -215,7 +278,24 @@ const MypageContent = ({ activeTab, activePostSection, activeVoteSection}: Props
             case "스크랩":
               return (
                 <View style={styles.contentContainer}>
-                  <Text style={styles.placeholderText}>투표 스크랩 내용이 여기에 표시됩니다.</Text>
+                    <FlatList
+                        data={mockVotes}
+                        keyExtractor={(item) => item.id}
+                        renderItem={({ item }) => (
+                        <VotingCard
+                            topic={item.topic}
+                            isLeft={item.isLeft}
+                            leftCount={item.leftCount}
+                            rightCount={item.rightCount}
+                            leftPercent={item.leftPercent}
+                            rightPercent={item.rightPercent}
+                            isScraped={item.isScraped}
+                            onScrapToggle={() => console.log(`Scrap toggled for vote ${item.id}`)}
+                            onCardPress={() => console.log(`Vote card pressed: ${item.id}`)}
+                        />
+                        )}
+                        contentContainerStyle={styles.listContent}
+                    />
                 </View>
               )
             default:
