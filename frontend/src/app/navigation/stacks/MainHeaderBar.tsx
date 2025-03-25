@@ -1,16 +1,18 @@
 import React from 'react';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Icons } from '../../../../assets/icons/Icons';
+import { RouteProp } from '@react-navigation/native';
 
-import NevTestPage1 from '../../../pages/StackSampleScreen/NevTestPage1';
-import NevTestPage2 from '../../../pages/StackSampleScreen/NevTestPage2';
 import NevTestPage3 from '../../../pages/StackSampleScreen/NevTestPage3';
 
 import DebateCardsScreen from '../../../pages/DebateCardsScreen/DebateCardsScreen';
+import OpinionListScreen from '../../../pages/OpinionListScreen/OpinionListScreen';
 
-// 스택 네비게이터
-const Stack = createNativeStackNavigator();
+import { StackParamList } from '../../../shared/page-stack/DebatePageStack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+const Stack = createNativeStackNavigator<StackParamList>();
 
 // 테스트용 예시 사용자 정보(전역 상태관리로 받아오도록 수정 필요)
 const currentUser = {
@@ -27,7 +29,7 @@ const opinion = {
     nickname: '반짝이는하마1',
 }
 
-// 메인 홈홈 상단 탭
+// 토론카드 홈 상단 탭
 export default function HeaderBar() {
     return (
         <Stack.Navigator>
@@ -42,7 +44,7 @@ export default function HeaderBar() {
                         return (
                             <View style={styles.headerRightItems}>
                                 <TouchableOpacity onPress={() => console.log("주제 청원으로 이동 메서드")}>
-                                    <Icons.add/>
+                                    <Icons.add />
                                 </TouchableOpacity>
                             </View>
 
@@ -52,29 +54,26 @@ export default function HeaderBar() {
             />
             {/* 토론 카드 상세(의견 목록) */}
             <Stack.Screen
-                name="NevTestPage2"
-                component={NevTestPage2}
-                options={{
-                    title: `Number ${debate.debateId}`,
+                name="OpinionListScreen"
+                component={OpinionListScreen}
+                options={({ route }) => ({
+                    title: `number ${route.params.debateId}`,
                     headerBackButtonDisplayMode: 'minimal',
-                    headerRight: () => {
-                        return (
-                            <View style={styles.headerRightItems}>
-                                <TouchableOpacity onPress={() => console.log("공유")}>
-                                    <Icons.share/>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => console.log("북마크")}>
-                                    <Icons.bookmark/>
-                                </TouchableOpacity>
-                            </View>
-
-                        )
-                    }
-                }}
+                    headerRight: () => (
+                        <View style={styles.headerRightItems}>
+                            <TouchableOpacity onPress={() => console.log('공유')}>
+                                <Icons.share />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => console.log('북마크')}>
+                                <Icons.bookmark />
+                            </TouchableOpacity>
+                        </View>
+                    ),
+                })}
             />
             {/* 의견 상세 */}
             <Stack.Screen
-                name="NevTestPage3"
+                name="OpinionDetailScreen"
                 component={NevTestPage3}
                 options={() => {
                     // 현재 사용자와 작성자 비교해 우측 아이콘 및 기능 변경
@@ -98,16 +97,16 @@ function HeaderRightIcons({ isAuthor }: { isAuthor: boolean }) {
             {isAuthor ? (
                 <>
                     <TouchableOpacity onPress={() => console.log('수정')}>
-                        <Icons.edit/>
+                        <Icons.edit />
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => console.log('삭제')}>
-                        <Icons.delete/>
+                        <Icons.delete />
                     </TouchableOpacity>
                 </>
             ) : (
                 <>
                     <TouchableOpacity onPress={() => console.log('신고')}>
-                        <Icons.report/>
+                        <Icons.report />
                     </TouchableOpacity>
                 </>
             )}
