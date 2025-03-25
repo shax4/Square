@@ -9,8 +9,11 @@ import org.shax3.square.domain.auth.dto.UserTokenDto;
 import org.shax3.square.domain.auth.model.RefreshToken;
 import org.shax3.square.domain.auth.repository.RefreshTokenRepository;
 import org.shax3.square.domain.user.dto.UserSignUpDto;
+import org.shax3.square.domain.user.dto.request.CheckNicknameRequest;
 import org.shax3.square.domain.user.dto.request.SignUpRequest;
+import org.shax3.square.domain.user.dto.response.CheckNicknameResponse;
 import org.shax3.square.domain.user.model.*;
+import org.shax3.square.domain.user.repository.UserRedisRepository;
 import org.shax3.square.domain.user.repository.UserRepository;
 import org.shax3.square.exception.CustomException;
 
@@ -19,6 +22,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 class UserServiceTest {
@@ -31,6 +35,9 @@ class UserServiceTest {
 
     @Mock
     private RefreshTokenRepository refreshTokenRepository;
+
+    @Mock
+    private UserRedisRepository userRedisRepository;
 
     @InjectMocks
     private UserService userService;
@@ -212,5 +219,59 @@ class UserServiceTest {
 
         verify(refreshTokenRepository, times(1)).deleteByToken(refreshToken);
         verify(userRepository, times(1)).findById(user.getId());
+    }
+
+    @Test
+    @DisplayName("닉네임 중복 검사 false - db에 이미 존재함")
+    void checkNicknameDuplication_existingNickname_returnsFalse() {
+        // given
+        String nickname = "existingUser";
+        CheckNicknameRequest request = new CheckNicknameRequest(nickname);
+        // 이미 존재하는 사용자가 있다고 가정 (더미 User 객체 사용)
+        User dummyUser = User.builder().build();
+        given(userRepository.findByNickname(nickname)).willReturn(Optional.of(dummyUser));
+
+        // when
+        CheckNicknameResponse response = userService.checkNicknameDuplication(request);
+
+        // then
+        assertThat(response).isEqualTo(CheckNicknameResponse.createFalse());
+        verify(userRepository).findByNickname(nickname);
+    }
+
+    @Test
+    @DisplayName("닉네임 중복검사 true")
+    void checkNicknameDuplication_nonExistingNickname_reservationSuccessful_returnsTrue() {
+        // given
+        String nickname = "newUser";
+        CheckNicknameRequest request = new CheckNicknameRequest(nickname);
+        given(userRepository.findByNickname(nickname)).willReturn(Optional.empty());
+        given(userRedisRepository.reserveNickname(nickname)).willReturn(true);
+
+        // when
+        CheckNicknameResponse response = userService.checkNicknameDuplication(request);
+
+        // then
+        assertThat(response).isEqualTo(CheckNicknameResponse.createTrue());
+        verify(userRepository).findByNickname(nickname);
+        verify(userRedisRepository).reserveNickname(nickname);
+    }
+
+    @Test
+    @DisplayName("닉네임 중복검사 false - 레디스에 예약된 닉네임이 있음")
+    void checkNicknameDuplication_nonExistingNickname_reservationFails_returnsFalse() {
+        // given
+        String nickname = "anotherUser";
+        CheckNicknameRequest request = new CheckNicknameRequest(nickname);
+        given(userRepository.findByNickname(nickname)).willReturn(Optional.empty());
+        given(userRedisRepository.reserveNickname(nickname)).willReturn(false);
+
+        // when
+        CheckNicknameResponse response = userService.checkNicknameDuplication(request);
+
+        // then
+        assertThat(response).isEqualTo(CheckNicknameResponse.createFalse());
+        verify(userRepository).findByNickname(nickname);
+        verify(userRedisRepository).reserveNickname(nickname);
     }
 }
