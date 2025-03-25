@@ -1,6 +1,7 @@
 package org.shax3.square.domain.scrap.service;
 
 import lombok.RequiredArgsConstructor;
+import org.shax3.square.domain.debate.service.DebateService;
 import org.shax3.square.domain.scrap.dto.request.CreateScrapRequest;
 import org.shax3.square.domain.scrap.model.Scrap;
 import org.shax3.square.domain.scrap.model.TargetType;
@@ -14,16 +15,27 @@ import org.springframework.transaction.annotation.Transactional;
 public class ScrapService {
 
     private final ScrapRepository scrapRepository;
+    private final DebateService debateService;
 
     @Transactional
     public void createScrap(User user, CreateScrapRequest createScrapRequest) {
+        findTarget(createScrapRequest);
         Scrap scrap = createScrapRequest.to(user);
         scrapRepository.save(scrap);
     }
 
     @Transactional
     public void deleteScrap(User user, Long targetId, TargetType targetType) {
-//        Scrap scrap = scrapRepository.findByUserIdAndTargetId(user.getId(), targetId)
-//                .orElseThrow(() -> new CustomException());
+        scrapRepository.deleteByUserIdAndTargetIdAndTargetType(user.getId(), targetId, targetType);
+    }
+
+    private void findTarget(CreateScrapRequest createScrapRequest) {
+        TargetType targetType = createScrapRequest.targetType();
+        if (targetType.equals(TargetType.DEBATE)) {
+            debateService.findDebateById(createScrapRequest.targetId());
+            return;
+        }
+
+        //TODO: 포스트 서비스에서 찾기
     }
 }
