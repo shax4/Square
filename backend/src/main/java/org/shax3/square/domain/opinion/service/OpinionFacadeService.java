@@ -18,22 +18,29 @@ import java.util.List;
 @Service
 public class OpinionFacadeService {
     private final OpinionService opinionService;
-    private final OpinionCommentService commentService;
+    private final OpinionCommentService opinionCommentService;
     private final S3Service s3Service;
 
+    /* 답글을 생성하기 위한 메서드
+    - 답글에 opinionId가 필요하기 때문에
+      이 opinionService와 opinionCommentService 두개를 참조해야하는 함
+     */
     @Transactional
     public CreateOpinionCommentResponse createOpinionComment(User user, CreateOpinionCommentRequest request) {
         Opinion opinion = opinionService.getOpinion(request.opinionId());
         String profileUrl = s3Service.generatePresignedGetUrl(user.getS3Key());
 
-        OpinionComment newComment = commentService.createComment(request, opinion, user);
+        OpinionComment newComment = opinionCommentService.createComment(request, opinion, user);
         return CreateOpinionCommentResponse.of(newComment, profileUrl);
     }
 
+    /*
+        의견정보와 그 의견에 달린 답글 모두 조회해야함
+     */
     @Transactional(readOnly = true)
     public OpinionDetailsResponse getOpinionDetails(User user, Long opinionId) {
         Opinion opinion = opinionService.getOpinion(opinionId);
-        List<CommentResponse> comments = commentService.getOpinionComments(user, opinionId);
+        List<CommentResponse> comments = opinionCommentService.getOpinionComments(user, opinionId);
         String profileUrl = s3Service.generatePresignedGetUrl(user.getS3Key());
 
         return OpinionDetailsResponse.of(opinion, comments, profileUrl);
