@@ -39,7 +39,7 @@ pipeline {
             steps {
                 echo "앱 재배포 (docker-compose.app.yml)"
                 sh '''
-                  echo "기존 백엔드 컨테이너 제거"
+                  echo "기존 컨테이너 제거"
                   docker-compose --env-file .env -f ${COMPOSE_PATH} rm -f || true
 
                   echo "app.yml 재빌드 및 실행"
