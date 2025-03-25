@@ -62,14 +62,4 @@ public class OpinionController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/my")
-    public ResponseEntity<MyOpinionResponse> my(@AuthUser User user,
-                                                @RequestParam int limit,
-                                                @RequestParam int nextCursorId) {
-
-//        MyOpinionResponse response = opinionService.getMyOpinions(user,limit,nextCursorId);
-//        return ResponseEntity.ok(response);
-        return null;
-
-    }
 }
