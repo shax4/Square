@@ -43,9 +43,31 @@ public class AuthController {
             summary = "임시 로그인 API",
             description = "email을 입력하면 Access Token과 Refresh Token을 반환합니다."
     )
-    @GetMapping("/test")
-    public ResponseEntity<TestUserInfoResponse> loginTest() {
+    @GetMapping("/test1")
+    public ResponseEntity<TestUserInfoResponse> loginTest1() {
         UserLoginDto userLoginDto = authService.loginTest("test@test.com");
+
+        return ResponseEntity.ok().body(TestUserInfoResponse.from(userLoginDto, userLoginDto.accessToken(), userLoginDto.refreshToken().getToken()));
+    }
+
+    @Operation(
+            summary = "임시 로그인 API2",
+            description = "email을 입력하면 Access Token과 Refresh Token을 반환합니다."
+    )
+    @GetMapping("/test2")
+    public ResponseEntity<TestUserInfoResponse> loginTest2() {
+        UserLoginDto userLoginDto = authService.loginTest("test2@test.com");
+
+        return ResponseEntity.ok().body(TestUserInfoResponse.from(userLoginDto, userLoginDto.accessToken(), userLoginDto.refreshToken().getToken()));
+    }
+
+    @Operation(
+            summary = "임시 로그인 API3",
+            description = "email을 입력하면 Access Token과 Refresh Token을 반환합니다."
+    )
+    @GetMapping("/test3")
+    public ResponseEntity<TestUserInfoResponse> loginTest3() {
+        UserLoginDto userLoginDto = authService.loginTest("test3@test.com");
 
         return ResponseEntity.ok().body(TestUserInfoResponse.from(userLoginDto, userLoginDto.accessToken(), userLoginDto.refreshToken().getToken()));
     }
