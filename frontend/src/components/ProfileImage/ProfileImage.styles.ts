@@ -15,5 +15,9 @@ export const styles = StyleSheet.create({
     large: {
         width: 80,
         height: 80,
-    }
+    },
+    extralarge: {
+        width: 120,
+        height: 120,
+    },
 })

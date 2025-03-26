@@ -12,3 +12,6 @@ export {default as LikeButton} from "./LikeButton"
 
 // 텍스트 필드 컴포넌트.
 export {default as TextField} from "./TextField";
+
+// 체크 박스 컴포넌트.
+export {default as Checkbox} from "./Checkbox";
