@@ -27,7 +27,7 @@ export default function OpinionListScreen() {
                 <Text style={styles.topicViewText}>{debate.topic}</Text>
             </View>
 
-            {/* 좌 우 의견 태그 */}
+            {/* 좌 우 의견 옵션션 태그 */}
             <View style={styles.optionView}>
                 <Text style={styles.optionText}>{debate.leftOption}</Text>
                 <Text style={styles.optionText}>{debate.rightOption}</Text>
@@ -39,12 +39,14 @@ export default function OpinionListScreen() {
                     data={opinionResponse1}
                     onEndReached={() => {console.log("end of Data")}}
                 />
+
+                {/* AI 요약 및 전체 의견 텍스트 토글 */}
+                <View style={styles.opinionTypeToggleView}>
+                    <ToggleSwitch />
+                </View>
             </View>
 
-            {/* AI 요약 및 전체 의견 텍스트 토글 */}
-            <View style={styles.opinionTypeToggleView}>
-                <ToggleSwitch />
-            </View>
+            
 
             {/* 좌 우 투표 버튼 */}
             <View style={styles.VoteButtonView}>
@@ -90,6 +92,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         marginLeft: 20,
         marginRight: 20,
+        marginBottom: 10,
     },
     optionText: {
         width: '30%',
@@ -102,10 +105,13 @@ const styles = StyleSheet.create({
     },
     opinionView: {
         flex: 8,
+        justifyContent: 'flex-end',
+        alignItems: 'center',
     },
     opinionTypeToggleView: {
-        flex: 1.2,
-        backgroundColor: 'rgba(0 , 0, 0, 0)' 
+        position: 'absolute',
+        bottom: 10,
+        backgroundColor: 'rgba(0 , 0, 0, 0)',
     },
     VoteButtonView: {
         flex: 3,
@@ -117,7 +123,8 @@ const styles = StyleSheet.create({
     TotalVoteCountView: {
         flex: 1,
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         backgroundColor: colors.white,
+        
     }
 });
