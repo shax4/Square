@@ -14,7 +14,7 @@ public record CommentResponse(
         String content,
         boolean isLiked
 ) {
-    public static CommentResponse of(OpinionComment comment, String profileUrl) {
+    public static CommentResponse of(OpinionComment comment, String profileUrl,boolean isLiked) {
         return new CommentResponse(
                 comment.getId(),
                 comment.getUser().getNickname(),
@@ -23,7 +23,7 @@ public record CommentResponse(
                 comment.getCreatedAt(),
                 comment.getLikeCount(),
                 comment.getContent(),
-                false // TODO: 좋아요 여부 로직 추가 필요
+                isLiked
         );
     }
 }

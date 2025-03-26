@@ -27,11 +27,12 @@ public class OpinionCommentService {
     @Transactional(readOnly = true)
     public List<CommentResponse> getOpinionComments(User user, Long opinionId) {
         List<OpinionComment> comments = opinionCommentRepository.findByOpinionId(opinionId);
-
+        boolean isLiked = false; //TODO 추가구현 필요
         return comments.stream()
                 .map(comment -> CommentResponse.of(
                         comment,
-                        s3Service.generatePresignedGetUrl(comment.getUser().getS3Key())
+                        s3Service.generatePresignedGetUrl(comment.getUser().getS3Key()),
+                        isLiked
                 ))
                 .toList();
     }
