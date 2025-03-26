@@ -16,6 +16,7 @@ import { BoardAPI } from "../BoardScreen/Api/boardApi"; // 게시판 API 호출
 import BoardItem from "./components/BoardItem"; // 개별 게시글 항목을 표시하는 컴포넌트
 import EmptyBoardList from "./components/EmptyBoardList"; // 게시글이 없을 때 표시하는 컴포넌트
 import PopularPostItem from "./components/PopularPostItem"; // 인기 게시글 컴포넌트
+import { Icons } from "../../../assets/icons/Icons";
 
 // 인기 게시글 인터페이스
 interface PopularPost {
@@ -198,7 +199,7 @@ export default function BoardListScreen({ navigation }: BoardListScreenProps) {
             }
           }}
           onEndReachedThreshold={0.1}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={[styles.listContent, boards.length === 0 && styles.emptyListContent]} // 빈 상태면 세로축 중앙 정렬
           // 빈 상태 컴포넌트 추가
           ListEmptyComponent={
             <EmptyBoardList
@@ -216,7 +217,7 @@ export default function BoardListScreen({ navigation }: BoardListScreenProps) {
             navigation.navigate("BoardWrite", { postId: undefined })
           }
         >
-          <Text style={styles.writeButtonText}>글쓰기</Text>
+          <Icons.write />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -234,6 +235,11 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingBottom: 90, // 하단 네비게이션 바 높이(60) + 여백(30)
+  },
+  emptyListContent: {
+    flexGrow: 1, // 컨텐츠가 없을 때 전체 공간 사용
+    justifyContent: "center",
+    alignItems: "center",
   },
   popularSection: {
     padding: 16,
