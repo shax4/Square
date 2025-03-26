@@ -1,7 +1,7 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { View, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 
 import { Icons } from "../../../../assets/icons/Icons";
 import { BoardAPI } from "../../../pages/BoardScreen/Api/boardApi";
@@ -92,7 +92,7 @@ function HeaderRightIcons({
 }) {
   // 게시글 데이터를 가져오기 위한 로직
   // const post = mockFetchPost(boardId); // 실제 API 호출로 대체 필요
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<BoardStackParamList>>();
 
   // 게시글 수정 기능
   const handleEdit = () => {
