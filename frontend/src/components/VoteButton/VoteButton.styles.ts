@@ -12,55 +12,83 @@ export const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-around',
     },
-    
-    CardVoteButtonBeforeVoteLeft: {
+    VoteButtonBase: {
+        width: '45%',
+        height: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 15,
+    },
+    VoteNotSelectedLeft: {
         backgroundColor: colors.yesLight,
-        width: '45%',
-        height: '80%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 15,
     },
-    CardVoteButtonBeforeVoteRight: {
+    VoteNotSelectedRight: {
         backgroundColor: colors.noLight,
-        width: '45%',
-        height: '80%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 15,
     },
-    CardVoteButtonSelectedLeft: {
+    VoteSelectedLeft: {
         backgroundColor: colors.yesDark,
-        height: '80%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 15,
     },
-    CardVoteButtonSelectedRight: {
+    VoteSelectedRight: {
         backgroundColor: colors.noDark,
-        height: '80%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 15,
     },
-    CardVoteButtonNotSelectedLeft: {
+
+    VoteButtonBeforeVoteLeft: {
         backgroundColor: colors.yesLight,
-        height: '80%',
+        width: '45%',
+        height: 100,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 15,
     },
-    CardVoteButtonNotSelectedRight: {
+    VoteButtonBeforeVoteRight: {
         backgroundColor: colors.noLight,
-        height: '80%',
+        width: '45%',
+        height: 100,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 15,
     },
-    CardVoteIcon: {
+    VoteButtonSelectedLeft: {
+        backgroundColor: colors.yesDark,
+        height: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 15,
+    },
+    VoteButtonSelectedRight: {
+        backgroundColor: colors.noDark,
+        height: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 15,
+    },
+    VoteButtonNotSelectedLeft: {
+        backgroundColor: colors.yesLight,
+        height: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 15,
+    },
+    VoteButtonNotSelectedRight: {
+        backgroundColor: colors.noLight,
+        height: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 15,
+    },
+    VoteIcon: {
         fontSize: 35,
     },
-    CardVoteText: {
+    VoteContents: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    VoteMainText: {
         fontSize: 20,
     },
+    VoteSubText: {
+        fontSize: 13,
+    }
+
 });

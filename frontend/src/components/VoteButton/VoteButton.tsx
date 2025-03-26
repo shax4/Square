@@ -1,105 +1,91 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import React from 'react';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { styles } from './VoteButton.styles';
+import { AfterVoteButtonViewProps, BeforeVoteButtonViewProps } from './VoteButton.types';
 
 const leftOptionEmoji = "🙆‍♂️";
 const rightOptionEmoji = "🙅";
-// 투표 완료 상태 컴포넌트
-const VotedView = ({
-    debateId,
-    leftOption,
-    rightOption,
-    leftPercent,
-    rightPercent,
-    leftCount,
-    rightCount,
-    isLeft,
-    onSelectLeft,
-    onSelectRight,
-}: {
-    debateId: number;
-    leftOption: string;
-    rightOption: string;
-    leftPercent: number;
-    rightPercent: number;
-    leftCount: number;
-    rightCount: number;
-    isLeft: boolean;
-    onSelectLeft: () => void;
-    onSelectRight: () => void;
-}): JSX.Element => {
 
-    {/* 최소 30%, 최대 70%로 제한 */ }
+// 투표 완료
+export const AfterVoteButtonView = ({ debate, onSelectLeft, onSelectRight }: AfterVoteButtonViewProps): JSX.Element => {
+    const {
+        leftOption,
+        rightOption,
+        leftPercent,
+        rightPercent,
+        leftCount,
+        rightCount,
+        isLeft,
+    } = debate;
+
     const widthLeft = Math.max(30, Math.min(leftPercent, 70)) - 10;
     const widthRight = 100 - widthLeft - 10;
 
     return (
         <View style={styles.Container}>
-            {/* 좌측 버튼 */}
             <TouchableOpacity
                 style={[
-                    isLeft ? styles.CardVoteButtonSelectedLeft : styles.CardVoteButtonNotSelectedLeft,
-                    { width: `${widthLeft}%` }
+                    styles.VoteButtonBase,
+                    isLeft ? styles.VoteSelectedLeft : styles.VoteNotSelectedLeft,
+                    { width: `${widthLeft}%` },
                 ]}
-                /* OpinionListScreen 으로 이동 */
                 onPress={onSelectLeft}
             >
-                <Text style={styles.CardVoteIcon}>{leftOptionEmoji}</Text>
-                <Text style={styles.CardVoteText}>{leftOption}</Text>
-                <Text style={styles.CardVoteText}>{leftPercent}% ({leftCount}명)</Text>
+
+                <View style={styles.VoteContents}>
+                    <Text style={styles.VoteIcon}>{leftOptionEmoji}</Text>
+                    <Text style={styles.VoteMainText}>{leftOption}</Text>
+                    <Text style={styles.VoteSubText}>{leftPercent}% ({leftCount}명)</Text>
+                </View>
             </TouchableOpacity>
 
-            {/* 우측 버튼 */}
             <TouchableOpacity
                 style={[
-                    !isLeft ? styles.CardVoteButtonSelectedRight : styles.CardVoteButtonNotSelectedRight,
-                    { width: `${widthRight}%` }
+                    styles.VoteButtonBase,
+                    !isLeft ? styles.VoteSelectedRight : styles.VoteNotSelectedRight,
+                    { width: `${widthRight}%` },
                 ]}
-                /* OpinionListScreen 으로 이동 */
                 onPress={onSelectRight}
             >
-                <Text style={styles.CardVoteIcon}>{rightOptionEmoji}</Text>
-                <Text style={styles.CardVoteText}>{rightOption}</Text>
-                <Text style={styles.CardVoteText}>{rightPercent}% ({rightCount}명)</Text>
+
+                <View style={styles.VoteContents}>
+                    <Text style={styles.VoteIcon}>{rightOptionEmoji}</Text>
+                    <Text style={styles.VoteMainText}>{rightOption}</Text>
+                    <Text style={styles.VoteSubText}>{rightPercent}% ({rightCount}명)</Text>
+                </View>
             </TouchableOpacity>
         </View>
     );
 };
 
-// 투표 전 상태 컴포넌트
-const UnvotedView = ({
-    debateId,
-    leftOption,
-    rightOption,
-    onSelectLeft,
-    onSelectRight
-}: {
-    debateId: number;
-    leftOption: string;
-    rightOption: string;
-    onSelectLeft: () => void;
-    onSelectRight: () => void;
-}): JSX.Element => (
+// 투표 전
+export const BeforeVoteButtonView = ({ debate, onSelectLeft, onSelectRight }: BeforeVoteButtonViewProps): JSX.Element => {
+    const { leftOption, rightOption } = debate;
 
-    <View style={styles.Container}>
-        {/* 좌측 버튼 */}
-        <TouchableOpacity
-            style={styles.CardVoteButtonBeforeVoteLeft}
-            onPress={onSelectLeft}
-        >
-            <Text style={styles.CardVoteIcon}>{leftOptionEmoji}</Text>
-            <Text style={styles.CardVoteText}>{leftOption}</Text>
-        </TouchableOpacity>
+    return (
+        <View style={styles.Container}>
+            <TouchableOpacity
+                style={[
+                    styles.VoteButtonBase, styles.VoteNotSelectedLeft]}
+                onPress={onSelectLeft}
+            >
+                <View style={styles.VoteContents}>
+                    <Text style={styles.VoteIcon}>{leftOptionEmoji}</Text>
+                    <Text style={styles.VoteMainText}>{leftOption}</Text>
+                </View>
+            </TouchableOpacity>
 
-        {/* 우측 버튼 */}
-        <TouchableOpacity
-            style={styles.CardVoteButtonBeforeVoteRight}
-            onPress={onSelectRight}
-        >
-            <Text style={styles.CardVoteIcon}>{rightOptionEmoji}</Text>
-            <Text style={styles.CardVoteText}>{rightOption}</Text>
-        </TouchableOpacity>
-    </View>
-);
+            <TouchableOpacity
+                style={[
+                    styles.VoteButtonBase, styles.VoteNotSelectedRight]}
+                onPress={onSelectRight}
+            >
+                <View style={styles.VoteContents}>
+                    <Text style={styles.VoteIcon}>{rightOptionEmoji}</Text>
+                    <Text style={styles.VoteMainText}>{rightOption}</Text>
+                </View>
 
-export default { VotedView, UnvotedView };
+            </TouchableOpacity>
+        </View>
+    );
+};

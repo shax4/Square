@@ -2,14 +2,14 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { View, ActivityIndicator, FlatList, Dimensions, StyleSheet } from 'react-native';
 import DebateCard from './DebateCard';
 import { cardData } from './card-data';
-import { CardProps } from './DebateCard.types';
+import { DebateProps } from './DebateData.types';
 import { styles } from './DebateCard.styles';
 
 
 const { width, height } = Dimensions.get('window');
 
 export default function DebateCardList() {
-    const [debates, setDebates] = useState<CardProps[]>([]);
+    const [debates, setDebates] = useState<DebateProps[]>([]);
     const [cursorId, setCursorId] = useState<number>(0);
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);

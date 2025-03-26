@@ -6,11 +6,11 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { StackParamList } from '../../shared/page-stack/DebatePageStack';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import { CardProps } from './DebateCard.types';
+import { DebateProps } from './DebateData.types';
 import { styles } from './DebateCard.styles';
 import { Icons } from '../../../assets/icons/Icons';
 import VoteConfirmModal from './VoteConfirmModal';
-import VoteButton from '../VoteButton/VoteButton'
+import { AfterVoteButtonView, BeforeVoteButtonView } from '../VoteButton/VoteButton'
 
 const Stack = createNativeStackNavigator<StackParamList>();
 
@@ -27,7 +27,23 @@ const DebateCard = ({
     leftPercent,
     rightPercent,
     totalVoteCount
-}: CardProps): JSX.Element => {
+}: DebateProps): JSX.Element => {
+
+    const debate: DebateProps = {
+        debateId,
+        category,
+        topic,
+        leftOption,
+        rightOption,
+        isScraped,
+        isLeft,
+        leftCount,
+        rightCount,
+        leftPercent,
+        rightPercent,
+        totalVoteCount,
+    };
+
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedSide, setSelectedSide] = useState<boolean | null>(isLeft);
 
@@ -94,23 +110,14 @@ const DebateCard = ({
                     {/* Vote Buttons: 투표 여부(isLeft에 따라 다르게 렌더링*/}
                     <View style={styles.CardVote}>
                     {isLeft != null ? (
-                        <VoteButton.VotedView
-                            debateId={debateId}
-                            leftOption={leftOption}
-                            rightOption={rightOption}
-                            leftPercent={leftPercent}
-                            rightPercent={rightPercent}
-                            leftCount={leftCount}
-                            rightCount={rightCount}
-                            isLeft={isLeft}
+                        <AfterVoteButtonView
+                            debate={ debate }
                             onSelectLeft={navigateToOpinionListPage}
                             onSelectRight={navigateToOpinionListPage}
                         />
                     ) : (
-                        <VoteButton.UnvotedView
-                            debateId={debateId}
-                            leftOption={leftOption}
-                            rightOption={rightOption}
+                        <BeforeVoteButtonView
+                            debate={ debate }
                             onSelectLeft={() => {
                                 setSelectedSide(true);
                                 setModalVisible(true);

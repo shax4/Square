@@ -1,4 +1,4 @@
-export interface CardProps {
+export interface DebateProps {
     debateId: number;
     category: string;
     topic: string;

@@ -2,8 +2,11 @@ import * as React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { StackParamList } from '../../shared/page-stack/DebatePageStack';
-import { cardData } from '../../components/DebateCard/card-data';
+import { cardData as debateList } from '../../components/DebateCard/card-data';
 import colors from '../../../assets/colors';
+import { AfterVoteButtonView, BeforeVoteButtonView } from '../../components/VoteButton/VoteButton';
+
+import ToggleSwitch from './Components/ToggleSwitch';
 
 type OpinionListScreenRouteProp = RouteProp<StackParamList, 'OpinionListScreen'>;
 
@@ -11,46 +14,53 @@ export default function OpinionListScreen() {
     const route = useRoute<OpinionListScreenRouteProp>();
     const { debateId } = route.params;
 
-    const cardItem = cardData[debateId];
-    console.log(debateId)
-    console.log(cardItem.topic)
+    // Axios로 가져와야 함
+    const debate = debateList[debateId];
+
     return (
 
         <View style={styles.container}>
             {/* 토론 주제 표시 */}
             <View style={styles.topicView}>
-                <Text style={styles.topicViewText}>{cardItem.topic}</Text>
+                <Text style={styles.topicViewText}>{debate.topic}</Text>
             </View>
 
             {/* 좌 우 의견 태그 */}
             <View style={styles.optionView}>
-                <Text style={styles.optionText}>{cardItem.leftOption}</Text>
-                <Text style={styles.optionText}>{cardItem.rightOption}</Text>
+                <Text style={styles.optionText}>{debate.leftOption}</Text>
+                <Text style={styles.optionText}>{debate.rightOption}</Text>
             </View>
 
             {/* 의견 텍스트 버블: 토글에 따라 보여주는 텍스트 버블 타입이 달라짐 */}
             <View style={styles.opinionView}>
-
+                
             </View>
 
             {/* AI 요약 및 전체 의견 텍스트 토글 */}
             <View style={styles.opinionTypeToggleView}>
-                <TouchableOpacity>
-                    <Text>AI 요약</Text>
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <Text>전체 의견</Text>
-                </TouchableOpacity>
+                <ToggleSwitch/>
             </View>
 
             {/* 좌 우 투표 버튼 */}
-            <View>
-
+            <View style={styles.VoteButtonView}>
+                {debate.isLeft != null ?
+                    <AfterVoteButtonView
+                        debate={debate}
+                        onSelectLeft={() => { console.log("left Voted") }}
+                        onSelectRight={() => { console.log("left Voted") }}
+                    />
+                    :
+                    <BeforeVoteButtonView
+                        debate={debate}
+                        onSelectLeft={() => { console.log("left not Voted") }}
+                        onSelectRight={() => { console.log("left not Voted") }}
+                    />
+                }
             </View>
 
             {/* 참여중 인원 출력력 */}
-            <View>
-                <Text>지금까지 n명 참여중</Text>
+            <View style={styles.TotalVoteCountView}>
+                <Text>지금까지 {debate.totalVoteCount}명 참여중</Text>
             </View>
 
         </View>
@@ -64,7 +74,6 @@ const styles = StyleSheet.create({
     topicView: {
         height: 100,
         alignItems: 'flex-start',
-        justifyContent: 'center',
         margin: 20,
         flexWrap: 'wrap',
     },
@@ -73,7 +82,6 @@ const styles = StyleSheet.create({
         fontWeight: 600,
     },
     optionView: {
-        flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginLeft: 20,
@@ -89,10 +97,22 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     opinionView: {
-        flex: 5,
-        backgroundColor: colors.black,
+        flex: 8,
     },
     opinionTypeToggleView: {
-        flex: 2,
+        flex: 1.2,
+    },
+    VoteButtonView: {
+        flex: 3,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: colors.white,
+    },
+    TotalVoteCountView: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: colors.white,
     }
 });

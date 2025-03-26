@@ -1,20 +1,13 @@
-export type VotedViewProps = {
-    debateId: number;
-    leftOption: string;
-    rightOption: string;
-    leftPercent: number;
-    rightPercent: number;
-    leftCount: number;
-    rightCount: number;
-    isLeft: boolean;
+import { DebateProps } from "../DebateCard";
+
+export type AfterVoteButtonViewProps = {
+    debate: DebateProps;
     onSelectLeft: () => void;
     onSelectRight: () => void;
 };
 
-export type UnvotedViewProps = {
-    debateId: number;
-    leftOption: string;
-    rightOption: string;
+export type BeforeVoteButtonViewProps = {
+    debate: DebateProps;
     onSelectLeft: () => void;
     onSelectRight: () => void;
 };
