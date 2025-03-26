@@ -15,7 +15,6 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { BoardAPI } from "../BoardScreen/Api/boardApi"; // 게시판 API 호출
 import BoardItem from "./components/BoardItem"; // 개별 게시글 항목을 표시하는 컴포넌트
 import EmptyBoardList from "./components/EmptyBoardList"; // 게시글이 없을 때 표시하는 컴포넌트
-import PopularPostItem from "./components/PopularPostItem"; // 인기 게시글 컴포넌트
 import { Icons } from "../../../assets/icons/Icons";
 
 // 인기 게시글 인터페이스
@@ -94,12 +93,15 @@ export default function BoardListScreen({ navigation }: BoardListScreenProps) {
 
       const data = response.data as PostsResponse;
 
-      // 새로고침 또는 첫 로드 시 전체 데이터 설정, 그렇지 않으면 추가
+      // 새로고침 또는 첫 로드 시 전체 데이터 설정, 그렇지 않으면 중복 제거 후 추가
       if (refresh) {
         setBoards(data.posts);
         setPopularPosts(data.popular);
       } else {
-        setBoards((prev) => [...prev, ...data.posts]);
+        const uniquePosts = data.posts.filter(
+          (newPost) => !boards.some((existingPost) => existingPost.postId === newPost.postId)
+        );
+        setBoards((prev) => [...prev, ...uniquePosts]);
       }
 
       setNextCursorId(data.nextCursorId);
