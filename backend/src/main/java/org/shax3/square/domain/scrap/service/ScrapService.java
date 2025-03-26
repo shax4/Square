@@ -57,22 +57,18 @@ public class ScrapService {
         //TODO: 포스트 서비스에서 찾기
     }
 
-    @Transactional(readOnly = true)
     public List<Long> getDebateScrap(User user) {
         return getScrap(user, DEBATE);
     }
 
-    @Transactional(readOnly = true)
     public List<Long> getPostScrap(User user) {
         return getScrap(user, POST);
     }
 
-    @Transactional(readOnly = true)
     public boolean isDebateScraped(User user, Long debateId) {
         return isTargetScraped(user, debateId, DEBATE);
     }
 
-    @Transactional(readOnly = true)
     public boolean isPostScraped(User user, Long postId) {
         return isTargetScraped(user, postId, POST);
     }
