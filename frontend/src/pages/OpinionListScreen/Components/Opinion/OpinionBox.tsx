@@ -1,9 +1,9 @@
 import React from "react";
 import { View, Text, StyleSheet, Image } from "react-native";
 import { Opinion } from "./OpinionProps";
-import { getTimeAgo } from "../../shared/utils/timeAge/timeAge";
-import { ProfileImage, PersonalityTag } from "../../components";
-import { styles } from './OpinionBubble.styles';
+import { getTimeAgo } from "../../../../shared/utils/timeAge/timeAge";
+import { ProfileImage, PersonalityTag } from "../../../../components";
+import { styles } from '../ContentBubble.styles';
 
 import { AntDesign, Feather } from '@expo/vector-icons'; // 하트/댓글 아이콘용
 
@@ -11,7 +11,7 @@ interface Props {
     opinion: Opinion;
 }
 
-const OpinionBubble = ({ opinion }: Props) => {
+const OpinionBox = ({ opinion }: Props) => {
     const {
         content,
         nickname,
@@ -40,7 +40,7 @@ const OpinionBubble = ({ opinion }: Props) => {
                 {/* 상단: 프로필, 닉네임, userType */}
                 <View style={styles.topRow}>
                     <ProfileImage
-                        imageUrl={profileUrl}
+                        // imageUrl={profileUrl}
                         variant="small"
                     />
                     <Text style={styles.nickname}>{nickname}</Text>
@@ -69,4 +69,4 @@ const OpinionBubble = ({ opinion }: Props) => {
     );
 };
 
-export default OpinionBubble;
+export default OpinionBox;
