@@ -11,14 +11,7 @@ import MypageContent from "./Components/MypageContent"
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 
-type StackParamList = {
-    NevTestPage1: undefined;
-    NevTestPage2: undefined;
-    NevTestPage3: undefined;
-    UiTestScreen: undefined;
-    PersonalityResultScreen: undefined;
-    ProfileUpdateScreen: undefined;
-};
+import {StackParamList} from '../../shared/page-stack/MyPageStack'
 
 const MypageScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
