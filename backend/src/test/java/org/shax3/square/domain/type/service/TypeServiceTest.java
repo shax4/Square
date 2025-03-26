@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -39,6 +40,7 @@ public class TypeServiceTest {
     }
 
     @Test
+    @DisplayName("성향테스트 질문 목록 순서 랜덤으로 조회")
     public void getShuffledQuestionList_ShouldReturnCorrectResponse() {
         // when
         TypeTestQuestionResponse response = typeService.getShuffledQuestionList();
