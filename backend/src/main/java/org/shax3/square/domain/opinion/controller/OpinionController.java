@@ -64,9 +64,9 @@ public class OpinionController {
 
     @Operation(summary = "내 의견 목록 조회",description = "사용자가 자신의 의견 목록을 조회하는 API입니다." )
     @GetMapping("/my")
-    public ResponseEntity<MyOpinionResponse> my(@AuthUser User user,
-                                                @RequestParam(required = false) Long nextCursorId,
-                                                @RequestParam(defaultValue = "5") int limit
+    public ResponseEntity<MyOpinionResponse> readMyOpinions(@AuthUser User user,
+                                                            @RequestParam(required = false) Long nextCursorId,
+                                                            @RequestParam(defaultValue = "5") int limit
                                                      ) {
 
         MyOpinionResponse response = opinionService.getMyOpinions(user,nextCursorId,limit);
