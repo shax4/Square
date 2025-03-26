@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { View, ActivityIndicator, FlatList, Dimensions, StyleSheet } from 'react-native';
 import DebateCard from './DebateCard';
-import { cardData } from './card-data';
+import { debateData } from './card-data';
 import { DebateProps } from './DebateData.types';
 import { styles } from './DebateCard.styles';
 
@@ -24,7 +24,7 @@ export default function DebateCardList() {
         setLoading(true);
 
         const startIndex = cursorId !== null ? cursorId : 0;
-        const newData = cardData.slice(startIndex, startIndex + limit);
+        const newData = debateData.slice(startIndex, startIndex + limit);
         if (newData.length > 0) {
             setDebates(prevData => [...prevData, ...newData]);
             setCursorId(startIndex + limit);

@@ -2,11 +2,15 @@ import * as React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { StackParamList } from '../../shared/page-stack/DebatePageStack';
-import { cardData as debateList } from '../../components/DebateCard/card-data';
+import { debateData as debateList } from '../../components/DebateCard/card-data';
 import colors from '../../../assets/colors';
 import { AfterVoteButtonView, BeforeVoteButtonView } from '../../components/VoteButton/VoteButton';
 
+import { OpinionBubble } from '../../components/OpinionBubble';
+import { opinionResponse1 } from '../../components/OpinionBubble';
+
 import ToggleSwitch from './Components/ToggleSwitch';
+import OpinionBubbleList from '../../components/OpinionBubble/OpinionBubbleList';
 
 type OpinionListScreenRouteProp = RouteProp<StackParamList, 'OpinionListScreen'>;
 
@@ -33,12 +37,15 @@ export default function OpinionListScreen() {
 
             {/* 의견 텍스트 버블: 토글에 따라 보여주는 텍스트 버블 타입이 달라짐 */}
             <View style={styles.opinionView}>
-                
+                <OpinionBubbleList
+                    data={opinionResponse1}
+                    onEndReached={() => {console.log("end of Data")}}
+                />
             </View>
 
             {/* AI 요약 및 전체 의견 텍스트 토글 */}
             <View style={styles.opinionTypeToggleView}>
-                <ToggleSwitch/>
+                <ToggleSwitch />
             </View>
 
             {/* 좌 우 투표 버튼 */}

@@ -1,6 +1,6 @@
 import { DebateProps } from "./DebateData.types";
 
-export const cardData: DebateProps[] = [
+export const debateData: DebateProps[] = [
     {
         debateId: 0,
         category: "테스트",

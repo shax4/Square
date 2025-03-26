@@ -57,7 +57,7 @@ export default function HeaderBar() {
                 name="OpinionListScreen"
                 component={OpinionListScreen}
                 options={({ route }) => ({
-                    title: `number ${route.params.debateId}`,
+                    title: `Number ${route.params.debateId}`,
                     headerBackButtonDisplayMode: 'minimal',
                     headerRight: () => (
                         <View style={styles.headerRightItems}>
