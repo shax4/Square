@@ -57,7 +57,6 @@ class OpinionCommentServiceTest {
 
 
         mockComment = OpinionComment.builder()
-                .id(1L)
                 .user(mockUser)
                 .content("Sample Comment")
                 .build();
@@ -73,7 +72,7 @@ class OpinionCommentServiceTest {
         OpinionComment mockComment = new OpinionComment(1L, null, mockUser, "Nice!", 5, true);
         List<OpinionComment> mockComments = List.of(mockComment);
 
-        when(opinionCommentRepository.findByOpinionIdAndValidTrue(1L)).thenReturn(mockComments);
+        when(opinionCommentRepository.findByOpinionId(1L)).thenReturn(mockComments);
         when(s3Service.generatePresignedGetUrl("test-key")).thenReturn("presigned-url");
 
         // When
@@ -91,7 +90,7 @@ class OpinionCommentServiceTest {
     @DisplayName("댓글이 없는 경우 빈 리스트 반환 테스트")
     void getOpinionComments_emptyList() {
         // Given
-        when(opinionCommentRepository.findByOpinionIdAndValidTrue(1L)).thenReturn(List.of());
+        when(opinionCommentRepository.findByOpinionId(1L)).thenReturn(List.of());
 
         // When
         List<CommentResponse> responses = opinionCommentService.getOpinionComments(mockUser, 1L);

@@ -2,12 +2,14 @@ package org.shax3.square.domain.debate.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "debate")
+@SQLRestriction("is_valid = true")
 public class Debate {
 
     @Id

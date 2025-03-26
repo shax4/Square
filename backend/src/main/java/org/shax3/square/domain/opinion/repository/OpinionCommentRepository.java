@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface OpinionCommentRepository extends JpaRepository<OpinionComment, Long> {
-    List<OpinionComment> findByOpinionIdAndValidTrue(Long opinionId);
+    List<OpinionComment> findByOpinionId(Long opinionId);
 }
