@@ -1,1 +1,1 @@
-export const hideTabBarScreens = ["NevTestPage2", "SomePage"]; // 하단 네비게이션 바를 안보이게 할 스크린 이름.
+export const hideTabBarScreens = ["NevTestPage2", "SomePage", "OpinionListScreen"]; // 하단 네비게이션 바를 안보이게 할 스크린 이름.
