@@ -7,6 +7,7 @@ import org.shax3.square.domain.scrap.model.Scrap;
 import org.shax3.square.domain.scrap.model.TargetType;
 import org.shax3.square.domain.scrap.repository.ScrapRepository;
 import org.shax3.square.domain.user.model.User;
+import org.shax3.square.exception.CustomException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 
 import static org.shax3.square.domain.scrap.model.TargetType.DEBATE;
 import static org.shax3.square.domain.scrap.model.TargetType.POST;
+import static org.shax3.square.exception.ExceptionCode.SCRAP_ALREADY_EXISTS;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +29,15 @@ public class ScrapService {
     @Transactional
     public void createScrap(User user, CreateScrapRequest createScrapRequest) {
         findTarget(createScrapRequest);
+        Optional<Scrap> foundScrap = scrapRepository.findByUserAndTargetIdAndTargetType(
+                user,
+                createScrapRequest.targetId(),
+                createScrapRequest.targetType()
+        );
+        if (foundScrap.isPresent()) {
+            throw new CustomException(SCRAP_ALREADY_EXISTS);
+        }
+
         Scrap scrap = createScrapRequest.to(user);
         scrapRepository.save(scrap);
     }
