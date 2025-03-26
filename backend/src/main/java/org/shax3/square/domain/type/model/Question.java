@@ -5,7 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,34 +15,23 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity
 @Getter
 @NoArgsConstructor(access = PROTECTED)
+@AllArgsConstructor(access = PROTECTED)
 @Table(
         name = "question"
 )
 public class Question {
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    @Column(name = "id")
+    @Column
     private Long id;
 
-    @Column(name = "content", nullable = false)
+    @Column(nullable = false)
     private String content;
 
-    @Column(name = "category", nullable = false)
+    @Column(nullable = false)
     private String category;
 
-    @Column(name = "direction", nullable = false)
+    @Column(nullable = false)
     private boolean direction;
 
-    @Builder
-    public Question(
-            Long id,
-            String content,
-            String category,
-            boolean direction
-    ) {
-        this.id = id;
-        this.content = content;
-        this.category = category;
-        this.direction = direction;
-    }
 }
