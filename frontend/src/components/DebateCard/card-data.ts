@@ -1,6 +1,20 @@
-import { CardProps } from "./DebateCard.types";
+import { DebateProps } from "./DebateData.types";
 
-export const cardData: CardProps[] = [
+export const debateData: DebateProps[] = [
+    {
+        debateId: 0,
+        category: "테스트",
+        topic: "개 vs 고양이",
+        leftOption: "개",
+        rightOption: "고양이",
+        isScraped: false,
+        isLeft: true,
+        leftCount: 80,
+        rightCount: 20,
+        leftPercent: 80,
+        rightPercent: 20,
+        totalVoteCount: 100,
+    },
     {
         debateId: 1,
         category: "연애",
