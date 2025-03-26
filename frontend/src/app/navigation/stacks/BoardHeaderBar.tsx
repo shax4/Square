@@ -7,14 +7,12 @@ import { Icons } from "../../../../assets/icons/Icons";
 import BoardListScreen from "../../../pages/BoardScreen/BoardListScreen";
 import BoardDetailScreen from "../../../pages/BoardScreen/BoardDetailScreen";
 import BoardWriteScreen from "../../../pages/BoardScreen/BoardWriteScreen";
-import UiTestScreen from "../../../pages/ui-test-screen/UiTestScreen";
 
 // 네비게이션 파라미터 타입 정의
 type BoardStackParamList = {
   BoardList: undefined;
   BoardDetail: { boardId: number };
   BoardWrite: { postId?: number };
-  UiTestScreen: { postId?: number };
 };
 
 // 스택 네비게이터
@@ -24,10 +22,7 @@ const Stack = createNativeStackNavigator<BoardStackParamList>();
 const currentUser = {
   nickname: "반짝이는하마",
 };
-// 테스트용 예시 게시물 정보(api에서 받아오도록 수정 필요)
-const post = {
-  nickname: "반짝이는하마1",
-};
+// 게시물 정보는 BoardDetailScreen에서 route.params.boardId를 통해 가져옵니다
 
 // 게시판 상단 탭
 export default function BoardHeaderBar() {
@@ -46,16 +41,13 @@ export default function BoardHeaderBar() {
       <Stack.Screen
         name="BoardDetail"
         component={BoardDetailScreen}
-        options={({ route }) => {
-          // 현재 사용자와 작성자 비교해 우측 아이콘 및 기능 변경
-          const isAuthor = currentUser.nickname === post.nickname;
-
-          return {
-            title: "게시판 상세",
-            headerBackButtonDisplayMode: "minimal",
-            headerRight: () => <HeaderRightIcons isAuthor={isAuthor} />,
-          };
-        }}
+        options={({ route }) => ({
+          title: "게시판 상세",
+          headerBackButtonDisplayMode: "minimal",
+          headerRight: () => (
+            <HeaderRightIcons boardId={route.params.boardId} />
+          ),
+        })}
       />
       {/* 글쓰기 화면 */}
       <Stack.Screen
@@ -71,8 +63,21 @@ export default function BoardHeaderBar() {
   );
 }
 
+// Mock함수 (실제 API 호출로 대체 필요)
+function mockFetchPost(boardId: number) {
+  const mockPosts = [
+    { postId: 1, nickname: "반짝이는하마" },
+    { postId: 2, nickname: "즐거운팬더" },
+    { postId: 3, nickname: "행복한기린" },
+  ];
+  return mockPosts.find((post) => post.postId === boardId);
+}
+
 // 상단 바 우측 아이콘 컴포넌트: 현재 사용자와 글 작성자 여부 확인
-function HeaderRightIcons({ isAuthor }: { isAuthor: boolean }) {
+function HeaderRightIcons({ boardId }: { boardId: number }) {
+  // 게시글 데이터를 가져오기 위한 로직
+  const post = mockFetchPost(boardId); // 실제 API 호출로 대체 필요
+  const isAuthor = currentUser.nickname === post?.nickname;
   return (
     <View style={styles.headerRightItems}>
       {isAuthor ? (
