@@ -12,8 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.shax3.square.common.model.TargetType.DEBATE;
 import static org.shax3.square.common.model.TargetType.POST;
@@ -29,12 +27,11 @@ public class ScrapService {
     @Transactional
     public void createScrap(User user, CreateScrapRequest createScrapRequest) {
         findTarget(createScrapRequest);
-        Optional<Scrap> foundScrap = scrapRepository.findByUserAndTargetIdAndTargetType(
+        if(scrapRepository.existsByUserAndTargetIdAndTargetType(
                 user,
                 createScrapRequest.targetId(),
                 createScrapRequest.targetType()
-        );
-        if (foundScrap.isPresent()) {
+        )) {
             throw new CustomException(SCRAP_ALREADY_EXISTS);
         }
 
@@ -78,11 +75,10 @@ public class ScrapService {
         return scraps
                 .stream()
                 .map(Scrap::getTargetId)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private boolean isTargetScraped(User user, Long targetId, TargetType targetType) {
-        Optional<Scrap> scrap = scrapRepository.findByUserAndTargetIdAndTargetType(user, targetId, targetType);
-        return scrap.isPresent();
+        return scrapRepository.existsByUserAndTargetIdAndTargetType(user, targetId, targetType);
     }
 }
