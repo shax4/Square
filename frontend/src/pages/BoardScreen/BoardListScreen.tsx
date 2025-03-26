@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     paddingBottom: 90, // 하단 네비게이션 바 높이(60) + 여백(30)
   },
   emptyListContent: {
-    flexGrow: 1, // 컨텐츠가 없을 때 전체 공간 사용
+    flex: 1, // 컨텐츠가 없을 때 전체 공간 사용
     justifyContent: "center",
     alignItems: "center",
   },
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
   writeButton: {
     position: "absolute",
     right: 20,
-    bottom: Platform.OS === "ios" ? 90 : 80, // 하단 네비게이션 바 위에 배치
+    bottom: Platform.OS === "ios" ? 100 : 90, // 하단 네비게이션 바 위에 배치
     backgroundColor: "#007BFF",
     width: 60,
     height: 60,
