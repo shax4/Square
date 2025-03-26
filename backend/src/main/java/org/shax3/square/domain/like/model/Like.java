@@ -34,10 +34,10 @@ public class Like extends BaseTimeEntity {
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
-	@Column(name = "target_id", nullable = false)
+	@Column(nullable = false)
 	private Long targetId;
 
-	@Column(name = "target_type", nullable = false)
+	@Column(nullable = false)
 	private TargetType targetType;
 
 	@Column(name = "is_like", nullable = false)

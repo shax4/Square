@@ -1,8 +1,11 @@
 package org.shax3.square.domain.like.service;
 
+import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.like.dto.LikeRequest;
 import org.shax3.square.domain.like.model.Like;
 import org.shax3.square.domain.like.repository.LikeRepository;
+import org.shax3.square.domain.opinion.service.OpinionCommentService;
+import org.shax3.square.domain.opinion.service.OpinionService;
 import org.shax3.square.domain.user.model.User;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +17,17 @@ import lombok.RequiredArgsConstructor;
 public class LikeService {
 
 	private final LikeRepository likeRepository;
+	private final OpinionService opinionService;
+	private final OpinionCommentService opinionCommentService;
 
 	@Transactional
 	public void like(User user, LikeRequest likeRequest) {
-		Like like = likeRepository.findByUserAndTargetIdAndTargetType(user, likeRequest.targetId(), likeRequest.targetType())
+
+		Long targetId = likeRequest.targetId();
+
+		TargetType targetType = likeRequest.targetType();
+
+		Like like = likeRepository.findByUserAndTargetIdAndTargetType(user, targetId, targetType)
 			.map(existingLike -> {
 				existingLike.toggleLike();
 				return existingLike;
@@ -25,6 +35,15 @@ public class LikeService {
 			.orElseGet(() -> likeRequest.to(user));
 
 		likeRepository.save(like);
+	}
+
+	public boolean isPresent(Long targetId, TargetType targetType) {
+		switch (targetType) {
+			case OPINION -> opinionService.getOpinion(targetId);
+			case OPINION_COMMENT -> opinionCommentService.getOpinionComment(targetId);
+			case PROPOSAL ->
+
+		}
 	}
 
 }
