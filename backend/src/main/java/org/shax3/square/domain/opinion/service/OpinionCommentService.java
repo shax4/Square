@@ -26,7 +26,7 @@ public class OpinionCommentService {
 
     @Transactional(readOnly = true)
     public List<CommentResponse> getOpinionComments(User user, Long opinionId) {
-        List<OpinionComment> comments = opinionCommentRepository.findByOpinionIdAndValidTrue(opinionId);
+        List<OpinionComment> comments = opinionCommentRepository.findByOpinionId(opinionId);
 
         return comments.stream()
                 .map(comment -> CommentResponse.of(
