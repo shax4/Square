@@ -10,9 +10,18 @@ import {
   ScrollView,
   Alert
 } from 'react-native';
-import { BoardAPI } from './Api/BoardApi';
+import { BoardAPI } from './Api/boardApi';
+import { StackScreenProps } from '@react-navigation/stack';
 
-export default function BoardWriteScreen({ route, navigation }) {
+// 네비게이션 파라미터 타입 정의
+type BoardStackParamList = {
+  BoardWrite: { postId?: number }; // postId는 선택적 파라미터
+};
+
+// props 타입 정의
+type Props = StackScreenProps<BoardStackParamList, 'BoardWrite'>;
+
+export default function BoardWriteScreen({ route, navigation }: Props) {
   // 게시글 ID (수정 모드일 경우 존재)
   const postId = route.params?.postId;
   // 수정 모드인지 여부 확인
@@ -35,7 +44,7 @@ export default function BoardWriteScreen({ route, navigation }) {
   const fetchPostData = async () => {
     try {
       setLoading(true);
-      const response = await BoardAPI.getPostDetail(postId);
+      const response = await BoardAPI.getPostDetail(postId!); // 수정 시 postId는 반드시 존재해야함
       const post = response.data;
       setTitle(post.title);
       setContent(post.content);
@@ -66,7 +75,7 @@ export default function BoardWriteScreen({ route, navigation }) {
       
       if (isEditMode) {
         // 게시글 수정
-        await BoardAPI.updatePost(postId, postData);
+        await BoardAPI.updatePost(postId!, postData); // 수정 시 postId는 반드시 존재해야함
         Alert.alert('완료', '게시글이 수정되었습니다.', [
           { text: '확인', onPress: () => navigation.goBack() }
         ]);

@@ -1,17 +1,33 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import ProfileImage from '../../../components/ProfileImage/ProfileImage';
-import { BoardAPI } from '../Api/BoardApi';
+import { BoardAPI } from '../Api/boardApi';
 import { Icons } from '../../../../assets/icons/Icons';
 
 // 현재 로그인한 사용자 정보 (실제로는 상태 관리나 컨텍스트에서 가져옴)
 const currentUser = {
-  id: 1, // 예시 ID
+  nickname: '반짝이는하마', // 예시 ID
 };
+// 댓글 인터페이스
+interface Comment {
+  commentId: number; // 댓글 ID
+  nickname: string; // 작성자 닉네임
+  profileUrl?: string; // 작성자 프로필 이미지 URL
+  userType: string; // 작성자 유형
+  createdAt: string; // 작성 시간
+  content: string; // 댓글 내용
+  likeCount: number; // 좋아요 개수
+  isLiked: boolean; // 사용자가 좋아요를 눌렀는지 여부
+}
 
-export default function CommentItem({ comment, onDelete }) {
+interface CommentItemProps {
+  comment: Comment; // 댓글 데이터 객체
+  onDelete?: () => void; // 삭제 후 실행될 콜백 함수 (선택적)
+}
+
+export default function CommentItem({ comment, onDelete }: CommentItemProps) {
   // 현재 사용자가 댓글 작성자인지 확인
-  const isAuthor = comment.userId === currentUser.id;
+  const isAuthor = comment.nickname === currentUser.nickname;
 
   // 댓글 삭제 함수
   const handleDelete = () => {
@@ -28,8 +44,8 @@ export default function CommentItem({ comment, onDelete }) {
           text: "삭제", 
           onPress: async () => {
             try {
-              await BoardAPI.deleteComment(comment.id);
-              onDelete(); // 댓글 목록 새로고침
+              await BoardAPI.deleteComment(comment.commentId);
+              if (onDelete) onDelete(); // 댓글 목록 새로고침
             } catch (error) {
               console.error('댓글 삭제에 실패했습니다:', error);
               Alert.alert("오류", "댓글 삭제 중 오류가 발생했습니다.");
@@ -45,14 +61,14 @@ export default function CommentItem({ comment, onDelete }) {
     <View style={styles.container}>
       {/* 프로필 이미지 */}
       <ProfileImage 
-        uri={comment.author.profileImage} 
-        size={32} 
+        imageUrl={comment.profileUrl} 
+        variant='medium' 
       />
       
       <View style={styles.commentContent}>
         <View style={styles.commentHeader}>
           {/* 작성자 이름 */}
-          <Text style={styles.authorName}>{comment.author.nickname}</Text>
+          <Text style={styles.authorName}>{comment.nickname}</Text>
           {/* 작성 시간 */}
           <Text style={styles.commentDate}>{comment.createdAt}</Text>
           

@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { StackScreenProps } from "@react-navigation/stack";
-import { BoardAPI } from "./Api/BoardApi";
+import { BoardAPI } from "./Api/boardApi";
 import ProfileImage from "../../components/ProfileImage/ProfileImage";
 import CommentItem from "./components/CommentItem";
 

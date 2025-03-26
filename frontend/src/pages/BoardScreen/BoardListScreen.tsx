@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { BoardAPI } from "../BoardScreen/Api/BoardApi"; // 게시판 API 호출
+import { BoardAPI } from "../BoardScreen/Api/boardApi"; // 게시판 API 호출
 import BoardItem from "./components/BoardItem"; // 개별 게시글 항목을 표시하는 컴포넌트
 import PopularPostItem from "./components/PopularPostItem"; // 인기 게시글 컴포넌트
 

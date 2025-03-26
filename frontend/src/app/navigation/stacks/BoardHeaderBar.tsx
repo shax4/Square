@@ -4,13 +4,21 @@ import { View, TouchableOpacity, StyleSheet } from "react-native";
 
 import { Icons } from "../../../../assets/icons/Icons";
 
-import NevTestPage1 from "../../../pages/StackSampleScreen/NevTestPage1";
-import NevTestPage2 from "../../../pages/StackSampleScreen/NevTestPage2";
-import NevTestPage3 from "../../../pages/StackSampleScreen/NevTestPage3";
+import BoardListScreen from "../../../pages/BoardScreen/BoardListScreen";
+import BoardDetailScreen from "../../../pages/BoardScreen/BoardDetailScreen";
+import BoardWriteScreen from "../../../pages/BoardScreen/BoardWriteScreen";
 import UiTestScreen from "../../../pages/ui-test-screen/UiTestScreen";
 
+// 네비게이션 파라미터 타입 정의
+type BoardStackParamList = {
+  BoardList: undefined;
+  BoardDetail: { boardId: number };
+  BoardWrite: { postId?: number };
+  UiTestScreen: { postId?: number };
+};
+
 // 스택 네비게이터
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<BoardStackParamList>();
 
 // 테스트용 예시 사용자 정보(전역 상태관리로 받아오도록 수정 필요)
 const currentUser = {
@@ -27,8 +35,8 @@ export default function BoardHeaderBar() {
     <Stack.Navigator>
       {/* 게시판 목록 */}
       <Stack.Screen
-        name="NevTestPage1"
-        component={NevTestPage1}
+        name="BoardList"
+        component={BoardListScreen}
         options={{
           title: "게시판 목록",
           headerBackButtonDisplayMode: "minimal",
@@ -36,9 +44,9 @@ export default function BoardHeaderBar() {
       />
       {/* 게시판 상세 */}
       <Stack.Screen
-        name="NevTestPage2"
-        component={NevTestPage2}
-        options={() => {
+        name="BoardDetail"
+        component={BoardDetailScreen}
+        options={({ route }) => {
           // 현재 사용자와 작성자 비교해 우측 아이콘 및 기능 변경
           const isAuthor = currentUser.nickname === post.nickname;
 
@@ -47,6 +55,15 @@ export default function BoardHeaderBar() {
             headerBackButtonDisplayMode: "minimal",
             headerRight: () => <HeaderRightIcons isAuthor={isAuthor} />,
           };
+        }}
+      />
+      {/* 글쓰기 화면 */}
+      <Stack.Screen
+        name="BoardWrite"
+        component={BoardWriteScreen}
+        options={{
+          title: "게시글 작성",
+          headerBackButtonDisplayMode: "minimal",
         }}
       />
       {/* UiTestScreen 추가 */}
