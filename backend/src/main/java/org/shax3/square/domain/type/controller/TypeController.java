@@ -24,7 +24,7 @@ public class TypeController {
     )
     @GetMapping
     public ResponseEntity<TypeTestQuestionResponse> getTypeTestQuestions() {
-        TypeTestQuestionResponse typeTestQuestionResponse = typeService.getTypeTestQuestionList();
+        TypeTestQuestionResponse typeTestQuestionResponse = typeService.getShuffledQuestionList();
 
         return ResponseEntity.ok(typeTestQuestionResponse);
     }
