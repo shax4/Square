@@ -3,16 +3,13 @@ import { View, Text, TouchableOpacity, Alert } from 'react-native';
 
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { StackParamList } from '../../shared/page-stack/DebatePageStack';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { StackParamList } from '../../../shared/page-stack/DebatePageStack';
 
 import { DebateProps } from './DebateData.types';
 import { styles } from './DebateCard.styles';
-import { Icons } from '../../../assets/icons/Icons';
+import { Icons } from '../../../../assets/icons/Icons';
 import VoteConfirmModal from './VoteConfirmModal';
-import { AfterVoteButtonView, BeforeVoteButtonView } from '../VoteButton/VoteButton'
-
-const Stack = createNativeStackNavigator<StackParamList>();
+import { AfterVoteButtonView, BeforeVoteButtonView } from '../../../components/VoteButton/VoteButton'
 
 const DebateCard = ({
     debateId,

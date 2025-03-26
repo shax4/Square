@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Icons } from '../../../../assets/icons/Icons';
-import { RouteProp } from '@react-navigation/native';
 
 import NevTestPage3 from '../../../pages/StackSampleScreen/NevTestPage3';
 
@@ -10,7 +9,6 @@ import OpinionListScreen from '../../../pages/OpinionListScreen/OpinionListScree
 
 import { StackParamList } from '../../../shared/page-stack/DebatePageStack';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const Stack = createNativeStackNavigator<StackParamList>();
 

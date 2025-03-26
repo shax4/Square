@@ -1,4 +1,4 @@
-import { DebateProps } from "../DebateCard";
+import { DebateProps } from "../../pages/DebateCardsScreen/DebateCard";
 
 export type AfterVoteButtonViewProps = {
     debate: DebateProps;

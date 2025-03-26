@@ -1,13 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Animated, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import colors from '../../../../assets/colors';
 
 export default function ToggleSwitch() {
     const [isSummary, setIsSummary] = useState(true); // true: AI 요약, false: 전체 의견
-
-    const handleToggle = () => {
-        setIsSummary(prev => !prev);
-    };
 
     return (
         <View style={styles.opinionTypeToggleView}>

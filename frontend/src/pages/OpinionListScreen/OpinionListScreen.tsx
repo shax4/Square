@@ -1,16 +1,15 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { StackParamList } from '../../shared/page-stack/DebatePageStack';
-import { debateData as debateList } from '../../components/DebateCard/card-data';
+import { debateData as debateList } from '../DebateCardsScreen/DebateCard/card-data';
 import colors from '../../../assets/colors';
 import { AfterVoteButtonView, BeforeVoteButtonView } from '../../components/VoteButton/VoteButton';
 
-import { OpinionBubble } from '../../components/OpinionBubble';
-import { opinionResponse1 } from '../../components/OpinionBubble';
+import { opinionResponse1 } from './Components';
 
 import ToggleSwitch from './Components/ToggleSwitch';
-import OpinionBubbleList from '../../components/OpinionBubble/OpinionBubbleList';
+import OpinionBubbleList from './Components/OpinionBubbleList';
 
 type OpinionListScreenRouteProp = RouteProp<StackParamList, 'OpinionListScreen'>;
 
@@ -22,7 +21,6 @@ export default function OpinionListScreen() {
     const debate = debateList[debateId];
 
     return (
-
         <View style={styles.container}>
             {/* 토론 주제 표시 */}
             <View style={styles.topicView}>
@@ -69,7 +67,6 @@ export default function OpinionListScreen() {
             <View style={styles.TotalVoteCountView}>
                 <Text>지금까지 {debate.totalVoteCount}명 참여중</Text>
             </View>
-
         </View>
     )
 }
@@ -108,6 +105,7 @@ const styles = StyleSheet.create({
     },
     opinionTypeToggleView: {
         flex: 1.2,
+        backgroundColor: 'rgba(0 , 0, 0, 0)' 
     },
     VoteButtonView: {
         flex: 3,
