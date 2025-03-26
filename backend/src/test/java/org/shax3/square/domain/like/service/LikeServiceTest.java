@@ -50,6 +50,13 @@ class LikeServiceTest {
 		likeService.like(user, request);
 
 		// Then
+		verify(likeRepository).save(argThat(like ->
+			like.getUser().equals(user) &&
+				like.getTargetId().equals(1L) &&
+				like.getTargetType() == TargetType.POST &&
+				like.isLike()
+		));
+		verify(likeRepository, times(1)).save();
 
 	}
 }

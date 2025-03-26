@@ -68,4 +68,10 @@ public class OpinionCommentService {
 
         comment.updateContent(request.content());
     }
+
+    public OpinionComment getOpinionComment(Long opinionCommentId) {
+        return opinionCommentRepository.findById(opinionCommentId)
+            .orElseThrow(() -> new CustomException(OPINION_COMMENT_NOT_FOUND));
+    }
+
 }
