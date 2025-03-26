@@ -4,6 +4,7 @@ pipeline {
     environment {
         COMPOSE_PATH = "docker-compose.app.yml"
         BACKEND_IMAGE_NAME = "backend:latest"
+        REGISTRY_IMAGE_NAME = "eenzzi/square:latest"
     }
 
     stages {
@@ -35,15 +36,34 @@ pipeline {
             }
         }
 
+        stage('Tag & Push to DockerHub') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'docker-hub',
+                    usernameVariable: 'USERNAME',
+                    passwordVariable: 'TOKEN'
+                )]) {
+                    sh '''
+                        docker tag ${BACKEND_IMAGE_NAME} ${REGISTRY_IMAGE_NAME}
+                        echo "$TOKEN" | docker login -u "$USERNAME" --password-stdin
+                        docker push ${REGISTRY_IMAGE_NAME}
+                    '''
+                }
+            }
+        }
+
         stage('Deploy App') {
             steps {
                 echo "앱 재배포 (docker-compose.app.yml)"
                 sh '''
-                  echo "기존 백엔드 컨테이너 제거"
-                  docker container rm -f backend || true
+                    echo "기존 백엔드 컨테이너 제거"
+                    docker container rm -f backend || true
 
-                  echo "백엔드 컨테이너만 재빌드 및 실행"
-                  docker-compose -p square --env-file .env -f ${COMPOSE_PATH} up -d --build backend
+                    echo "최신 이미지 pull 후 실행"
+                    docker pull ${REGISTRY_IMAGE_NAME}
+
+                    echo "백엔드 컨테이너만 재빌드 및 실행"
+                    docker-compose -p square --env-file .env -f ${COMPOSE_PATH} up -d --build backend
                 '''
             }
         }

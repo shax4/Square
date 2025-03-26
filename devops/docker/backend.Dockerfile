@@ -15,7 +15,7 @@ COPY backend backend
 
 RUN cd backend && ./gradlew clean bootJar --no-daemon
 
-# 7. 멀티 스테이지 빌드
+# 멀티 스테이지 빌드
 FROM openjdk:17-jdk-slim
 
 WORKDIR /app
