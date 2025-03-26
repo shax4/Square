@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { StackParamList } from '../../shared/page-stack/DebatePageStack';
@@ -6,16 +6,17 @@ import { debateData as debateList } from '../DebateCardsScreen/DebateCard/card-d
 import colors from '../../../assets/colors';
 import { AfterVoteButtonView, BeforeVoteButtonView } from '../../components/VoteButton/VoteButton';
 
-import { opinionResponse1 } from './Components';
+import { opinionResponse1 } from './Components/Opinion/opinion-list-test-data';
 
 import ToggleSwitch from './Components/ToggleSwitch';
-import OpinionBubbleList from './Components/OpinionBubbleList';
+import OpinionBubbleList from './Components/Opinion/OpinionBubbleList';
 
 type OpinionListScreenRouteProp = RouteProp<StackParamList, 'OpinionListScreen'>;
 
 export default function OpinionListScreen() {
     const route = useRoute<OpinionListScreenRouteProp>();
     const { debateId } = route.params;
+    const [isSummary, setIsSummary] = useState(true); // ai요약, 의견 토글
 
     // Axios로 가져와야 함
     const debate = debateList[debateId];
@@ -33,16 +34,24 @@ export default function OpinionListScreen() {
                 <Text style={styles.optionText}>{debate.rightOption}</Text>
             </View>
 
-            {/* 의견 텍스트 버블: 토글에 따라 보여주는 텍스트 버블 타입이 달라짐 */}
+            {/* 의견 텍스트 버블: isSummary 토글에 따라 보여주는 텍스트 버블 타입이 달라짐 */}
             <View style={styles.opinionView}>
-                <OpinionBubbleList
+                {isSummary ? (
+                    <Text> Opinions</Text>
+                ) : (
+                    <OpinionBubbleList
                     data={opinionResponse1}
                     onEndReached={() => {console.log("end of Data")}}
-                />
+                    />
+                )}
+                
 
                 {/* AI 요약 및 전체 의견 텍스트 토글 */}
                 <View style={styles.opinionTypeToggleView}>
-                    <ToggleSwitch />
+                    <ToggleSwitch
+                        isSummary={isSummary}
+                        setIsSummary={setIsSummary}
+                    />
                 </View>
             </View>
 
@@ -65,7 +74,7 @@ export default function OpinionListScreen() {
                 }
             </View>
 
-            {/* 참여중 인원 출력력 */}
+            {/* 참여중 인원 출력 */}
             <View style={styles.TotalVoteCountView}>
                 <Text>지금까지 {debate.totalVoteCount}명 참여중</Text>
             </View>

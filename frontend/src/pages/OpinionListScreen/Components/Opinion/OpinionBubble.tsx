@@ -1,8 +1,8 @@
 import React from "react";
 import { View, Text, StyleSheet, Image } from "react-native";
 import { Opinion } from "./OpinionProps";
-import { getTimeAgo } from "../../../shared/utils/timeAge/timeAge";
-import { ProfileImage, PersonalityTag } from "../../../components";
+import { getTimeAgo } from "../../../../shared/utils/timeAge/timeAge";
+import { ProfileImage, PersonalityTag } from "../../../../components";
 import { styles } from './OpinionBubble.styles';
 
 import { AntDesign, Feather } from '@expo/vector-icons'; // 하트/댓글 아이콘용

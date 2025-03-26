@@ -1,5 +1,5 @@
 import { OpinionsResponse } from './OpinionsResponseProps';
-import { debateData } from '../../DebateCardsScreen/DebateCard';
+import { debateData } from '../../../DebateCardsScreen/DebateCard';
 
 export const opinionResponse1: OpinionsResponse = {
     debate: debateData[0],

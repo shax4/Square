@@ -1,5 +1,5 @@
 import { Opinion } from "./OpinionProps";
-import { DebateProps } from "../../DebateCardsScreen/DebateCard";
+import { DebateProps } from "../../../DebateCardsScreen/DebateCard";
 
 export interface OpinionsResponse {
     debate: DebateProps;
