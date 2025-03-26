@@ -37,7 +37,7 @@ services:
     restart: unless-stopped
     ports:
       - "6380:6379"
-    command: ["redis-server", "--bind", "0.0.0.0", "--protected-mode", "no", "--requirepass", "${REDIS_CACHE_PASSWORD}"]
+    command: ["redis-server", "--bind", "0.0.0.0", "--protected-mode", "no", "--requirepass", "${REDIS_BATCH_PASSWORD}"]
     volumes:
       - redis-batch-data:/data
     networks:
