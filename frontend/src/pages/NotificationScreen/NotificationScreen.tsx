@@ -10,6 +10,7 @@ const NotificationScreen = ({ navigation }: any) => {
 
   // Handle notification press (mark as read)
   const handleNotificationPress = (id: string) => {
+    console.log("알림 누름 ID : ", id);
     setNotifications((prevNotifications) =>
       prevNotifications.map((notification) =>
         notification.notificationId === id ? { ...notification, isRead: true } : notification,
