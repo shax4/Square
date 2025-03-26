@@ -1,8 +1,10 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 import { Icons } from "../../../../assets/icons/Icons";
+import { BoardAPI } from "../../../pages/BoardScreen/Api/boardApi";
 
 import BoardListScreen from "../../../pages/BoardScreen/BoardListScreen";
 import BoardDetailScreen from "../../../pages/BoardScreen/BoardDetailScreen";
@@ -10,9 +12,9 @@ import BoardWriteScreen from "../../../pages/BoardScreen/BoardWriteScreen";
 
 // 네비게이션 파라미터 타입 정의
 type BoardStackParamList = {
-  BoardList: undefined;
-  BoardDetail: { boardId: number };
-  BoardWrite: { postId?: number };
+  BoardList: undefined; // 게시글 목록 화면은 별도의 파라미터가 없음
+  BoardDetail: { boardId: number }; // 게시글 상세 화면은 boardId를 필요로 함
+  BoardWrite: { postId?: number }; // 게시글 작성/수정 화면은 선택적 postId를 필요로 함
 };
 
 // 스택 네비게이터
@@ -41,13 +43,21 @@ export default function BoardHeaderBar() {
       <Stack.Screen
         name="BoardDetail"
         component={BoardDetailScreen}
-        options={({ route }) => ({
-          title: "게시판 상세",
-          headerBackButtonDisplayMode: "minimal",
-          headerRight: () => (
-            <HeaderRightIcons boardId={route.params.boardId} />
-          ),
-        })}
+        options={({ route }) => {
+          const boardId = route.params.boardId;
+
+          // 현재 게시글 데이터를 가져와서 작성자 확인
+          const post = mockFetchPost(boardId);
+          const isAuthor = currentUser.nickname === post?.nickname;
+
+          return {
+            title: "게시판 상세",
+            headerBackButtonDisplayMode: "minimal",
+            headerRight: () => (
+              <HeaderRightIcons isAuthor={isAuthor} boardId={boardId} />
+            ),
+          };
+        }}
       />
       {/* 글쓰기 화면 */}
       <Stack.Screen
@@ -58,7 +68,6 @@ export default function BoardHeaderBar() {
           headerBackButtonDisplayMode: "minimal",
         }}
       />
-
     </Stack.Navigator>
   );
 }
@@ -74,18 +83,56 @@ function mockFetchPost(boardId: number) {
 }
 
 // 상단 바 우측 아이콘 컴포넌트: 현재 사용자와 글 작성자 여부 확인
-function HeaderRightIcons({ boardId }: { boardId: number }) {
+function HeaderRightIcons({
+  isAuthor,
+  boardId,
+}: {
+  isAuthor: boolean;
+  boardId: number;
+}) {
   // 게시글 데이터를 가져오기 위한 로직
-  const post = mockFetchPost(boardId); // 실제 API 호출로 대체 필요
-  const isAuthor = currentUser.nickname === post?.nickname;
+  // const post = mockFetchPost(boardId); // 실제 API 호출로 대체 필요
+  const navigation = useNavigation();
+
+  // 게시글 수정 기능
+  const handleEdit = () => {
+    // BoardWrite 화면으로 이동하면서 postId 전달
+    navigation.navigate("BoardWrite", { postId: boardId });
+  };
+
+  // 게시글 삭제 기능
+  const handleDelete = () => {
+    Alert.alert("게시글 삭제", "정말 이 게시글을 삭제하시겠습니까?", [
+      { text: "취소", style: "cancel" },
+      {
+        text: "삭제",
+        onPress: async () => {
+          try {
+            // API를 호출하여 게시글 삭제
+            await BoardAPI.deletePost(boardId);
+            Alert.alert("삭제 완료", "게시글이 삭제되었습니다.", [
+              {
+                text: "확인",
+                onPress: () => navigation.navigate("BoardList"),
+              },
+            ]);
+          } catch (error) {
+            console.error("게시글 삭제 중 오류 발생:", error);
+            Alert.alert("오류", "게시글 삭제 중 문제가 발생했습니다.");
+          }
+        },
+        style: "destructive",
+      },
+    ]);
+  };
   return (
     <View style={styles.headerRightItems}>
       {isAuthor ? (
         <>
-          <TouchableOpacity onPress={() => console.log("수정")}>
+          <TouchableOpacity onPress={handleEdit}>
             <Icons.edit />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => console.log("삭제")}>
+          <TouchableOpacity onPress={handleDelete}>
             <Icons.delete />
           </TouchableOpacity>
         </>
