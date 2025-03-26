@@ -6,10 +6,13 @@ import { debateData as debateList } from '../DebateCardsScreen/DebateCard/card-d
 import colors from '../../../assets/colors';
 import { AfterVoteButtonView, BeforeVoteButtonView } from '../../components/VoteButton/VoteButton';
 
-import { opinionResponse1 } from './Components/Opinion/opinion-list-test-data';
-
 import ToggleSwitch from './Components/ToggleSwitch';
-import OpinionBubbleList from './Components/Opinion/OpinionBubbleList';
+
+import SummaryBoxList from './Components/Summary/SummaryBoxList'
+import { SummariesResponse1 } from './Components/Summary';
+
+import OpinionBoxList from './Components/Opinion/OpinionBoxList';
+import { opinionResponse1 } from './Components/Opinion/opinion-list-test-data';
 
 type OpinionListScreenRouteProp = RouteProp<StackParamList, 'OpinionListScreen'>;
 
@@ -37,9 +40,12 @@ export default function OpinionListScreen() {
             {/* 의견 텍스트 버블: isSummary 토글에 따라 보여주는 텍스트 버블 타입이 달라짐 */}
             <View style={styles.opinionView}>
                 {isSummary ? (
-                    <Text> Opinions</Text>
+                    <SummaryBoxList
+                        data={SummariesResponse1}
+                        onEndReached={() => {console.log("end of Data")}}
+                    />
                 ) : (
-                    <OpinionBubbleList
+                    <OpinionBoxList
                     data={opinionResponse1}
                     onEndReached={() => {console.log("end of Data")}}
                     />

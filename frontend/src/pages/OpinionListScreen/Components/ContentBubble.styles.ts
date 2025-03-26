@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import colors from "../../../../../assets/colors";
+import colors from "../../../../assets/colors";
 
 export const styles = StyleSheet.create({
     bubbleWrapper: {
