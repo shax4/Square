@@ -1,4 +1,4 @@
-package org.shax3.square.domain.scrap.model;
+package org.shax3.square.common.model;
 
 public enum TargetType {
     DEBATE, POST

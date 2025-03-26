@@ -13,7 +13,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.shax3.square.common.entity.BaseTimeEntity;
-import org.shax3.square.domain.scrap.dto.request.CreateScrapRequest;
+import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.user.model.User;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -44,9 +44,9 @@ public class Scrap extends BaseTimeEntity {
     TargetType targetType;
 
     @Builder
-    public Scrap(User user, CreateScrapRequest createScrapRequest) {
+    public Scrap(User user, Long targetId, TargetType targetType) {
         this.user = user;
-        this.targetId = createScrapRequest.targetId();
-        this.targetType = createScrapRequest.targetType();
+        this.targetId = targetId;
+        this.targetType = targetType;
     }
 }

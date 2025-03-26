@@ -2,7 +2,7 @@ package org.shax3.square.domain.scrap.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import org.shax3.square.domain.scrap.model.Scrap;
-import org.shax3.square.domain.scrap.model.TargetType;
+import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.user.model.User;
 
 public record CreateScrapRequest(
@@ -14,7 +14,8 @@ public record CreateScrapRequest(
     public Scrap to(User user) {
         return Scrap.builder()
                 .user(user)
-                .createScrapRequest(this)
+                .targetId(targetId)
+                .targetType(targetType)
                 .build();
     }
 }

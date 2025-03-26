@@ -3,7 +3,7 @@ package org.shax3.square.domain.scrap.service;
 import org.shax3.square.domain.debate.service.DebateService;
 import org.shax3.square.domain.scrap.dto.request.CreateScrapRequest;
 import org.shax3.square.domain.scrap.model.Scrap;
-import org.shax3.square.domain.scrap.model.TargetType;
+import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.scrap.repository.ScrapRepository;
 import org.shax3.square.domain.user.model.User;
 import org.shax3.square.exception.CustomException;

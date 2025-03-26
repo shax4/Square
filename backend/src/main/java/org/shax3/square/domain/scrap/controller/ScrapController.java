@@ -6,7 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.annotation.AuthUser;
 import org.shax3.square.domain.scrap.dto.request.CreateScrapRequest;
-import org.shax3.square.domain.scrap.model.TargetType;
+import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.scrap.service.ScrapService;
 import org.shax3.square.domain.user.model.User;
 import org.springframework.http.ResponseEntity;
