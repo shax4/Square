@@ -11,6 +11,8 @@ const ProfileImage = ({imageUrl, variant = "small"}: ProfileImageProps) => {
                 return styles.medium;
             case "large":
                 return styles.large;
+            case "extralarge":
+                return styles.extralarge;
         }
     };
 

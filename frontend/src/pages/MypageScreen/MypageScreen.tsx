@@ -17,10 +17,11 @@ type StackParamList = {
     NevTestPage3: undefined;
     UiTestScreen: undefined;
     PersonalityResultScreen: undefined;
+    ProfileUpdateScreen: undefined;
 };
 
 const MypageScreen = () => {
-    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
+  const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
 
   // Main tab toggle (Posts vs Votes)
   const [activeTab, setActiveTab] = useState("게시글")
@@ -53,7 +54,7 @@ const MypageScreen = () => {
           <View style={styles.profileActions}>
             <MypageButton
               title="프로필 수정"
-              onPress={() => console.log("Edit profile")}
+              onPress={() => navigation.navigate('ProfileUpdateScreen')}
               variant="secondary"
               style={styles.actionButton}
             />
