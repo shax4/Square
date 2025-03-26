@@ -12,6 +12,7 @@ import NevTestPage2 from '../../../pages/StackSampleScreen/NevTestPage2';
 import PersonalitySurveyPage from '../../../pages/PersonalitySurveyPage/PersonalitySurveyPage';
 import PersonalityResultScreen from '../../../pages/PersonalityResultScreen/PersonalityResultScreen';
 import ProfileUpdateScreen from '../../../pages/ProfileUpdateScreen/ProfileUpdateScreen';
+import DeleteAccountScreen from '../../../pages/DeleteAccountScreen/DeleteAccountScreen'
 
 // 스택 네비게이터
 const Stack = createNativeStackNavigator();
@@ -80,6 +81,14 @@ export default function HeaderBar() {
                 component={ProfileUpdateScreen}
                 options={{
                     title: '프로필 수정',
+                    headerBackButtonDisplayMode: 'minimal',
+                }}
+            />
+            <Stack.Screen
+                name="DeleteAccountScreen"
+                component={DeleteAccountScreen}
+                options={{
+                    title: '탈퇴하기',
                     headerBackButtonDisplayMode: 'minimal',
                 }}
             />

@@ -5,7 +5,23 @@ import {ProfileImage, TextField, Button} from "../../components"
 import {ButtonVariant} from '../../components/Button'
 import colors from "../../../assets/colors"
 
-const ProfileUpdateScreen = ({ navigation }: any) => {
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
+
+type StackParamList = {
+    NevTestPage1: undefined;
+    NevTestPage2: undefined;
+    NevTestPage3: undefined;
+    UiTestScreen: undefined;
+    PersonalityResultScreen: undefined;
+    ProfileUpdateScreen: undefined;
+    MypageScreen: undefined;
+    DeleteAccountScreen: undefined;
+};
+
+const ProfileUpdateScreen = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
+
   // State for form fields
   const [nickname, setNickname] = useState("반짝이는하마")
   const [region, setRegion] = useState("서울특별시")
@@ -37,13 +53,14 @@ const ProfileUpdateScreen = ({ navigation }: any) => {
   // Handle save button press
   const handleSave = () => {
     console.log("저장 버튼 클릭")
-    // Here you would implement API call to save profile changes
+    navigation.goBack();
   }
 
   // Handle account deletion
   const handleDeleteAccount = () => {
     console.log("탈퇴하기 클릭")
     // Here you would implement account deletion flow
+    navigation.navigate('DeleteAccountScreen')
   }
 
   return (

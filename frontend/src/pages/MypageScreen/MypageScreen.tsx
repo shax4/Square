@@ -21,7 +21,7 @@ type StackParamList = {
 };
 
 const MypageScreen = () => {
-    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
+  const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
 
   // Main tab toggle (Posts vs Votes)
   const [activeTab, setActiveTab] = useState("게시글")
