@@ -1,42 +1,48 @@
-import axios from "./Axios";
+// 개발용 mock api 사용
+import { MockBoardAPI } from "../mocks/boardApi";
 
-export const BoardAPI = {
-  // 게시글 목록 조회
-  getPosts: (
-    sort: "latest" | "likes" = "latest",
-    nextCursorId: number | null = null,
-    nextCursorLikes: number | null = null,
-    limit: number = 10
-  ) => {
-    const params: any = { sort, limit };
-    if (nextCursorId) params.nextCursorId = nextCursorId;
-    if (nextCursorLikes) params.nextCursorLikes = nextCursorLikes;
+export const BoardAPI = MockBoardAPI;
 
-    return axios.get("/api/posts", { params });
-  },
-  // 특정 게시글 상세 조회
-  getPostDetail: (postId: number) => axios.get(`/api/posts/${postId}`),
+// 실제 API 코드
+// import axios from "./Axios";
 
-  // 게시글 생성
-  createPost: (data: { title: string; content: string }) =>
-    axios.post(`/api/posts`, data),
+// export const BoardAPI = {
+//   // 게시글 목록 조회
+//   getPosts: (
+//     sort: "latest" | "likes" = "latest",
+//     nextCursorId: number | null = null,
+//     nextCursorLikes: number | null = null,
+//     limit: number = 10
+//   ) => {
+//     const params: any = { sort, limit };
+//     if (nextCursorId) params.nextCursorId = nextCursorId;
+//     if (nextCursorLikes) params.nextCursorLikes = nextCursorLikes;
 
-  // 게시글 수정
-  updatePost: (postId: number, data: { title: string; content: string }) =>
-    axios.put(`/api/posts/${postId}`, data),
+//     return axios.get("/api/posts", { params });
+//   },
+//   // 특정 게시글 상세 조회
+//   getPostDetail: (postId: number) => axios.get(`/api/posts/${postId}`),
 
-  // 게시글 삭제
-  deletePost: (postId: number) => axios.delete(`/api/posts/${postId}`),
+//   // 게시글 생성
+//   createPost: (data: { title: string; content: string }) =>
+//     axios.post(`/api/posts`, data),
 
-  // 댓글 생성
-  createComment: (postId: number, content: string) =>
-    axios.post(`/api/comments`, { postId, content }),
+//   // 게시글 수정
+//   updatePost: (postId: number, data: { title: string; content: string }) =>
+//     axios.put(`/api/posts/${postId}`, data),
 
-  // 댓글 수정
-  updateComment: (commentId: number, content: string) =>
-    axios.put(`/api/comments/${commentId}`, { content }),
+//   // 게시글 삭제
+//   deletePost: (postId: number) => axios.delete(`/api/posts/${postId}`),
 
-  // 댓글 삭제
-  deleteComment: (commentId: number) =>
-    axios.delete(`/api/comments/${commentId}`),
-};
+//   // 댓글 생성
+//   createComment: (postId: number, content: string) =>
+//     axios.post(`/api/comments`, { postId, content }),
+
+//   // 댓글 수정
+//   updateComment: (commentId: number, content: string) =>
+//     axios.put(`/api/comments/${commentId}`, { content }),
+
+//   // 댓글 삭제
+//   deleteComment: (commentId: number) =>
+//     axios.delete(`/api/comments/${commentId}`),
+// };
