@@ -11,8 +11,8 @@ import org.springframework.context.annotation.Configuration;
 public class SwaggerConfig {
 
     public static final String JWT_SCHEME_NAME = "JWT";
-    public static final String COOKIE_SCHEME_NAME = "RefreshToken";
-    public static final String BEARER_SCHEME = "bearer";
+    public static final String COOKIE_SCHEME_NAME = "refresh-token";
+    public static final String BEARER_SCHEME = "Bearer";
 
     @Bean
     public OpenAPI openAPI() {
