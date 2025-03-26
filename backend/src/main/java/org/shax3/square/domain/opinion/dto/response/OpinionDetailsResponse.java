@@ -17,7 +17,7 @@ public record OpinionDetailsResponse(
         boolean isLiked,
         List<CommentResponse> comments
 ) {
-    public static OpinionDetailsResponse of(Opinion opinion, List<CommentResponse> comments, String presignedUrl) {
+    public static OpinionDetailsResponse of(Opinion opinion, List<CommentResponse> comments, String presignedUrl, boolean isLiked) {
         return new OpinionDetailsResponse(
                 opinion.getId(),
                 opinion.getUser().getNickname(),
@@ -27,7 +27,7 @@ public record OpinionDetailsResponse(
                 opinion.getContent(),
                 opinion.getLikeCount(),
                 comments.size(),
-                false, // TODO: 좋아요 여부 로직 추가 필요
+                isLiked,
                 comments
         );
     }

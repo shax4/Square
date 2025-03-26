@@ -42,8 +42,8 @@ public class OpinionFacadeService {
         Opinion opinion = opinionService.getOpinion(opinionId);
         List<CommentResponse> comments = opinionCommentService.getOpinionComments(user, opinionId);
         String profileUrl = s3Service.generatePresignedGetUrl(user.getS3Key());
-
-        return OpinionDetailsResponse.of(opinion, comments, profileUrl);
+        boolean isLiked = false; // TODO 추가구현 필요;
+        return OpinionDetailsResponse.of(opinion, comments, profileUrl,isLiked);
     }
 }
 

@@ -5,6 +5,7 @@ import org.shax3.square.domain.debate.model.Debate;
 import org.shax3.square.domain.debate.service.DebateService;
 import org.shax3.square.domain.opinion.dto.request.CreateOpinionRequest;
 import org.shax3.square.domain.opinion.dto.request.UpdateOpinionRequest;
+import org.shax3.square.domain.opinion.dto.response.MyOpinionResponse;
 import org.shax3.square.domain.opinion.model.Opinion;
 import org.shax3.square.domain.opinion.repository.OpinionRepository;
 import org.shax3.square.domain.s3.service.S3Service;
@@ -61,4 +62,8 @@ public class OpinionService {
     }
 
 
+    @Transactional(readOnly = true)
+    public MyOpinionResponse getMyOpinions(User user, Long nextCursorId, int limit) {
+        return MyOpinionResponse.of(opinionRepository.findMyOpinions(user, nextCursorId, limit));
+    }
 }
