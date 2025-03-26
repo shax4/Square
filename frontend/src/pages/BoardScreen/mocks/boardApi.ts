@@ -80,7 +80,7 @@ export const MockBoardAPI = {
       comments: []
     };
     
-    mockPosts.unshift(newPost);
+    mockPosts.unshift(newPost); // 새 게시글을 mockPosts 배열의 최상단에 추가
     
     return Promise.resolve({
       data: newPost,

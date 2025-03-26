@@ -5,6 +5,7 @@ import { useNavigation, NavigationProp } from "@react-navigation/native";
 
 import { Icons } from "../../../../assets/icons/Icons";
 import { BoardAPI } from "../../../pages/BoardScreen/Api/boardApi";
+import { mockPosts } from "../../../pages/BoardScreen/mocks/boardData";
 
 import BoardListScreen from "../../../pages/BoardScreen/BoardListScreen";
 import BoardDetailScreen from "../../../pages/BoardScreen/BoardDetailScreen";
@@ -74,11 +75,6 @@ export default function BoardHeaderBar() {
 
 // Mock함수 (실제 API 호출로 대체 필요)
 function mockFetchPost(boardId: number) {
-  const mockPosts = [
-    { postId: 1, nickname: "반짝이는하마" },
-    { postId: 2, nickname: "즐거운팬더" },
-    { postId: 3, nickname: "행복한기린" },
-  ];
   return mockPosts.find((post) => post.postId === boardId);
 }
 
