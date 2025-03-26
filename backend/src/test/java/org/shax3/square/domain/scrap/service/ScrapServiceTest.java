@@ -6,6 +6,7 @@ import org.shax3.square.domain.scrap.model.Scrap;
 import org.shax3.square.domain.scrap.model.TargetType;
 import org.shax3.square.domain.scrap.repository.ScrapRepository;
 import org.shax3.square.domain.user.model.User;
+import org.shax3.square.exception.CustomException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,6 +20,7 @@ import java.util.Optional;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,6 +48,8 @@ public class ScrapServiceTest {
         when(request.targetType()).thenReturn(TargetType.DEBATE);
         when(request.targetId()).thenReturn(targetId);
         when(request.to(user)).thenReturn(scrap);
+        when(scrapRepository.findByUserAndTargetIdAndTargetType(user, targetId, TargetType.DEBATE))
+                .thenReturn(Optional.empty());
 
         // when
         scrapService.createScrap(user, request);
@@ -55,6 +59,46 @@ public class ScrapServiceTest {
         verify(scrapRepository, times(1)).save(scrap);
     }
 
+    @Test
+    @DisplayName("createScrap - 대상이 Debate인 경우 중복 Scrap이 존재하면 CustomException 발생")
+    public void testCreateScrap_duplicateScrap_whenTargetIsDebate() {
+        // given
+        User user = User.builder().build();
+        Long targetId = 50L;
+        CreateScrapRequest request = mock(CreateScrapRequest.class);
+        when(request.targetType()).thenReturn(TargetType.DEBATE);
+        when(request.targetId()).thenReturn(targetId);
+        when(scrapRepository.findByUserAndTargetIdAndTargetType(user, targetId, TargetType.DEBATE))
+                .thenReturn(Optional.of(mock(Scrap.class)));
+
+        // when, then
+        assertThatThrownBy(() -> scrapService.createScrap(user, request))
+                .isInstanceOf(CustomException.class);
+
+        verify(scrapRepository, never()).save(any(Scrap.class));
+    }
+
+
+//    @Test
+//    @DisplayName("createScrap - 대상이 Post인 경우 중복 Scrap이 존재하면 CustomException 발생")
+//    public void testCreateScrap_duplicateScrap_whenTargetIsPost() {
+//        // given
+//        User user = User.builder().build();
+//        Long targetId = 50L;
+//        CreateScrapRequest request = mock(CreateScrapRequest.class);
+//        when(request.targetType()).thenReturn(TargetType.POST);
+//        when(request.targetId()).thenReturn(targetId);
+//        when(scrapRepository.findByUserAndTargetIdAndTargetType(user, targetId, TargetType.POST))
+//                .thenReturn(Optional.of(mock(Scrap.class)));
+//
+//        // when, then
+//        assertThatThrownBy(() -> scrapService.createScrap(user, request))
+//                .isInstanceOf(CustomException.class);
+//
+//        verify(scrapRepository, never()).save(any(Scrap.class));
+//    }
+//
+//
 //    @Test
 //    @DisplayName("createScrap - 대상이 Post인 경우, debateService.findDebateById 미호출 및 Scrap 저장 확인")
 //    public void testCreateScrap_whenTargetIsPost() {
@@ -67,6 +111,8 @@ public class ScrapServiceTest {
 //        when(request.targetType()).thenReturn(TargetType.POST);
 //        when(request.targetId()).thenReturn(targetId);
 //        when(request.to(user)).thenReturn(scrap);
+//        when(scrapRepository.findByUserAndTargetIdAndTargetType(user, targetId, TargetType.POST))
+//                .thenReturn(Optional.empty());
 //
 //        // when
 //        scrapService.createScrap(user, request);
@@ -76,6 +122,28 @@ public class ScrapServiceTest {
 //        verify(scrapRepository, times(1)).save(scrap);
 //    }
 
+    @Test
+    @DisplayName("createScrap - 동일한 Scrap이 존재할 경우 CustomException 발생")
+    public void testCreateScrap_whenAlreadyExists() {
+        // given
+        User user = User.builder().build();
+        Long targetId = 100L;
+        CreateScrapRequest request = mock(CreateScrapRequest.class);
+        when(request.targetType()).thenReturn(TargetType.DEBATE);
+        when(request.targetId()).thenReturn(targetId);
+        // 이미 Scrap이 존재하는 경우
+        when(scrapRepository.findByUserAndTargetIdAndTargetType(user, targetId, TargetType.DEBATE))
+                .thenReturn(Optional.of(mock(Scrap.class)));
+
+        // when, then
+        assertThatThrownBy(() -> scrapService.createScrap(user, request))
+                .isInstanceOf(CustomException.class);
+
+        verify(debateService, times(1)).findDebateById(targetId);
+        verify(scrapRepository, never()).save(any(Scrap.class));
+    }
+
+    // 이하 기존 테스트 코드 (deleteScrap, getScrap, isScraped 관련 테스트) 는 변경하지 않았습니다.
     @Test
     @DisplayName("deleteScrap - Scrap 삭제 메소드 호출 확인")
     public void testDeleteScrap() {
