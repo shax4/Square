@@ -13,7 +13,7 @@ import org.shax3.square.domain.user.model.User;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-@Table(name = "opinionComment")
+@Table(name = "opinion_comment")
 @SQLRestriction("is_valid = true")
 public class OpinionComment extends BaseTimeEntity {
 
