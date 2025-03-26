@@ -1,19 +1,7 @@
 import { StyleSheet, Text, View, TouchableOpacity, Animated } from "react-native"
 import { Swipeable } from "react-native-gesture-handler"
 import { Ionicons } from "@expo/vector-icons"
-
-
-export type NotificationType = "post" | "comment" | "like" | "follow" | "system"
-
-type NotificationCardProps = {
-  id: string
-  title: string
-  message: string
-  notificationType: NotificationType
-  isRead: boolean
-  onPress: () => void
-  onDelete: () => void
-}
+import {NotificationCardProps} from "./NotificationCard.types"
 
 const NotificationCard = ({
   id,
@@ -60,10 +48,8 @@ const NotificationCard = ({
         return { label: "댓글", color: "#9BF6FF" }
       case "like":
         return { label: "좋아요", color: "#FFADAD" }
-      case "follow":
-        return { label: "팔로우", color: "#BDB2FF" }
       case "system":
-        return { label: "시스템", color: "#FFFFFC" }
+        return { label: "시스템", color: "#FFADAD" }
       default:
         return { label: "게시글", color: "#A0C4FF" }
     }
@@ -136,11 +122,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#FF4D4D",
     justifyContent: "center",
     alignItems: "flex-end",
-    width: 80,
+    width: 100,
     height: "100%",
   },
   deleteButton: {
-    width: 80,
+    width: 100,
     height: "100%",
     justifyContent: "center",
     alignItems: "center",
