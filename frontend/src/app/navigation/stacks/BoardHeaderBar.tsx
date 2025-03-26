@@ -38,7 +38,7 @@ export default function BoardHeaderBar() {
         name="BoardList"
         component={BoardListScreen}
         options={{
-          title: "게시판 목록",
+          title: "자유 게시판",
           headerBackButtonDisplayMode: "minimal",
         }}
       />
@@ -66,15 +66,7 @@ export default function BoardHeaderBar() {
           headerBackButtonDisplayMode: "minimal",
         }}
       />
-      {/* UiTestScreen 추가 */}
-      <Stack.Screen
-        name="UiTestScreen"
-        component={UiTestScreen}
-        options={{
-          title: "UI 테스트 화면",
-          headerBackButtonDisplayMode: "minimal",
-        }}
-      />
+
     </Stack.Navigator>
   );
 }

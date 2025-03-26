@@ -12,6 +12,7 @@ import {
 import { StackNavigationProp } from "@react-navigation/stack";
 import { BoardAPI } from "../BoardScreen/Api/boardApi"; // 게시판 API 호출
 import BoardItem from "./components/BoardItem"; // 개별 게시글 항목을 표시하는 컴포넌트
+import EmptyBoardList from "./components/EmptyBoardList"; // 게시글이 없을 때 표시하는 컴포넌트
 import PopularPostItem from "./components/PopularPostItem"; // 인기 게시글 컴포넌트
 
 // 인기 게시글 인터페이스
@@ -192,6 +193,14 @@ export default function BoardListScreen({ navigation }: BoardListScreenProps) {
           }
         }}
         onEndReachedThreshold={0.1}
+        // 빈 상태 컴포넌트 추가
+        ListEmptyComponent={
+          <EmptyBoardList
+            onPressWrite={() =>
+              navigation.navigate("BoardWrite", { postId: undefined })
+            }
+          />
+        }
       />
 
       {/* 글쓰기 버튼 */}
