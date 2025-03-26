@@ -5,7 +5,7 @@ import org.shax3.square.domain.debate.model.Vote;
 import org.shax3.square.domain.user.model.User;
 
 public record VoteRequest(
-        boolean left
+        boolean isLeft
 ) {
     public Vote to(Debate debate, User user) {
         return Vote.builder()
@@ -16,7 +16,7 @@ public record VoteRequest(
                 .ageRange(user.getAgeRange())
                 .religion(user.getReligion())
                 .type(user.getType())
-                .left(left)
+                .left(isLeft)
                 .build();
     }
 }
