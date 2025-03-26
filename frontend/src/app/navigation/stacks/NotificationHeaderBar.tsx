@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 import NevTestPage1 from '../../../pages/StackSampleScreen/NevTestPage1';
+import NotificationScreen from '../../../pages/NotificationScreen/NotificationScreen'
 
 // 스택 네비게이터
 const Stack = createNativeStackNavigator();
@@ -13,8 +14,8 @@ export default function HeaderBar() {
         <Stack.Navigator>
             {/* 토론 카드 목록 */}
             <Stack.Screen
-                name="NevTestPage1"
-                component={NevTestPage1}
+                name="NotificationScreen"
+                component={NotificationScreen}
                 options={{
                     title: '알림',
                     headerBackButtonDisplayMode: 'minimal',
