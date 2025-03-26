@@ -46,9 +46,7 @@ public enum ExceptionCode {
 	OPINION_NOT_FOUND(8001,"해당 의견을 찾을 수 없습니다."),
 	OPINION_DELETED(8002, "이미 삭제된 의견입니다."),
 
-	OPINION_COMMENT_NOT_FOUND(9001,"해당 의견 답글을 찾을 수 없습니다."),
-
-	SCRAP_ALREADY_EXISTS(10001, "이미 해당 게시물/논쟁을 스크랩하고 있습니다."),
+	OPINION_COMMENT_NOT_FOUND(9001,"해당 의견 답글을 찾을 수 없습니다.")
 	;
 	private final int code;
 	private final String message;
