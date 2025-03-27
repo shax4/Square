@@ -16,13 +16,9 @@ import { BoardAPI } from "./Api/boardApi";
 import ProfileImage from "../../components/ProfileImage/ProfileImage";
 import CommentItem from "./components/CommentItem";
 import { useFocusEffect } from "@react-navigation/native";
+import { BoardStackParamList } from "../../shared/page-stack/BoardPageStack";
 
-// 네비게이션 파라미터 타입 정의
-type BoardStackParamList = {
-  BoardDetail: { boardId: number }; // 상세 화면에 전달되는 boardId
-  BoardWrite: { postId?: number }; // 글쓰기 화면 (수정 모드일 경우 postId 전달)
-};
-
+// 네비게이션 프롭 타입 정의
 type Props = StackScreenProps<BoardStackParamList, "BoardDetail">;
 
 // 게시글 상세 정보 타입 정의

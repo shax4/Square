@@ -2,6 +2,7 @@ import React, { useRef } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { View, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { useNavigation, NavigationProp, useFocusEffect } from "@react-navigation/native";
+import { useConfirmModal } from "../../../pages/BoardScreen/hooks/useConfirmModal";
 
 import { Icons } from "../../../../assets/icons/Icons";
 import { BoardAPI } from "../../../pages/BoardScreen/Api/boardApi";
@@ -10,13 +11,7 @@ import { mockPosts } from "../../../pages/BoardScreen/mocks/boardData";
 import BoardListScreen from "../../../pages/BoardScreen/BoardListScreen";
 import BoardDetailScreen from "../../../pages/BoardScreen/BoardDetailScreen";
 import BoardWriteScreen from "../../../pages/BoardScreen/BoardWriteScreen";
-
-// 네비게이션 파라미터 타입 정의
-type BoardStackParamList = {
-  BoardList: { refresh?: boolean }; // 게시글 목록 화면은 별도의 파라미터가 없음 (refresh는 선택적 파라미터)
-  BoardDetail: { boardId: number; refresh?: boolean }; // 게시글 상세 화면은 boardId를 필요로 함
-  BoardWrite: { postId?: number }; // 게시글 작성/수정 화면은 선택적 postId를 필요로 함
-};
+import { BoardStackParamList } from "../../../shared/page-stack/BoardPageStack";
 
 // 스택 네비게이터
 const Stack = createNativeStackNavigator<BoardStackParamList>();
@@ -81,41 +76,17 @@ export default function BoardHeaderBar() {
           title: "게시글 작성",
           headerBackButtonDisplayMode: "minimal",
         }}
-        // 화면을 떠나기 전에 실행되는 리스너 추가
-        listeners={({ navigation }) => ({
-          beforeRemove: (e) => {
-            console.log("beforeRemove 이벤트 호출:", e.data.action);
-            // 이미 네비게이션 중이면 중복 처리 방지
-            if (isNavigatingRef.current) {
-              return;
+        listeners={({ navigation }) => {
+          const { showCancelConfirmation, isNavigatingRef } = useConfirmModal({navigation});
+          
+          return {
+            beforeRemove: (e) => {
+              if (isNavigatingRef.current) return;
+              e.preventDefault();
+              showCancelConfirmation();
             }
-
-            // 기본 뒤로가기 동작 방지
-            e.preventDefault();
-
-            // 확인 모달 표시
-            Alert.alert(
-              "작성 취소",
-              "변경 사항이 저장되지 않을 수 있습니다. 취소하시겠습니까?",
-              [
-                { text: "아니오", style: "cancel" },
-                {
-                  text: "예",
-                  onPress: () => {
-                    console.log("사용자가 '예'를 선택했습니다.");
-                    // 네비게이션 중 표시
-                    isNavigatingRef.current = true;
-                    // 네비게이션 실행
-                    navigation.navigate({
-                      name: "BoardList",
-                      params: { refresh: true },
-                    });
-                  },
-                },
-              ]
-            );
-          },
-        })}
+          };
+        }}
       />
     </Stack.Navigator>
   );
