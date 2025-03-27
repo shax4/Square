@@ -3,10 +3,16 @@ package org.shax3.square.domain.type.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.shax3.square.domain.auth.annotation.AuthUser;
+import org.shax3.square.domain.type.dto.request.EndTypeTestRequest;
 import org.shax3.square.domain.type.dto.response.TypeTestQuestionResponse;
+import org.shax3.square.domain.type.dto.response.TypeInfoResponse;
 import org.shax3.square.domain.type.service.TypeService;
+import org.shax3.square.domain.user.model.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,5 +33,19 @@ public class TypeController {
         TypeTestQuestionResponse typeTestQuestionResponse = typeService.getShuffledQuestionList();
 
         return ResponseEntity.ok(typeTestQuestionResponse);
+    }
+
+    @Operation(
+            summary = "성향테스트 완료(생성) api",
+            description = "성향테스트 답변을 입력하면 결과를 반환합니다."
+    )
+    @PostMapping
+    public ResponseEntity<TypeInfoResponse> endTypeTest(
+            @AuthUser User user,
+            @RequestBody EndTypeTestRequest endTypeTestRequest
+    ) {
+        TypeInfoResponse typeInfoResponse = typeService.endTypeTest(endTypeTestRequest);
+
+        return ResponseEntity.ok(typeInfoResponse);
     }
 }
