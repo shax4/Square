@@ -13,7 +13,8 @@ const colors = {
     placeholderText: "#A0A0A8",
     blurbackgroundColor: 'rgba(0,0,0,0.5)',
     cancelButton: '#ccc',
-    hashtag: '#e1e1e1'
+    hashtag: '#e1e1e1',
+    proposalBox: '#F7F7F8',
 }
 
 export default colors;
