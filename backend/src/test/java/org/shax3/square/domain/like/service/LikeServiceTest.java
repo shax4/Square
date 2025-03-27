@@ -1,5 +1,6 @@
 package org.shax3.square.domain.like.service;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -14,15 +15,26 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.like.dto.LikeRequest;
+import org.shax3.square.domain.like.model.Like;
 import org.shax3.square.domain.like.repository.LikeRepository;
+import org.shax3.square.domain.opinion.service.OpinionCommentService;
+import org.shax3.square.domain.opinion.service.OpinionService;
+import org.shax3.square.domain.proposal.service.ProposalService;
 import org.shax3.square.domain.user.model.User;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.shax3.square.exception.CustomException;
+import org.shax3.square.exception.ExceptionCode;
 
 @ExtendWith(MockitoExtension.class)
 class LikeServiceTest {
 
 	@Mock
 	private LikeRepository likeRepository;
+	@Mock
+	private OpinionService opinionService;
+	@Mock
+	private OpinionCommentService opinionCommentService;
+	@Mock
+	private ProposalService proposalService;
 
 	@InjectMocks
 	private LikeService likeService;
@@ -34,16 +46,18 @@ class LikeServiceTest {
 		user = User.builder()
 			.nickname("TestUser")
 			.build();
-
 	}
 
 	@Test
 	@DisplayName("좋아요 생성 - 좋아요가 존재하지 않을 때")
-	void like_Create() {
+	void like_create() {
 		// Given
-		LikeRequest request = new LikeRequest(1L, TargetType.POST);
+		Long targetId = 100L;
+		TargetType targetType = TargetType.OPINION;
+		LikeRequest request = new LikeRequest(targetId, targetType);
 
-		when(likeRepository.findByUserAndTargetIdAndTargetType(user, 1L, TargetType.POST))
+		when(opinionService.isOpinionExists(targetId)).thenReturn(true);
+		when(likeRepository.findByUserAndTargetIdAndTargetType(user, targetId, targetType))
 			.thenReturn(Optional.empty());
 
 		// When
@@ -51,12 +65,54 @@ class LikeServiceTest {
 
 		// Then
 		verify(likeRepository).save(argThat(like ->
-			like.getUser().equals(user) &&
-				like.getTargetId().equals(1L) &&
-				like.getTargetType() == TargetType.POST &&
-				like.isLike()
+			like.getUser().equals(user)
+				&& like.getTargetId().equals(targetId)
+				&& like.getTargetType() == targetType
+				&& like.isLike()
 		));
-		verify(likeRepository, times(1)).save();
-
 	}
+
+	@Test
+	@DisplayName("좋아요 토글 - 좋아요가 이미 존재할 때")
+	void like_cancel() {
+		// Given
+		Long targetId = 200L;
+		TargetType targetType = TargetType.OPINION;
+
+		Like existingLike = Like.builder()
+			.user(user)
+			.targetId(targetId)
+			.targetType(targetType)
+			.build();
+
+		LikeRequest request = new LikeRequest(targetId, targetType);
+
+		when(opinionService.isOpinionExists(targetId)).thenReturn(true);
+		when(likeRepository.findByUserAndTargetIdAndTargetType(user, targetId, targetType))
+			.thenReturn(Optional.of(existingLike));
+
+		// When
+		likeService.like(user, request);
+
+		// Then
+		assertThat(existingLike.isLike()).isFalse();
+		verify(likeRepository, never()).save(any(Like.class));
+	}
+
+	@Test
+	@DisplayName("예외 - 존재하지 않은 타겟에 좋아요 생성")
+	void like_create_notExistsTarget() {
+		// Given
+		Long targetId = 300L;
+		TargetType targetType = TargetType.OPINION;
+		LikeRequest request = new LikeRequest(targetId, targetType);
+
+		when(opinionService.isOpinionExists(targetId)).thenReturn(false);
+
+		// When & Then
+		assertThatThrownBy(() -> likeService.like(user, request))
+			.isInstanceOf(CustomException.class)
+			.hasMessage(ExceptionCode.NOT_FOUND.getMessage());
+	}
+
 }
