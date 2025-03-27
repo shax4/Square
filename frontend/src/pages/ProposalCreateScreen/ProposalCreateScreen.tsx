@@ -14,7 +14,7 @@ export default function ProposalCreateScreen() {
     const confirmCreateProposal = () => {
         // 저장 로직
         console.log(debateTopic);
-        navigation.navigate("ProposalListScreen");
+        navigation.goBack();
     }
 
     return (
