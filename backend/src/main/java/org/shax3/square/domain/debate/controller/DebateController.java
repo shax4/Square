@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.annotation.AuthUser;
 import org.shax3.square.domain.debate.dto.request.VoteRequest;
+import org.shax3.square.domain.debate.dto.response.MyVotedDebatesResponse;
 import org.shax3.square.domain.debate.dto.response.VoteResponse;
 import org.shax3.square.domain.debate.service.DebateService;
 import org.shax3.square.domain.debate.service.VoteService;
@@ -30,4 +31,18 @@ public class DebateController {
         VoteResponse response = voteService.vote(request, debateId, user);
         return ResponseEntity.ok(response);
     }
-}
+
+
+    @Operation(summary = "내가 투표한 목록 조회 API ",
+            description = "사용자가 투표한 목록을 최신순으로 조회하는 API 입니다.")
+
+    @GetMapping("/my-votes")
+    public ResponseEntity<MyVotedDebatesResponse> getMyVotedDebates(
+            @RequestParam(required = false) Long nextCursorId,
+            @RequestParam(defaultValue = "10") int limit,
+            @AuthUser User user) {
+
+        MyVotedDebatesResponse response = voteService.getMyVotedDebates(user, nextCursorId, limit);
+        return ResponseEntity.ok(response);
+    }
+    }
