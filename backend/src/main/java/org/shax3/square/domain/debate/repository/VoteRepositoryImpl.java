@@ -30,7 +30,7 @@ public class VoteRepositoryImpl implements VoteRepositoryCustom {
                 .join(vote.debate).fetchJoin()
                 .where(builder)
                 .orderBy(vote.id.desc())
-                .limit(limit + 1)
+                .limit(limit)
                 .fetch();
     }
 }

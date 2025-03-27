@@ -31,11 +31,15 @@ public class ProposalService {
 
     @Transactional(readOnly = true)
     public ProposalsResponse getProposals(String sort, Long nextCursorId, Integer nextCursorLikes, int limit) {
+        List<Proposal> proposals = findProposalsBySort(sort, nextCursorId, nextCursorLikes, limit + 1);
+        boolean hasNext = proposals.size() > limit;
 
-        List<Proposal> proposals = findProposalsBySort(sort, nextCursorId, nextCursorLikes, limit);
+        if (hasNext) {
+            proposals = proposals.subList(0, limit);
+        }
+
         return ProposalsResponse.of(proposals, sort);
     }
-
     private List<Proposal> findProposalsBySort(String sort, Long nextCursorId, Integer nextCursorLikes, int limit) {
         if ("likes".equals(sort)) {
             return proposalRepository.findProposalsByLikes(nextCursorId, nextCursorLikes, limit);
