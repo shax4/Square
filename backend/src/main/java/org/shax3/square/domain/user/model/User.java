@@ -108,6 +108,10 @@ public class User extends BaseTimeEntity {
         this.religion = updateProfileRequest.religion();
     }
 
+    public void updateType(Type type) {
+        this.type = type;
+    }
+
     public void deleteAccount() {
         this.state = LEAVE;
     }
