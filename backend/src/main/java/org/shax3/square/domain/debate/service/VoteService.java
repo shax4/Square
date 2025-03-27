@@ -50,14 +50,17 @@ public class VoteService {
     @Transactional(readOnly = true)
     public MyVotedDebatesResponse getMyVotedDebates(User user, Long nextCursorId, int limit) {
         List<Vote> votes = voteRepository.findByUserOrderByIdDesc(user, nextCursorId, limit + 1);
-
+        //다음 페이지가 있는지 (repository에서 +1 하기 때문에 다음 페이지가 있다면 size가 더 커야함
         boolean hasNext = votes.size() > limit;
+        //다음 페이지가 있다면, 하나를 자름
         List<Vote> pageVotes = hasNext ? votes.subList(0, limit) : votes;
+
+        List<Long> userScraps = scrapService.getDebateScrap(user);
 
         List<DebateDto> debates = pageVotes.stream()
                 .map(vote -> {
                     Debate debate = vote.getDebate();
-                    boolean isScraped = scrapService.isDebateScraped(user, debate.getId());
+                    boolean isScraped = userScraps.contains(debate.getId());
                     VoteResponse voteResponse = calculateVoteResult(debate);
                     return DebateDto.of(user,vote,voteResponse,isScraped);
                 })
