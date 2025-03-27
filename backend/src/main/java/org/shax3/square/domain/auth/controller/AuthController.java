@@ -44,8 +44,16 @@ public class AuthController {
             description = "email을 입력하면 Access Token과 Refresh Token을 반환합니다."
     )
     @GetMapping("/test1")
-    public ResponseEntity<TestUserInfoResponse> loginTest1() {
+    public ResponseEntity<TestUserInfoResponse> loginTest1(
+            HttpServletResponse response
+    ) {
         UserLoginDto userLoginDto = authService.loginTest("test@test.com");
+
+        Cookie cookie = new Cookie("refresh-token", userLoginDto.refreshToken().getToken());
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false);
+        cookie.setPath("/");
+        response.addCookie(cookie);
 
         return ResponseEntity.ok().body(TestUserInfoResponse.from(userLoginDto, userLoginDto.accessToken(), userLoginDto.refreshToken().getToken()));
     }
@@ -55,8 +63,16 @@ public class AuthController {
             description = "email을 입력하면 Access Token과 Refresh Token을 반환합니다."
     )
     @GetMapping("/test2")
-    public ResponseEntity<TestUserInfoResponse> loginTest2() {
+    public ResponseEntity<TestUserInfoResponse> loginTest2(
+            HttpServletResponse response
+    ) {
         UserLoginDto userLoginDto = authService.loginTest("test2@test.com");
+
+        Cookie cookie = new Cookie("refresh-token", userLoginDto.refreshToken().getToken());
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false);
+        cookie.setPath("/");
+        response.addCookie(cookie);
 
         return ResponseEntity.ok().body(TestUserInfoResponse.from(userLoginDto, userLoginDto.accessToken(), userLoginDto.refreshToken().getToken()));
     }
@@ -66,8 +82,16 @@ public class AuthController {
             description = "email을 입력하면 Access Token과 Refresh Token을 반환합니다."
     )
     @GetMapping("/test3")
-    public ResponseEntity<TestUserInfoResponse> loginTest3() {
+    public ResponseEntity<TestUserInfoResponse> loginTest3(
+            HttpServletResponse response
+    ) {
         UserLoginDto userLoginDto = authService.loginTest("test3@test.com");
+
+        Cookie cookie = new Cookie("refresh-token", userLoginDto.refreshToken().getToken());
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false);
+        cookie.setPath("/");
+        response.addCookie(cookie);
 
         return ResponseEntity.ok().body(TestUserInfoResponse.from(userLoginDto, userLoginDto.accessToken(), userLoginDto.refreshToken().getToken()));
     }
