@@ -1,3 +1,123 @@
+# 사각: Square
+
+> 당신의 생각을 나누고 인사이트를 찾아보세요!  
+> 열정적인 당신을 위한 모바일 논쟁 플랫폼
+>   
+> [🔗 서비스 바로가기](https://j12a307.p.ssafy.io/)
+
+# ✨ 프로젝트 소개 - 사각(Square)
+
+온라인 커뮤니티, 자주 이용하시나요?  
+많은 사람이 모이는 공간일수록 다양한 의견이 오가며 자연스레 **논쟁**이 발생합니다.  
+하지만 감정 싸움으로 번지거나 생산적인 논의가 금세 휘발되는 문제,  
+이제는 **사각(Square)** 이 해결합니다.
+
+**사각(Square)** 은  
+서로 다른 생각을 가진 사람들이 **건전하게 소통**할 수 있도록 설계된  
+**실시간 논쟁 기반 토론 플랫폼**입니다.
+<br>
+## 🎯 우리가 해결하고자 한 문제
+
+- 논쟁이 감정적으로 흐르거나 흐지부지 끝나는 문제
+- 생산적인 토론 결과를 보존하기 어려운 구조
+- 텍스트 기반 커뮤니티에서의 비효율적인 의사소통
+
 ---
-맞짱토론 펀치가 '사각'이 되었어요!!
----
+
+
+
+# 🚀 주요 기능
+
+## 🧭 성향 테스트 기반 커뮤니티 매칭
+- 간단한 설문을 통해 개인 성향을 분석
+- 유사 성향 사용자끼리 자유롭게 소통하는 커뮤니티 제공
+
+## 📌 오늘의 논쟁 & 투표
+- 매일 다른 주제를 추천하고, 사용자들은 찬/반 투표
+- 투표 결과는 **성별 / 연령대 / 성향별 통계**로 시각화 제공
+
+## 💬 의견 공유 & AI 요약
+- 의견, 댓글, 답글을 통한 자유로운 표현
+- AI가 찬성과 반대 입장의 대표 논리 요약
+
+## 🗣 실시간 토론방
+- **발언자 / 배심원 / 관전자** 역할 기반의 실시간 토론
+- UI/UX 설계를 통해 **격식 있고 존중하는 분위기** 형성
+
+## 📝 자유게시판 & 마이페이지
+- 성향 기반 자유게시판 제공 (글 작성, 댓글, 좋아요, 스크랩)
+- 내가 남긴 글/댓글/스크랩/좋아요 내역을 **마이페이지에서 확인**
+
+
+
+# 🛠️ 기술적 도전 및 해결
+
+## 📊 통계 및 시각화
+- 사용자 참여 데이터를 바탕으로 **카테고리별 통계 시각화**
+- 찬성/반대 의견의 주요 논리를 **AI가 자동 요약**
+
+## 🚀 성능 최적화
+- **웹 워커**를 활용한 정확한 타이머 동작
+- 불필요한 리렌더링 방지, 탭 중복 입장 차단 로직 설계
+
+## 📦 로그 수집 및 저장
+- `Redis` 기반 **클릭/행동 로그 수집**
+- `Spring Batch + Scheduler`로 MongoDB에 **비동기 저장**
+
+## 📱 모바일 최적화
+- React Native 기반 모바일 앱 개발
+- 햅틱 피드백, 백그라운드 푸시 알림 등 **네이티브 UX 강화**
+
+
+## 🧩 시스템 아키텍처
+
+![시스템아키텍쳐](/uploads/36fc6da6ce1ff5b3fb42055b26621c46/시스템아키텍쳐.png)
+
+
+## ⚙️ 기술 스택
+
+🖥️ Backend
+
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)
+![Spring JPA](https://img.shields.io/badge/Spring%20JPA-6DB33F?style=for-the-badge&logo=spring&logoColor=white)
+![Spring Security](https://img.shields.io/badge/Spring%20Security-6DB33F?style=for-the-badge&logo=spring-security&logoColor=white)
+
+🌐 Frontend
+
+![React Native](https://img.shields.io/badge/React%20Native-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Zustand](https://img.shields.io/badge/Zustand-000000?style=for-the-badge&logo=zustand&logoColor=white)
+![Expo](https://img.shields.io/badge/Expo-000020?style=for-the-badge&logo=expo&logoColor=white)
+
+🐝 Database
+
+![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
+
+⚙️ DevOps & Infrastructure
+
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)
+![Amazon S3](https://img.shields.io/badge/Amazon%20S3-569A31?style=for-the-badge&logo=amazonaws&logoColor=white)
+
+🛠️ CI/CD & Automation
+
+![Jenkins](https://img.shields.io/badge/Jenkins-D24939?style=for-the-badge&logo=jenkins&logoColor=white)
+
+🤝 Collaboration & PM
+
+![Notion](https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=notion&logoColor=white)
+![Figma](https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white)
+![Jira](https://img.shields.io/badge/Jira-0052CC?style=for-the-badge&logo=jira&logoColor=white)
+![Mattermost](https://img.shields.io/badge/Mattermost-0058CC?style=for-the-badge&logo=mattermost&logoColor=white)
+
+## 🫶🏻 팀 소개
+
+
+|                            박성욱                            |                            김민철                            |                            배석진                            |                           서준호                           |                            윤다은                             |                            이은지                            |
+|:---------------------------------------------------------:|:---------------------------------------------------------:|:---------------------------------------------------------:|:-------------------------------------------------------:|:----------------------------------------------------------:|:----------------------------------------------------------:|
+| <img src="https://github.com/respectwo2.png" width="100"> | <img src="https://github.com/MovieGoers.png" width="100"> | <img src="https://github.com/Setto1044.png" width="100"> | <img src="https://github.com/sjh2395.png" width="100"> | <img src="https://github.com/syoon4486.png" width="100"> | <img src="https://github.com/purelej99.png" width="100"> |
+|              **팀장 / BE**              |              **FE**              |              **FE**              |              **FE**              |              **BE**              |              **BE / INFRA**              |
+|   [@respectwo2](https://github.com/respectwo2)   |   [@MovieGoers](https://github.com/MovieGoers)   |   [@Setto1044](https://github.com/Setto1044)   |   [@sjh2395](https://github.com/sjh2395)   |   [@syoon4486](https://github.com/syoon4486)   |   [@purelej99](https://github.com/purelej99)   |
