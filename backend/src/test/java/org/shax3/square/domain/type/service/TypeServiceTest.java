@@ -115,7 +115,6 @@ public class TypeServiceTest {
         assertThat(response.score3()).isEqualTo(expectedScore[0]);
         assertThat(response.score4()).isEqualTo(expectedScore[0]);
 
-        verify(typeRepository).deleteByUser(user);
         verify(typeRepository).save(any(TypeResult.class));
 
         verify(user).updateType(Type.valueOf(expectedTypeString));

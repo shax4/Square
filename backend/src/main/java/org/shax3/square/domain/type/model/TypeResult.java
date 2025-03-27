@@ -70,4 +70,15 @@ public class TypeResult {
         this.score3 = score[2];
         this.score4 = score[3];
     }
+
+    public void updateType(Type1 type1, Type2 type2, Type3 type3, Type4 type4, int[] score) {
+        this.type1 = type1;
+        this.type2 = type2;
+        this.type3 = type3;
+        this.type4 = type4;
+        this.score1 = score[0];
+        this.score2 = score[1];
+        this.score3 = score[2];
+        this.score4 = score[3];
+    }
 }

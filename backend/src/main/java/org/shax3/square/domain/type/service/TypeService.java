@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.shax3.square.exception.ExceptionCode.*;
 
@@ -71,7 +72,22 @@ public class TypeService {
         Type3 type3 = Type3.valueOf(score[2] < 0 ? "T" : "S");
         Type4 type4 = Type4.valueOf(score[3] < 0 ? "B" : "R");
 
-        TypeResult typeResult = TypeResult.builder()
+        String typeInString = type1.name() + type2.name() + type3.name() + type4.name();
+        Type type = Type.valueOf(typeInString);
+
+        user.updateType(type);
+
+        Optional<TypeResult> foundTypeResult = typeRepository.findByUser(user);
+
+        TypeResult typeResult;
+        if (foundTypeResult.isPresent()) {
+            typeResult = foundTypeResult.get();
+            typeResult.updateType(type1, type2, type3, type4, score);
+
+            return TypeInfoResponse.of(user.getNickname(), typeInString, score);
+        }
+
+        typeResult = TypeResult.builder()
                 .user(user)
                 .type1(type1)
                 .type2(type2)
@@ -80,13 +96,7 @@ public class TypeService {
                 .score(score)
                 .build();
 
-        typeRepository.deleteByUser(user);
         typeRepository.save(typeResult);
-
-        String typeInString = type1.name() + type2.name() + type3.name() + type4.name();
-        Type type = Type.valueOf(typeInString);
-
-        user.updateType(type);
 
         return TypeInfoResponse.of(user.getNickname(), typeInString, score);
     }
