@@ -1,15 +1,18 @@
 package org.shax3.square.domain.type.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.mock;
+import static org.shax3.square.exception.ExceptionCode.TYPE_RESULT_NOT_FOUND;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,6 +31,8 @@ import org.shax3.square.domain.type.repository.QuestionRepository;
 import org.shax3.square.domain.type.repository.TypeRepository;
 import org.shax3.square.domain.user.model.Type;
 import org.shax3.square.domain.user.model.User;
+import org.shax3.square.domain.user.service.UserService;
+import org.shax3.square.exception.CustomException;
 
 @ExtendWith(MockitoExtension.class)
 public class TypeServiceTest {
@@ -37,6 +42,9 @@ public class TypeServiceTest {
 
     @Mock
     private TypeRepository typeRepository;
+
+    @Mock
+    private UserService userService;
 
     @InjectMocks
     private TypeService typeService;
@@ -111,12 +119,82 @@ public class TypeServiceTest {
         assertThat(response.nickname()).isEqualTo("TestUser");
         assertThat(response.userType()).isEqualTo(expectedTypeString);
         assertThat(response.score1()).isEqualTo(expectedScore[0]);
-        assertThat(response.score2()).isEqualTo(expectedScore[0]);
-        assertThat(response.score3()).isEqualTo(expectedScore[0]);
-        assertThat(response.score4()).isEqualTo(expectedScore[0]);
+        assertThat(response.score2()).isEqualTo(expectedScore[1]);
+        assertThat(response.score3()).isEqualTo(expectedScore[2]);
+        assertThat(response.score4()).isEqualTo(expectedScore[3]);
 
         verify(typeRepository).save(any(TypeResult.class));
 
         verify(user).updateType(Type.valueOf(expectedTypeString));
+    }
+
+    @Test
+    @DisplayName("내 타입 정보 조회(getMyTypeInfo) - 정상 케이스")
+    public void getMyTypeInfo_ShouldReturnCorrectResponse() {
+        // given
+        User user = mock(User.class);
+        when(user.getNickname()).thenReturn("TestUser");
+        when(user.getType()).thenReturn(Type.valueOf("ICSR"));
+        int[] scores = new int[]{2, 2, 2, 2};
+        TypeResult typeResult = TypeResult.builder()
+                .score(scores)
+                .user(user)
+                .build();
+        when(typeRepository.findByUser(user)).thenReturn(Optional.of(typeResult));
+
+        // when
+        TypeInfoResponse response = typeService.getMyTypeInfo(user);
+
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response.nickname()).isEqualTo("TestUser");
+        assertThat(response.userType()).isEqualTo("ICSR");
+        assertThat(response.score1()).isEqualTo(scores[0]);
+        assertThat(response.score2()).isEqualTo(scores[1]);
+        assertThat(response.score3()).isEqualTo(scores[2]);
+        assertThat(response.score4()).isEqualTo(scores[3]);
+    }
+
+    @Test
+    @DisplayName("내 타입 정보 조회(getMyTypeInfo) - 결과 미존재 시 예외 발생")
+    public void getMyTypeInfo_NotFound_ShouldThrowException() {
+        // given
+        User user = mock(User.class);
+        when(typeRepository.findByUser(user)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> typeService.getMyTypeInfo(user))
+                .isInstanceOf(CustomException.class)
+                .hasMessageContaining(TYPE_RESULT_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("유저 ID로 타입 정보 조회(getTypeInfo) - 정상 케이스")
+    public void getTypeInfo_ShouldReturnCorrectResponse() {
+        // given
+        Long userId = 1L;
+        User user = mock(User.class);
+        when(userService.findById(userId)).thenReturn(user);
+        when(user.getNickname()).thenReturn("TestUser");
+        when(user.getType()).thenReturn(Type.valueOf("ICSR"));
+        int[] scores = new int[]{2, 2, 2, 2};
+        TypeResult typeResult = TypeResult.builder()
+                .score(scores)
+                .user(user)
+                .build();
+        when(typeRepository.findByUser(user)).thenReturn(Optional.of(typeResult));
+
+        // when
+        TypeInfoResponse response = typeService.getTypeInfo(userId);
+
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response.nickname()).isEqualTo("TestUser");
+        assertThat(response.userType()).isEqualTo("ICSR");
+        assertThat(response.score1()).isEqualTo(scores[0]);
+        assertThat(response.score2()).isEqualTo(scores[1]);
+        assertThat(response.score3()).isEqualTo(scores[2]);
+        assertThat(response.score4()).isEqualTo(scores[3]);
+        verify(userService).findById(userId);
     }
 }

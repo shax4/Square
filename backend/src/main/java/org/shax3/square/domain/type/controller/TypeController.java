@@ -12,6 +12,7 @@ import org.shax3.square.domain.type.service.TypeService;
 import org.shax3.square.domain.user.model.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,6 +47,32 @@ public class TypeController {
             @Valid @RequestBody EndTypeTestRequest endTypeTestRequest
     ) {
         TypeInfoResponse typeInfoResponse = typeService.endTypeTest(user, endTypeTestRequest);
+
+        return ResponseEntity.ok(typeInfoResponse);
+    }
+
+    @Operation(
+            summary = "내 성향테스트 결과 조회 api",
+            description = "토큰만 있으면 내 성향테스트 결과를 반환합니다."
+    )
+    @GetMapping("/my")
+    public ResponseEntity<TypeInfoResponse> getMyTypeTestResult(
+            @AuthUser User user
+    ) {
+        TypeInfoResponse typeInfoResponse = typeService.getMyTypeInfo(user);
+
+        return ResponseEntity.ok(typeInfoResponse);
+    }
+
+    @Operation(
+            summary = "타인의 성향테스트 결과 조회 api",
+            description = "userId를 입력하면 해당 유저의 성향테스트 결과를 반환합니다."
+    )
+    @GetMapping("{userId}")
+    public ResponseEntity<TypeInfoResponse> getMyTypeTestResult(
+            @PathVariable Long userId
+    ) {
+        TypeInfoResponse typeInfoResponse = typeService.getTypeInfo(userId);
 
         return ResponseEntity.ok(typeInfoResponse);
     }
