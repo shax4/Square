@@ -194,8 +194,8 @@ export const MockBoardAPI = {
       const commentIndex = post.comments.findIndex(c => c.commentId === commentId);
       
       if (commentIndex !== -1) {
-        post.comments.splice(commentIndex, 1);
-        post.commentCount -= 1;
+        post.comments.splice(commentIndex, 1); // 댓글 제거
+        post.commentCount -= 1; // 댓글 수 감소
         found = true;
         break;
       }
