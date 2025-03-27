@@ -25,7 +25,7 @@ public class OpinionCommentService {
     private final S3Service s3Service;
 
     @Transactional(readOnly = true)
-    public List<CommentResponse> getOpinionComments(User user, Long opinionId) {
+    public List<CommentResponse> getOpinionComments(Long opinionId) {
         List<OpinionComment> comments = opinionCommentRepository.findByOpinionId(opinionId);
         boolean isLiked = false; //TODO 추가구현 필요
         return comments.stream()
