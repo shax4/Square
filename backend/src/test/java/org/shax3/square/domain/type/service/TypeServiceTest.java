@@ -3,6 +3,7 @@ package org.shax3.square.domain.type.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,12 +29,24 @@ public class TypeServiceTest {
 
     private List<Question> questions;
 
+    private Question createQuestion(Long id, String content, String category, boolean direction) {
+        try {
+            Constructor<Question> constructor = Question.class.getDeclaredConstructor(
+                    Long.class, String.class, String.class, boolean.class
+            );
+            constructor.setAccessible(true);
+            return constructor.newInstance(id, content, category, direction);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @BeforeEach
     public void setUp() {
         questions = Arrays.asList(
-                new Question(1L, "Question 1?", "가치관", true),
-                new Question(2L, "Question 2?", "가치관", true),
-                new Question(3L, "Question 3?", "가치관", true)
+                createQuestion(1L, "Question 1?", "가치관", true),
+                createQuestion(2L, "Question 2?", "가치관", true),
+                createQuestion(3L, "Question 3?", "가치관", true)
         );
         when(questionRepository.findAll()).thenReturn(questions);
         typeService.init();
