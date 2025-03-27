@@ -1,0 +1,64 @@
+version: "3.8"
+
+services:
+  nginx:
+    build:
+      context: ./devops
+      dockerfile: docker/nginx.Dockerfile
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /var/lib/letsencrypt:/var/lib/letsencrypt
+    environment:
+      SERVER_DOMAIN: ${SERVER_DOMAIN}
+    networks:
+      - app-network
+
+  backend:
+    container_name: backend
+    image: eenzzi/square:latest
+    pull_policy: always
+    ports:
+      - "8080:8080"
+    environment:
+      - SERVICE_NAME=${SERVICE_NAME}
+
+      # JWT 설정
+      - JWT_ACCESS_TOKEN_EXPIRY=${JWT_ACCESS_TOKEN_EXPIRY}
+      - JWT_REFRESH_TOKEN_EXPIRY=${JWT_REFRESH_TOKEN_EXPIRY}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_SIGN_UP_TOKEN_EXPIRY=${JWT_SIGN_UP_TOKEN_EXPIRY}
+
+      # MySQL 설정
+      - SPRING_DATASOURCE_URL=jdbc:mysql://${DB_MYSQL_HOST}:${DB_MYSQL_PORT}/${DB_MYSQL_DATABASE}
+      - SPRING_DATASOURCE_USERNAME=${DB_MYSQL_ID}
+      - SPRING_DATASOURCE_PASSWORD=${DB_MYSQL_PASSWORD}
+
+      # Google 로그인 설정
+      - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+
+      # S3 설정
+      - S3_ACCESS_KEY=${S3_ACCESS_KEY}
+      - S3_SECRET_KEY=${S3_SECRET_KEY}
+      - S3_BUCKET=${S3_BUCKET}
+
+      # Redis 캐시용
+      - REDIS_CACHE_HOST=${REDIS_CACHE_HOST}
+      - REDIS_CACHE_PORT=${REDIS_CACHE_PORT}
+      - REDIS_CACHE_PASSWORD=${REDIS_CACHE_PASSWORD}
+
+      # Redis 배치용
+      - REDIS_BATCH_HOST=${REDIS_BATCH_HOST}
+      - REDIS_BATCH_PORT=${REDIS_BATCH_PORT}
+      - REDIS_BATCH_PASSWORD=${REDIS_BATCH_PASSWORD}
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    external: true
