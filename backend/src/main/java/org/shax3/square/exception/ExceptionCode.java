@@ -48,7 +48,9 @@ public enum ExceptionCode {
 
 	OPINION_COMMENT_NOT_FOUND(9001,"해당 의견 답글을 찾을 수 없습니다."),
 
-	SCRAP_ALREADY_EXISTS(10001, "이미 해당 게시물/논쟁을 스크랩하고 있습니다.")
+	SCRAP_ALREADY_EXISTS(10001, "이미 해당 게시물/논쟁을 스크랩하고 있습니다."),
+
+	TYPE_QUESTION_DUPLICATION(11002, "같은 질문에 중복 답변이 존재합니다."),
 	;
 	private final int code;
 	private final String message;

@@ -8,7 +8,14 @@ public record TypeInfoResponse(
     int score3,
     int score4
 ) {
-    public static TypeInfoResponse of() {
-
+    public static TypeInfoResponse of(String nickname, String userType, int[] score) {
+        return new TypeInfoResponse(
+                nickname,
+                userType,
+                score[0],
+                score[1],
+                score[2],
+                score[3]
+        );
     }
 }

@@ -2,6 +2,7 @@ package org.shax3.square.domain.type.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.annotation.AuthUser;
 import org.shax3.square.domain.type.dto.request.EndTypeTestRequest;
@@ -42,9 +43,9 @@ public class TypeController {
     @PostMapping
     public ResponseEntity<TypeInfoResponse> endTypeTest(
             @AuthUser User user,
-            @RequestBody EndTypeTestRequest endTypeTestRequest
+            @Valid @RequestBody EndTypeTestRequest endTypeTestRequest
     ) {
-        TypeInfoResponse typeInfoResponse = typeService.endTypeTest(endTypeTestRequest);
+        TypeInfoResponse typeInfoResponse = typeService.endTypeTest(user, endTypeTestRequest);
 
         return ResponseEntity.ok(typeInfoResponse);
     }

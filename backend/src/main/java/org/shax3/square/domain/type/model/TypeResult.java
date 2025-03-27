@@ -22,9 +22,9 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 @AllArgsConstructor(access = PROTECTED)
 @Table(
-        name = "type"
+        name = "type_result"
 )
-public class Type {
+public class TypeResult {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     @Column
@@ -41,22 +41,33 @@ public class Type {
     private int score1;
 
     @Column(nullable = false)
-    private Type1 type2;
+    private Type2 type2;
 
     @Column(nullable = false)
     private int score2;
 
     @Column(nullable = false)
-    private Type1 type3;
+    private Type3 type3;
 
     @Column(nullable = false)
     private int score3;
 
     @Column(nullable = false)
-    private Type1 type4;
+    private Type4 type4;
 
     @Column(nullable = false)
     private int score4;
 
-
+    @Builder
+    public TypeResult(User user, Type1 type1, Type2 type2, Type3 type3, Type4 type4, int[] score) {
+        this.user = user;
+        this.type1 = type1;
+        this.type2 = type2;
+        this.type3 = type3;
+        this.type4 = type4;
+        this.score1 = score[0];
+        this.score2 = score[1];
+        this.score3 = score[2];
+        this.score4 = score[3];
+    }
 }
