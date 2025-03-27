@@ -1,6 +1,8 @@
 package org.shax3.square.domain.like.service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.like.dto.LikeRequest;
@@ -59,45 +61,45 @@ public class LikeService {
 	}
 
 	/**
-	 * Key:   like:POST:1
-	 * Value: Set of userIds (좋아요 누른 사용자들)
+	 * Key:   like:batch
+	 * Value: TargetType:targetId:userId
 	 * Type:  Set
 	 */
 	public void toggleLikeInRedis(User user, Long targetId, TargetType targetType) {
-		String key = generateKey(targetType, targetId);
-		String userId = user.getId().toString();
+		String key = "like:batch";
+		String value = targetType.name() + ":" + targetId + ":" + user.getId();
 
-		Boolean alreadyLiked = batchRedisTemplate.opsForSet().isMember(key, userId);
-		if (Boolean.TRUE.equals(alreadyLiked)) {
-			batchRedisTemplate.opsForSet().remove(key, userId);
+		Boolean isMember = batchRedisTemplate.opsForSet().isMember(key, value);
+		if (Boolean.TRUE.equals(isMember)) {
+			batchRedisTemplate.opsForSet().remove(key, value);
 		} else {
-			batchRedisTemplate.opsForSet().add(key, userId);
+			batchRedisTemplate.opsForSet().add(key, value);
 		}
-	}
-
-	private String generateKey(TargetType targetType, Long targetId) {
-		return "like:" + targetType.name() + ":" + targetId;
 	}
 
 	@Transactional
 	public void persistLikes(List<Long> userIds, TargetType targetType, Long targetId) {
 
 		List<User> users = userService.findAllByIds(userIds);
+		List<Like> existsLikes = likeRepository.findByTargetIdAndTargetTypeAndUserIn(targetId, targetType, users);
 
-		User user = userService.findById(userId);
+		Set<Long> existsUserIds = existsLikes.stream()
+			.map(like -> like.getUser().getId())
+			.collect(Collectors.toSet());
 
-		likeRepository.findByUserAndTargetIdAndTargetType(user, targetId, targetType)
-			.ifPresentOrElse(
-				Like::toggleLike,
-				() -> {
-					Like like = Like.builder()
+		// 기존 좋아요는 toggle
+		existsLikes.forEach(Like::toggleLike);
+
+		// 새로운 좋아요는 생성
+		List<Like> newLikes = users.stream()
+				.filter(user -> !existsUserIds.contains(user.getId()))
+				.map(user -> Like.builder()
 						.user(user)
 						.targetId(targetId)
 						.targetType(targetType)
-						.build();
+						.build())
+				.toList();
 
-					likeRepository.save(like);
-				}
-			);
+		likeRepository.saveAll(newLikes);
 	}
 }

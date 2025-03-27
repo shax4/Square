@@ -1,6 +1,9 @@
 package org.shax3.square.domain.like.batch;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.shax3.square.common.model.TargetType;
@@ -22,34 +25,34 @@ public class LikeBatchScheduler {
 
 	@Scheduled(fixedRate = 300_000)
 	public void flushLikes() {
-		Set<String> keys = batchRedisTemplate.keys("like:*");
+		Set<Object> entries = batchRedisTemplate.opsForSet().members("like:batch");
 
-		if (keys.isEmpty()) return; // 키가 비어있으면 리턴
+		if (entries == null || entries.isEmpty()) return;
 
-		for (String key : keys) {
-			Set<Object> userIdsSet = batchRedisTemplate.opsForSet().members(key);
-			if (userIdsSet == null || userIdsSet.isEmpty()) { // 좋아요를 누른 사용자가 없으면 키 삭제
-				batchRedisTemplate.delete(key);
-				continue;
-			}
+		Map<String, List<Long>> grouped = new HashMap<>();
 
-			String[] parts = key.split(":");
-			if (parts.length != 3) {
-				log.error("Invalid key: {}", key);
-				batchRedisTemplate.delete(key);
-				continue;
-			}
+		for (Object entryObj : entries) {
+			String entry = entryObj.toString(); // ex) POST:1:101
+			String[] parts = entry.split(":");
+			if (parts.length != 3) continue;
 
-			String targetType = parts[1];
-			Long targetId = Long.valueOf(parts[2]);
+			String type = parts[0];
+			Long targetId = Long.valueOf(parts[1]);
+			Long userId = Long.valueOf(parts[2]);
 
-			List<Long> userIds = userIdsSet.stream()
-				.map(id -> Long.valueOf(id.toString()))
-				.toList();
-
-			likeService.persistLikes(userIds, TargetType.valueOf(targetType), targetId);
-
-			batchRedisTemplate.delete(key);
+			String key = type + ":" + targetId;
+			grouped.computeIfAbsent(key, k -> new ArrayList<>()).add(userId); // key가 없으면 새로운 ArrayList 생성
 		}
+
+		for (Map.Entry<String, List<Long>> group : grouped.entrySet()) {
+			String[] parts = group.getKey().split(":");
+			TargetType targetType = TargetType.valueOf(parts[0]);
+			Long targetId = Long.valueOf(parts[1]);
+			List<Long> userIds = group.getValue();
+
+			likeService.persistLikes(userIds, targetType, targetId);
+		}
+
+		batchRedisTemplate.delete("like:batch");
 	}
 }
