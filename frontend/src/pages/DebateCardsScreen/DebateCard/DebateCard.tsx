@@ -41,10 +41,18 @@ const DebateCard = ({
         totalVoteCount,
     };
 
+
+    // 투표 및 투표 확인 모달 관련
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedSide, setSelectedSide] = useState<boolean | null>(isLeft);
 
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
+
+    // 투표 버튼 클릭 시
+    const handleVote = (isLeft: boolean) => {
+        setSelectedSide(isLeft);
+        setModalVisible(true);
+    }
 
     // 투표 모달 취소
     const handleVoteCancel = () => {
@@ -106,25 +114,23 @@ const DebateCard = ({
 
                     {/* Vote Buttons: 투표 여부(isLeft에 따라 다르게 렌더링*/}
                     <View style={styles.CardVote}>
-                    {isLeft != null ? (
-                        <AfterVoteButtonView
-                            debate={ debate }
-                            onSelectLeft={navigateToOpinionListPage}
-                            onSelectRight={navigateToOpinionListPage}
-                        />
-                    ) : (
-                        <BeforeVoteButtonView
-                            debate={ debate }
-                            onSelectLeft={() => {
-                                setSelectedSide(true);
-                                setModalVisible(true);
-                            }}
-                            onSelectRight={() => {
-                                setSelectedSide(false);
-                                setModalVisible(true);
-                            }}
-                        />
-                    )}
+                        {isLeft != null ? (
+                            <AfterVoteButtonView
+                                debate={debate}
+                                onSelectLeft={navigateToOpinionListPage}
+                                onSelectRight={navigateToOpinionListPage}
+                            />
+                        ) : (
+                            <BeforeVoteButtonView
+                                debate={debate}
+                                onSelectLeft={() => {
+                                    handleVote(true);
+                                }}
+                                onSelectRight={() => {
+                                    handleVote(false);
+                                }}
+                            />
+                        )}
                     </View>
 
                     {/* Footer */}
@@ -140,6 +146,8 @@ const DebateCard = ({
             {/* 투표 확인 모달 */}
             <VoteConfirmModal
                 visible={modalVisible}
+                debateId={debateId}
+                isLeft={selectedSide!} // 투표를 통해 selectedSice가 null 이 아닐때만 실행됨
                 onCancel={handleVoteCancel}
                 onConfirm={handleVoteConfirm}
             />
