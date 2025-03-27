@@ -2,12 +2,11 @@ import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Icons } from '../../../../assets/icons/Icons';
 
-import NevTestPage3 from '../../../pages/StackSampleScreen/NevTestPage3';
-
 import DebateCardsScreen from '../../../pages/DebateCardsScreen/DebateCardsScreen';
 import OpinionListScreen from '../../../pages/OpinionListScreen/OpinionListScreen';
 import ProposalListScreen from '../../../pages/ProposalListScreen/ProposalListScreen';
 import ProposalCreateScreen from '../../../pages/ProposalCreateScreen/ProposalCreateScreen';
+import OpinionDetailScreen from '../../../pages/OpinionDetailScreen/OpinionDetailScreen';
 
 import { StackParamList } from '../../../shared/page-stack/DebatePageStack';
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -67,7 +66,7 @@ export default function HeaderBar() {
             {/* 의견 상세 */}
             <Stack.Screen
                 name="OpinionDetailScreen"
-                component={NevTestPage3}
+                component={OpinionDetailScreen}
                 options={() => {
                     // 현재 사용자와 작성자 비교해 우측 아이콘 및 기능 변경
                     const isAuthor = currentUser.nickname === opinion.nickname;
@@ -91,7 +90,7 @@ export default function HeaderBar() {
                     };
                 }}
             />
-            {/* 청원 작성성 */}
+            {/* 청원 작성 */}
             <Stack.Screen
                 name="ProposalCreateScreen"
                 component={ProposalCreateScreen}

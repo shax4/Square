@@ -11,7 +11,7 @@
 export type StackParamList = {
     DebateCardsScreen: undefined;
     OpinionListScreen: { debateId: number };
-    OpinionDetailScreen: undefined;
+    OpinionDetailScreen: { opinionId: number };
     ProposalListScreen: undefined;
     ProposalCreateScreen: undefined;
 };
