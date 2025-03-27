@@ -34,14 +34,10 @@ public class LikeService {
 			throw new CustomException(ExceptionCode.NOT_FOUND);
 		}
 
-		Like like = likeRepository.findByUserAndTargetIdAndTargetType(user, targetId, targetType)
-			.map(existingLike -> {
-				existingLike.toggleLike();
-				return existingLike;
-			})
-			.orElseGet(() -> likeRequest.to(user));
-
-		likeRepository.save(like);
+		likeRepository.findByUserAndTargetIdAndTargetType(user, targetId, targetType)
+			.ifPresentOrElse(
+				Like::toggleLike,
+				() -> likeRepository.save(likeRequest.to(user)));
 	}
 
 	public boolean isPresent(Long targetId, TargetType targetType) {
