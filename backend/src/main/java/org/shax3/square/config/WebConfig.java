@@ -1,4 +1,4 @@
-package org.shax3.square.common.config;
+package org.shax3.square.config;
 
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.AuthenticationArgumentResolver;

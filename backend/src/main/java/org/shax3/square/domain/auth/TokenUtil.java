@@ -1,11 +1,12 @@
 package org.shax3.square.domain.auth;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import org.shax3.square.domain.auth.domain.RefreshToken;
+import org.shax3.square.domain.auth.model.RefreshToken;
 import org.shax3.square.domain.auth.dto.UserTokenDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -69,13 +70,24 @@ public class TokenUtil {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(tokenBytes);
     }
 
-    public boolean isAccessTokenValid(String accessToken) {
+    public boolean isTokenValid(String accessToken) {
         try {
             parseToken(accessToken);
-            return true;
         } catch (JwtException e) {
             return false;
         }
+        return true;
+    }
+
+    public Long isAccessTokenExpired(String accessToken) {
+        try {
+            parseToken(accessToken);
+        } catch (ExpiredJwtException e) {
+            return Long.parseLong(e.getClaims().getSubject());
+        } catch (JwtException e) {
+            return null;
+        }
+        return null;
     }
 
     private Jws<Claims> parseToken(String accessToken) {

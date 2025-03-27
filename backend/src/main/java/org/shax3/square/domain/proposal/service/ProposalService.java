@@ -1,7 +1,6 @@
 package org.shax3.square.domain.proposal.service;
 
 import lombok.RequiredArgsConstructor;
-import org.shax3.square.domain.proposal.dto.ProposalDto;
 import org.shax3.square.domain.proposal.dto.request.CreateProposalRequest;
 import org.shax3.square.domain.proposal.dto.response.CreateProposalsResponse;
 import org.shax3.square.domain.proposal.dto.response.ProposalsResponse;
@@ -12,7 +11,6 @@ import org.shax3.square.exception.CustomException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.shax3.square.exception.ExceptionCode.*;
@@ -23,10 +21,7 @@ public class ProposalService {
     private final ProposalRepository proposalRepository;
 
     @Transactional
-    public CreateProposalsResponse save(CreateProposalRequest request, String token) {
-
-        User user = User.builder().build();
-//      User user = 토큰추출기.getuserId(token);
+    public CreateProposalsResponse save(CreateProposalRequest request, User user) {
 
         Proposal proposal = request.to(user);
         proposalRepository.save(proposal);

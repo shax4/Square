@@ -16,10 +16,23 @@ spring:
       maximum-pool-size: 20
       minimum-idle: 10
 
+  data:
+
+#    mongodb:
+#      database: ${MONGODB_DATABASE}
+#      uri: ${MONGODB_URI}
+
+  cache:
+    redis:
+      host: ${REDIS_CACHE_HOST}
+      port: ${REDIS_CACHE_PORT}
+      password: ${REDIS_CACHE_PASSWORD}
+      ttl-minutes: 1440
+
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: false
@@ -33,11 +46,26 @@ spring:
       refresh-token-expiry: ${JWT_REFRESH_TOKEN_EXPIRY}
       sign-up-token-expiry: ${JWT_SIGN_UP_TOKEN_EXPIRY}
 
+cloud:
+  aws:
+    s3:
+      bucket: ${S3_BUCKET}
+    region:
+      static: ap-northeast-1
+    credentials:
+      access-key: ${S3_ACCESS_KEY}
+      secret-key: ${S3_SECRET_KEY}
+
 oauth2:
   google:
     client-id: ${GOOGLE_CLIENT_ID}
     client-secret: ${GOOGLE_CLIENT_SECRET}
     redirect-uri: ${GOOGLE_REDIRECT_URI}
+
+batch-redis:
+  host: ${REDIS_BATCH_HOST}
+  port: ${REDIS_BATCH_PORT}
+  password: ${REDIS_BATCH_PASSWORD}
 
 springdoc:
   api-docs:
@@ -45,7 +73,6 @@ springdoc:
     path: /api-docs
 
   swagger-ui:
-    path: /api-test
     display-request-duration: true
     filter: true
     doc-expansion: none

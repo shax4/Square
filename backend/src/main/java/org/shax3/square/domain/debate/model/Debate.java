@@ -2,12 +2,14 @@ package org.shax3.square.domain.debate.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "debate")
+@SQLRestriction("is_valid = true")
 public class Debate {
 
     @Id
@@ -17,12 +19,24 @@ public class Debate {
     @Column(nullable = false)
     private String Topic;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
+
     @Column(name ="is_valid",nullable = false)
-    private boolean isValid;
+    private boolean valid;
 
     @Column (nullable = false)
     private String leftOption;
 
     @Column (nullable = false)
     private String rightOption;
+
+    @Builder
+    public Debate(String topic, String leftOption, String rightOption) {
+        this.Topic = topic;
+        this.leftOption = leftOption;
+        this.rightOption = rightOption;
+        this.valid = true;
+    }
 }

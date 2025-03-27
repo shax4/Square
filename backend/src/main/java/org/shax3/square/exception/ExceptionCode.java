@@ -17,6 +17,13 @@ public enum ExceptionCode {
 	UNABLE_TO_GET_ACCESS_TOKEN(2002, "소셜 로그인 공급자로부터 인증 토큰을 받아올 수 없습니다."),
 	NICKNAME_BLANK_NOT_ALLOW(2003, "닉네임 및 이름에는 빈칸을 허용하지 않습니다."),
 	AGE_LIMIT_FROM_TEN(2004, "10대 미만의 사용자는 서비스 이용이 불가합니다."),
+	SOCIAL_TYPE_MISMATCH(2005, "이미 다른 소셜 계정이 존재합니다."),
+	SIGN_UP_TOKEN_INVALID(2006, "회원가입 페이지가 만료되었습니다. 다시 시도해주세요."),
+	DUPLICATE_EMAIL(2007, "해당 이메일로 회원가입한 계정이 이미 존재합니다."),
+	NOT_PROFILE_IMG(2008, "사진이 유효하지 않습니다."),
+	USER_DELETED(2009, "탈퇴한 회원입니다."),
+	USER_INACTIVE(2010, "비활성 회원입니다."),
+	USER_NOT_FOUND(2011, "유저를 찾을 수 없습니다."),
 
 	UNAUTHORIZED_ACCESS(3000, "접근할 수 없는 리소스입니다."),
 	INVALID_REFRESH_TOKEN(3001, "사용자 식별에 실패했습니다. 다시 로그인해주세요."),
@@ -30,8 +37,19 @@ public enum ExceptionCode {
 	COMMENT_NOT_FOUND(4005, "댓글을 찾을 수 없습니다."),
 	TEAM_BOARD_NOT_FOUND(4006, "게시판을 찾을 수 없습니다."),
 
+	PROPOSAL_NOT_FOUND(5004, "청원을 찾을 수 없습니다."),
 
-	PROPOSAL_NOT_FOUND(5004, "청원을 찾을 수 없습니다.");
+	DEBATE_NOT_FOUND(6001,"토론을 찾을 수 없습니다."),
+
+	ALREADY_VOTED(7001,"이미 투표한 토론입니다."),
+
+	OPINION_NOT_FOUND(8001,"해당 의견을 찾을 수 없습니다."),
+	OPINION_DELETED(8002, "이미 삭제된 의견입니다."),
+
+	OPINION_COMMENT_NOT_FOUND(9001,"해당 의견 답글을 찾을 수 없습니다."),
+
+	SCRAP_ALREADY_EXISTS(10001, "이미 해당 게시물/논쟁을 스크랩하고 있습니다.")
+	;
 	private final int code;
 	private final String message;
 }

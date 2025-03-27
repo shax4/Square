@@ -17,6 +17,8 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 import java.util.Arrays;
 
+import static org.shax3.square.domain.user.model.State.INACTIVE;
+import static org.shax3.square.domain.user.model.State.LEAVE;
 import static org.shax3.square.exception.ExceptionCode.*;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
@@ -48,8 +50,10 @@ public class GuestAuthenticationArgumentResolver implements HandlerMethodArgumen
         String refreshToken = extractRefreshToken(request);
         String accessToken = extractAccessToken(request);
 
-        if (tokenUtil.isAccessTokenValid(accessToken)) {
-            return extractUser(accessToken);
+        if (tokenUtil.isTokenValid(accessToken)) {
+            User user = extractUser(accessToken);
+            checkState(user);
+            return user;
         }
 
         return null;
@@ -82,5 +86,14 @@ public class GuestAuthenticationArgumentResolver implements HandlerMethodArgumen
 
         return userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(INVALID_REQUEST));
+    }
+
+    private void checkState(User user) {
+        if (user.getState() == LEAVE) {
+            throw new CustomException(USER_DELETED);
+        }
+        if (user.getState() == INACTIVE) {
+            throw new CustomException(USER_INACTIVE);
+        }
     }
 }
