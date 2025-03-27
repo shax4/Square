@@ -132,7 +132,7 @@ public class TypeService {
         score[index] += testAnswer;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public TypeInfoResponse getMyTypeInfo(User user) {
         TypeResult typeResult = typeRepository.findByUser(user)
                 .orElseThrow(() -> new CustomException(TYPE_RESULT_NOT_FOUND));
@@ -147,7 +147,7 @@ public class TypeService {
         return TypeInfoResponse.of(user.getNickname(), user.getType().name(), score);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public TypeInfoResponse getTypeInfo(Long userId) {
         User user = userService.findById(userId);
 
