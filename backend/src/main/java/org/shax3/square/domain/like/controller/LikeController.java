@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/likes")
 public class LikeController {
 
-	private LikeService likeService;
+	private final LikeService likeService;
 
 	@Operation(
 			summary = "좋아요 api",
