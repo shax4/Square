@@ -151,5 +151,33 @@ class ProposalServiceTest {
         verify(proposalRepository, times(1)).findById(1L);
 
     }
+
+    @Test
+    @DisplayName("청원이 존재하는 경우 true 반환")
+    void isOpinionExists_whenPresent() {
+        // given
+        Long proposalId = 3L;
+        when(proposalRepository.existsById(proposalId)).thenReturn(true);
+
+        // when
+        boolean exists = proposalService.isProposalExists(proposalId);
+
+        // then
+        assertThat(exists).isTrue();
+    }
+
+    @Test
+    @DisplayName("청원이 존재하지 않는 경우 false 반환")
+    void isOpinionExists_whenNotPresent() {
+        // given
+        Long proposalId = 4L;
+        when(proposalRepository.existsById(proposalId)).thenReturn(false);
+
+        // when
+        boolean exists = proposalService.isProposalExists(proposalId);
+
+        // then
+        assertThat(exists).isFalse();
+    }
 }
 
