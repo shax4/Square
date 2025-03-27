@@ -28,7 +28,11 @@ public class LikeService {
 	private final RedisTemplate<String, Object> batchRedisTemplate;
 	private final UserService userService;
 
-	@Transactional
+	/**
+	 * Redis에 좋아요 저장
+	 * @param user
+	 * @param likeRequest
+	 */
 	public void like(User user, LikeRequest likeRequest) {
 
 		Long targetId = likeRequest.targetId();
@@ -73,6 +77,7 @@ public class LikeService {
 		return "like:" + targetType.name() + ":" + targetId;
 	}
 
+	@Transactional
 	public void persistLike(Long userId, TargetType targetType, Long targetId) {
 		User user = userService.findById(userId);
 
