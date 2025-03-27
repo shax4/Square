@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class OpinionService {
     private final OpinionRepository opinionRepository;
     private final DebateService debateService;
-    private final S3Service s3Service;
 
     @Transactional
     public void createOpinion(User user, CreateOpinionRequest request) {
