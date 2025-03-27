@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface userDetails{
   nickname: string;
+  userType: string;
   token: string;
 }
 
