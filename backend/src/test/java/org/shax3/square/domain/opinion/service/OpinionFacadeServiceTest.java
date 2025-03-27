@@ -113,7 +113,7 @@ class OpinionFacadeServiceTest {
         );
 
         when(opinionService.getOpinion(1L)).thenReturn(mockOpinion);
-        when(opinionCommentService.getOpinionComments(mockUser, 1L)).thenReturn(mockComments);
+        when(opinionCommentService.getOpinionComments(1L)).thenReturn(mockComments);
         when(s3Service.generatePresignedGetUrl("test-key")).thenReturn("presigned-url");
 
         OpinionDetailsResponse response = opinionFacadeService.getOpinionDetails(mockUser, 1L);
@@ -135,14 +135,14 @@ class OpinionFacadeServiceTest {
                 .isInstanceOf(CustomException.class)
                 .hasMessage(ExceptionCode.OPINION_NOT_FOUND.getMessage());
 
-        verify(opinionCommentService, never()).getOpinionComments(any(), any());
+        verify(opinionCommentService, never()).getOpinionComments(any());
     }
 
     @Test
     @DisplayName("댓글이 없는 경우 의견 상세 조회 성공 테스트")
     void getOpinionDetails_noComments() {
         when(opinionService.getOpinion(1L)).thenReturn(mockOpinion);
-        when(opinionCommentService.getOpinionComments(mockUser, 1L)).thenReturn(List.of());
+        when(opinionCommentService.getOpinionComments(1L)).thenReturn(List.of());
         when(s3Service.generatePresignedGetUrl("test-key")).thenReturn("presigned-url");
 
         OpinionDetailsResponse response = opinionFacadeService.getOpinionDetails(mockUser, 1L);

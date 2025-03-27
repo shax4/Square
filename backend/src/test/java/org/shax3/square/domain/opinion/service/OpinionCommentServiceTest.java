@@ -76,7 +76,7 @@ class OpinionCommentServiceTest {
         when(s3Service.generatePresignedGetUrl("test-key")).thenReturn("presigned-url");
 
         // When
-        List<CommentResponse> responses = opinionCommentService.getOpinionComments(mockUser, 1L);
+        List<CommentResponse> responses = opinionCommentService.getOpinionComments(1L);
 
         // Then
         assertThat(responses).isNotNull().hasSize(1);
@@ -93,7 +93,7 @@ class OpinionCommentServiceTest {
         when(opinionCommentRepository.findByOpinionId(1L)).thenReturn(List.of());
 
         // When
-        List<CommentResponse> responses = opinionCommentService.getOpinionComments(mockUser, 1L);
+        List<CommentResponse> responses = opinionCommentService.getOpinionComments(1L);
 
         // Then
         assertThat(responses).isNotNull().isEmpty();
@@ -205,6 +205,32 @@ class OpinionCommentServiceTest {
         verify(opinionCommentRepository, times(1)).findById(1L); // findById 호출 검증
     }
 
+    @Test
+    @DisplayName("답글이 존재하는 경우 true 반환")
+    void isOpinionCommentExists_whenPresent() {
+        // given
+        Long opinionCommentId = 3L;
+        when(opinionCommentRepository.existsById(opinionCommentId)).thenReturn(true);
 
+        // when
+        boolean exists = opinionCommentService.isOpinionCommentExists(opinionCommentId);
+
+        // then
+        assertThat(exists).isTrue();
+    }
+
+    @Test
+    @DisplayName("답글이 존재하지 않는 경우 false 반환")
+    void isOpinionCommentExists_whenNotPresent() {
+        // given
+        Long opinionCommentId = 4L;
+        when(opinionCommentRepository.existsById(opinionCommentId)).thenReturn(false);
+
+        // when
+        boolean exists = opinionCommentService.isOpinionCommentExists(opinionCommentId);
+
+        // then
+        assertThat(exists).isFalse();
+    }
 
 }

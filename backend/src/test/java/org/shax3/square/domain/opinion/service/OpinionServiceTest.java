@@ -326,6 +326,66 @@ class OpinionServiceTest {
     }
 
 
+    @Test
+    @DisplayName("의견 존재하면 정상 반환")
+    void getOpinion_whenPresent() {
+        // given
+        Long opinionId = 1L;
+        Opinion opinion = Opinion.builder()
+            .content("test")
+            .build();
+        ReflectionTestUtils.setField(opinion, "id", opinionId);
+
+        when(opinionRepository.findById(opinionId)).thenReturn(Optional.of(opinion));
+
+        // when
+        Opinion result = opinionService.getOpinion(opinionId);
+
+        // then
+        assertThat(result).isEqualTo(opinion);
+    }
+
+    @Test
+    @DisplayName("의견 존재하지 않으면 예외 발생")
+    void getOpinion_whenNotPresent() {
+        // given
+        Long opinionId = 2L;
+
+        when(opinionRepository.findById(opinionId)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> opinionService.getOpinion(opinionId))
+            .isInstanceOf(CustomException.class)
+            .hasMessage(ExceptionCode.OPINION_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("의견이 존재하는 경우 true 반환")
+    void isOpinionExists_whenPresent() {
+        // given
+        Long opinionId = 3L;
+        when(opinionRepository.existsById(opinionId)).thenReturn(true);
+
+        // when
+        boolean exists = opinionService.isOpinionExists(opinionId);
+
+        // then
+        assertThat(exists).isTrue();
+    }
+
+    @Test
+    @DisplayName("의견이 존재하지 않는 경우 false 반환")
+    void isOpinionExists_whenNotPresent() {
+        // given
+        Long opinionId = 4L;
+        when(opinionRepository.existsById(opinionId)).thenReturn(false);
+
+        // when
+        boolean exists = opinionService.isOpinionExists(opinionId);
+
+        // then
+        assertThat(exists).isFalse();
+    }
 
 }
 
