@@ -82,10 +82,16 @@ export default function BoardWriteScreen({ route, navigation }: Props) {
           {
             text: "확인",
             onPress: () => {
-              // 수정한 게시글 상세 페이지로 이동하면서 새로고침 플래그 전달
-              navigation.navigate("BoardDetail", {
-                boardId: postId,
-                refresh: true,
+              // 네비게이션 스택 재설정 (수정 화면 제거)
+              navigation.reset({
+                index: 1,
+                routes: [
+                  { name: "BoardList" },
+                  {
+                    name: "BoardDetail",
+                    params: { boardId: postId, refresh: true },
+                  },
+                ],
               });
             },
           },
