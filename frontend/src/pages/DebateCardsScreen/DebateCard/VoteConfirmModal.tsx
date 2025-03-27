@@ -5,11 +5,13 @@ import { styles } from './DebateCard.styles';
 
 interface VoteConfirmModalProps {
     visible: boolean;
-    onConfirm: () => void;
+    onConfirm: (debateId: number, isLeft: boolean) => void;
     onCancel: () => void;
+    isLeft: boolean;
+    debateId: number;
 }
 
-const VoteConfirmModal = ({ visible, onConfirm, onCancel }: VoteConfirmModalProps) => {
+const VoteConfirmModal = ({ visible, onConfirm, onCancel, debateId, isLeft }: VoteConfirmModalProps) => {
     return (
         <Modal
             transparent
@@ -25,7 +27,7 @@ const VoteConfirmModal = ({ visible, onConfirm, onCancel }: VoteConfirmModalProp
                         <Text style={styles.message}>정말 투표하시겠어요?</Text>
 
                         <View style={styles.buttonGroup}>
-                            <TouchableOpacity style={styles.confirmButton} onPress={onConfirm}>
+                            <TouchableOpacity style={styles.confirmButton} onPress={() => onConfirm(debateId, isLeft)}>
                                 <Text style={styles.confirmText}>예</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>

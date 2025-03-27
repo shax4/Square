@@ -1,6 +1,6 @@
-import React from 'react';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React from "react";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
 import NevTestPage1 from '../../../pages/StackSampleScreen/NevTestPage1';
 import NotificationScreen from '../../../pages/NotificationScreen/NotificationScreen'
@@ -37,8 +37,8 @@ export default function HeaderBar() {
 }
 
 const styles = StyleSheet.create({
-    headerRightItems: {
-        flexDirection: 'row',
-        gap: 12,
-    },
+  headerRightItems: {
+    flexDirection: "row",
+    gap: 12,
+  },
 });
