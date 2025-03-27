@@ -8,8 +8,10 @@ import org.shax3.square.domain.opinion.service.OpinionCommentService;
 import org.shax3.square.domain.opinion.service.OpinionService;
 import org.shax3.square.domain.proposal.service.ProposalService;
 import org.shax3.square.domain.user.model.User;
+import org.shax3.square.domain.user.service.UserService;
 import org.shax3.square.exception.CustomException;
 import org.shax3.square.exception.ExceptionCode;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
@@ -23,6 +25,8 @@ public class LikeService {
 	private final OpinionService opinionService;
 	private final OpinionCommentService opinionCommentService;
 	private final ProposalService proposalService;
+	private final RedisTemplate<String, Object> batchRedisTemplate;
+	private final UserService userService;
 
 	@Transactional
 	public void like(User user, LikeRequest likeRequest) {
@@ -34,10 +38,7 @@ public class LikeService {
 			throw new CustomException(ExceptionCode.NOT_FOUND);
 		}
 
-		likeRepository.findByUserAndTargetIdAndTargetType(user, targetId, targetType)
-			.ifPresentOrElse(
-				Like::toggleLike,
-				() -> likeRepository.save(likeRequest.to(user)));
+		toggleLikeInRedis(user, targetId, targetType); // Redis에 좋아요 저장
 	}
 
 	public boolean isPresent(Long targetId, TargetType targetType) {
@@ -51,4 +52,42 @@ public class LikeService {
 		};
 	}
 
+	/**
+	 * Key:   like:POST:1
+	 * Value: Set of userIds (좋아요 누른 사용자들)
+	 * Type:  Set
+	 */
+	public void toggleLikeInRedis(User user, Long targetId, TargetType targetType) {
+		String key = generateKey(targetType, targetId);
+		String userId = user.getId().toString();
+
+		Boolean alreadyLiked = batchRedisTemplate.opsForSet().isMember(key, userId);
+		if (Boolean.TRUE.equals(alreadyLiked)) {
+			batchRedisTemplate.opsForSet().remove(key, userId);
+		} else {
+			batchRedisTemplate.opsForSet().add(key, userId);
+		}
+	}
+
+	private String generateKey(TargetType targetType, Long targetId) {
+		return "like:" + targetType.name() + ":" + targetId;
+	}
+
+	public void persistLike(Long userId, TargetType targetType, Long targetId) {
+		User user = userService.findById(userId);
+
+		likeRepository.findByUserAndTargetIdAndTargetType(user, targetId, targetType)
+			.ifPresentOrElse(
+				Like::toggleLike,
+				() -> {
+					Like like = Like.builder()
+						.user(user)
+						.targetId(targetId)
+						.targetType(targetType)
+						.build();
+
+					likeRepository.save(like);
+				}
+			);
+	}
 }
