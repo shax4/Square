@@ -1,5 +1,7 @@
 package org.shax3.square.domain.like.service;
 
+import java.util.List;
+
 import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.like.dto.LikeRequest;
 import org.shax3.square.domain.like.model.Like;
@@ -78,7 +80,10 @@ public class LikeService {
 	}
 
 	@Transactional
-	public void persistLike(Long userId, TargetType targetType, Long targetId) {
+	public void persistLikes(List<Long> userIds, TargetType targetType, Long targetId) {
+
+		List<User> users = userService.findAllByIds(userIds);
+
 		User user = userService.findById(userId);
 
 		likeRepository.findByUserAndTargetIdAndTargetType(user, targetId, targetType)

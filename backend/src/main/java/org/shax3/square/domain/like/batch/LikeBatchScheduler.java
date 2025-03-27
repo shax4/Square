@@ -1,5 +1,6 @@
 package org.shax3.square.domain.like.batch;
 
+import java.util.List;
 import java.util.Set;
 
 import org.shax3.square.common.model.TargetType;
@@ -26,8 +27,8 @@ public class LikeBatchScheduler {
 		if (keys.isEmpty()) return; // 키가 비어있으면 리턴
 
 		for (String key : keys) {
-			Set<Object> userIds = batchRedisTemplate.opsForSet().members(key);
-			if (userIds == null || userIds.isEmpty()) { // 좋아요를 누른 사용자가 없으면 키 삭제
+			Set<Object> userIdsSet = batchRedisTemplate.opsForSet().members(key);
+			if (userIdsSet == null || userIdsSet.isEmpty()) { // 좋아요를 누른 사용자가 없으면 키 삭제
 				batchRedisTemplate.delete(key);
 				continue;
 			}
@@ -42,11 +43,11 @@ public class LikeBatchScheduler {
 			String targetType = parts[1];
 			Long targetId = Long.valueOf(parts[2]);
 
-			for (Object userIdObj : userIds) {
-				Long userId = Long.valueOf(userIdObj.toString());
-				likeService.persistLike(userId, TargetType.valueOf(targetType), targetId);
-				log.debug("Persisting like - userId: {}, targetType: {}, targetId: {}", userId, targetType, targetId);
-			}
+			List<Long> userIds = userIdsSet.stream()
+				.map(id -> Long.valueOf(id.toString()))
+				.toList();
+
+			likeService.persistLikes(userIds, TargetType.valueOf(targetType), targetId);
 
 			batchRedisTemplate.delete(key);
 		}
