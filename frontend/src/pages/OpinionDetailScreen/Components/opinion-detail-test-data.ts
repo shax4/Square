@@ -1,5 +1,5 @@
-import { OpinionDetailResponse } from './OpinionDetailResponseProps';
-const opinionDetailTestData: OpinionDetailResponse = {
+import { OpinionsResponse } from './OpinionsResponse.types';
+const opinionDetailTestData: OpinionsResponse = {
     opinionId: 1,
     nickname: "초코파이",
     profileUrl: "https://example.com/profile1.jpg",

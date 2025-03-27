@@ -1,5 +1,5 @@
 // 의견 댓글 
-export interface OpinionComment {
+export interface Comment {
     commentId: number;
     nickname: string;
     profileUrl: string;

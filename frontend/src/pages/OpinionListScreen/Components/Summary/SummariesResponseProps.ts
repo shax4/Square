@@ -1,7 +1,7 @@
 import { Summary } from "./SummaryProps";
-import { DebateProps } from "../../../DebateCardsScreen/DebateCard";
+import { Debate } from "../../../DebateCardsScreen/DebateCard";
 
 export interface SummariesResponse {
-    debate: DebateProps;
+    debate: Debate;
     summaries: Summary[];
 }

@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { StackParamList } from '../../../shared/page-stack/DebatePageStack';
 
-import { DebateProps } from './DebateData.types';
+import { Debate } from './Debate.types';
 import { styles } from './DebateCard.styles';
 import { Icons } from '../../../../assets/icons/Icons';
 import VoteConfirmModal from './VoteConfirmModal';
@@ -24,9 +24,9 @@ const DebateCard = ({
     leftPercent,
     rightPercent,
     totalVoteCount
-}: DebateProps): JSX.Element => {
+}: Debate): JSX.Element => {
 
-    const debate: DebateProps = {
+    const debate: Debate = {
         debateId,
         category,
         topic,

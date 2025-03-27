@@ -1,7 +1,7 @@
 // 의견 요청
-import { OpinionComment } from "./OpinionCommentProps";
+import { Comment } from "./Comment.types";
 
-export interface OpinionDetailResponse {
+export interface OpinionsResponse {
     opinionId: number;
     nickname: string;
     profileUrl: string;
@@ -11,5 +11,5 @@ export interface OpinionDetailResponse {
     likeCount: number;
     commentCount: number;
     isLiked: boolean;
-    comments: OpinionComment[];
+    comments: Comment[];
 }
