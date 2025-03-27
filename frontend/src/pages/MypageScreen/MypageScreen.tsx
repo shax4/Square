@@ -64,6 +64,12 @@ const MypageScreen = () => {
               variant="secondary"
               style={styles.actionButton}
             />
+            <MypageButton
+              title="useAuth"
+              onPress={() => navigation.navigate('PersonalityResultScreen')}
+              variant="secondary"
+              style={styles.actionButton}
+            />
           </View>
         </View>
 
