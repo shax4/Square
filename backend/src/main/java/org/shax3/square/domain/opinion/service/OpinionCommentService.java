@@ -48,8 +48,7 @@ public class OpinionCommentService {
 
     @Transactional
     public void deleteOpinionComment(User user, Long commentId) {
-        OpinionComment comment = opinionCommentRepository.findById(commentId)
-                .orElseThrow(() -> new CustomException(OPINION_COMMENT_NOT_FOUND));
+        OpinionComment comment = getOpinionComment(commentId);
 
         if (!comment.getUser().getId().equals(user.getId())) {
             throw new CustomException(ExceptionCode.NOT_AUTHOR);
@@ -60,8 +59,7 @@ public class OpinionCommentService {
 
     @Transactional
     public void updateOpinionComment(User user, UpdateOpinionRequest request, Long commentId) {
-        OpinionComment comment = opinionCommentRepository.findById(commentId)
-                .orElseThrow(() -> new CustomException(OPINION_COMMENT_NOT_FOUND));
+        OpinionComment comment = getOpinionComment(commentId);
 
         if (!comment.getUser().getId().equals(user.getId())) {
             throw new CustomException(ExceptionCode.NOT_AUTHOR);
@@ -73,6 +71,10 @@ public class OpinionCommentService {
     public OpinionComment getOpinionComment(Long opinionCommentId) {
         return opinionCommentRepository.findById(opinionCommentId)
             .orElseThrow(() -> new CustomException(OPINION_COMMENT_NOT_FOUND));
+    }
+
+    public boolean isOpinionCommentExists(Long opinionCommentId) {
+        return opinionCommentRepository.existsById(opinionCommentId);
     }
 
 }

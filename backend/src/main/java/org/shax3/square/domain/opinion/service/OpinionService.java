@@ -33,8 +33,7 @@ public class OpinionService {
 
     @Transactional
     public void updateOpinion(UpdateOpinionRequest request, User user, Long opinionId) {
-        Opinion opinion = opinionRepository.findById(opinionId)
-                .orElseThrow(() -> new CustomException(ExceptionCode.OPINION_NOT_FOUND));
+        Opinion opinion = getOpinion(opinionId);
 
         if (!opinion.getUser().getId().equals(user.getId())) {
             throw new CustomException(ExceptionCode.NOT_AUTHOR);
@@ -46,8 +45,7 @@ public class OpinionService {
 
     @Transactional
     public void deleteOpinion(User user, Long opinionId) {
-        Opinion opinion = opinionRepository.findById(opinionId)
-                .orElseThrow(() -> new CustomException(ExceptionCode.OPINION_NOT_FOUND));
+        Opinion opinion = getOpinion(opinionId);
 
         if (!opinion.getUser().getId().equals(user.getId())) {
             throw new CustomException(ExceptionCode.NOT_AUTHOR);
@@ -61,6 +59,9 @@ public class OpinionService {
                 .orElseThrow(() -> new CustomException(ExceptionCode.OPINION_NOT_FOUND));
     }
 
+    public boolean isOpinionExists(Long opinionId) {
+        return opinionRepository.existsById(opinionId);
+    }
 
     @Transactional(readOnly = true)
     public MyOpinionResponse getMyOpinions(User user, Long nextCursorId, int limit) {

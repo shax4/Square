@@ -53,6 +53,10 @@ public class ProposalService {
         }
         proposal.softDelete();
     }
+
+    public boolean isProposalExists(Long proposalId) {
+        return proposalRepository.existsById(proposalId);
+    }
 }
 
 
