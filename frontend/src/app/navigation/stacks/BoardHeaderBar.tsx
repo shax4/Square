@@ -13,7 +13,7 @@ import BoardWriteScreen from "../../../pages/BoardScreen/BoardWriteScreen";
 
 // 네비게이션 파라미터 타입 정의
 type BoardStackParamList = {
-  BoardList: undefined; // 게시글 목록 화면은 별도의 파라미터가 없음
+  BoardList: { refresh?: boolean }; // 게시글 목록 화면은 별도의 파라미터가 없음 (refresh는 선택적 파라미터)
   BoardDetail: { boardId: number }; // 게시글 상세 화면은 boardId를 필요로 함
   BoardWrite: { postId?: number }; // 게시글 작성/수정 화면은 선택적 postId를 필요로 함
 };
@@ -109,7 +109,7 @@ function HeaderRightIcons({
             Alert.alert("삭제 완료", "게시글이 삭제되었습니다.", [
               {
                 text: "확인",
-                onPress: () => navigation.navigate("BoardList"),
+                onPress: () => navigation.navigate("BoardList", { refresh: true }),
               },
             ]);
           } catch (error) {

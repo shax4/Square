@@ -45,7 +45,7 @@ export default function CommentItem({ comment, onDelete }: CommentItemProps) {
           onPress: async () => {
             try {
               await BoardAPI.deleteComment(comment.commentId);
-              if (onDelete) onDelete(); // 댓글 목록 새로고침
+              if (onDelete) onDelete(); // 상위 컴포넌트에서 전달된 콜백 함수 호출
             } catch (error) {
               console.error('댓글 삭제에 실패했습니다:', error);
               Alert.alert("오류", "댓글 삭제 중 오류가 발생했습니다.");

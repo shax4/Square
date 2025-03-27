@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   FlatList,
@@ -12,6 +12,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
+import { RouteProp, useFocusEffect } from "@react-navigation/native";
 import { BoardAPI } from "../BoardScreen/Api/boardApi"; // 게시판 API 호출
 import BoardItem from "./components/BoardItem"; // 개별 게시글 항목을 표시하는 컴포넌트
 import EmptyBoardList from "./components/EmptyBoardList"; // 게시글이 없을 때 표시하는 컴포넌트
@@ -49,8 +50,8 @@ interface PostsResponse {
 
 // 네비게이션 파라미터 타입 정의
 type BoardStackParamList = {
-  BoardList: undefined; // 목록 확인 시에는 필요 파라미터 없음
-  BoardDetail: { boardId: number }; // 게시글 상세 정보 확인 시에는 boardId 참조
+  BoardList: { refresh?: boolean }; // 목록 확인 시에는 필요 파라미터 없음
+  BoardDetail: { boardId: number; refresh?: boolean }; // 게시글 상세 정보 확인 시에는 boardId 참조
   BoardWrite: { postId?: number }; // 게시글 수정 시에는 postId 참조 (작성 시에는 postId 없으므로 ? 기호로 선택적 파라미터임을 표시)
 };
 
@@ -63,9 +64,13 @@ type BoardListScreenNavigationProp = StackNavigationProp<
 // props 타입 정의
 interface BoardListScreenProps {
   navigation: BoardListScreenNavigationProp;
+  route: RouteProp<BoardStackParamList, "BoardList">;
 }
 
-export default function BoardListScreen({ navigation }: BoardListScreenProps) {
+export default function BoardListScreen({
+  route,
+  navigation,
+}: BoardListScreenProps) {
   const [boards, setBoards] = useState<Post[]>([]); // 게시글 목록 데이터 상태 관리
   const [popularPosts, setPopularPosts] = useState<PopularPost[]>([]); // 인기 게시글 목록 데이터 상태 관리
   const [loading, setLoading] = useState(false); // 데이터 로딩 상태 관리
@@ -73,10 +78,28 @@ export default function BoardListScreen({ navigation }: BoardListScreenProps) {
   const [nextCursorLikes, setNextCursorLikes] = useState<number | null>(null);
   const [sort, setSort] = useState<"latest" | "likes">("latest"); // 정렬 방식
 
-  // 컴포넌트가 처음 렌더링 될 때 게시글 데이터를 가져옵니다.
+  // 초기 데이터 로딩
   useEffect(() => {
-    fetchBoards(true); // 처음 로드 시 새로고침
-  }, [sort]); // 정렬 방식이 변경되면 데이터 다시 로드
+    fetchBoards(true); // 컴포넌트 마운트 시 데이터 가져오기
+  }, []); // 빈 의존성 배열은 컴포넌트가 처음 마운트 될 때만 실행됨
+
+  // 데이터 변경이 감지되면 데이터 다시 로드 (게시글 실시간 업데이트)
+  useEffect(() => {
+    if (route.params?.refresh) {
+      fetchBoards(true); // 새로고침 수행
+      navigation.setParams({ refresh: undefined }); // 플래그 초기화
+    }
+  }, [route.params?.refresh]); // 정렬 방식이 변경되면 데이터 다시 로드
+
+  // 화면에 포커스가 올 때마다 데이터 새로고침 (댓글 개수 실시간 업데이트)
+  useFocusEffect(
+    useCallback(() => {
+      fetchBoards(true); // 전체 데이터 새로고침
+      return () => {
+        // 정리 작업 (필요한 경우)
+      };
+    }, [sort]) // sort가 변경되면 다시 실행
+  );
 
   // 게시글 목록을 서버에서 가져오는 함수
   const fetchBoards = async (refresh = false) => {
@@ -99,7 +122,10 @@ export default function BoardListScreen({ navigation }: BoardListScreenProps) {
         setPopularPosts(data.popular);
       } else {
         const uniquePosts = data.posts.filter(
-          (newPost) => !boards.some((existingPost) => existingPost.postId === newPost.postId)
+          (newPost) =>
+            !boards.some(
+              (existingPost) => existingPost.postId === newPost.postId
+            )
         );
         setBoards((prev) => [...prev, ...uniquePosts]);
       }
@@ -178,7 +204,7 @@ export default function BoardListScreen({ navigation }: BoardListScreenProps) {
             <Text
               style={sort === "likes" ? styles.activeSortText : styles.sortText}
             >
-              좋아요순
+              인기순
             </Text>
           </TouchableOpacity>
         </View>
@@ -201,7 +227,10 @@ export default function BoardListScreen({ navigation }: BoardListScreenProps) {
             }
           }}
           onEndReachedThreshold={0.1}
-          contentContainerStyle={[styles.listContent, boards.length === 0 && styles.emptyListContent]} // 빈 상태면 세로축 중앙 정렬
+          contentContainerStyle={[
+            styles.listContent,
+            boards.length === 0 && styles.emptyListContent,
+          ]} // 빈 상태면 세로축 중앙 정렬
           // 빈 상태 컴포넌트 추가
           ListEmptyComponent={
             <EmptyBoardList
