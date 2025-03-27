@@ -33,6 +33,8 @@ public class DebateController {
     }
 
 
+    @Operation(summary = "내가 투표한 목록 조회 API ",
+            description = "사용자가 투표한 목록을 최신순으로 조회하는 API 입니다.")
 
     @GetMapping("/my-votes")
     public ResponseEntity<MyVotedDebatesResponse> getMyVotedDebates(
