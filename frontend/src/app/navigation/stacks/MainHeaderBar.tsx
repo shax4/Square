@@ -7,6 +7,7 @@ import NevTestPage3 from '../../../pages/StackSampleScreen/NevTestPage3';
 import DebateCardsScreen from '../../../pages/DebateCardsScreen/DebateCardsScreen';
 import OpinionListScreen from '../../../pages/OpinionListScreen/OpinionListScreen';
 import ProposalListScreen from '../../../pages/ProposalListScreen/ProposalListScreen';
+import ProposalCreateScreen from '../../../pages/ProposalCreateScreen/ProposalCreateScreen';
 
 import { StackParamList } from '../../../shared/page-stack/DebatePageStack';
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -40,7 +41,7 @@ export default function HeaderBar() {
                     title: '오늘의 주제',
                     headerBackButtonDisplayMode: 'minimal',
                     //headerRight: () => DebateCardsScreenHeaderRightIcons() // 일반 함수 형태: Hook 사용 불가
-                    headerRight: () => <DebateCardsScreenHeaderRightIcons/> // React 컴포넌트 JSX 형태: Hook 사용 가능
+                    headerRight: () => <DebateCardsScreenHeaderRightIcons /> // React 컴포넌트 JSX 형태: Hook 사용 가능
 
                 }}
             />
@@ -85,7 +86,18 @@ export default function HeaderBar() {
                 component={ProposalListScreen}
                 options={() => {
                     return {
-                        title: '새로운 주제 신청리스트',
+                        title: '새로운 주제 신청 리스트',
+                        headerBackButtonDisplayMode: 'minimal',
+                    };
+                }}
+            />
+            {/* 청원 작성성 */}
+            <Stack.Screen
+                name="ProposalCreateScreen"
+                component={ProposalCreateScreen}
+                options={() => {
+                    return {
+                        title: '새로운 주제 작성하기',
                         headerBackButtonDisplayMode: 'minimal',
                     };
                 }}
@@ -95,7 +107,7 @@ export default function HeaderBar() {
 }
 
 
-function DebateCardsScreenHeaderRightIcons() {    
+function DebateCardsScreenHeaderRightIcons() {
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
     return (
         <View style={styles.headerRightItems}>
