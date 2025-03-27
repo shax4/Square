@@ -16,12 +16,10 @@ public record DebateDto(
           boolean isScraped
 ) {
 
-    public static DebateDto of(User user, Vote vote, VoteResponse voteResponse, boolean isScraped) {
-        Debate debate = vote.getDebate();
-
+    public static DebateDto of(Vote vote, VoteResponse voteResponse, boolean isScraped) {
         return new DebateDto(
-                debate.getId(),
-                debate.getTopic(),
+                vote.getDebate().getId(),
+                vote.getDebate().getTopic(),
                 vote.isLeft(),
                 voteResponse.leftCount(),
                 voteResponse.rightCount(),
@@ -30,4 +28,18 @@ public record DebateDto(
                 isScraped
         );
     }
+
+    public static DebateDto of(Debate debate, boolean isLeft, VoteResponse voteResponse, boolean isScraped) {
+        return new DebateDto(
+                debate.getId(),
+                debate.getTopic(),
+                isLeft,
+                voteResponse.leftCount(),
+                voteResponse.rightCount(),
+                voteResponse.leftPercent(),
+                voteResponse.rightPercent(),
+                isScraped
+        );
+    }
+
 }

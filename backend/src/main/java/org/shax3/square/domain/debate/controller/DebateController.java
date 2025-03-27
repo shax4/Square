@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.annotation.AuthUser;
 import org.shax3.square.domain.debate.dto.request.VoteRequest;
+import org.shax3.square.domain.debate.dto.response.MyScrapedDebatesResponse;
 import org.shax3.square.domain.debate.dto.response.MyVotedDebatesResponse;
 import org.shax3.square.domain.debate.dto.response.VoteResponse;
 import org.shax3.square.domain.debate.service.DebateService;
@@ -45,4 +46,15 @@ public class DebateController {
         MyVotedDebatesResponse response = voteService.getMyVotedDebates(user, nextCursorId, limit);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/my-scrap")
+    public ResponseEntity<MyScrapedDebatesResponse> getMyScrapedDebates(
+            @RequestParam(required = false) Long nextCursorId,
+            @RequestParam(defaultValue = "10") int limit,
+            @AuthUser User user) {
+
+        MyScrapedDebatesResponse response = voteService.getScrapedDebates(user, nextCursorId, limit);
+        return ResponseEntity.ok(response);
     }
+
+}

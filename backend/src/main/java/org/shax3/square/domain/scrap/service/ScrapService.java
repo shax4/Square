@@ -81,4 +81,8 @@ public class ScrapService {
     private boolean isTargetScraped(User user, Long targetId, TargetType targetType) {
         return scrapRepository.existsByUserAndTargetIdAndTargetType(user, targetId, targetType);
     }
+    @Transactional(readOnly = true)
+    public List<Scrap> getPaginatedScraps(User user, TargetType type, Long cursorId, int limit) {
+        return scrapRepository.findScrapsByUserAndType(user, type, cursorId, limit);
+    }
 }
