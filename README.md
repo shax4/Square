@@ -3,7 +3,7 @@
   <img src="/uploads/41b1236fa6adabebd9313caafcc18f07/네모흰색배경.png" alt="네모흰색배경" width="40%" />
 </div>
 
-
+<div>
 <h1 align="center" style="text-align: center; font-size: 1.5em">사각: Square</h1>
 
 <div align="center">
