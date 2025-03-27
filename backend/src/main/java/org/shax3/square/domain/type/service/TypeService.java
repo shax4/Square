@@ -17,6 +17,7 @@ import org.shax3.square.domain.type.repository.QuestionRepository;
 import org.shax3.square.domain.type.repository.TypeRepository;
 import org.shax3.square.domain.user.model.Type;
 import org.shax3.square.domain.user.model.User;
+import org.shax3.square.domain.user.service.UserService;
 import org.shax3.square.exception.CustomException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +37,7 @@ public class TypeService {
 
     private final QuestionRepository questionRepository;
     private final TypeRepository typeRepository;
+    private final UserService userService;
 
     @PostConstruct
     public void init() {
@@ -128,5 +130,27 @@ public class TypeService {
 
         int index = (questionId - 1) / 8;
         score[index] += testAnswer;
+    }
+
+    @Transactional
+    public TypeInfoResponse getMyTypeInfo(User user) {
+        TypeResult typeResult = typeRepository.findByUser(user)
+                .orElseThrow(() -> new CustomException(TYPE_RESULT_NOT_FOUND));
+
+        int[] score = {
+                typeResult.getScore1(),
+                typeResult.getScore2(),
+                typeResult.getScore3(),
+                typeResult.getScore4()
+        };
+
+        return TypeInfoResponse.of(user.getNickname(), user.getType().name(), score);
+    }
+
+    @Transactional
+    public TypeInfoResponse getTypeInfo(Long userId) {
+        User user = userService.findById(userId);
+
+        return getMyTypeInfo(user);
     }
 }

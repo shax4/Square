@@ -133,4 +133,9 @@ public class UserService {
         String profileUrl = s3Service.generatePresignedGetUrl(s3Key);
         return ProfileUrlResponse.from(profileUrl);
     }
+
+    public User findById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+    }
 }

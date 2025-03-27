@@ -52,6 +52,7 @@ public enum ExceptionCode {
 	SCRAP_ALREADY_EXISTS(10001, "이미 해당 게시물/논쟁을 스크랩하고 있습니다."),
 
 	TYPE_QUESTION_DUPLICATION(11002, "같은 질문에 중복 답변이 존재합니다."),
+	TYPE_RESULT_NOT_FOUND(11003, "성향테스트 결과가 존재하지 않습니다.")
 	;
 	private final int code;
 	private final String message;
