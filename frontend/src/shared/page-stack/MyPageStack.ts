@@ -4,4 +4,5 @@ export type StackParamList = {
     MypageScreen: undefined;
     DeleteAccountScreen: undefined;
     UseAuthTestScreen: undefined;
+    SignupTestScreen: undefined;
 };

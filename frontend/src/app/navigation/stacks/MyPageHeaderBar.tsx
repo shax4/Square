@@ -14,6 +14,7 @@ import PersonalityResultScreen from '../../../pages/PersonalityResultScreen/Pers
 import ProfileUpdateScreen from '../../../pages/ProfileUpdateScreen/ProfileUpdateScreen';
 import DeleteAccountScreen from '../../../pages/DeleteAccountScreen/DeleteAccountScreen';
 import UseAuthTestScreen from '../../../pages/UseAuthTestScreen/UseAuthTestScreen';
+import SignupTestScreen from '../../../pages/SignupTestScreen/SignupTestScreen';
 
 // 스택 네비게이터
 const Stack = createNativeStackNavigator();
@@ -90,6 +91,14 @@ export default function HeaderBar() {
                 component={UseAuthTestScreen}
                 options={{
                     title: '탈퇴하기',
+                    headerBackButtonDisplayMode: 'minimal',
+                }}
+            />
+            <Stack.Screen
+                name="SignupTestScreen"
+                component={SignupTestScreen}
+                options={{
+                    title: 'SignupTestScreen',
                     headerBackButtonDisplayMode: 'minimal',
                 }}
             />
