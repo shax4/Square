@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
-import { Opinion } from "./OpinionProps";
+import { Opinion } from "./Opinion.types";
 import { getTimeAgo } from "../../../../shared/utils/timeAge/timeAge";
 import { ProfileImage, PersonalityTag } from "../../../../components";
 import { styles } from '../ContentBubble.styles';

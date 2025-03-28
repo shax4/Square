@@ -1,4 +1,4 @@
-import { Opinion } from "./OpinionProps";
+import { Opinion } from "./Opinion.types";
 import { Debate } from "../../../DebateCardsScreen/DebateCard";
 
 export interface OpinionsResponse {

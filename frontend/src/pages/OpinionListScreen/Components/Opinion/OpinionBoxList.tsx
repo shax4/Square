@@ -1,6 +1,6 @@
 import React from "react";
 import { FlatList, StyleSheet } from "react-native";
-import { OpinionsResponse } from "./OpinionsResponseProps";
+import { OpinionsResponse } from "./OpinionsResponse.types";
 import OpinionBox from "./OpinionBox";
 
 interface Props {

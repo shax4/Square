@@ -1,4 +1,4 @@
-import { Summary } from "./SummaryProps";
+import { Summary } from "./Summary.types";
 import { Debate } from "../../../DebateCardsScreen/DebateCard";
 
 export interface SummariesResponse {

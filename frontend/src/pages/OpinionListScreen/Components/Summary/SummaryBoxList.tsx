@@ -1,6 +1,6 @@
 import React from "react";
 import { FlatList, StyleSheet } from "react-native";
-import { SummariesResponse } from "./SummariesResponseProps";
+import { SummariesResponse } from "./SummariesResponse.types";
 import SummaryBox from "./SummaryBox";
 
 interface Props {
