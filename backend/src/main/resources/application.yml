@@ -73,6 +73,7 @@ springdoc:
     path: /api-docs
 
   swagger-ui:
+    url: /api/api-docs
     display-request-duration: true
     filter: true
     doc-expansion: none
