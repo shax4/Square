@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface ScrapRepository extends JpaRepository<Scrap, Long> {
+public interface ScrapRepository extends JpaRepository<Scrap, Long>, ScrapRepositoryCustom {
 
     void deleteByUserAndTargetIdAndTargetType(User user, Long targetId, TargetType targetType);
 
