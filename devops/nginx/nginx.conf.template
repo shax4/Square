@@ -48,12 +48,12 @@ http {
         }
 
         # Swagger UI 접근 허용
-        location /swagger-ui/ {
-            proxy_pass http://backend:8080/swagger-ui/;
+        location /api/swagger-ui/ {
+            proxy_pass http://backend:8080/api/swagger-ui/;
         }
 
-        location /v3/api-docs/ {
-            proxy_pass http://backend:8080/v3/api-docs/;
+        location /api/v3/api-docs/ {
+            proxy_pass http://backend:8080/api/v3/api-docs/;
         }
 
     }
