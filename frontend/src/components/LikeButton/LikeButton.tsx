@@ -4,7 +4,13 @@ import {Ionicons} from "@expo/vector-icons";
 import {styles} from "./LikeButton.styles";
 import {LikeButtonProps} from "./LikeButton.types";
 
-const LikeButton = ({initialCount = 0, initialLiked = false}: LikeButtonProps) => {
+const LikeButton = ({
+    initialCount = 0, 
+    initialLiked = false, 
+    isVertical=true,
+    size ="large"
+    }: LikeButtonProps) => {
+
     const [liked, setLiked] = useState<boolean>(initialLiked);
     const [likeCount, setLikeCount] = useState<number>(initialCount);
 
@@ -12,11 +18,13 @@ const LikeButton = ({initialCount = 0, initialLiked = false}: LikeButtonProps) =
         setLiked(!liked);
         setLikeCount((prev) => (liked ? prev -1 : prev + 1));
     }
+    const iconSize = size === "large" ? 32 : 24;
+    const textSize = size === "large" ? 14 : 12;
 
     return (
-        <TouchableOpacity onPress={handleLike} style={styles.container} activeOpacity={0.7}>
-            <Ionicons name={liked ? "heart" : "heart-outline"} size={32} color={liked? "red" : "gray"}/>
-            <Text style={styles.likeCount}>{likeCount}</Text>
+        <TouchableOpacity onPress={handleLike} style={isVertical? styles.container : styles.containerHorizontal} activeOpacity={0.7}>
+            <Ionicons name={liked ? "heart" : "heart-outline"} size={iconSize} color={liked? "red" : "gray"}/>
+            <Text style={[styles.likeCount, {fontSize: textSize}]}>{likeCount}</Text>
         </TouchableOpacity>
     )
 }

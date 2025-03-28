@@ -1,5 +1,5 @@
 import React from "react";
-import { Ionicons, MaterialCommunityIcons, MaterialIcons, Feather, Octicons, FontAwesome } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons, AntDesign, Feather, Octicons, FontAwesome, EvilIcons } from "@expo/vector-icons";
 
 export const Icons = {
     edit: (props: any) => <Ionicons name="pencil" size={24} {...props} />,
@@ -13,8 +13,9 @@ export const Icons = {
     logout: (props: any) => <Ionicons name="exit-outline" size={24} color="black" {...props} />,
     send: (props: any) => <MaterialCommunityIcons name="send" size={24} {...props} />,
     write: (props: any) => <Feather name="edit" size={24} color="white" {...props} />,
-    heartFill: (props: any) => <FontAwesome name="heart" size={24} color="black" />,
-    heartBlank: (props: any) => <FontAwesome name="heart-o" size={24} color="black" />,
+    heartFill: (props: any) => <AntDesign name="heart" size={20} color="red" />,
+    heartBlank: (props: any) => <AntDesign name="hearto" size={20} color="gray" />,
+    comment: (props: any) => <EvilIcons name="comment" size={32} color="gray" />,
     leftOptionEmoji: "🙆‍♂️",
     rightOptionEmoji: "🙅",
 };

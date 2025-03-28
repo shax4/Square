@@ -34,11 +34,9 @@ function ProfileBox({
 
 export const styles = StyleSheet.create({
     Container: {
-        flex: 1,
         flexDirection: 'row'
     },
     UserInfoView: {
-        flex: 1,
     },
     UserNameAndTagView: {
         flexDirection: 'row',

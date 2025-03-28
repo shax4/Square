@@ -5,11 +5,16 @@ export const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
     },
+    containerHorizontal: {
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: 'row',
+        marginLeft: 10,
+    },
     icon: {
         marginBottom: 4,
     },
     likeCount: {
-        fontSize: 14,
         fontWeight: "bold",
         color: "gray",
     },
