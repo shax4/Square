@@ -1,0 +1,24 @@
+package org.shax3.square.domain.post.dto.request;
+
+import jakarta.validation.constraints.NotBlank;
+import org.shax3.square.domain.post.model.Post;
+import org.shax3.square.domain.user.model.User;
+
+import java.util.List;
+
+public record UpdatePostRequest(
+        @NotBlank
+        String title,
+        @NotBlank
+        String content,
+        List<String> deletedImages,
+        List<String> addedImages
+) {
+    public Post to(User user) {
+        return Post.builder()
+                .title(this.title)
+                .content(this.content)
+                .user(user)
+                .build();
+    }
+}

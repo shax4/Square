@@ -1,5 +1,6 @@
 package org.shax3.square.domain.post.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
@@ -7,14 +8,19 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.SQLRestriction;
 import org.shax3.square.domain.user.model.Type;
 import org.shax3.square.domain.user.model.User;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -55,6 +61,10 @@ public class Post {
     @Column(nullable = false)
     private int referenceCount;
 
+    @Setter
+    @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    private List<PostImage> postImages = new ArrayList<>();
+
     @Builder
     public Post(String title, String content, User user) {
         this.title = title;
@@ -64,5 +74,21 @@ public class Post {
         this.valid = true;
         this.likeCount = 0;
         this.referenceCount = 0;
+    }
+
+    public void updatePost(String title, String content) {
+        this.title = title;
+        this.content = content;
+
+    }
+
+    public void addPostImage(PostImage postImage) {
+        postImages.add(postImage);
+        postImage.setPost(this);
+    }
+
+    public void removePostImage(PostImage postImage) {
+        postImages.remove(postImage);
+        postImage.setPost(null);
     }
 }
