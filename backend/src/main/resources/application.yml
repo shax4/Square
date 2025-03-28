@@ -70,10 +70,10 @@ batch-redis:
 springdoc:
   api-docs:
     enabled: true
-    path: /api-docs
+#    path: /api-docs
 
   swagger-ui:
-    url: /api-docs
+#    url: /api-docs
     display-request-duration: true
     filter: true
     doc-expansion: none
