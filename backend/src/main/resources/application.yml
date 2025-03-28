@@ -69,7 +69,6 @@ batch-redis:
 springdoc:
   api-docs:
     enabled: true
-    path: /api-docs
 
   swagger-ui:
     display-request-duration: true
