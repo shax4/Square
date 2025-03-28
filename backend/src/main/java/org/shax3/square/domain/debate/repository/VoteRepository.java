@@ -14,4 +14,5 @@ public interface VoteRepository extends JpaRepository<Vote, Long>, VoteRepositor
     int countByDebate(Debate debate);
     int countByDebateAndLeftTrue(Debate debate);
     Optional<Vote> findByDebateAndUser(Debate debate, User user);
+    List<Vote> findByDebate(Debate debate);
 }
