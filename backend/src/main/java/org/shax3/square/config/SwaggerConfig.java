@@ -30,6 +30,7 @@ public class SwaggerConfig {
                 .in(SecurityScheme.In.COOKIE);
 
         return new OpenAPI()
+            .addServersItem(new Server().url("https://j12a307.p.ssafy.io"))
             .components(new Components()
                     .addSecuritySchemes(JWT_SCHEME_NAME, jwtSecurityScheme)
                     .addSecuritySchemes(COOKIE_SCHEME_NAME, cookieSecurityScheme))
