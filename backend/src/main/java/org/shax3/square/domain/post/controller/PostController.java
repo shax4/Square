@@ -27,7 +27,7 @@ public class PostController {
             description = "게시글 제목, 내용, 이미지(선택)를 넣어주면 게시글을 생성해줍니다."
     )
     @PostMapping
-    public ResponseEntity<Void> reissueToken(
+    public ResponseEntity<Void> createPost(
             @AuthUser User user,
             @Valid @RequestBody CreatePostRequest createPostRequest
     ) {
