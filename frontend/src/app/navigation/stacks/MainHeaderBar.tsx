@@ -25,7 +25,7 @@ const debate = {
 
 // 테스트용 논쟁 의견 작성자자 정보(api에서 받아오도록 수정 필요)
 const opinion = {
-    nickname: '반짝이는하마1',
+    nickname: '반짝이는하마',
 }
 
 // 토론카드 홈 상단 탭
