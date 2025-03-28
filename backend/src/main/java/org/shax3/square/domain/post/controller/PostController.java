@@ -42,7 +42,7 @@ public class PostController {
 
     @Operation(
             summary = "게시글 수정 api",
-            description = "게시글 제목, 내용, 이미지(선택)를 넣어주면 게시글을 수정합니다."
+            description = "게시글 제목, 내용, 삭제 이미지, 추가 이미지 리스트를 넣어주면 게시글을 수정합니다."
     )
     @PutMapping("/{postId}")
     public ResponseEntity<Void> updatePost(
