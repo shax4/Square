@@ -13,6 +13,7 @@ export const Icons = {
     logout: (props: any) => <Ionicons name="exit-outline" size={24} color="black" {...props} />,
     send: (props: any) => <MaterialCommunityIcons name="send" size={24} {...props} />,
     write: (props: any) => <Feather name="edit" size={24} color="white" {...props} />,
+    back: (props: any) => <Ionicons name="chevron-back" size={24} color="black" {...props} />,
     heartFill: (props: any) => <AntDesign name="heart" size={20} color="red" />,
     heartBlank: (props: any) => <AntDesign name="hearto" size={20} color="gray" />,
     comment: (props: any) => <EvilIcons name="comment" size={32} color="gray" />,

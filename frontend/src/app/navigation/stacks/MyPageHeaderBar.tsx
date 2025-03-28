@@ -12,18 +12,11 @@ import NevTestPage2 from '../../../pages/StackSampleScreen/NevTestPage2';
 import PersonalitySurveyPage from '../../../pages/PersonalitySurveyPage/PersonalitySurveyPage';
 import PersonalityResultScreen from '../../../pages/PersonalityResultScreen/PersonalityResultScreen';
 import ProfileUpdateScreen from '../../../pages/ProfileUpdateScreen/ProfileUpdateScreen';
-import DeleteAccountScreen from '../../../pages/DeleteAccountScreen/DeleteAccountScreen'
+import DeleteAccountScreen from '../../../pages/DeleteAccountScreen/DeleteAccountScreen';
+import UseAuthTestScreen from '../../../pages/UseAuthTestScreen/UseAuthTestScreen';
 
 // 스택 네비게이터
 const Stack = createNativeStackNavigator();
-
-// 이동할 페이지 스택 타입
-type StackParamList = {
-    MypageScreen: undefined;
-    NevTestPage2: undefined;
-    PersonalitySurveyPage: undefined;
-    PersonalityResultScreen: undefined;
-};
 
 // 마이 페이지 상단 탭
 export default function HeaderBar() {
@@ -87,6 +80,14 @@ export default function HeaderBar() {
             <Stack.Screen
                 name="DeleteAccountScreen"
                 component={DeleteAccountScreen}
+                options={{
+                    title: '탈퇴하기',
+                    headerBackButtonDisplayMode: 'minimal',
+                }}
+            />
+            <Stack.Screen
+                name="UseAuthTestScreen"
+                component={UseAuthTestScreen}
                 options={{
                     title: '탈퇴하기',
                     headerBackButtonDisplayMode: 'minimal',
