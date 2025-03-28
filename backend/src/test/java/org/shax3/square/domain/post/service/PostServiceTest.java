@@ -8,7 +8,6 @@ import org.shax3.square.domain.post.dto.request.CreatePostRequest;
 import org.shax3.square.domain.post.dto.request.UpdatePostRequest;
 import org.shax3.square.domain.post.model.Post;
 import org.shax3.square.domain.post.model.PostImage;
-import org.shax3.square.domain.post.repository.PostImageRepository;
 import org.shax3.square.domain.post.repository.PostRepository;
 import org.shax3.square.domain.s3.service.S3Service;
 import org.shax3.square.domain.user.model.User;
@@ -34,9 +33,6 @@ public class PostServiceTest {
     private PostRepository postRepository;
 
     @Mock
-    private PostImageRepository postImageRepository;
-
-    @Mock
     private S3Service s3Service;
 
     @InjectMocks
@@ -48,7 +44,7 @@ public class PostServiceTest {
     @BeforeEach
     void setUp() {
         user = User.builder().build();
-        dummyPost = Post.builder().build();
+        dummyPost = spy(Post.builder().build());
     }
 
     @Test
@@ -63,7 +59,7 @@ public class PostServiceTest {
         postService.createPost(request, user);
 
         // then
-        verify(postImageRepository, never()).saveAll(any());
+        verify(dummyPost, never()).addPostImage(any(PostImage.class));
         verify(postRepository).save(dummyPost);
     }
 
@@ -87,6 +83,7 @@ public class PostServiceTest {
             assertThat(pi.getPost()).isEqualTo(dummyPost);
         }
         verify(postRepository).save(dummyPost);
+        verify(dummyPost, never()).addPostImage(any(PostImage.class));
     }
 
     @Test
@@ -106,7 +103,7 @@ public class PostServiceTest {
                     assertThat(customEx.getCode()).isEqualTo(POST_IMAGE_LIMIT.getCode());
                 });
 
-        verify(postImageRepository, never()).saveAll(any());
+        verify(dummyPost, never()).addPostImage(any(PostImage.class));
     }
 
     @Test
@@ -158,7 +155,6 @@ public class PostServiceTest {
         post.setPostImages(new ArrayList<>(Arrays.asList(image1, image2)));
 
         when(postRepository.findById(postId)).thenReturn(Optional.of(post));
-        when(postImageRepository.countPostImagesByPost(post)).thenReturn(2);
         when(user.getId()).thenReturn(1L);
 
         UpdatePostRequest updateRequest = mock(UpdatePostRequest.class);
@@ -189,7 +185,6 @@ public class PostServiceTest {
 
         when(user.getId()).thenReturn(1L);
         when(postRepository.findById(postId)).thenReturn(Optional.of(post));
-        when(postImageRepository.countPostImagesByPost(post)).thenReturn(2);
 
         UpdatePostRequest updateRequest = mock(UpdatePostRequest.class);
         when(updateRequest.deletedImages()).thenReturn(Arrays.asList());

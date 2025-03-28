@@ -6,7 +6,6 @@ import org.shax3.square.domain.post.dto.request.CreatePostRequest;
 import org.shax3.square.domain.post.dto.request.UpdatePostRequest;
 import org.shax3.square.domain.post.model.Post;
 import org.shax3.square.domain.post.model.PostImage;
-import org.shax3.square.domain.post.repository.PostImageRepository;
 import org.shax3.square.domain.post.repository.PostRepository;
 import org.shax3.square.domain.s3.service.S3Service;
 import org.shax3.square.domain.user.model.User;
@@ -26,7 +25,6 @@ import static org.shax3.square.exception.ExceptionCode.*;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final PostImageRepository postImageRepository;
     private final S3Service s3Service;
 
     @Transactional
@@ -66,7 +64,7 @@ public class PostService {
 
         verifyAuthor(user, post);
 
-        int currentCount  = postImageRepository.countPostImagesByPost(post);
+        int currentCount  = post.getPostImages().size();
         int newCount = currentCount - updatePostRequest.deletedImages().size() + updatePostRequest.addedImages().size();
         if (newCount > 3) {
             throw new CustomException(POST_IMAGE_LIMIT);
