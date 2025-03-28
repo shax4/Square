@@ -63,6 +63,12 @@ const MypageScreen = () => {
               variant="secondary"
               style={styles.actionButton}
             />
+            <MypageButton
+              title="API 테스트"
+              onPress={() => navigation.navigate('SignupTestScreen')}
+              variant="secondary"
+              style={styles.actionButton}
+            />
           </View>
         </View>
 
