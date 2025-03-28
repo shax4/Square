@@ -6,10 +6,12 @@ import NevTestPage3 from '../../../pages/StackSampleScreen/NevTestPage3';
 
 import DebateCardsScreen from '../../../pages/DebateCardsScreen/DebateCardsScreen';
 import OpinionListScreen from '../../../pages/OpinionListScreen/OpinionListScreen';
+import ProposalListScreen from '../../../pages/ProposalListScreen/ProposalListScreen';
+import ProposalCreateScreen from '../../../pages/ProposalCreateScreen/ProposalCreateScreen';
 
 import { StackParamList } from '../../../shared/page-stack/DebatePageStack';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
+import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
 const Stack = createNativeStackNavigator<StackParamList>();
 
 // 테스트용 예시 사용자 정보(전역 상태관리로 받아오도록 수정 필요)
@@ -38,16 +40,9 @@ export default function HeaderBar() {
                 options={{
                     title: '오늘의 주제',
                     headerBackButtonDisplayMode: 'minimal',
-                    headerRight: () => {
-                        return (
-                            <View style={styles.headerRightItems}>
-                                <TouchableOpacity onPress={() => console.log("주제 청원으로 이동 메서드")}>
-                                    <Icons.add />
-                                </TouchableOpacity>
-                            </View>
+                    //headerRight: () => DebateCardsScreenHeaderRightIcons() // 일반 함수 형태: Hook 사용 불가
+                    headerRight: () => <DebateCardsScreenHeaderRightIcons /> // React 컴포넌트 JSX 형태: Hook 사용 가능
 
-                        )
-                    }
                 }}
             />
             {/* 토론 카드 상세(의견 목록) */}
@@ -80,7 +75,30 @@ export default function HeaderBar() {
                     return {
                         title: '의견 상세',
                         headerBackButtonDisplayMode: 'minimal',
-                        headerRight: () => <HeaderRightIcons isAuthor={isAuthor} />,
+                        headerRight: () => <OpinionDetailScreenHeaderRightIcons isAuthor={isAuthor} />,
+                    };
+                }}
+            />
+
+            {/* 청원 리스트 */}
+            <Stack.Screen
+                name="ProposalListScreen"
+                component={ProposalListScreen}
+                options={() => {
+                    return {
+                        title: '새로운 주제 신청 리스트',
+                        headerBackButtonDisplayMode: 'minimal',
+                    };
+                }}
+            />
+            {/* 청원 작성성 */}
+            <Stack.Screen
+                name="ProposalCreateScreen"
+                component={ProposalCreateScreen}
+                options={() => {
+                    return {
+                        title: '새로운 주제 작성하기',
+                        headerBackButtonDisplayMode: 'minimal',
                     };
                 }}
             />
@@ -88,8 +106,20 @@ export default function HeaderBar() {
     );
 }
 
+
+function DebateCardsScreenHeaderRightIcons() {
+    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
+    return (
+        <View style={styles.headerRightItems}>
+            <TouchableOpacity onPress={() => { navigation.navigate('ProposalListScreen') }}>
+                <Icons.add />
+            </TouchableOpacity>
+        </View>
+    )
+}
+
 // 상단 바 우측 아이콘 컴포넌트: 현재 사용자와 글 작성자 여부 확인
-function HeaderRightIcons({ isAuthor }: { isAuthor: boolean }) {
+function OpinionDetailScreenHeaderRightIcons({ isAuthor }: { isAuthor: boolean }) {
     return (
         <View style={styles.headerRightItems}>
             {isAuthor ? (

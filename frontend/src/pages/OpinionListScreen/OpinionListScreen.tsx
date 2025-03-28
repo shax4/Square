@@ -103,7 +103,7 @@ export default function OpinionListScreen() {
                     <AfterVoteButtonView
                         debate={debate}
                         onSelectLeft={() => { console.log("left Voted") }}
-                        onSelectRight={() => { console.log("left Voted") }}
+                        onSelectRight={() => { console.log("right Voted") }}
                     />
                     :
                     <BeforeVoteButtonView

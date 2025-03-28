@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,11 +9,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { StackScreenProps } from "@react-navigation/stack";
 import { BoardAPI } from "./Api/boardApi";
 import ProfileImage from "../../components/ProfileImage/ProfileImage";
 import CommentItem from "./components/CommentItem";
+import { useFocusEffect } from "@react-navigation/native";
 
 // 네비게이션 파라미터 타입 정의
 type BoardStackParamList = {
@@ -74,6 +76,18 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
   const [commentText, setCommentText] = useState("");
   // 로딩 상태를 관리하는 상태
   const [loading, setLoading] = useState(true);
+  // 강제 리렌더링을 위한 카운터 상태
+  const [RenderCounter, setRenderCounter] = useState(0);
+
+  // 화면에 포커스가 올 때마다 데이터 갱신
+  useFocusEffect(
+    useCallback(() => {
+      fetchPostDetail();
+      return () => {
+        // 화면을 떠날 때 정리 작업 (필요한 경우)
+      };
+    }, [boardId])
+  );
 
   // 컴포넌트가 마운트될 때 게시글 데이터를 가져옴
   useEffect(() => {
@@ -83,8 +97,15 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
   // 게시글 상세 정보를 가져오는 함수
   const fetchPostDetail = async () => {
     try {
+      setLoading(true);
+
       const response = await BoardAPI.getPostDetail(boardId);
-      setPost(response.data);
+
+      // 상태 업데이트를 강제로 새 객체로 설정
+      setPost({ ...response.data });
+
+      // 강제 리렌더링을 위한 카운터 상태 추가
+      setRenderCounter((prev) => prev + 1);
     } catch (error) {
       console.error("게시글 상세 정보를 불러오는 데 실패했습니다:", error);
     } finally {
@@ -147,7 +168,9 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
             <CommentItem
               key={comment.commentId}
               comment={comment}
-              onDelete={fetchPostDetail} // 댓글 삭제 후 게시글 데이터 다시 가져오기
+              onDelete={() => {
+                fetchPostDetail();
+              }} // 댓글 삭제 후 게시글 데이터를 다시 불러옴
             />
           ))}
         </View>
