@@ -15,6 +15,7 @@ const colors = {
     cancelButton: '#ccc',
     hashtag: '#e1e1e1',
     proposalBox: '#F7F7F8',
+    grayText: 'gray',
 }
 
 export default colors;

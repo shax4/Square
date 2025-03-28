@@ -1,6 +1,6 @@
-import { DebateProps } from "./DebateData.types";
+import { Debate } from "./Debate.types";
 
-export const debateData: DebateProps[] = [
+export const debateData: Debate[] = [
     {
         debateId: 0,
         category: "테스트",

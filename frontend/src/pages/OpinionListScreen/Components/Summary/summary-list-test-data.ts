@@ -1,4 +1,4 @@
-import { SummariesResponse } from "./SummariesResponseProps";
+import { SummariesResponse } from "./SummariesResponse.types";
 import { debateData } from '../../../DebateCardsScreen/DebateCard';
 
 export const SummariesResponse1: SummariesResponse = {

@@ -1,4 +1,4 @@
-export interface DebateProps {
+export interface Debate {
     debateId: number;
     category: string;
     topic: string;

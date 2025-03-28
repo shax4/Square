@@ -1,13 +1,13 @@
-import { DebateProps } from "../../pages/DebateCardsScreen/DebateCard";
+import { Debate } from "../../pages/DebateCardsScreen/DebateCard";
 
 export type AfterVoteButtonViewProps = {
-    debate: DebateProps;
+    debate: Debate;
     onSelectLeft: () => void;
     onSelectRight: () => void;
 };
 
 export type BeforeVoteButtonViewProps = {
-    debate: DebateProps;
+    debate: Debate;
     onSelectLeft: () => void;
     onSelectRight: () => void;
 };

@@ -1,8 +1,8 @@
-import { Opinion } from "./OpinionProps";
-import { DebateProps } from "../../../DebateCardsScreen/DebateCard";
+import { Opinion } from "./Opinion.types";
+import { Debate } from "../../../DebateCardsScreen/DebateCard";
 
 export interface OpinionsResponse {
-    debate: DebateProps;
+    debate: Debate;
     opinions: Opinion[];
 
     nextLeftCursorId: number | null;
