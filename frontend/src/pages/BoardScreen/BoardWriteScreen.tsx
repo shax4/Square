@@ -12,13 +12,8 @@ import {
 } from "react-native";
 import { BoardAPI } from "./Api/boardApi";
 import { StackScreenProps } from "@react-navigation/stack";
-
-// 네비게이션 파라미터 타입 정의
-type BoardStackParamList = {
-  BoardList: { refresh?: boolean }; // 목록 화면에서 새로고침 여부를 위한 refresh 추가
-  BoardDetail: { boardId: number; refresh?: boolean }; // 상세 회면에서 새로고침 여부를 위한 refresh 추가
-  BoardWrite: { postId?: number }; // postId는 선택적 파라미터
-};
+import { useConfirmModal } from "./hooks/useConfirmModal";
+import { BoardStackParamList } from "../../shared/page-stack/BoardPageStack";
 
 // props 타입 정의
 type Props = StackScreenProps<BoardStackParamList, "BoardWrite">;
@@ -34,6 +29,8 @@ export default function BoardWriteScreen({ route, navigation }: Props) {
   const [content, setContent] = useState("");
   // 로딩 상태 관리
   const [loading, setLoading] = useState(false);
+  // 취소 모달 커스텀 훅
+  const { showCancelConfirmation } = useConfirmModal({navigation, isEditMode, postId});
 
   // 수정 모드일 때 기존 데이터 로드
   useEffect(() => {
@@ -117,6 +114,11 @@ export default function BoardWriteScreen({ route, navigation }: Props) {
     }
   };
 
+  // 취소 버튼에 모달 로직 연결
+  const handleCancel = () => {
+    showCancelConfirmation()
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -154,7 +156,7 @@ export default function BoardWriteScreen({ route, navigation }: Props) {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.button, styles.cancelButton]}
-          onPress={() => navigation.goBack()}
+          onPress={handleCancel}
           disabled={loading}
         >
           <Text style={styles.cancelButtonText}>취소</Text>
