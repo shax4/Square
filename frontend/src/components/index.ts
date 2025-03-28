@@ -15,3 +15,6 @@ export {default as TextField} from "./TextField";
 
 // 체크 박스 컴포넌트.
 export {default as Checkbox} from "./Checkbox";
+
+// 카운터 컴포넌트.
+export {default as Counter} from "./Counter";
