@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static org.shax3.square.exception.ExceptionCode.*;
@@ -134,8 +135,7 @@ public class UserService {
         return ProfileUrlResponse.from(profileUrl);
     }
 
-    public User findById(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+    public List<User> findAllById(List<Long> userIds) {
+        return userRepository.findAllById(userIds);
     }
 }

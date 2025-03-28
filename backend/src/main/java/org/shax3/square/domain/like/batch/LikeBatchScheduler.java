@@ -29,6 +29,7 @@ public class LikeBatchScheduler {
 
 		if (entries == null || entries.isEmpty()) return;
 
+		// String -> POST:1, List<Long> -> [101, 102], ex) POST:1:[101, 102])
 		Map<String, List<Long>> grouped = new HashMap<>();
 
 		for (Object entryObj : entries) {

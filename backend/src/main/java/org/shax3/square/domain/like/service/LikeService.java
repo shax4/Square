@@ -69,7 +69,7 @@ public class LikeService {
 		String key = "like:batch";
 		String value = targetType.name() + ":" + targetId + ":" + user.getId();
 
-		Boolean isMember = batchRedisTemplate.opsForSet().isMember(key, value);
+		Boolean isMember = batchRedisTemplate.opsForSet().isMember(key, value); // Redis에 존재하는지 확인
 		if (Boolean.TRUE.equals(isMember)) {
 			batchRedisTemplate.opsForSet().remove(key, value);
 		} else {
@@ -77,10 +77,16 @@ public class LikeService {
 		}
 	}
 
+	/**
+	 * Redis에 저장된 좋아요를 DB에 저장
+	 * @param userIds
+	 * @param targetType
+	 * @param targetId
+	 */
 	@Transactional
 	public void persistLikes(List<Long> userIds, TargetType targetType, Long targetId) {
 
-		List<User> users = userService.findAllByIds(userIds);
+		List<User> users = userService.findAllById(userIds);
 		List<Like> existsLikes = likeRepository.findByTargetIdAndTargetTypeAndUserIn(targetId, targetType, users);
 
 		Set<Long> existsUserIds = existsLikes.stream()
