@@ -15,6 +15,7 @@ export const Icons = {
     write: (props: any) => <Feather name="edit" size={24} color="white" {...props} />,
     heartFill: (props: any) => <FontAwesome name="heart" size={24} color="black" />,
     heartBlank: (props: any) => <FontAwesome name="heart-o" size={24} color="black" />,
+    back: (props: any) => <Ionicons name="chevron-back" size={24} color="black" {...props} />,
     leftOptionEmoji: "🙆‍♂️",
     rightOptionEmoji: "🙅",
 };

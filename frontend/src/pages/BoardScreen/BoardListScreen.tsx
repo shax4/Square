@@ -17,6 +17,7 @@ import { BoardAPI } from "../BoardScreen/Api/boardApi"; // 게시판 API 호출
 import BoardItem from "./components/BoardItem"; // 개별 게시글 항목을 표시하는 컴포넌트
 import EmptyBoardList from "./components/EmptyBoardList"; // 게시글이 없을 때 표시하는 컴포넌트
 import { Icons } from "../../../assets/icons/Icons";
+import { BoardStackParamList } from "../../shared/page-stack/BoardPageStack";
 
 // 인기 게시글 인터페이스
 interface PopularPost {
@@ -47,13 +48,6 @@ interface PostsResponse {
   nextCursorId: number | null;
   nextCursorLikes: number | null;
 }
-
-// 네비게이션 파라미터 타입 정의
-type BoardStackParamList = {
-  BoardList: { refresh?: boolean }; // 목록 확인 시에는 필요 파라미터 없음
-  BoardDetail: { boardId: number; refresh?: boolean }; // 게시글 상세 정보 확인 시에는 boardId 참조
-  BoardWrite: { postId?: number }; // 게시글 수정 시에는 postId 참조 (작성 시에는 postId 없으므로 ? 기호로 선택적 파라미터임을 표시)
-};
 
 // 네비게이션 프롭 타입 정의
 type BoardListScreenNavigationProp = StackNavigationProp<
