@@ -47,14 +47,6 @@ http {
             proxy_set_header X-Forwarded-Proto $scheme;
         }
 
-        # Swagger UI 접근 허용
-        location /api/swagger-ui/ {
-            proxy_pass http://backend:8080/api/swagger-ui/;
-        }
-
-        location /api/v3/api-docs/ {
-            proxy_pass http://backend:8080/api/v3/api-docs/;
-        }
 
     }
 }
