@@ -46,7 +46,7 @@ public class ScrapFacadeService {
     }
 
     public List<Long> getScrapIds(User user, TargetType targetType) {
-        return scrapService.getScrap(user, targetType);
+        return scrapService.getScrapIds(user, targetType);
     }
 
 }

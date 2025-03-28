@@ -12,8 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.shax3.square.common.model.TargetType.DEBATE;
-import static org.shax3.square.common.model.TargetType.POST;
 import static org.shax3.square.exception.ExceptionCode.SCRAP_ALREADY_EXISTS;
 
 @Service
@@ -41,15 +39,7 @@ public class ScrapService {
         scrapRepository.deleteByUserAndTargetIdAndTargetType(user, targetId, targetType);
     }
 
-    public List<Long> getDebateScrap(User user) {
-        return getScrap(user, DEBATE);
-    }
-
-    public List<Long> getPostScrap(User user) {
-        return getScrap(user, POST);
-    }
-
-    public List<Long> getScrap(User user, TargetType targetType) {
+    public List<Long> getScrapIds(User user, TargetType targetType) {
         List<Scrap> scraps = scrapRepository.findByUserAndTargetType(user, targetType);
         return scraps
                 .stream()
