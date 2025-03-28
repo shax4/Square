@@ -81,9 +81,9 @@ public class VoteService {
 
         boolean hasNext = scraps.size() > limit;
         List<Scrap> pageScraps = hasNext ? scraps.subList(0, limit) : scraps;
-
         List<DebateDto> debates = pageScraps.stream()
                 .map(scrap -> {
+                    //TODO debateService 대신 Redis에서 가져오는걸로 변경
                     Debate debate = debateService.findDebateById(scrap.getTargetId());
                     VoteResponse voteResponse = calculateVoteResult(debate);
                     Optional<Vote> userVote = voteRepository.findByDebateAndUser(debate,user);
