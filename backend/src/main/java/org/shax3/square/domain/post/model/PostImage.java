@@ -32,7 +32,7 @@ public class PostImage {
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String s3Key;
 
     @Builder

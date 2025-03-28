@@ -38,6 +38,7 @@ public enum ExceptionCode {
 	COMMENT_NOT_FOUND(4005, "댓글을 찾을 수 없습니다."),
 	POST_IMAGE_LIMIT(4006, "하나의 게시글에는 최대 3개의 이미지를 업로드할 수 있습니다."),
 	IMAGE_NOT_FOUND(4007, "이미지 삭제가 정상적으로 처리되지 않았습니다."),
+	DUPLICATE_IMAGE(4008, "같은 s3Key는 업로드할 수 없습니다"),
 
 	PROPOSAL_NOT_FOUND(5004, "청원을 찾을 수 없습니다."),
 

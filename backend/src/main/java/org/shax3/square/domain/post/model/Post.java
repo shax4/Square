@@ -91,4 +91,8 @@ public class Post {
         postImages.remove(postImage);
         postImage.setPost(null);
     }
+
+    public void softDelete() {
+        valid = false;
+    }
 }

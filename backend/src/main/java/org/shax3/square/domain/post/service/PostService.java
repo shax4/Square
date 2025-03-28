@@ -11,6 +11,7 @@ import org.shax3.square.domain.post.repository.PostRepository;
 import org.shax3.square.domain.s3.service.S3Service;
 import org.shax3.square.domain.user.model.User;
 import org.shax3.square.exception.CustomException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +44,12 @@ public class PostService {
                     .toList();
             post.setPostImages(postImages);
         }
-        postRepository.save(post);
+
+        try {
+            postRepository.save(post);
+        } catch (DataIntegrityViolationException e) {
+            throw new CustomException(DUPLICATE_IMAGE);
+        }
     }
 
     private void checkSize(List<String> postImages) {
@@ -87,5 +93,19 @@ public class PostService {
         if (!Objects.equals(post.getUser().getId(), user.getId())) {
             throw new CustomException(NOT_AUTHOR);
         }
+    }
+
+    @Transactional
+    public void deletePost(User user, Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
+
+        verifyAuthor(user, post);
+
+        for (PostImage image : post.getPostImages()) {
+            s3Service.deleteImage(image.getS3Key());
+            post.removePostImage(image);
+        }
+        post.softDelete();
     }
 }
