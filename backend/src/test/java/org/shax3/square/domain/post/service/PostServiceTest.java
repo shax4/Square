@@ -67,7 +67,7 @@ public class PostServiceTest {
     @DisplayName("유효한 이미지 정보가 있는 경우: 올바른 PostImage 목록이 설정되고 postRepository.save()가 호출되어야 함")
     void createPostWithValidImages_shouldSavePostWithPostImages() {
         // given
-        List<String> s3Keys = Arrays.asList("s3Key1", "s3Key2");
+        List<String> s3Keys = Arrays.asList("post/s3Key1", "post/s3Key2");
         CreatePostRequest request = mock(CreatePostRequest.class);
         when(request.to(user)).thenReturn(dummyPost);
         when(request.postImages()).thenReturn(s3Keys);
@@ -90,7 +90,7 @@ public class PostServiceTest {
     @DisplayName("이미지 정보가 3개 초과인 경우: CustomException 발생 및 저장 메서드 호출 없음")
     void createPostWithTooManyImages_shouldThrowCustomException() {
         // given
-        List<String> s3Keys = Arrays.asList("s3Key1", "s3Key2", "s3Key3", "s3Key4");
+        List<String> s3Keys = Arrays.asList("post/s3Key1", "post/s3Key2", "post/s3Key3", "post/s3Key4");
         CreatePostRequest request = mock(CreatePostRequest.class);
         when(request.to(user)).thenReturn(dummyPost);
         when(request.postImages()).thenReturn(s3Keys);
@@ -150,16 +150,16 @@ public class PostServiceTest {
         Long postId = 1L;
         User user = spy(User.builder().build());
         Post post = spy(Post.builder().user(user).build());
-        PostImage image1 = PostImage.builder().s3Key("s3Key1").build();
-        PostImage image2 = PostImage.builder().s3Key("s3Key2").build();
+        PostImage image1 = PostImage.builder().s3Key("post/s3Key1").build();
+        PostImage image2 = PostImage.builder().s3Key("post/s3Key2").build();
         post.setPostImages(new ArrayList<>(Arrays.asList(image1, image2)));
 
         when(postRepository.findById(postId)).thenReturn(Optional.of(post));
         when(user.getId()).thenReturn(1L);
 
         UpdatePostRequest updateRequest = mock(UpdatePostRequest.class);
-        when(updateRequest.deletedImages()).thenReturn(Arrays.asList("s3Key1"));
-        when(updateRequest.addedImages()).thenReturn(Arrays.asList("s3Key3"));
+        when(updateRequest.deletedImages()).thenReturn(Arrays.asList("post/s3Key1"));
+        when(updateRequest.addedImages()).thenReturn(Arrays.asList("post/s3Key3"));
         when(updateRequest.title()).thenReturn("Updated Title");
         when(updateRequest.content()).thenReturn("Updated Content");
 
@@ -168,9 +168,9 @@ public class PostServiceTest {
 
         // then
         verify(post).updatePost("Updated Title", "Updated Content");
-        verify(post).removePostImage(argThat(img -> "s3Key1".equals(img.getS3Key())));
-        verify(s3Service).deleteImage("s3Key1");
-        verify(post).addPostImage(argThat(img -> "s3Key3".equals(img.getS3Key())));
+        verify(post).removePostImage(argThat(img -> "post/s3Key1".equals(img.getS3Key())));
+        verify(s3Service).deleteImage("post/s3Key1");
+        verify(post).addPostImage(argThat(img -> "post/s3Key3".equals(img.getS3Key())));
     }
 
     @Test

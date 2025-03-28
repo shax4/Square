@@ -36,10 +36,13 @@ public class PostService {
         if (s3Keys != null) {
             checkSize(s3Keys);
             List<PostImage> postImages = createPostRequest.postImages().stream()
-                    .map(s3Key -> PostImage.builder()
-                            .post(post)
-                            .s3Key(s3Key)
-                            .build())
+                    .map(s3Key -> {
+                        checkValidImage(s3Key);
+                        return PostImage.builder()
+                                .post(post)
+                                .s3Key(s3Key)
+                                .build();
+                    })
                     .toList();
             post.setPostImages(postImages);
         }
@@ -76,11 +79,14 @@ public class PostService {
                 .filter(image -> updatePostRequest.deletedImages().contains(image.getS3Key()))
                 .toList();
         for (PostImage image : imagesToRemove) {
-            post.removePostImage(image);
+            if (!post.removePostImage(image)) {
+                throw new CustomException(IMAGE_NOT_FOUND);
+            }
             s3Service.deleteImage(image.getS3Key());
         }
 
         updatePostRequest.addedImages().forEach(s3Key -> {
+            checkValidImage(s3Key);
             PostImage newImage = PostImage.builder()
                     .s3Key(s3Key)
                     .build();
@@ -94,6 +100,12 @@ public class PostService {
         }
     }
 
+    private void checkValidImage(String s3Key) {
+        if (!s3Key.startsWith("post/")) {
+            throw new CustomException(INVALID_S3_KEY);
+        }
+    }
+
     @Transactional
     public void deletePost(User user, Long postId) {
         Post post = postRepository.findById(postId)
@@ -102,9 +114,17 @@ public class PostService {
         verifyAuthor(user, post);
 
         for (PostImage image : new ArrayList<>(post.getPostImages())) {
+            if (!post.removePostImage(image)) {
+                throw new CustomException(IMAGE_NOT_FOUND);
+            }
             s3Service.deleteImage(image.getS3Key());
-            post.removePostImage(image);
         }
         post.softDelete();
+    }
+
+    public void validatePostExists(Long id) {
+        if (!postRepository.existsById(id)) {
+            throw new CustomException(POST_NOT_FOUND);
+        }
     }
 }

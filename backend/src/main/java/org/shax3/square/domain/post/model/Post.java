@@ -87,9 +87,9 @@ public class Post {
         postImage.setPost(this);
     }
 
-    public void removePostImage(PostImage postImage) {
-        postImages.remove(postImage);
+    public boolean removePostImage(PostImage postImage) {
         postImage.setPost(null);
+        return postImages.remove(postImage);
     }
 
     public void softDelete() {
