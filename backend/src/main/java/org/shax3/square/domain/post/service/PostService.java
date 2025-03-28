@@ -15,6 +15,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -102,7 +103,7 @@ public class PostService {
 
         verifyAuthor(user, post);
 
-        for (PostImage image : post.getPostImages()) {
+        for (PostImage image : new ArrayList<>(post.getPostImages())) {
             s3Service.deleteImage(image.getS3Key());
             post.removePostImage(image);
         }
