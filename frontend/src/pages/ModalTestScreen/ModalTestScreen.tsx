@@ -94,28 +94,6 @@ export default function ModalTestScreen() {
           const showMoreOpinions = () => {
             console.log('의견 더 보기를 클릭했습니다!')
           }
-    
-    function formatBubbleData(data: {value: number; label: string}[]){
-      if(data.length <= 3) return data;
-
-      const topThree = data.slice(0, 3);
-      const otherTotal = data.slice(3).reduce((sum, item) => sum + item.value, 0);
-
-      return [...topThree, {value: otherTotal, label: "기타"}];
-    }
-
-    const formattedResultData = {
-      leftResult: {
-        ...resultData.leftResult,
-        type: formatBubbleData(resultData.leftResult.type),
-        region: formatBubbleData(resultData.leftResult.region),
-      },
-      rightResult: {
-        ...resultData.rightResult,
-        type: formatBubbleData(resultData.rightResult.type),
-        region: formatBubbleData(resultData.rightResult.region),
-      },
-    };
 
     return (
         <View style={styles.container}>
@@ -127,7 +105,7 @@ export default function ModalTestScreen() {
                 <Text style={styles.buttonText}>결과 리포트 보기</Text>
                 </TouchableOpacity>
 
-                <DebateResultModal visible={isModalVisible} onClose={() => setIsModalVisible(false)} onPressMoreOpinion={showMoreOpinions} data={formattedResultData} leftOption={'있다!'} rightOption={'없다!'}/>
+                <DebateResultModal visible={isModalVisible} onClose={() => setIsModalVisible(false)} onPressMoreOpinion={showMoreOpinions} data={resultData} leftOption={'있다!'} rightOption={'없다!'}/>
             </View>
         </View>
     )

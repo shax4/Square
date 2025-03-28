@@ -19,14 +19,25 @@ const BubbleChart: React.FC<BubbleChartProps> = ({
 }) => {
   const [bubbles, setBubbles] = useState<Bubble[]>([])
 
+  function formatBubbleData(data: {value: number; label: string}[]){
+    if(data.length <= 3) return data;
+
+    const topThree = data.slice(0, 3);
+    const otherTotal = data.slice(3).reduce((sum, item) => sum + item.value, 0);
+
+    return [...topThree, {value: otherTotal, label: "기타"}];
+  }
+
   // Calculate bubble sizes and positions with collision avoidance
   useEffect(() => {
     if (!data || data.length === 0) return
 
-    const total = data.reduce((sum, item) => sum + item.value, 0)
+    const formattedData = formatBubbleData(data);
+
+    const total = formattedData.reduce((sum, item) => sum + item.value, 0)
 
     // Initial bubble creation with sizes but no positions yet
-    const initialBubbles: Bubble[] = data.map((item, index) => {
+    const initialBubbles: Bubble[] = formattedData.map((item, index) => {
       // Calculate radius based on value percentage
       const percentage = item.value / total
       const radius = minRadius + percentage * (maxRadius - minRadius)
