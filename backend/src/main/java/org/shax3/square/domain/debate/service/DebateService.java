@@ -6,13 +6,12 @@ import org.shax3.square.domain.debate.dto.VoteResultDto;
 import org.shax3.square.domain.debate.model.Debate;
 import org.shax3.square.domain.debate.model.Vote;
 import org.shax3.square.domain.debate.repository.DebateRepository;
-import org.shax3.square.domain.user.model.*;
 import org.shax3.square.exception.CustomException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-import java.util.function.Function;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.shax3.square.exception.ExceptionCode.DEBATE_NOT_FOUND;
@@ -44,30 +43,7 @@ public class DebateService {
     }
 
     private VoteResultDto createVoteResultDto(List<Vote> votes) {
-        return new VoteResultDto(
-                aggregateEnum(votes, Vote::getGender, Gender.class),
-                aggregateEnum(votes, Vote::getAgeRange, AgeRange.class),
-                aggregateEnum(votes, Vote::getType, Type.class),
-                aggregateEnum(votes, Vote::getRegion, Region.class),
-                aggregateEnum(votes, Vote::getReligion, Religion.class)
-        );
+        return VoteResultDto.fromVotes(votes);
     }
 
-    private <T extends Enum<T> & DisplayableEnum> Map<String, Integer> aggregateEnum(
-            List<Vote> votes, Function<Vote, T> getter, Class<T> enumClass) {
-
-        Map<String, Integer> result = new LinkedHashMap<>();
-
-        for (T constant : enumClass.getEnumConstants()) {
-            result.put(constant.getKoreanName(), 0);
-        }
-
-        votes.stream()
-                .map(getter)
-                .filter(Objects::nonNull)
-                .collect(Collectors.groupingBy(DisplayableEnum::getKoreanName, Collectors.counting()))
-                .forEach((key, count) -> result.put(key, count.intValue()));
-
-        return result;
-    }
 }
