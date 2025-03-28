@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { Icons } from '../../../../assets/icons/Icons';
 
 import DebateCardsScreen from '../../../pages/DebateCardsScreen/DebateCardsScreen';
@@ -7,6 +7,7 @@ import OpinionListScreen from '../../../pages/OpinionListScreen/OpinionListScree
 import ProposalListScreen from '../../../pages/ProposalListScreen/ProposalListScreen';
 import ProposalCreateScreen from '../../../pages/ProposalCreateScreen/ProposalCreateScreen';
 import OpinionDetailScreen from '../../../pages/OpinionDetailScreen/OpinionDetailScreen';
+import OpinionEditScreen from '../../../pages/OpinionEditScreen/OpinionEditScreen';
 
 import { StackParamList } from '../../../shared/page-stack/DebatePageStack';
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -67,6 +68,21 @@ export default function HeaderBar() {
             <Stack.Screen
                 name="OpinionDetailScreen"
                 component={OpinionDetailScreen}
+                options={({ route }) => {
+                    // 현재 사용자와 작성자 비교해 우측 아이콘 및 기능 변경
+                    const isAuthor = currentUser.nickname === opinion.nickname;
+                    const opinionId = route.params.opinionId;
+                    return {
+                        title: '의견 상세',
+                        headerBackButtonDisplayMode: 'minimal',
+                        headerRight: () => <OpinionDetailScreenHeaderRightIcons isAuthor={isAuthor} opinionId={opinionId}/>,
+                    };
+                }}
+            />
+            {/* 의견 수정 */}
+            <Stack.Screen
+                name="OpinionEditScreen"
+                component={OpinionEditScreen}
                 options={() => {
                     // 현재 사용자와 작성자 비교해 우측 아이콘 및 기능 변경
                     const isAuthor = currentUser.nickname === opinion.nickname;
@@ -74,7 +90,7 @@ export default function HeaderBar() {
                     return {
                         title: '의견 상세',
                         headerBackButtonDisplayMode: 'minimal',
-                        headerRight: () => <OpinionDetailScreenHeaderRightIcons isAuthor={isAuthor} />,
+                        // headerRight: () => <EditOpinionHeaderRightIcon />,
                     };
                 }}
             />
@@ -118,12 +134,13 @@ function DebateCardsScreenHeaderRightIcons() {
 }
 
 // 상단 바 우측 아이콘 컴포넌트: 현재 사용자와 글 작성자 여부 확인
-function OpinionDetailScreenHeaderRightIcons({ isAuthor }: { isAuthor: boolean }) {
+function OpinionDetailScreenHeaderRightIcons({ isAuthor, opinionId }: { isAuthor: boolean; opinionId: number } ) {
+    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
     return (
         <View style={styles.headerRightItems}>
             {isAuthor ? (
                 <>
-                    <TouchableOpacity onPress={() => console.log('수정')}>
+                    <TouchableOpacity onPress={() => navigation.navigate('OpinionEditScreen', { opinionId })}>
                         <Icons.edit />
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => console.log('삭제')}>
@@ -139,6 +156,15 @@ function OpinionDetailScreenHeaderRightIcons({ isAuthor }: { isAuthor: boolean }
             )}
         </View>
     );
+}
+
+function EditOpinionHeaderRightIcon() {
+    return (
+        <TouchableOpacity
+            onPress={() => {}}>
+            <Text>수정</Text>
+        </TouchableOpacity>
+    )
 }
 
 const styles = StyleSheet.create({

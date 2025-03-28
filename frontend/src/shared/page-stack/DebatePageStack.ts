@@ -14,4 +14,5 @@ export type StackParamList = {
     OpinionDetailScreen: { opinionId: number };
     ProposalListScreen: undefined;
     ProposalCreateScreen: undefined;
+    OpinionEditScreen: { opinionId: number };
 };
