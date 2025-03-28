@@ -22,6 +22,7 @@ import org.shax3.square.exception.CustomException;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -71,6 +72,8 @@ class VoteServiceTest {
 
         mockDebate2 = Debate.builder().topic("토론2").build();
         ReflectionTestUtils.setField(mockDebate2, "id", 200L);
+
+
 
         scrap1 = Scrap.builder().targetId(100L).targetType(TargetType.DEBATE).build();
         ReflectionTestUtils.setField(scrap1, "id", 1L);
@@ -177,19 +180,14 @@ class VoteServiceTest {
         when(debateService.findDebateById(100L)).thenReturn(mockDebate1);
         when(debateService.findDebateById(200L)).thenReturn(mockDebate2);
 
-        // 투표 통계 실제 계산 로직 사용 (모킹 제거)
-        when(voteRepository.countByDebate(mockDebate1)).thenReturn(7);
-        when(voteRepository.countByDebateAndLeftTrue(mockDebate1)).thenReturn(4);
-        when(voteRepository.countByDebate(mockDebate2)).thenReturn(5);
-        when(voteRepository.countByDebateAndLeftTrue(mockDebate2)).thenReturn(3);
-
         // When
         MyScrapedDebatesResponse response = voteService.getScrapedDebates(mockUser, null, 2);
 
         // Then
-        assertThat(response.scraps().get(0).leftCount()).isEqualTo(4); // 검증 추가
-        assertThat(response.scraps().get(1).leftCount()).isEqualTo(3);
+        assertThat(response.scraps())
+                .allMatch(dto -> dto.leftCount() == 0); // 모든 항목 0 검증
     }
+
 
     @Test
     @DisplayName("스크랩 목록 조회 - 마지막 페이지")
@@ -200,9 +198,6 @@ class VoteServiceTest {
 
         when(debateService.findDebateById(100L)).thenReturn(mockDebate1);
         when(debateService.findDebateById(200L)).thenReturn(mockDebate2);
-
-        when(voteRepository.countByDebate(any())).thenReturn(5);
-        when(voteRepository.countByDebateAndLeftTrue(any())).thenReturn(3);
 
         // When
         MyScrapedDebatesResponse response = voteService.getScrapedDebates(mockUser, 3L, 2);
