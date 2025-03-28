@@ -67,8 +67,7 @@ public class DebateController {
     @GetMapping("/{debateId}/result")
     public ResponseEntity<DebateVotedResultResponse> getDebateVotedResult(@AuthUser User user, @PathVariable Long debateId) {
 
-        Debate debate = debateService.findDebateById(debateId);
-        DebateVotedResultResponse response = debateService.getVoteResult(debate);
+        DebateVotedResultResponse response = debateService.getVoteResult(debateId);
 
         return ResponseEntity.ok(response);
     }

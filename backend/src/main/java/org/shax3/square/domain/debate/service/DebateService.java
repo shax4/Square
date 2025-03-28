@@ -9,6 +9,7 @@ import org.shax3.square.domain.debate.repository.DebateRepository;
 import org.shax3.square.domain.user.model.*;
 import org.shax3.square.exception.CustomException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.function.Function;
@@ -28,7 +29,9 @@ public class DebateService {
                 .orElseThrow(() -> new CustomException(DEBATE_NOT_FOUND));
     }
 
-    public DebateVotedResultResponse getVoteResult(Debate debate) {
+    @Transactional(readOnly = true)
+    public DebateVotedResultResponse getVoteResult(Long debateId) {
+        Debate debate = findDebateById(debateId);
         List<Vote> votes = voteService.getVotesByDebate(debate);
 
         Map<Boolean, List<Vote>> groupedVotes = votes.stream()
@@ -53,8 +56,11 @@ public class DebateService {
     private <T extends Enum<T> & DisplayableEnum> Map<String, Integer> aggregateEnum(
             List<Vote> votes, Function<Vote, T> getter, Class<T> enumClass) {
 
-        Map<String, Integer> result = Arrays.stream(enumClass.getEnumConstants())
-                .collect(Collectors.toMap(DisplayableEnum::getKoreanName, e -> 0, (a, b) -> b, LinkedHashMap::new));
+        Map<String, Integer> result = new LinkedHashMap<>();
+
+        for (T constant : enumClass.getEnumConstants()) {
+            result.put(constant.getKoreanName(), 0);
+        }
 
         votes.stream()
                 .map(getter)
