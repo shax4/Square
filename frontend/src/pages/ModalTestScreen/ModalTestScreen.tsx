@@ -22,16 +22,19 @@ export default function ModalTestScreen() {
                 { value: 1, label: "50대" },
               ],
               type: [
-                { value: 70, label: "PNTB" },
-                { value: 14, label: "PNTR" },
-                { value: 14, label: "ICTR" },
-                { value: 2, label: "기타" },
+                { value: 40, label: "PNTB" },
+                { value: 25, label: "ABCD" },
+                { value: 20, label: "PNTR" },
+                { value: 10, label: "PNTR" },
+                { value: 3, label: "ICTR" },
+                { value: 2, label: "ASDF" },
               ],
               region: [
-                { value: 70, label: "서울특별시" },
-                { value: 14, label: "인천광역시" },
-                { value: 14, label: "경기도" },
-                { value: 2, label: "기타" },
+                { value: 60, label: "서울특별시" },
+                { value: 20, label: "인천광역시" },
+                { value: 15, label: "경기도" },
+                { value: 10, label: "부산광역시" },
+                { value: 5, label: "대전광역시" },
               ],
               religion: [
                 { value: 50, label: "없음" },
@@ -61,16 +64,17 @@ export default function ModalTestScreen() {
                 { value: 5, label: "50대" },
               ],
               type: [
-                { value: 65, label: "PNTB" },
-                { value: 15, label: "PNTR" },
-                { value: 15, label: "ICTR" },
-                { value: 5, label: "기타" },
+                { value: 40, label: "PNTB" },
+                { value: 25, label: "ABCD" },
+                { value: 20, label: "PNTR" },
+                { value: 10, label: "PNTR" },
+                { value: 3, label: "ICTR" },
+                { value: 2, label: "ASDF" },
               ],
               region: [
                 { value: 60, label: "서울특별시" },
                 { value: 20, label: "인천광역시" },
                 { value: 15, label: "경기도" },
-                { value: 5, label: "기타" },
               ],
               religion: [
                 { value: 45, label: "없음" },
@@ -90,6 +94,28 @@ export default function ModalTestScreen() {
           const showMoreOpinions = () => {
             console.log('의견 더 보기를 클릭했습니다!')
           }
+    
+    function formatBubbleData(data: {value: number; label: string}[]){
+      if(data.length <= 3) return data;
+
+      const topThree = data.slice(0, 3);
+      const otherTotal = data.slice(3).reduce((sum, item) => sum + item.value, 0);
+
+      return [...topThree, {value: otherTotal, label: "기타"}];
+    }
+
+    const formattedResultData = {
+      leftResult: {
+        ...resultData.leftResult,
+        type: formatBubbleData(resultData.leftResult.type),
+        region: formatBubbleData(resultData.leftResult.region),
+      },
+      rightResult: {
+        ...resultData.rightResult,
+        type: formatBubbleData(resultData.rightResult.type),
+        region: formatBubbleData(resultData.rightResult.region),
+      },
+    };
 
     return (
         <View style={styles.container}>
@@ -101,7 +127,7 @@ export default function ModalTestScreen() {
                 <Text style={styles.buttonText}>결과 리포트 보기</Text>
                 </TouchableOpacity>
 
-                <DebateResultModal visible={isModalVisible} onClose={() => setIsModalVisible(false)} onPressMoreOpinion={showMoreOpinions} data={resultData} leftOption={'있다!'} rightOption={'없다!'}/>
+                <DebateResultModal visible={isModalVisible} onClose={() => setIsModalVisible(false)} onPressMoreOpinion={showMoreOpinions} data={formattedResultData} leftOption={'있다!'} rightOption={'없다!'}/>
             </View>
         </View>
     )
