@@ -84,28 +84,27 @@ class ProposalServiceTest {
 
     @Test
     @DisplayName("최신순 목록 조회 테스트")
-    void getProposals_sort_latest(){
-
-        when(proposalRepository.findProposalsByLatest(null, 5))
+    void getProposals_sort_latest() {
+        when(proposalRepository.findProposalsByLatest(null, 6))
                 .thenReturn(mockProposals);
 
         ProposalsResponse response = proposalService.getProposals("latest", null, null, 5);
 
         assertThat(response.proposals()).hasSize(5);
         assertThat(response.nextCursorId()).isEqualTo(mockProposals.get(4).getId());
-
     }
 
     @Test
     @DisplayName("좋아요순 목록 조회 테스트")
-    public void getProposals_sort_likeCount(){
+    public void getProposals_sort_likeCount() {
         List<Proposal> expectedSortedLikesList = List.of(
                 mockProposals.get(2), //likecount 5
                 mockProposals.get(0), //likecount 4
-                mockProposals.get(1) //likecount 3
+                mockProposals.get(1), //likecount 3
+                mockProposals.get(3)  //likecount 2
         );
 
-        when(proposalRepository.findProposalsByLikes(null, null, 3))
+        when(proposalRepository.findProposalsByLikes(null, null, 4))
                 .thenReturn(expectedSortedLikesList);
 
         ProposalsResponse response = proposalService.getProposals("likes", null, null, 3);
@@ -117,14 +116,14 @@ class ProposalServiceTest {
     }
 
     @Test
-    @DisplayName("좋아요순 목록 조회 - 목록이 부족해 limit보다 결과 size가 작은 경우")
-    public void getProposals_sort_likeCount_withCursor(){
+    @DisplayName("좋아요순 목록 조회 - 마지막 페이지 테스트")
+    public void getProposals_sort_likeCount_lastPage() {
         List<Proposal> expectedSortedLikesList = List.of(
                 mockProposals.get(2), //likecount 5
-                mockProposals.get(0) //likecount 4
+                mockProposals.get(0)  //likecount 4
         );
 
-        when(proposalRepository.findProposalsByLikes(null, 3, 3))
+        when(proposalRepository.findProposalsByLikes(null, 3, 4))
                 .thenReturn(expectedSortedLikesList);
 
         ProposalsResponse response = proposalService.getProposals("likes", null, 3, 3);
@@ -150,6 +149,34 @@ class ProposalServiceTest {
         assertThat(proposal.isValid()).isFalse();
         verify(proposalRepository, times(1)).findById(1L);
 
+    }
+
+    @Test
+    @DisplayName("청원이 존재하는 경우 true 반환")
+    void isOpinionExists_whenPresent() {
+        // given
+        Long proposalId = 3L;
+        when(proposalRepository.existsById(proposalId)).thenReturn(true);
+
+        // when
+        boolean exists = proposalService.isProposalExists(proposalId);
+
+        // then
+        assertThat(exists).isTrue();
+    }
+
+    @Test
+    @DisplayName("청원이 존재하지 않는 경우 false 반환")
+    void isOpinionExists_whenNotPresent() {
+        // given
+        Long proposalId = 4L;
+        when(proposalRepository.existsById(proposalId)).thenReturn(false);
+
+        // when
+        boolean exists = proposalService.isProposalExists(proposalId);
+
+        // then
+        assertThat(exists).isFalse();
     }
 }
 

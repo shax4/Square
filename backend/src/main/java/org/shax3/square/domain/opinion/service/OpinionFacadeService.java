@@ -40,10 +40,10 @@ public class OpinionFacadeService {
     @Transactional(readOnly = true)
     public OpinionDetailsResponse getOpinionDetails(User user, Long opinionId) {
         Opinion opinion = opinionService.getOpinion(opinionId);
-        List<CommentResponse> comments = opinionCommentService.getOpinionComments(user, opinionId);
+        List<CommentResponse> comments = opinionCommentService.getOpinionComments(opinionId);
         String profileUrl = s3Service.generatePresignedGetUrl(user.getS3Key());
-
-        return OpinionDetailsResponse.of(opinion, comments, profileUrl);
+        boolean isLiked = false; // TODO 추가구현 필요;
+        return OpinionDetailsResponse.of(opinion, comments, profileUrl,isLiked);
     }
 }
 

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.annotation.AuthUser;
 import org.shax3.square.domain.opinion.dto.request.CreateOpinionRequest;
 import org.shax3.square.domain.opinion.dto.request.UpdateOpinionRequest;
+import org.shax3.square.domain.opinion.dto.response.MyOpinionResponse;
 import org.shax3.square.domain.opinion.dto.response.OpinionDetailsResponse;
 import org.shax3.square.domain.opinion.service.OpinionFacadeService;
 import org.shax3.square.domain.opinion.service.OpinionService;
@@ -59,6 +60,17 @@ public class OpinionController {
     public ResponseEntity<Void> delete(@AuthUser User user, @PathVariable Long opinionId) {
         opinionService.deleteOpinion(user,opinionId);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "내 의견 목록 조회",description = "사용자가 자신의 의견 목록을 조회하는 API입니다." )
+    @GetMapping("/my")
+    public ResponseEntity<MyOpinionResponse> readMyOpinions(@AuthUser User user,
+                                                            @RequestParam(required = false) Long nextCursorId,
+                                                            @RequestParam(defaultValue = "5") int limit
+                                                     ) {
+
+        MyOpinionResponse response = opinionService.getMyOpinions(user,nextCursorId,limit);
+        return ResponseEntity.ok(response);
     }
 
 }

@@ -5,6 +5,7 @@ import org.shax3.square.domain.debate.model.Debate;
 import org.shax3.square.domain.debate.service.DebateService;
 import org.shax3.square.domain.opinion.dto.request.CreateOpinionRequest;
 import org.shax3.square.domain.opinion.dto.request.UpdateOpinionRequest;
+import org.shax3.square.domain.opinion.dto.response.MyOpinionResponse;
 import org.shax3.square.domain.opinion.model.Opinion;
 import org.shax3.square.domain.opinion.repository.OpinionRepository;
 import org.shax3.square.domain.s3.service.S3Service;
@@ -14,12 +15,13 @@ import org.shax3.square.exception.ExceptionCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class OpinionService {
     private final OpinionRepository opinionRepository;
     private final DebateService debateService;
-    private final S3Service s3Service;
 
     @Transactional
     public void createOpinion(User user, CreateOpinionRequest request) {
@@ -32,8 +34,7 @@ public class OpinionService {
 
     @Transactional
     public void updateOpinion(UpdateOpinionRequest request, User user, Long opinionId) {
-        Opinion opinion = opinionRepository.findById(opinionId)
-                .orElseThrow(() -> new CustomException(ExceptionCode.OPINION_NOT_FOUND));
+        Opinion opinion = getOpinion(opinionId);
 
         if (!opinion.getUser().getId().equals(user.getId())) {
             throw new CustomException(ExceptionCode.NOT_AUTHOR);
@@ -45,8 +46,7 @@ public class OpinionService {
 
     @Transactional
     public void deleteOpinion(User user, Long opinionId) {
-        Opinion opinion = opinionRepository.findById(opinionId)
-                .orElseThrow(() -> new CustomException(ExceptionCode.OPINION_NOT_FOUND));
+        Opinion opinion = getOpinion(opinionId);
 
         if (!opinion.getUser().getId().equals(user.getId())) {
             throw new CustomException(ExceptionCode.NOT_AUTHOR);
@@ -60,5 +60,19 @@ public class OpinionService {
                 .orElseThrow(() -> new CustomException(ExceptionCode.OPINION_NOT_FOUND));
     }
 
+    public boolean isOpinionExists(Long opinionId) {
+        return opinionRepository.existsById(opinionId);
+    }
 
+    @Transactional(readOnly = true)
+    public MyOpinionResponse getMyOpinions(User user, Long nextCursorId, int limit) {
+        List<Opinion> opinions = opinionRepository.findMyOpinions(user, nextCursorId, limit + 1);
+        boolean hasNext = opinions.size() > limit;
+
+        if (hasNext) {
+            opinions = opinions.subList(0, limit);
+        }
+
+        return MyOpinionResponse.of(opinions);
+    }
 }

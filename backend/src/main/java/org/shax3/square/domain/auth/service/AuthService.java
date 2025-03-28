@@ -27,12 +27,16 @@ public class AuthService {
     private final GoogleAuthService googleAuthService;
 
 
+    @Transactional
     public UserLoginDto loginTest(String email) {
         Optional<User> user = userRepository.findByEmail(email);
 
         if (user.isPresent()) {
             User loginUser = user.get();
-            UserTokenDto userTokens = tokenUtil.createLoginToken(loginUser.getId());
+
+            Long userId = loginUser.getId();
+            UserTokenDto userTokens = tokenUtil.createLoginToken(userId);
+            refreshTokenRepository.deleteByUserId(userId);
             refreshTokenRepository.save(userTokens.refreshToken());
 
             return UserLoginDto.createMemberLoginDto(userTokens, loginUser);

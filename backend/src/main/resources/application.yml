@@ -22,6 +22,7 @@ spring:
 #      database: ${MONGODB_DATABASE}
 #      uri: ${MONGODB_URI}
 
+  cache:
     redis:
       host: ${REDIS_CACHE_HOST}
       port: ${REDIS_CACHE_PORT}

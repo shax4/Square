@@ -57,7 +57,6 @@ class OpinionCommentServiceTest {
 
 
         mockComment = OpinionComment.builder()
-                .id(1L)
                 .user(mockUser)
                 .content("Sample Comment")
                 .build();
@@ -73,11 +72,11 @@ class OpinionCommentServiceTest {
         OpinionComment mockComment = new OpinionComment(1L, null, mockUser, "Nice!", 5, true);
         List<OpinionComment> mockComments = List.of(mockComment);
 
-        when(opinionCommentRepository.findByOpinionIdAndValidTrue(1L)).thenReturn(mockComments);
+        when(opinionCommentRepository.findByOpinionId(1L)).thenReturn(mockComments);
         when(s3Service.generatePresignedGetUrl("test-key")).thenReturn("presigned-url");
 
         // When
-        List<CommentResponse> responses = opinionCommentService.getOpinionComments(mockUser, 1L);
+        List<CommentResponse> responses = opinionCommentService.getOpinionComments(1L);
 
         // Then
         assertThat(responses).isNotNull().hasSize(1);
@@ -91,10 +90,10 @@ class OpinionCommentServiceTest {
     @DisplayName("댓글이 없는 경우 빈 리스트 반환 테스트")
     void getOpinionComments_emptyList() {
         // Given
-        when(opinionCommentRepository.findByOpinionIdAndValidTrue(1L)).thenReturn(List.of());
+        when(opinionCommentRepository.findByOpinionId(1L)).thenReturn(List.of());
 
         // When
-        List<CommentResponse> responses = opinionCommentService.getOpinionComments(mockUser, 1L);
+        List<CommentResponse> responses = opinionCommentService.getOpinionComments(1L);
 
         // Then
         assertThat(responses).isNotNull().isEmpty();
@@ -206,6 +205,32 @@ class OpinionCommentServiceTest {
         verify(opinionCommentRepository, times(1)).findById(1L); // findById 호출 검증
     }
 
+    @Test
+    @DisplayName("답글이 존재하는 경우 true 반환")
+    void isOpinionCommentExists_whenPresent() {
+        // given
+        Long opinionCommentId = 3L;
+        when(opinionCommentRepository.existsById(opinionCommentId)).thenReturn(true);
 
+        // when
+        boolean exists = opinionCommentService.isOpinionCommentExists(opinionCommentId);
+
+        // then
+        assertThat(exists).isTrue();
+    }
+
+    @Test
+    @DisplayName("답글이 존재하지 않는 경우 false 반환")
+    void isOpinionCommentExists_whenNotPresent() {
+        // given
+        Long opinionCommentId = 4L;
+        when(opinionCommentRepository.existsById(opinionCommentId)).thenReturn(false);
+
+        // when
+        boolean exists = opinionCommentService.isOpinionCommentExists(opinionCommentId);
+
+        // then
+        assertThat(exists).isFalse();
+    }
 
 }

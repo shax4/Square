@@ -25,13 +25,14 @@ public class OpinionCommentService {
     private final S3Service s3Service;
 
     @Transactional(readOnly = true)
-    public List<CommentResponse> getOpinionComments(User user, Long opinionId) {
-        List<OpinionComment> comments = opinionCommentRepository.findByOpinionIdAndValidTrue(opinionId);
-
+    public List<CommentResponse> getOpinionComments(Long opinionId) {
+        List<OpinionComment> comments = opinionCommentRepository.findByOpinionId(opinionId);
+        boolean isLiked = false; //TODO 추가구현 필요
         return comments.stream()
                 .map(comment -> CommentResponse.of(
                         comment,
-                        s3Service.generatePresignedGetUrl(comment.getUser().getS3Key())
+                        s3Service.generatePresignedGetUrl(comment.getUser().getS3Key()),
+                        isLiked
                 ))
                 .toList();
     }
@@ -47,8 +48,7 @@ public class OpinionCommentService {
 
     @Transactional
     public void deleteOpinionComment(User user, Long commentId) {
-        OpinionComment comment = opinionCommentRepository.findById(commentId)
-                .orElseThrow(() -> new CustomException(OPINION_COMMENT_NOT_FOUND));
+        OpinionComment comment = getOpinionComment(commentId);
 
         if (!comment.getUser().getId().equals(user.getId())) {
             throw new CustomException(ExceptionCode.NOT_AUTHOR);
@@ -59,8 +59,7 @@ public class OpinionCommentService {
 
     @Transactional
     public void updateOpinionComment(User user, UpdateOpinionRequest request, Long commentId) {
-        OpinionComment comment = opinionCommentRepository.findById(commentId)
-                .orElseThrow(() -> new CustomException(OPINION_COMMENT_NOT_FOUND));
+        OpinionComment comment = getOpinionComment(commentId);
 
         if (!comment.getUser().getId().equals(user.getId())) {
             throw new CustomException(ExceptionCode.NOT_AUTHOR);
@@ -68,4 +67,14 @@ public class OpinionCommentService {
 
         comment.updateContent(request.content());
     }
+
+    public OpinionComment getOpinionComment(Long opinionCommentId) {
+        return opinionCommentRepository.findById(opinionCommentId)
+            .orElseThrow(() -> new CustomException(OPINION_COMMENT_NOT_FOUND));
+    }
+
+    public boolean isOpinionCommentExists(Long opinionCommentId) {
+        return opinionCommentRepository.existsById(opinionCommentId);
+    }
+
 }
