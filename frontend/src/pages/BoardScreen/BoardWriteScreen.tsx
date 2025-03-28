@@ -30,7 +30,7 @@ export default function BoardWriteScreen({ route, navigation }: Props) {
   // 로딩 상태 관리
   const [loading, setLoading] = useState(false);
   // 취소 모달 커스텀 훅
-  const { showCancelConfirmation } = useConfirmModal({navigation});
+  const { showCancelConfirmation } = useConfirmModal({navigation, isEditMode, postId});
 
   // 수정 모드일 때 기존 데이터 로드
   useEffect(() => {

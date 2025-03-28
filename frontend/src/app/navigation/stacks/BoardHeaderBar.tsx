@@ -75,11 +75,17 @@ export default function BoardHeaderBar() {
       <Stack.Screen
         name="BoardWrite"
         component={BoardWriteScreen}
-        options={{
+        options={({ route }) => ({
           title: "게시글 작성",
           headerBackButtonDisplayMode: "minimal",
-          headerLeft: () => <CustomBack showConfirm={true} />,
-        }}
+          headerLeft: () => (
+            <CustomBack
+              showConfirm={true}
+              isEditMode={!!route.params?.postId}
+              postId={route.params?.postId}
+            />
+          ),
+        })}
       />
     </Stack.Navigator>
   );
