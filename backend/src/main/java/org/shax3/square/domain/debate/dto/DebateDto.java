@@ -8,7 +8,7 @@ import org.shax3.square.domain.user.model.User;
 public record DebateDto(
           Long debateId,
           String topic,
-          boolean isLeft,
+          Boolean isLeft,
           int leftCount,
           int rightCount,
           int leftPercent,
@@ -29,7 +29,7 @@ public record DebateDto(
         );
     }
 
-    public static DebateDto of(Debate debate, boolean isLeft, VoteResponse voteResponse, boolean isScraped) {
+    public static DebateDto of(Debate debate, Boolean isLeft, VoteResponse voteResponse, boolean isScraped) {
         return new DebateDto(
                 debate.getId(),
                 debate.getTopic(),

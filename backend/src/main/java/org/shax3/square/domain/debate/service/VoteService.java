@@ -85,9 +85,13 @@ public class VoteService {
                 .map(scrap -> {
                     //TODO debateService 대신 Redis에서 가져오는걸로 변경
                     Debate debate = debateService.findDebateById(scrap.getTargetId());
-                    VoteResponse voteResponse = calculateVoteResult(debate);
                     Optional<Vote> userVote = voteRepository.findByDebateAndUser(debate,user);
-                    boolean isLeft = userVote.map(Vote::isLeft).orElse(false);
+                    Boolean isLeft = userVote.map(Vote::isLeft).orElse(null);
+
+                    VoteResponse voteResponse = (isLeft != null)
+                            ? calculateVoteResult(debate)
+                            : VoteResponse.create();
+
                     return DebateDto.of(debate, isLeft, voteResponse, true);
                 })
                 .toList();
