@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = process.env.EXPO_PUBLIC_URL;
+const API_URL = "https://j12a307.p.ssafy.io";
 // process.env.EXPO_PUBLIC_URL
 
 const axiosInstance = axios.create({
