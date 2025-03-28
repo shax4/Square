@@ -2,7 +2,8 @@ package org.shax3.square.domain.user.model;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public enum AgeRange {
+
+public enum AgeRange implements DisplayableEnum {
     TEN("10대"),
     TWENTY("20대"),
     THIRTY("30대"),
@@ -15,6 +16,7 @@ public enum AgeRange {
         this.koreanName = koreanName;
     }
 
+    @Override
     @JsonValue
     public String getKoreanName() {
         return koreanName;
