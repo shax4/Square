@@ -2,6 +2,7 @@ package org.shax3.square.domain.type.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -14,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.shax3.square.domain.user.model.User;
 
+import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -34,24 +36,28 @@ public class TypeResult {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Enumerated(STRING)
     @Column(nullable = false)
     private Type1 type1;
 
     @Column(nullable = false)
     private int score1;
 
+    @Enumerated(STRING)
     @Column(nullable = false)
     private Type2 type2;
 
     @Column(nullable = false)
     private int score2;
 
+    @Enumerated(STRING)
     @Column(nullable = false)
     private Type3 type3;
 
     @Column(nullable = false)
     private int score3;
 
+    @Enumerated(STRING)
     @Column(nullable = false)
     private Type4 type4;
 
