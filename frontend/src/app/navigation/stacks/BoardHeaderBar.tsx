@@ -1,8 +1,13 @@
 import React, { useRef } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { View, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import { useNavigation, NavigationProp, useFocusEffect } from "@react-navigation/native";
+import {
+  useNavigation,
+  NavigationProp,
+  useFocusEffect,
+} from "@react-navigation/native";
 import { useConfirmModal } from "../../../pages/BoardScreen/hooks/useConfirmModal";
+import { CustomBack } from "../components/CustomBack";
 
 import { Icons } from "../../../../assets/icons/Icons";
 import { BoardAPI } from "../../../pages/BoardScreen/Api/boardApi";
@@ -27,7 +32,10 @@ export default function BoardHeaderBar() {
   // useRef로 상태 관리 (리렌더링 방지)
   const isNavigatingRef = useRef(false);
 
-  
+  const navigation = useNavigation<NavigationProp<BoardStackParamList>>();
+  // 커스텀 훅을 컴포넌트 최상위 레벨에서 호출
+  const { showCancelConfirmation } = useConfirmModal({ navigation });
+
   // 화면이 포커스를 받을 때마다 useRef 값 재설정
   useFocusEffect(
     React.useCallback(() => {
@@ -36,6 +44,13 @@ export default function BoardHeaderBar() {
       return () => {};
     }, [])
   );
+
+  // 뒤로가기 이벤트 핸들러 함수
+  const handleBeforeRemove = (e: any) => {
+    if (!isNavigatingRef.current) return;
+    e.preventDefault();
+    showCancelConfirmation();
+  }
 
   return (
     <Stack.Navigator>
@@ -75,17 +90,7 @@ export default function BoardHeaderBar() {
         options={{
           title: "게시글 작성",
           headerBackButtonDisplayMode: "minimal",
-        }}
-        listeners={({ navigation }) => {
-          const { showCancelConfirmation, isNavigatingRef } = useConfirmModal({navigation});
-          
-          return {
-            beforeRemove: (e) => {
-              if (isNavigatingRef.current) return;
-              e.preventDefault();
-              showCancelConfirmation();
-            }
-          };
+          headerLeft: () => <CustomBack showConfirm={true} />,
         }}
       />
     </Stack.Navigator>

@@ -1,4 +1,3 @@
-// hooks/useConfirmModal.ts
 import { useRef } from 'react';
 import { Alert } from 'react-native';
 import { CommonActions, NavigationProp } from '@react-navigation/native';
