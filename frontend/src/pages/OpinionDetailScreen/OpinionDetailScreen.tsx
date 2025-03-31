@@ -1,24 +1,28 @@
-import { RouteProp, useRoute } from "@react-navigation/native";
-import { StyleSheet, Text, TouchableOpacity, View, ScrollView, KeyboardAvoidingView, Platform, TextInputComponent, TextInput } from "react-native";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import { Text, TouchableOpacity, View, ScrollView, KeyboardAvoidingView, Platform, TextInput, Alert } from "react-native";
 import { StackParamList } from "../../shared/page-stack/DebatePageStack";
 import opinionDetailTestData from './Components/opinion-detail-test-data';
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
-import colors from "../../../assets/colors";
 import { Icons } from "../../../assets/icons/Icons";
-import { LikeButton, ProfileImage, TextField } from "../../components";
-import { useState } from "react";
+import { LikeButton, ProfileImage } from "../../components";
+import { useLayoutEffect, useState } from "react";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { styles } from './Components/OpinionDetailScreen.styles'
 
 type OpinionDetailRouteProp = RouteProp<StackParamList, 'OpinionDetailScreen'>;
 
 export default function OpinionDetailScreen() {
-
+    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
     const route = useRoute<OpinionDetailRouteProp>();
     const { opinionId } = route.params;
     const response = opinionDetailTestData;
 
+    // 테스트용: 실제 APp 사용자 닉네임 가져와야 함
+    const userNickname = response.nickname;
+
     // 댓글 리스트
     const [comments, setComments] = useState(response.comments);
-    
+
     // 새로 입력하는 댓글
     const [commentText, setCommentText] = useState("");
 
@@ -27,11 +31,63 @@ export default function OpinionDetailScreen() {
         setCommentText(text);
     }
     const onPressCreateComment = () => {
-        clearCOmmentInputField;
+        clearCommentInputField;
     }
 
-    const clearCOmmentInputField = () => {
+    const clearCommentInputField = () => {
         setCommentText('');
+    }
+
+
+    // 상단 탭에 수정 및 신고 버튼 설정 
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            headerRight: () => (
+                <View style={styles.headerRightItems}>
+                    {response.nickname === userNickname ? (
+                        <>
+                            <TouchableOpacity onPress={() => navigation.navigate('OpinionEditScreen', { opinionId, content: response.content },)}>
+                                <Icons.edit />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={handleDelete}>
+                                <Icons.delete />
+                            </TouchableOpacity>
+                        </>
+                    ) : (
+                        <>
+                            <TouchableOpacity onPress={() => console.log('신고')}>
+                                <Icons.report />
+                            </TouchableOpacity>
+                        </>
+                    )}
+                </View>
+            ),
+        });
+    }, []);
+
+    const handleDelete = () => {
+        Alert.alert(
+            '삭제 확인',
+            '정말로 이 의견을 삭제하시겠습니까?',
+            [
+                {
+                    text: '취소',
+                    onPress: () => console.log('삭제 취소됨'),
+                    style: 'cancel',
+                },
+                {
+                    text: '삭제',
+                    onPress: () => { deleteOpinion(opinionId) },
+                    style: 'destructive',
+                },
+            ],
+            { cancelable: true }
+        );
+    };
+
+    // 게시글 삭제 진행 함수 추가 필요
+    const deleteOpinion = (opinionI: number) => {
+        console.log(opinionId + ' 삭제');
     }
 
     return (
@@ -132,89 +188,3 @@ export default function OpinionDetailScreen() {
 
     )
 }
-
-export const styles = StyleSheet.create({
-    Container: {
-        flex: 1,
-        backgroundColor: colors.white,
-    },
-    ProfileBoxView: {
-        margin: 12,
-        marginTop: 20,
-    },
-    OpinionContentView: {
-        margin: 15,
-    },
-    OpinionContentText: {
-        fontSize: 17,
-    },
-    LikeAndCommentCountView: {
-        flexDirection: 'row',
-        marginHorizontal: 15,
-        marginTop: 15,
-    },
-    CommentCountButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginHorizontal: 20,
-    },
-    CountText: {
-        color: colors.grayText,
-        fontSize: 14,
-    },
-    Separator: {
-        height: 0.7,
-        backgroundColor: colors.disabledText,
-        margin: 12,
-    },
-    ScrollViewContent: {
-        flex: 1,
-    },
-    CommentView: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginHorizontal: 20,
-    },
-    ProfileAndCommentView: {
-    },
-    CommentLikeView: {
-        flex: 1,
-        alignItems: 'flex-end',
-    },
-    CommentTextView: {
-        marginVertical: 15,
-        marginLeft: 20,
-    },
-    CommentText: {
-        fontSize: 15,
-    },
-    CommentCreateView: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: colors.white,
-        paddingHorizontal: 15,
-        paddingVertical: 10,
-        borderTopWidth: 0.5,
-        marginBottom: 20,
-        borderTopColor: colors.disabledText,
-    },
-    CommentProfileImage: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginRight: 10,
-    },
-    commentInput: {
-        flex: 1,
-        borderWidth: 1,
-        borderColor: "#e1e1e1",
-        borderRadius: 20,
-        padding: 10,
-        maxHeight: 80,
-    },
-    CommentSendButton: {
-        marginLeft: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-    }
-});
