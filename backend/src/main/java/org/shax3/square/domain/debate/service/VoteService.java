@@ -11,18 +11,19 @@ import org.shax3.square.exception.CustomException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.shax3.square.exception.ExceptionCode.*;
+import java.util.List;
+import java.util.Optional;
+
+import static org.shax3.square.exception.ExceptionCode.ALREADY_VOTED;
 
 
 @Service
 @RequiredArgsConstructor
 public class VoteService {
     private final VoteRepository voteRepository;
-    private final DebateService debateService;
 
     @Transactional
-    public VoteResponse vote(VoteRequest request, Long debateId, User user) {
-        Debate debate = debateService.findDebateById(debateId);
+    public VoteResponse vote(VoteRequest request, Debate debate, User user) {
 
         if (voteRepository.existsByDebateAndUser(debate, user)) {
             throw new CustomException(ALREADY_VOTED);
@@ -40,4 +41,21 @@ public class VoteService {
         int right = total - left;
         return VoteResponse.of(left, right, total);
     }
+
+
+    public List<Vote> getVotesByDebate(Debate debate) {
+        return voteRepository.findByDebate(debate);
+    }
+
+    public Optional<Vote> getVoteByUserAndDebate(User user, Debate debate) {
+        return voteRepository.findByDebateAndUser(debate, user);
+    }
+
+    public List<Vote> getVotesByUser(User user, Long nextCursorId, int limit) {
+        return voteRepository.findByUserOrderByIdDesc(user, nextCursorId, limit);
+    }
+
+
 }
+
+

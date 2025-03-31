@@ -138,4 +138,9 @@ public class UserService {
     public List<User> findAllById(List<Long> userIds) {
         return userRepository.findAllById(userIds);
     }
+
+    public User findById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+    }
 }

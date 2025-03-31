@@ -15,6 +15,8 @@ import org.shax3.square.exception.ExceptionCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class OpinionService {
@@ -64,6 +66,13 @@ public class OpinionService {
 
     @Transactional(readOnly = true)
     public MyOpinionResponse getMyOpinions(User user, Long nextCursorId, int limit) {
-        return MyOpinionResponse.of(opinionRepository.findMyOpinions(user, nextCursorId, limit));
+        List<Opinion> opinions = opinionRepository.findMyOpinions(user, nextCursorId, limit + 1);
+        boolean hasNext = opinions.size() > limit;
+
+        if (hasNext) {
+            opinions = opinions.subList(0, limit);
+        }
+
+        return MyOpinionResponse.of(opinions);
     }
 }

@@ -1,10 +1,9 @@
 package org.shax3.square.domain.scrap.service;
 
 import lombok.RequiredArgsConstructor;
-import org.shax3.square.domain.debate.service.DebateService;
+import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.scrap.dto.request.CreateScrapRequest;
 import org.shax3.square.domain.scrap.model.Scrap;
-import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.scrap.repository.ScrapRepository;
 import org.shax3.square.domain.user.model.User;
 import org.shax3.square.exception.CustomException;
@@ -13,8 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.shax3.square.common.model.TargetType.DEBATE;
-import static org.shax3.square.common.model.TargetType.POST;
 import static org.shax3.square.exception.ExceptionCode.SCRAP_ALREADY_EXISTS;
 
 @Service
@@ -22,20 +19,18 @@ import static org.shax3.square.exception.ExceptionCode.SCRAP_ALREADY_EXISTS;
 public class ScrapService {
 
     private final ScrapRepository scrapRepository;
-    private final DebateService debateService;
 
     @Transactional
-    public void createScrap(User user, CreateScrapRequest createScrapRequest) {
-        findTarget(createScrapRequest);
-        if(scrapRepository.existsByUserAndTargetIdAndTargetType(
+    public void createScrap(User user, CreateScrapRequest request) {
+        if (scrapRepository.existsByUserAndTargetIdAndTargetType(
                 user,
-                createScrapRequest.targetId(),
-                createScrapRequest.targetType()
+                request.targetId(),
+                request.targetType()
         )) {
             throw new CustomException(SCRAP_ALREADY_EXISTS);
         }
 
-        Scrap scrap = createScrapRequest.to(user);
+        Scrap scrap = request.to(user);
         scrapRepository.save(scrap);
     }
 
@@ -44,33 +39,7 @@ public class ScrapService {
         scrapRepository.deleteByUserAndTargetIdAndTargetType(user, targetId, targetType);
     }
 
-    private void findTarget(CreateScrapRequest createScrapRequest) {
-        TargetType targetType = createScrapRequest.targetType();
-        if (targetType.equals(DEBATE)) {
-            debateService.findDebateById(createScrapRequest.targetId());
-            return;
-        }
-
-        //TODO: 포스트 서비스에서 찾기
-    }
-
-    public List<Long> getDebateScrap(User user) {
-        return getScrap(user, DEBATE);
-    }
-
-    public List<Long> getPostScrap(User user) {
-        return getScrap(user, POST);
-    }
-
-    public boolean isDebateScraped(User user, Long debateId) {
-        return isTargetScraped(user, debateId, DEBATE);
-    }
-
-    public boolean isPostScraped(User user, Long postId) {
-        return isTargetScraped(user, postId, POST);
-    }
-
-    private List<Long> getScrap(User user, TargetType targetType) {
+    public List<Long> getScrapIds(User user, TargetType targetType) {
         List<Scrap> scraps = scrapRepository.findByUserAndTargetType(user, targetType);
         return scraps
                 .stream()
@@ -78,7 +47,12 @@ public class ScrapService {
                 .toList();
     }
 
-    private boolean isTargetScraped(User user, Long targetId, TargetType targetType) {
+    public boolean isTargetScraped(User user, Long targetId, TargetType targetType) {
         return scrapRepository.existsByUserAndTargetIdAndTargetType(user, targetId, targetType);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Scrap> getPaginatedScraps(User user, TargetType type, Long cursorId, int limit) {
+        return scrapRepository.findScrapsByUserAndType(user, type, cursorId, limit);
     }
 }
