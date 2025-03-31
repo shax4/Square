@@ -55,7 +55,7 @@ class DebateServiceTest {
                 new SummaryDto(2L, "요약2", false)
         );
 
-        VoteResponse voteResponse = new VoteResponse(10, 20, 30);
+        VoteResponse voteResponse = new VoteResponse(10, 20);
 
         when(debateRepository.findById(debateId)).thenReturn(Optional.of(debate));
         when(voteService.getVoteByUserAndDebate(user, debate)).thenReturn(Optional.of(mock(Vote.class)));
