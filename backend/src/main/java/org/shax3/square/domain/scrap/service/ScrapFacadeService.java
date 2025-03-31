@@ -18,18 +18,9 @@ import java.util.List;
 public class ScrapFacadeService {
 
     private final ScrapService scrapService;
-    private final DebateService debateService;
-//    private final PostService postService;
 
     @Transactional
     public void create(User user, CreateScrapRequest request) {
-        switch (request.targetType()) {
-            case DEBATE -> debateService.findDebateById(request.targetId());
-            //TODO: post 개발 후 구현
-//            case POST -> postService.findPostById(request.targetId());
-            default -> throw new CustomException(ExceptionCode.NOT_FOUND);
-        }
-
         scrapService.createScrap(user, request);
     }
 
