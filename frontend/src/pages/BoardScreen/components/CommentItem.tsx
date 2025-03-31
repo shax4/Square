@@ -11,7 +11,7 @@ import ProfileImage from "../../../components/ProfileImage/ProfileImage";
 import PersonalityTag from "../../../components/PersonalityTag/PersonalityTag";
 import LikeButton from "../../../components/LikeButton";
 import { BoardAPI } from "../Api/boardApi";
-import { Comment } from "./CommentItem.types";
+import { Comment } from "../board.types";
 import { Icons } from "../../../../assets/icons/Icons";
 import { useAuth } from "../../../shared/hooks/useAuth";
 import { getTimeAgo } from "../../../shared/utils/timeAge/timeAge";

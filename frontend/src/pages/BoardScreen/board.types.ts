@@ -17,3 +17,19 @@ export interface Comment {
 export interface Reply extends Omit<Comment, "replyCount" | "replies"> {
   parentId: number; // 대댓글은 parentId가 필수
 }
+
+// 게시글 타입
+export interface Post {
+  postId: number;
+  profileUrl?: string;
+  userType: string;
+  nickname: string;
+  createdAt: string;
+  title: string;
+  content: string;
+  likeCount: number;
+  commentCount: number;
+  isLiked: boolean;
+  isScrapped: boolean;
+  comments: Comment[];
+}

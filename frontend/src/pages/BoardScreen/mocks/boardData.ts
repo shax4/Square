@@ -34,7 +34,7 @@ export const currentUser = {
           replyCount: 2,
           replies: [
             {
-              replyId: 1,
+              commentId: 1,
               parentId: 1,
               nickname: "즐거운팬더",
               profileUrl: "",
@@ -45,7 +45,7 @@ export const currentUser = {
               isLiked: false
             },
             {
-              replyId: 2,
+              commentId: 2,
               parentId: 1,
               nickname: currentUser.nickname,
               profileUrl: currentUser.profileUrl,
@@ -69,7 +69,7 @@ export const currentUser = {
           replyCount: 1,
           replies: [
             {
-              replyId: 3,
+              commentId: 3,
               parentId: 2,
               nickname: "똑똑한사자",
               profileUrl: "",
@@ -122,7 +122,7 @@ export const currentUser = {
           replyCount: 2,
           replies: [
             {
-              replyId: 4,
+              commentId: 4,
               parentId: 4,
               nickname: "반짝이는코알라",
               profileUrl: "",
@@ -133,7 +133,7 @@ export const currentUser = {
               isLiked: true
             },
             {
-              replyId: 5,
+              commentId: 5,
               parentId: 4,
               nickname: "즐거운팬더",
               profileUrl: "",
@@ -157,7 +157,7 @@ export const currentUser = {
           replyCount: 1,
           replies: [
             {
-              replyId: 6,
+              commentId: 6,
               parentId: 5,
               nickname: "반짝이는코알라",
               profileUrl: "",
@@ -210,7 +210,7 @@ export const currentUser = {
           replyCount: 2,
           replies: [
             {
-              replyId: 7,
+              commentId: 7,
               parentId: 7,
               nickname: "즐거운팬더",
               profileUrl: "",
@@ -221,7 +221,7 @@ export const currentUser = {
               isLiked: false
             },
             {
-              replyId: 8,
+              commentId: 8,
               parentId: 7,
               nickname: currentUser.nickname,
               profileUrl: currentUser.profileUrl,
@@ -245,7 +245,7 @@ export const currentUser = {
           replyCount: 1,
           replies: [
             {
-              replyId: 9,
+              commentId: 9,
               parentId: 8,
               nickname: "즐거운팬더",
               profileUrl: "",
