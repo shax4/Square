@@ -6,15 +6,11 @@ import java.util.stream.Collectors;
 
 import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.like.dto.LikeRequest;
+import org.shax3.square.domain.like.handler.LikeTargetHandler;
 import org.shax3.square.domain.like.model.Like;
 import org.shax3.square.domain.like.repository.LikeRepository;
-import org.shax3.square.domain.opinion.service.OpinionCommentService;
-import org.shax3.square.domain.opinion.service.OpinionService;
-import org.shax3.square.domain.proposal.service.ProposalService;
 import org.shax3.square.domain.user.model.User;
 import org.shax3.square.domain.user.service.UserService;
-import org.shax3.square.exception.CustomException;
-import org.shax3.square.exception.ExceptionCode;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -26,11 +22,9 @@ import lombok.RequiredArgsConstructor;
 public class LikeService {
 
 	private final LikeRepository likeRepository;
-	private final OpinionService opinionService;
-	private final OpinionCommentService opinionCommentService;
-	private final ProposalService proposalService;
 	private final RedisTemplate<String, Object> batchRedisTemplate;
 	private final UserService userService;
+	private final LikeTargetHandler likeTargetHandler;
 
 	/**
 	 * Redis에 좋아요 저장
@@ -42,23 +36,11 @@ public class LikeService {
 		Long targetId = likeRequest.targetId();
 		TargetType targetType = likeRequest.targetType();
 
-		if (!isPresent(targetId, targetType)) {
-			throw new CustomException(ExceptionCode.NOT_FOUND);
-		}
+		likeTargetHandler.validateTargetExists(targetId, targetType); // 좋아요를 누를 타겟이 있는지 확인
 
 		toggleLikeInRedis(user, targetId, targetType); // Redis에 좋아요 저장
 	}
 
-	public boolean isPresent(Long targetId, TargetType targetType) {
-		return switch (targetType) {
-			case OPINION -> opinionService.isOpinionExists(targetId);
-			case OPINION_COMMENT -> opinionCommentService.isOpinionCommentExists(targetId);
-			case PROPOSAL -> proposalService.isProposalExists(targetId);
-			case POST -> false; // TODO: post 개발 후 구현
-			case POST_COMMENT -> false;
-			default -> throw new CustomException(ExceptionCode.INVALID_TARGET_TYPE);
-		};
-	}
 
 	/**
 	 * Key:   like:batch
@@ -114,16 +96,20 @@ public class LikeService {
 		likeRepository.saveAll(newLikes);
 
 		int likeDiff = (int) (newLikes.size() + toggledUp - toggledDown);
-		updateTargetLikeCount(targetType, targetId, likeDiff);
+		likeTargetHandler.updateTargetLikeCount(targetType, targetId, likeDiff);
 	}
 
-	private void updateTargetLikeCount(TargetType targetType, Long targetId, int diff) {
-		switch (targetType) {
-			case OPINION -> opinionService.increaseLikeCount(targetId, diff);
-			case PROPOSAL -> proposalService.increaseLikeCount(targetId, diff);
-			case OPINION_COMMENT -> opinionCommentService.increaseLikeCount(targetId, diff);
-			// TODO: POST, POST_COMMENT 등도 나중에 추가
-			default -> throw new CustomException(ExceptionCode.INVALID_TARGET_TYPE);
-		}
+	/**
+	 * 좋아요 여부를 확인하기 위한 메서드
+	 * @param user
+	 * @param targetType
+	 * @param targetIds
+	 * @return
+	 */
+	public Set<Long> getLikedTargetIds(User user, TargetType targetType, List<Long> targetIds) {
+		List<Like> likes = likeRepository.findByUserAndTargetTypeAndTargetIdInAndLikeTrue(user, targetType, targetIds);
+		return likes.stream()
+			.map(Like::getTargetId)
+			.collect(Collectors.toSet());
 	}
 }
