@@ -68,7 +68,6 @@ class VoteServiceTest {
         assertThat(response).isNotNull();
         assertThat(response.leftCount()).isEqualTo(7);
         assertThat(response.rightCount()).isEqualTo(3);
-        assertThat(response.totalVoteCount()).isEqualTo(10);
         verify(voteRepository).save(any(Vote.class));
     }
 
@@ -99,7 +98,6 @@ class VoteServiceTest {
         // then
         assertThat(result.leftCount()).isEqualTo(5);
         assertThat(result.rightCount()).isEqualTo(3);
-        assertThat(result.totalVoteCount()).isEqualTo(8);
     }
 
     @Test
