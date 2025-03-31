@@ -1,6 +1,8 @@
 package org.shax3.square.domain.opinion.service;
 
 import lombok.RequiredArgsConstructor;
+
+import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.opinion.dto.request.CreateOpinionCommentRequest;
 import org.shax3.square.domain.opinion.dto.request.UpdateOpinionRequest;
 import org.shax3.square.domain.opinion.dto.response.CommentResponse;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.shax3.square.exception.ExceptionCode.OPINION_COMMENT_NOT_FOUND;
 
@@ -24,17 +27,8 @@ public class OpinionCommentService {
     private final OpinionCommentRepository opinionCommentRepository;
     private final S3Service s3Service;
 
-    @Transactional(readOnly = true)
-    public List<CommentResponse> getOpinionComments(Long opinionId) {
-        List<OpinionComment> comments = opinionCommentRepository.findByOpinionId(opinionId);
-        boolean isLiked = false; //TODO 추가구현 필요
-        return comments.stream()
-                .map(comment -> CommentResponse.of(
-                        comment,
-                        s3Service.generatePresignedGetUrl(comment.getUser().getS3Key()),
-                        isLiked
-                ))
-                .toList();
+    public List<OpinionComment> getOpinionComments(Long opinionId) {
+        return opinionCommentRepository.findByOpinionId(opinionId);
     }
 
     public OpinionComment createComment(
@@ -73,8 +67,10 @@ public class OpinionCommentService {
             .orElseThrow(() -> new CustomException(OPINION_COMMENT_NOT_FOUND));
     }
 
-    public boolean isOpinionCommentExists(Long opinionCommentId) {
-        return opinionCommentRepository.existsById(opinionCommentId);
+    public void validateOpinionCommentExists(Long opinionCommentId) {
+        if (!opinionCommentRepository.existsById(opinionCommentId)) {
+            throw new CustomException(OPINION_COMMENT_NOT_FOUND);
+        }
     }
 
     public void increaseLikeCount(Long targetId, int countDiff) {

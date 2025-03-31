@@ -1,8 +1,11 @@
 package org.shax3.square.domain.opinion.service;
 
 import lombok.RequiredArgsConstructor;
+
+import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.debate.model.Debate;
 import org.shax3.square.domain.debate.service.DebateService;
+import org.shax3.square.domain.like.service.LikeService;
 import org.shax3.square.domain.opinion.dto.request.CreateOpinionRequest;
 import org.shax3.square.domain.opinion.dto.request.UpdateOpinionRequest;
 import org.shax3.square.domain.opinion.dto.response.MyOpinionResponse;
@@ -16,12 +19,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class OpinionService {
     private final OpinionRepository opinionRepository;
     private final DebateService debateService;
+    private final LikeService likeService;
 
     @Transactional
     public void createOpinion(User user, CreateOpinionRequest request) {
@@ -60,8 +65,10 @@ public class OpinionService {
                 .orElseThrow(() -> new CustomException(ExceptionCode.OPINION_NOT_FOUND));
     }
 
-    public boolean isOpinionExists(Long opinionId) {
-        return opinionRepository.existsById(opinionId);
+    public void validateOpinionExists(Long opinionId) {
+        if (!opinionRepository.existsById(opinionId)) {
+            throw new CustomException(ExceptionCode.OPINION_NOT_FOUND);
+        }
     }
 
     @Transactional(readOnly = true)
@@ -73,7 +80,13 @@ public class OpinionService {
             opinions = opinions.subList(0, limit);
         }
 
-        return MyOpinionResponse.of(opinions);
+        List<Long> opinionIds = opinions.stream()
+            .map(Opinion::getId)
+            .toList();
+
+        Set<Long> likedOpinionIds = likeService.getLikedTargetIds(user, TargetType.OPINION, opinionIds);
+
+        return MyOpinionResponse.of(opinions, likedOpinionIds);
     }
 
     public void increaseLikeCount(Long targetId, int countDiff) {

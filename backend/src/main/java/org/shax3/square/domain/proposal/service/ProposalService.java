@@ -10,6 +10,7 @@ import org.shax3.square.domain.proposal.model.Proposal;
 import org.shax3.square.domain.proposal.repository.ProposalRepository;
 import org.shax3.square.domain.user.model.User;
 import org.shax3.square.exception.CustomException;
+import org.shax3.square.exception.ExceptionCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,8 +64,10 @@ public class ProposalService {
             .orElseThrow(() -> new CustomException(PROPOSAL_NOT_FOUND));
     }
 
-    public boolean isProposalExists(Long proposalId) {
-        return proposalRepository.existsById(proposalId);
+    public void validateProposalExists(Long proposalId) {
+        if (!proposalRepository.existsById(proposalId)) {
+            throw new CustomException(PROPOSAL_NOT_FOUND);
+        }
     }
 
     public void increaseLikeCount(Long targetId, int countDiff) {
