@@ -8,11 +8,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.shax3.square.domain.opinion.dto.request.UpdateOpinionRequest;
-import org.shax3.square.domain.opinion.dto.response.CommentResponse;
 import org.shax3.square.domain.opinion.model.Opinion;
 import org.shax3.square.domain.opinion.model.OpinionComment;
 import org.shax3.square.domain.opinion.repository.OpinionCommentRepository;
-import org.shax3.square.domain.proposal.model.Proposal;
 import org.shax3.square.domain.s3.service.S3Service;
 import org.shax3.square.domain.user.model.Type;
 import org.shax3.square.domain.user.model.User;
@@ -213,7 +211,7 @@ class OpinionCommentServiceTest {
         when(opinionCommentRepository.existsById(opinionCommentId)).thenReturn(true);
 
         // when & then
-        assertThatCode(() -> opinionCommentService.validateOpinionCommentExists(opinionCommentId))
+        assertThatCode(() -> opinionCommentService.validateExists(opinionCommentId))
             .doesNotThrowAnyException();
     }
 
@@ -225,7 +223,7 @@ class OpinionCommentServiceTest {
         when(opinionCommentRepository.existsById(opinionCommentId)).thenReturn(false);
 
         // when & then
-        assertThatThrownBy(() -> opinionCommentService.validateOpinionCommentExists(opinionCommentId))
+        assertThatThrownBy(() -> opinionCommentService.validateExists(opinionCommentId))
             .isInstanceOf(CustomException.class)
             .hasMessage(ExceptionCode.OPINION_COMMENT_NOT_FOUND.getMessage());
     }

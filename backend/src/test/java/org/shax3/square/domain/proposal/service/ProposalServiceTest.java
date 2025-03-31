@@ -161,7 +161,7 @@ class ProposalServiceTest {
         when(proposalRepository.existsById(proposalId)).thenReturn(true);
 
         // when & then
-        assertThatCode(() -> proposalService.validateProposalExists(proposalId))
+        assertThatCode(() -> proposalService.validateExists(proposalId))
             .doesNotThrowAnyException();
     }
 
@@ -173,7 +173,7 @@ class ProposalServiceTest {
         when(proposalRepository.existsById(proposalId)).thenReturn(false);
 
         // when & then
-        assertThatThrownBy(() -> proposalService.validateProposalExists(proposalId))
+        assertThatThrownBy(() -> proposalService.validateExists(proposalId))
             .isInstanceOf(CustomException.class)
             .hasMessage(ExceptionCode.PROPOSAL_NOT_FOUND.getMessage());
     }
