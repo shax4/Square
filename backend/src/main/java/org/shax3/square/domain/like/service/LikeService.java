@@ -87,6 +87,9 @@ public class LikeService {
 	public void persistLikes(List<Long> userIds, TargetType targetType, Long targetId) {
 
 		List<User> users = userService.findAllById(userIds);
+
+		if (users.isEmpty()) return;
+
 		List<Like> existsLikes = likeRepository.findByTargetIdAndTargetTypeAndUserIn(targetId, targetType, users);
 
 		Set<Long> existsUserIds = existsLikes.stream()
