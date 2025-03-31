@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { Icons } from '../../../../assets/icons/Icons';
 
 import DebateCardsScreen from '../../../pages/DebateCardsScreen/DebateCardsScreen';
@@ -7,6 +7,7 @@ import OpinionListScreen from '../../../pages/OpinionListScreen/OpinionListScree
 import ProposalListScreen from '../../../pages/ProposalListScreen/ProposalListScreen';
 import ProposalCreateScreen from '../../../pages/ProposalCreateScreen/ProposalCreateScreen';
 import OpinionDetailScreen from '../../../pages/OpinionDetailScreen/OpinionDetailScreen';
+import OpinionEditScreen from '../../../pages/OpinionEditScreen/OpinionEditScreen';
 
 import { StackParamList } from '../../../shared/page-stack/DebatePageStack';
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -25,7 +26,7 @@ const debate = {
 
 // 테스트용 논쟁 의견 작성자자 정보(api에서 받아오도록 수정 필요)
 const opinion = {
-    nickname: '반짝이는하마1',
+    nickname: '반짝이는하마',
 }
 
 // 토론카드 홈 상단 탭
@@ -68,13 +69,24 @@ export default function HeaderBar() {
                 name="OpinionDetailScreen"
                 component={OpinionDetailScreen}
                 options={() => {
+                    return {
+                        title: '의견 상세',
+                        headerBackButtonDisplayMode: 'minimal',
+                    };
+                }}
+            />
+            {/* 의견 수정 */}
+            <Stack.Screen
+                name="OpinionEditScreen"
+                component={OpinionEditScreen}
+                options={() => {
                     // 현재 사용자와 작성자 비교해 우측 아이콘 및 기능 변경
                     const isAuthor = currentUser.nickname === opinion.nickname;
 
                     return {
                         title: '의견 상세',
                         headerBackButtonDisplayMode: 'minimal',
-                        headerRight: () => <OpinionDetailScreenHeaderRightIcons isAuthor={isAuthor} />,
+                        // headerRight: () => <EditOpinionHeaderRightIcon />,
                     };
                 }}
             />
@@ -115,30 +127,6 @@ function DebateCardsScreenHeaderRightIcons() {
             </TouchableOpacity>
         </View>
     )
-}
-
-// 상단 바 우측 아이콘 컴포넌트: 현재 사용자와 글 작성자 여부 확인
-function OpinionDetailScreenHeaderRightIcons({ isAuthor }: { isAuthor: boolean }) {
-    return (
-        <View style={styles.headerRightItems}>
-            {isAuthor ? (
-                <>
-                    <TouchableOpacity onPress={() => console.log('수정')}>
-                        <Icons.edit />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => console.log('삭제')}>
-                        <Icons.delete />
-                    </TouchableOpacity>
-                </>
-            ) : (
-                <>
-                    <TouchableOpacity onPress={() => console.log('신고')}>
-                        <Icons.report />
-                    </TouchableOpacity>
-                </>
-            )}
-        </View>
-    );
 }
 
 const styles = StyleSheet.create({
