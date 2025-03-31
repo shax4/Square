@@ -26,10 +26,12 @@ export default function OpinionListScreen() {
     const [isSummary, setIsSummary] = useState(true); // ai요약, 의견 토글
     const [isModalVisible, setIsModalVisible] = useState(isDebateModalVisible);
 
+
+    // 투표 통계 모달 닫기
     const closeDebateResultModal = () => {
         setIsModalVisible(false);
     }
-
+    // 투표 통계 모달 열기
     const openDebateResultModal = () => {
         setIsModalVisible(true);
     }
@@ -84,11 +86,11 @@ export default function OpinionListScreen() {
                 </View>
             </View>
 
-
             {/* 좌 우 투표 버튼 */}
             <View style={styles.VoteButtonView}>
                 <VoteButton
                     debate={debate}
+                    onVoteAction={() => { setIsModalVisible(true) }}
                 />
             </View>
 

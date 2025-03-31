@@ -8,13 +8,14 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { StackParamList } from '../../shared/page-stack/DebatePageStack';
 type VoteButtonProps = {
-    debate: Debate
+    debate: Debate;
+    onVoteAction?: () => void; // 모달 표시를 위한 콜백 추가
 };
 
 const leftOptionEmoji = "🙆‍♂️";
 const rightOptionEmoji = "🙅";
 
-const VoteButton = ({ debate }: VoteButtonProps): JSX.Element => {
+const VoteButton = ({ debate, onVoteAction }: VoteButtonProps): JSX.Element => {
     const {
         leftOption,
         rightOption,
@@ -39,10 +40,10 @@ const VoteButton = ({ debate }: VoteButtonProps): JSX.Element => {
             setSelectedSide(voteLeft);
             setModalVisible(true);
         }
-        // 투표를 한한 상태일 때: 투표 통계가 떠있는 의견 리스트 페이지로
+        // 투표를 한 상태일 때: 투표 통계가 떠있는 의견 리스트 페이지로
         else {
             console.log(debate.debateId + " " + (voteLeft ? " 왼쪽" : " 오른쪽"));
-            navigation.navigate('OpinionListScreen', { debateId: debate.debateId, isDebateModalVisible: true });
+            navigateOrRefreshScreenParam(debate.debateId, debate.isLeft);
         }
     }
 
@@ -68,16 +69,28 @@ const VoteButton = ({ debate }: VoteButtonProps): JSX.Element => {
         console.log(`debateId=${debateId}, 선택=${isLeft ? '왼쪽' : '오른쪽'}`);
         // API 요청 메서드 추가 필요
 
+        // 화면 이동 혹은 
+        navigateOrRefreshScreenParam(debateId, isLeft);
+
+    };
+
+    const navigateOrRefreshScreenParam = (
+        debateId: number,
+        isLeft: boolean,) => {
         // 통계 모달 띄우는 기능 추가 필요
         const currentRoute = navigation.getState().routes[navigation.getState().index];
-        // 투표 통계 모달을 볼 수 있는 의견 리스트 페이지에서 투표한 경우: 모달 띄우기만, 아니라면 페이지 이동
+
+        // 모달 컴포넌트가 있는 페이지에서 투표 버튼을 눌렀다면 모달 띄우기
         if (currentRoute.name === 'OpinionListScreen') {
-            navigation.setParams({ isDebateModalVisible: true });
-            console.log(currentRoute.name + " isDebateModalVisible 변경")
-        } else {
+            if (onVoteAction) {
+                onVoteAction();
+            }
+        } 
+        // 모달 컴포넌트가 없는 페이지에서 투표 버튼을 눌렀다면 페이지 이동
+        else {
             navigation.navigate('OpinionListScreen', { debateId: debate.debateId, isDebateModalVisible: true });
         }
-    };
+    }
 
     const voted = isLeft !== null;
     const widthLeft = voted ? Math.max(30, Math.min(leftPercent, 70)) - 10 : 45;
