@@ -5,10 +5,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.annotation.AuthUser;
+import org.shax3.square.domain.auth.annotation.Guest;
 import org.shax3.square.domain.debate.dto.DebateVotedResultResponse;
 import org.shax3.square.domain.debate.dto.request.VoteRequest;
 import org.shax3.square.domain.debate.dto.response.MyScrapedDebatesResponse;
 import org.shax3.square.domain.debate.dto.response.MyVotedDebatesResponse;
+import org.shax3.square.domain.debate.dto.response.SummaryResponse;
 import org.shax3.square.domain.debate.dto.response.VoteResponse;
 import org.shax3.square.domain.debate.model.Debate;
 import org.shax3.square.domain.debate.service.DebateFacadeService;
@@ -71,5 +73,19 @@ public class DebateController {
 
         return ResponseEntity.ok(response);
     }
+
+    @Operation(
+            summary = "AI 요약 조회 API",
+            description = """
+        지정한 논쟁 ID에 해당하는 AI 요약 결과를 조회합니다. \n
+        - 로그인하지 않은 경우 `hasVoted`, `isScraped` 값은 `null`로 반환됩니다. \n
+        """
+    )
+    @GetMapping("/{debateId}/summary")
+    public ResponseEntity<SummaryResponse> getSummary(@Guest User user, @PathVariable Long debateId){
+        SummaryResponse response = debateService.getSummaryResult(debateId, user);
+        return ResponseEntity.ok(response);
+    }
+
 
 }

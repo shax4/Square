@@ -6,9 +6,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.auth.annotation.AuthUser;
+import org.shax3.square.domain.debate.service.DebateService;
+import org.shax3.square.domain.post.service.PostService;
 import org.shax3.square.domain.scrap.dto.request.CreateScrapRequest;
 import org.shax3.square.domain.scrap.service.ScrapFacadeService;
 import org.shax3.square.domain.user.model.User;
+import org.shax3.square.exception.CustomException;
+import org.shax3.square.exception.ExceptionCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +23,8 @@ import org.springframework.web.bind.annotation.*;
 public class ScrapController {
 
     private final ScrapFacadeService scrapFacadeService;
+    private final DebateService debateService;
+    private final PostService postService;
 
     @Operation(
             summary = "스크랩 생성 api",
@@ -27,9 +33,16 @@ public class ScrapController {
     @PostMapping
     public ResponseEntity<Void> createScrap(
             @AuthUser User user,
-            @Valid @RequestBody CreateScrapRequest createScrapRequest
+            @Valid @RequestBody CreateScrapRequest request
     ) {
-        scrapFacadeService.create(user, createScrapRequest);
+        switch (request.targetType()) {
+            case DEBATE -> debateService.findDebateById(request.targetId());
+//            case POST -> postService.findPostById(request.targetId());
+            // 향후 다른 타입들도 추가 가능
+            default -> throw new CustomException(ExceptionCode.INVALID_TARGET_TYPE);
+        }
+
+        scrapFacadeService.create(user, request);
 
         return ResponseEntity.ok().build();
     }
