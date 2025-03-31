@@ -36,7 +36,6 @@ axiosInstance.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
         const {user, updateAccessToken, logOut} = useAuthStore.getState();
-        const refreshToken = user?.refreshToken;
         const accessToken = user?.accessToken;
 
         const isTokenExpired = error.response?.data?.code === 3002;
@@ -48,35 +47,39 @@ axiosInstance.interceptors.response.use(
             }
         */
 
-        if(isTokenExpired){
+        if(isTokenExpired && !originalRequest._retry){
             originalRequest._retry = true;
 
-            if(refreshToken){
-                try{
-                    const response = await axios.post(`${API_URL}/api/auth/reissue`, null, {
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`,
-                        },
-                    });
+            try{
+                const response = await axios.post(`${API_URL}/api/auth/reissue`, null, {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                });
 
-                    const authHeader = response.headers["authorization"]; // "Bearer {newAccessToken}"
+                const authHeader = response.headers["authorization"]; // "Bearer {newAccessToken}"
 
-                    if(!authHeader || !authHeader.startsWith("Bearer ")){
-                        throw new Error("🚨 Authorization 헤더 없음!");
-                    }
-
-                    const newAccessToken = authHeader.split(" ")[1]; // Bearer 이후 정보 가져옴.
-                    // AsyncStorage에 저장.
-
-                    console.log("새로 발급된 토큰 : ", newAccessToken)
-                    updateAccessToken(newAccessToken)
-                    originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-                }catch(error : any){
-                    // 로그아웃.
-                    console.error("토큰 재발급 에러 : ", error);
-                    console.error(error.response.data);
-                    logOut();
+                if(!authHeader || !authHeader.startsWith("Bearer ")){
+                    throw new Error("🚨 Authorization 헤더 없음!");
                 }
+
+                const newAccessToken = authHeader.split(" ")[1]; // Bearer 이후 정보 가져옴.
+                // AsyncStorage에 저장.
+
+                console.log("새로 발급된 토큰 : ", newAccessToken)
+                updateAccessToken(newAccessToken)
+                originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+
+                return axiosInstance(originalRequest);
+            }catch(error : any){
+                // 로그아웃.
+                console.error("토큰 재발급 에러:", error);
+                if (error.response) {
+                    console.error(error.response.data);
+                } else {
+                    console.error("🚨 네트워크 오류 또는 알 수 없는 오류 발생!");
+                }
+                logOut();
             }
         }
 
