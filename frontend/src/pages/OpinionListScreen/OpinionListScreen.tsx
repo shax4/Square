@@ -21,10 +21,10 @@ type OpinionListScreenRouteProp = RouteProp<StackParamList, 'OpinionListScreen'>
 
 export default function OpinionListScreen() {
     const route = useRoute<OpinionListScreenRouteProp>();
-    const { debateId, isDebateModalInitialVisible } = route.params;
+    const { debateId, isDebateModalVisible } = route.params;
 
     const [isSummary, setIsSummary] = useState(true); // ai요약, 의견 토글
-    const [isModalVisible, setIsModalVisible] = useState(isDebateModalInitialVisible);
+    const [isModalVisible, setIsModalVisible] = useState(isDebateModalVisible);
 
     const closeDebateResultModal = () => {
         setIsModalVisible(false);
@@ -35,20 +35,18 @@ export default function OpinionListScreen() {
     }
 
     useEffect(() => {
-        if (isDebateModalInitialVisible) {
+        if (isDebateModalVisible) {
             openDebateResultModal();
         } else {
             closeDebateResultModal();
         }
-    }, [isDebateModalInitialVisible]);
+    }, [isDebateModalVisible]);
 
     // Axios로 가져와야 함
     const debate = debateList[debateId];
 
     // 투표 통계 데이터
     const [debateResultData, setDebateResultData] = useState(resultData);
-
-
 
     return (
         <View style={styles.container}>

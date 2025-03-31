@@ -43,7 +43,7 @@ const DebateCard = ({
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
 
     const navigateToOpinionListPage = (isDebateModalInitialVisible: boolean) => {
-        navigation.navigate('OpinionListScreen', { debateId: debate.debateId, isDebateModalInitialVisible });
+        navigation.navigate('OpinionListScreen', { debateId: debate.debateId, isDebateModalVisible: isDebateModalInitialVisible });
     }
 
     return (
