@@ -12,7 +12,7 @@ export type StackParamList = {
     DebateCardsScreen: undefined;
     OpinionListScreen: {
         debateId: number;
-        isDebateModalVisible: boolean
+        showVoteResultModal?: boolean;
     };
     OpinionDetailScreen: { opinionId: number };
     ProposalListScreen: undefined;

@@ -2,12 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { StackParamList } from '../../shared/page-stack/DebatePageStack';
-import { debateData, debateData as debateList } from '../DebateCardsScreen/DebateCard/card-data';
+import { debateData as debateList } from '../DebateCardsScreen/DebateCard/card-data';
 import colors from '../../../assets/colors';
 import VoteButton from '../../components/VoteButton/VoteButton';
-
-import DebateResultModal from '../DebateResultModal/DebateResultModal';
-import { resultData } from './Components/debate-result-test-data';
 
 import ToggleSwitch from './Components/ToggleSwitch';
 
@@ -21,34 +18,13 @@ type OpinionListScreenRouteProp = RouteProp<StackParamList, 'OpinionListScreen'>
 
 export default function OpinionListScreen() {
     const route = useRoute<OpinionListScreenRouteProp>();
-    const { debateId, isDebateModalVisible } = route.params;
+    const { debateId, showVoteResultModal = false } = route.params;
 
     const [isSummary, setIsSummary] = useState(true); // ai요약, 의견 토글
-    const [isModalVisible, setIsModalVisible] = useState(isDebateModalVisible);
-
-
-    // 투표 통계 모달 닫기
-    const closeDebateResultModal = () => {
-        setIsModalVisible(false);
-    }
-    // 투표 통계 모달 열기
-    const openDebateResultModal = () => {
-        setIsModalVisible(true);
-    }
-
-    useEffect(() => {
-        if (isDebateModalVisible) {
-            openDebateResultModal();
-        } else {
-            closeDebateResultModal();
-        }
-    }, [isDebateModalVisible]);
 
     // Axios로 가져와야 함
     const debate = debateList[debateId];
 
-    // 투표 통계 데이터
-    const [debateResultData, setDebateResultData] = useState(resultData);
 
     return (
         <View style={styles.container}>
@@ -90,7 +66,7 @@ export default function OpinionListScreen() {
             <View style={styles.VoteButtonView}>
                 <VoteButton
                     debate={debate}
-                    onVoteAction={() => { setIsModalVisible(true) }}
+                    showVoteResultModal={showVoteResultModal}
                 />
             </View>
 
@@ -99,14 +75,6 @@ export default function OpinionListScreen() {
                 <Text>지금까지 {debate.totalVoteCount}명 참여중</Text>
             </View>
 
-            <DebateResultModal
-                data={debateResultData}
-                leftOption={debate.leftOption}
-                rightOption={debate.rightOption}
-                visible={isModalVisible}
-                onClose={() => closeDebateResultModal()}
-                onPressMoreOpinion={() => { }}
-            />
         </View>
     )
 }

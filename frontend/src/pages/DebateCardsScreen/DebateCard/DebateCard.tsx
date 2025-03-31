@@ -42,8 +42,8 @@ const DebateCard = ({
 
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
 
-    const navigateToOpinionListPage = (isDebateModalInitialVisible: boolean) => {
-        navigation.navigate('OpinionListScreen', { debateId: debate.debateId, isDebateModalVisible: isDebateModalInitialVisible });
+    const navigateToOpinionListPage = () => {
+        navigation.navigate('OpinionListScreen', { debateId });
     }
 
     return (
@@ -69,7 +69,7 @@ const DebateCard = ({
                     {/* Topic */}
                     <TouchableOpacity
                         style={styles.CardTopic}
-                        onPress={() => navigateToOpinionListPage(false)}>
+                        onPress={() => navigateToOpinionListPage()}>
                         <Text style={styles.CardTopicText}>{topic}</Text>
                     </TouchableOpacity>
 
