@@ -23,6 +23,7 @@ import org.shax3.square.exception.ExceptionCode;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -282,5 +283,63 @@ class OpinionServiceTest {
         // then
         verify(opinion).increaseLikeCount(3);
     }
+
+    @Test
+    @DisplayName("getMyOpinions - limit보다 많은 경우, limit만큼 잘라서 반환")
+    void getMyOpinions_limitExceeded_returnsLimitedList() {
+        // Given
+        int limit = 3;
+        Long nextCursorId = null;
+
+        List<Opinion> mockOpinions = createTestOpinions(5L, 4L, 3L, 2L); // 총 4개
+        when(opinionRepository.findMyOpinions(mockUser, nextCursorId, limit + 1))
+            .thenReturn(mockOpinions);
+
+        // When
+        List<Opinion> result = opinionService.getMyOpinions(mockUser, nextCursorId, limit);
+
+        // Then
+        assertThat(result).hasSize(limit);
+        assertThat(result.get(0).getId()).isEqualTo(5L);
+        assertThat(result.get(2).getId()).isEqualTo(3L);
+    }
+
+    @Test
+    @DisplayName("getMyOpinions - limit 이하일 경우 그대로 반환")
+    void getMyOpinions_limitNotExceeded_returnsAll() {
+        // Given
+        int limit = 3;
+        Long nextCursorId = null;
+
+        List<Opinion> mockOpinions = createTestOpinions(2L, 1L);
+        when(opinionRepository.findMyOpinions(mockUser, nextCursorId, limit + 1))
+            .thenReturn(mockOpinions);
+
+        // When
+        List<Opinion> result = opinionService.getMyOpinions(mockUser, nextCursorId, limit);
+
+        // Then
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getId()).isEqualTo(2L);
+        assertThat(result.get(1).getId()).isEqualTo(1L);
+    }
+
+    // 테스트용 Opinion 목록 생성 헬퍼 메서드
+    private List<Opinion> createTestOpinions(Long... ids) {
+        List<Opinion> opinions = new ArrayList<>();
+
+        for (Long id : ids) {
+            Opinion opinion = Opinion.builder()
+                .user(mockUser)
+                .debate(mockDebate)
+                .content("테스트 내용 " + id)
+                .build();
+            ReflectionTestUtils.setField(opinion, "id", id);
+            ReflectionTestUtils.setField(opinion, "valid", true);
+            opinions.add(opinion);
+        }
+        return opinions;
+    }
+
 }
 
