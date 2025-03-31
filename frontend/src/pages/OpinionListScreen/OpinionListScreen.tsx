@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { StackParamList } from '../../shared/page-stack/DebatePageStack';
@@ -25,15 +25,29 @@ export default function OpinionListScreen() {
 
     const [isSummary, setIsSummary] = useState(true); // ai요약, 의견 토글
     const [isModalVisible, setIsModalVisible] = useState(isDebateModalInitialVisible);
+
+    const closeDebateResultModal = () => {
+        setIsModalVisible(false);
+    }
+
+    const openDebateResultModal = () => {
+        setIsModalVisible(true);
+    }
+
+    useEffect(() => {
+        if (isDebateModalInitialVisible) {
+            openDebateResultModal();
+        } else {
+            closeDebateResultModal();
+        }
+    }, [isDebateModalInitialVisible]);
+
     // Axios로 가져와야 함
     const debate = debateList[debateId];
 
     // 투표 통계 데이터
-    const [debateResultData, setDebateResultData] = useState(debateData);
+    const [debateResultData, setDebateResultData] = useState(resultData);
 
-    const closeModal = () => {
-        setIsModalVisible(false);
-    }
 
 
     return (
@@ -86,11 +100,11 @@ export default function OpinionListScreen() {
             </View>
 
             <DebateResultModal
-                data={resultData}
+                data={debateResultData}
                 leftOption={debate.leftOption}
                 rightOption={debate.rightOption}
                 visible={isModalVisible}
-                onClose={() => closeModal()}
+                onClose={() => closeDebateResultModal()}
                 onPressMoreOpinion={() => { }}
             />
         </View>

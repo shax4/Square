@@ -68,8 +68,17 @@ const VoteButton = ({ debate }: VoteButtonProps): JSX.Element => {
         console.log(`debateId=${debateId}, 선택=${isLeft ? '왼쪽' : '오른쪽'}`);
         // API 요청 메서드 추가 필요
 
+
         // 통계 모달 띄우는 기능 추가 필요
-        navigation.navigate('OpinionListScreen', { debateId: debate.debateId, isDebateModalInitialVisible: true });
+        const currentRoute = navigation.getState().routes[navigation.getState().index];
+
+        // 투표 통계 모달을 볼 수 있는 의견 리스트 페이지에서 투표한 경우: 모달 띄우기만, 아니라면 페이지 이동
+        if (currentRoute.name === 'OpinionListScreen') {
+
+            navigation.setParams({ isDebateModalInitialVisible: true });
+        } else {
+            navigation.navigate('OpinionListScreen', { debateId: debate.debateId, isDebateModalInitialVisible: true });
+        }
     };
 
     const voted = isLeft !== null;
