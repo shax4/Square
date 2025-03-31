@@ -8,8 +8,7 @@ import { StackParamList } from '../../../shared/page-stack/DebatePageStack';
 import { Debate } from './Debate.types';
 import { styles } from './DebateCard.styles';
 import { Icons } from '../../../../assets/icons/Icons';
-import VoteConfirmModal from './VoteConfirmModal';
-import { AfterVoteButtonView, BeforeVoteButtonView } from '../../../components/VoteButton/VoteButton'
+import VoteButton from '../../../components/VoteButton/VoteButton'
 
 const DebateCard = ({
     debateId,
@@ -41,48 +40,10 @@ const DebateCard = ({
         totalVoteCount,
     };
 
-
-    // 투표 및 투표 확인 모달 관련
-    const [modalVisible, setModalVisible] = useState(false);
-    const [selectedSide, setSelectedSide] = useState<boolean | null>(isLeft);
-
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
 
-    // 투표 버튼 클릭 시
-    const handleVote = (isLeft: boolean) => {
-        setSelectedSide(isLeft);
-        setModalVisible(true);
-    }
-
-    // 투표 모달 취소
-    const handleVoteCancel = () => {
-        console.log("투표 취소");
-        setModalVisible(false);
-    };
-
-    // 투표 모달 확인
-    const handleVoteConfirm = () => {
-        if (selectedSide !== null) {
-            voteConfirm(debateId, selectedSide, navigation);
-        }
-        setModalVisible(false);
-    };
-
-    // 투표 모달 확인 클릭 시 동작하는 메서드
-    const voteConfirm = (
-        debateId: number,
-        isLeft: boolean,
-        navigation: NativeStackNavigationProp<StackParamList>
-    ) => {
-        console.log(`debateId=${debateId}, 선택=${isLeft ? '왼쪽' : '오른쪽'}`);
-        // API 요청 메서드 추가 필요
-
-        // 의견 상세 페이지로 이동
-        navigation.navigate('OpinionListScreen', { debateId });
-    };
-
-    const navigateToOpinionListPage = () => {
-        navigation.navigate('OpinionListScreen', { debateId });
+    const navigateToOpinionListPage = (isDebateModalInitialVisible: boolean) => {
+        navigation.navigate('OpinionListScreen', { debateId: debate.debateId, isDebateModalInitialVisible });
     }
 
     return (
@@ -108,29 +69,15 @@ const DebateCard = ({
                     {/* Topic */}
                     <TouchableOpacity
                         style={styles.CardTopic}
-                        onPress={() => navigation.navigate('OpinionListScreen', { debateId })}>
+                        onPress={() => navigateToOpinionListPage(false)}>
                         <Text style={styles.CardTopicText}>{topic}</Text>
                     </TouchableOpacity>
 
                     {/* Vote Buttons: 투표 여부(isLeft에 따라 다르게 렌더링*/}
                     <View style={styles.CardVote}>
-                        {isLeft != null ? (
-                            <AfterVoteButtonView
-                                debate={debate}
-                                onSelectLeft={navigateToOpinionListPage}
-                                onSelectRight={navigateToOpinionListPage}
-                            />
-                        ) : (
-                            <BeforeVoteButtonView
-                                debate={debate}
-                                onSelectLeft={() => {
-                                    handleVote(true);
-                                }}
-                                onSelectRight={() => {
-                                    handleVote(false);
-                                }}
-                            />
-                        )}
+                        <VoteButton
+                            debate={debate}
+                        />
                     </View>
 
                     {/* Footer */}
@@ -142,15 +89,6 @@ const DebateCard = ({
                 {/* 하단 패딩 */}
                 <View style={styles.CardMarginBottom} />
             </View>
-
-            {/* 투표 확인 모달 */}
-            <VoteConfirmModal
-                visible={modalVisible}
-                debateId={debateId}
-                isLeft={selectedSide!} // 투표를 통해 selectedSice가 null 이 아닐때만 실행됨
-                onCancel={handleVoteCancel}
-                onConfirm={handleVoteConfirm}
-            />
         </>
     )
 
