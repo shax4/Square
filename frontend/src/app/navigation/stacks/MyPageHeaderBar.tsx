@@ -15,6 +15,7 @@ import ProfileUpdateScreen from '../../../pages/ProfileUpdateScreen/ProfileUpdat
 import DeleteAccountScreen from '../../../pages/DeleteAccountScreen/DeleteAccountScreen';
 import UseAuthTestScreen from '../../../pages/UseAuthTestScreen/UseAuthTestScreen';
 import SignupTestScreen from '../../../pages/SignupTestScreen/SignupTestScreen';
+import MypageFeatureTestScreen from '../../../pages/MypageFeatureTestScreen/MypageFeatureTestScreen';
 import { ModalTestScreen } from '../../../pages';
 
 // 스택 네비게이터
@@ -108,6 +109,14 @@ export default function HeaderBar() {
                 component={ModalTestScreen}
                 options={{
                     title: 'ModalTestScreen',
+                    headerBackButtonDisplayMode: 'minimal',
+                }}
+            />
+            <Stack.Screen
+                name="MypageFeatureTestScreen"
+                component={MypageFeatureTestScreen}
+                options={{
+                    title: 'MypageFeatureTestScreen',
                     headerBackButtonDisplayMode: 'minimal',
                 }}
             />
