@@ -77,4 +77,9 @@ public class OpinionCommentService {
         return opinionCommentRepository.existsById(opinionCommentId);
     }
 
+    public void increaseLikeCount(Long targetId, int countDiff) {
+        OpinionComment opinionComment = getOpinionComment(targetId);
+        opinionComment.increaseLikeCount(countDiff);
+    }
+
 }

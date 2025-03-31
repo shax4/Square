@@ -56,5 +56,9 @@ public class Opinion extends BaseTimeEntity {
     public void softDelete() {
         this.valid = false;
     }
+
+    public void increaseLikeCount(int countDiff) {
+        this.likeCount += countDiff;
+    }
 }
 

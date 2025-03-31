@@ -87,7 +87,6 @@ public class LikeService {
 	public void persistLikes(List<Long> userIds, TargetType targetType, Long targetId) {
 
 		List<User> users = userService.findAllById(userIds);
-
 		if (users.isEmpty()) return;
 
 		List<Like> existsLikes = likeRepository.findByTargetIdAndTargetTypeAndUserIn(targetId, targetType, users);
@@ -95,6 +94,9 @@ public class LikeService {
 		Set<Long> existsUserIds = existsLikes.stream()
 			.map(like -> like.getUser().getId())
 			.collect(Collectors.toSet());
+
+		long toggledUp = existsLikes.stream().filter(like -> !like.isLike()).count();
+		long toggledDown = existsLikes.size() - toggledUp;
 
 		// 기존 좋아요는 toggle
 		existsLikes.forEach(Like::toggleLike);
@@ -110,5 +112,18 @@ public class LikeService {
 				.toList();
 
 		likeRepository.saveAll(newLikes);
+
+		int likeDiff = (int) (newLikes.size() + toggledUp - toggledDown);
+		updateTargetLikeCount(targetType, targetId, likeDiff);
+	}
+
+	private void updateTargetLikeCount(TargetType targetType, Long targetId, int diff) {
+		switch (targetType) {
+			case OPINION -> opinionService.increaseLikeCount(targetId, diff);
+			case PROPOSAL -> proposalService.increaseLikeCount(targetId, diff);
+			case OPINION_COMMENT -> opinionCommentService.increaseLikeCount(targetId, diff);
+			// TODO: POST, POST_COMMENT 등도 나중에 추가
+			default -> throw new CustomException(ExceptionCode.INVALID_TARGET_TYPE);
+		}
 	}
 }

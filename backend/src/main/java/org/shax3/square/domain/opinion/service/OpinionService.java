@@ -75,4 +75,9 @@ public class OpinionService {
 
         return MyOpinionResponse.of(opinions);
     }
+
+    public void increaseLikeCount(Long targetId, int countDiff) {
+        Opinion opinion = getOpinion(targetId);
+        opinion.increaseLikeCount(countDiff);
+    }
 }
