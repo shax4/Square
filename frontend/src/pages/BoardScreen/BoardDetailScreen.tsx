@@ -18,6 +18,7 @@ import CommentItem from "./components/CommentItem";
 import { useFocusEffect } from "@react-navigation/native";
 import { BoardStackParamList } from "../../shared/page-stack/BoardPageStack";
 import { Post, Comment, Reply } from "./board.types";
+import { getTimeAgo } from "../../shared/utils/timeAge/timeAge";
 
 // 네비게이션 프롭 타입 정의
 type Props = StackScreenProps<BoardStackParamList, "BoardDetail">;
@@ -103,7 +104,7 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
           <ProfileImage imageUrl={post?.profileUrl} variant="medium" />
           <View style={styles.authorInfo}>
             <Text style={styles.authorName}>{post?.nickname}</Text>
-            <Text style={styles.postDate}>{post?.createdAt}</Text>
+            <Text style={styles.postDate}>{post?.createdAt ? getTimeAgo(post.createdAt) : ""}</Text>
           </View>
         </View>
 
