@@ -1,5 +1,5 @@
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
-import { Text, TouchableOpacity, View, ScrollView, KeyboardAvoidingView, Platform, TextInput } from "react-native";
+import { Text, TouchableOpacity, View, ScrollView, KeyboardAvoidingView, Platform, TextInput, Alert } from "react-native";
 import { StackParamList } from "../../shared/page-stack/DebatePageStack";
 import opinionDetailTestData from './Components/opinion-detail-test-data';
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
@@ -49,7 +49,7 @@ export default function OpinionDetailScreen() {
                             <TouchableOpacity onPress={() => navigation.navigate('OpinionEditScreen', { opinionId, content: response.content },)}>
                                 <Icons.edit />
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => console.log('삭제')}>
+                            <TouchableOpacity onPress={handleDelete}>
                                 <Icons.delete />
                             </TouchableOpacity>
                         </>
@@ -65,6 +65,30 @@ export default function OpinionDetailScreen() {
         });
     }, []);
 
+    const handleDelete = () => {
+        Alert.alert(
+            '삭제 확인',
+            '정말로 이 의견을 삭제하시겠습니까?',
+            [
+                {
+                    text: '취소',
+                    onPress: () => console.log('삭제 취소됨'),
+                    style: 'cancel',
+                },
+                {
+                    text: '삭제',
+                    onPress: () => { deleteOpinion(opinionId) },
+                    style: 'destructive',
+                },
+            ],
+            { cancelable: true }
+        );
+    };
+
+    // 게시글 삭제 진행 함수 추가 필요
+    const deleteOpinion = (opinionI: number) => {
+        console.log(opinionId + ' 삭제');
+    }
 
     return (
         <View style={styles.Container}>
