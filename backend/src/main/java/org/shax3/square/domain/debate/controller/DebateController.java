@@ -8,6 +8,7 @@ import org.shax3.square.domain.auth.annotation.AuthUser;
 import org.shax3.square.domain.auth.annotation.Guest;
 import org.shax3.square.domain.debate.dto.DebateVotedResultResponse;
 import org.shax3.square.domain.debate.dto.request.VoteRequest;
+import org.shax3.square.domain.debate.dto.response.DebatesResponse;
 import org.shax3.square.domain.debate.dto.response.MyScrapedDebatesResponse;
 import org.shax3.square.domain.debate.dto.response.MyVotedDebatesResponse;
 import org.shax3.square.domain.debate.dto.response.SummaryResponse;
@@ -86,6 +87,17 @@ public class DebateController {
         SummaryResponse response = debateService.getSummaryResult(debateId, user);
         return ResponseEntity.ok(response);
     }
+
+
+    @GetMapping("/debates")
+    public ResponseEntity<DebatesResponse> getDebates(@Guest User user){
+
+        DebatesResponse response = debateService.getDebates(user);
+        return ResponseEntity.ok(response);
+    }
+
+
+
 
 
 }
