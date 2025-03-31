@@ -2,7 +2,7 @@
 export const currentUser = {
     id: 1,
     nickname: "반짝이는하마",
-    profileUrl: "https://example.com/profile1.jpg",
+    profileUrl: "",
     userType: "PNTB"
   };
   
@@ -25,7 +25,7 @@ export const currentUser = {
         {
           commentId: 1,
           nickname: "반짝이는코알라",
-          profileUrl: "https://example.com/profile2.jpg",
+          profileUrl: "",
           userType: "PNTB",
           createdAt: "2025-03-25T13:00:00Z",
           content: "첫 번째 댓글입니다",
@@ -37,7 +37,7 @@ export const currentUser = {
               replyId: 1,
               parentId: 1,
               nickname: "즐거운팬더",
-              profileUrl: "https://example.com/profile3.jpg",
+              profileUrl: "",
               userType: "PNTB",
               createdAt: "2025-03-25T13:15:00Z",
               content: "첫 번째 대댓글입니다",
@@ -72,7 +72,7 @@ export const currentUser = {
               replyId: 3,
               parentId: 2,
               nickname: "똑똑한사자",
-              profileUrl: "https://example.com/profile4.jpg",
+              profileUrl: "",
               userType: "PNTB",
               createdAt: "2025-03-25T14:15:00Z",
               content: "대댓글 테스트입니다",
@@ -84,7 +84,7 @@ export const currentUser = {
         {
           commentId: 3,
           nickname: "행복한기린",
-          profileUrl: "https://example.com/profile5.jpg",
+          profileUrl: "",
           userType: "PNTB",
           createdAt: "2025-03-25T15:00:00Z",
           content: "세 번째 댓글입니다",
@@ -100,7 +100,7 @@ export const currentUser = {
     {
       postId: 2,
       nickname: "반짝이는코알라",
-      profileUrl: "https://example.com/profile2.jpg",
+      profileUrl: "",
       userType: "PNTB",
       createdAt: "2025-03-24T10:34:56Z",
       title: "안녕하세요! 반가워요",
@@ -125,7 +125,7 @@ export const currentUser = {
               replyId: 4,
               parentId: 4,
               nickname: "반짝이는코알라",
-              profileUrl: "https://example.com/profile2.jpg",
+              profileUrl: "",
               userType: "PNTB",
               createdAt: "2025-03-24T11:15:00Z",
               content: "댓글 남겨주셔서 감사합니다!",
@@ -136,7 +136,7 @@ export const currentUser = {
               replyId: 5,
               parentId: 4,
               nickname: "즐거운팬더",
-              profileUrl: "https://example.com/profile3.jpg",
+              profileUrl: "",
               userType: "PNTB",
               createdAt: "2025-03-24T11:30:00Z",
               content: "모두 좋은 하루 되세요~",
@@ -148,7 +148,7 @@ export const currentUser = {
         {
           commentId: 5,
           nickname: "똑똑한사자",
-          profileUrl: "https://example.com/profile4.jpg",
+          profileUrl: "",
           userType: "PNTB",
           createdAt: "2025-03-24T12:00:00Z",
           content: "글 잘 봤습니다!",
@@ -160,7 +160,7 @@ export const currentUser = {
               replyId: 6,
               parentId: 5,
               nickname: "반짝이는코알라",
-              profileUrl: "https://example.com/profile2.jpg",
+              profileUrl: "",
               userType: "PNTB",
               createdAt: "2025-03-24T12:15:00Z",
               content: "감사합니다 :)",
@@ -172,7 +172,7 @@ export const currentUser = {
         {
           commentId: 6,
           nickname: "행복한기린",
-          profileUrl: "https://example.com/profile5.jpg",
+          profileUrl: "",
           userType: "PNTB",
           createdAt: "2025-03-24T13:00:00Z",
           content: "좋은 글이네요!",
@@ -188,7 +188,7 @@ export const currentUser = {
     {
       postId: 3,
       nickname: "즐거운팬더",
-      profileUrl: "https://example.com/profile3.jpg",
+      profileUrl: "",
       userType: "PNTB",
       createdAt: "2025-03-23T09:34:56Z",
       title: "오늘의 날씨가 정말 좋네요",
@@ -201,7 +201,7 @@ export const currentUser = {
         {
           commentId: 7,
           nickname: "행복한기린",
-          profileUrl: "https://example.com/profile5.jpg",
+          profileUrl: "",
           userType: "PNTB",
           createdAt: "2025-03-23T10:00:00Z",
           content: "정말 날씨가 좋네요! 저도 나들이 가려구요.",
@@ -213,7 +213,7 @@ export const currentUser = {
               replyId: 7,
               parentId: 7,
               nickname: "즐거운팬더",
-              profileUrl: "https://example.com/profile3.jpg",
+              profileUrl: "",
               userType: "PNTB",
               createdAt: "2025-03-23T10:15:00Z",
               content: "좋은 시간 보내세요~",
@@ -236,7 +236,7 @@ export const currentUser = {
         {
           commentId: 8,
           nickname: "반짝이는코알라",
-          profileUrl: "https://example.com/profile2.jpg",
+          profileUrl: "",
           userType: "PNTB",
           createdAt: "2025-03-23T11:00:00Z",
           content: "날씨 정보 감사합니다!",
@@ -248,7 +248,7 @@ export const currentUser = {
               replyId: 9,
               parentId: 8,
               nickname: "즐거운팬더",
-              profileUrl: "https://example.com/profile3.jpg",
+              profileUrl: "",
               userType: "PNTB",
               createdAt: "2025-03-23T11:15:00Z",
               content: "천만에요~",
