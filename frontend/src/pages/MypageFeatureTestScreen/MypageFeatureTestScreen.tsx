@@ -12,7 +12,7 @@ const MypageFeatureTestScreen = () => {
     return (
         <View style={styles.container}>
             <MypageButton
-              title="useAuth"
+              title="임시 로그인"
               onPress={() => navigation.navigate('UseAuthTestScreen')}
               variant="secondary"
               style={styles.actionButton}

@@ -92,7 +92,7 @@ export default function HeaderBar() {
                 name="UseAuthTestScreen"
                 component={UseAuthTestScreen}
                 options={{
-                    title: '탈퇴하기',
+                    title: '임시 로그인',
                     headerBackButtonDisplayMode: 'minimal',
                 }}
             />

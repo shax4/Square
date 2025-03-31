@@ -1,24 +1,47 @@
 import {View, Text, Button} from 'react-native'
 import { useAuth } from '../../shared/hooks'
-import { userDetails } from '../../shared/stores/auth'
-import { PersonalityTag } from '../../components'
+import { userDetails, UserInfo } from '../../shared/types/user'
+import { loginTemp, getProfileInfos } from './Api/loginAPI'
+import { useState } from 'react'
 
 const UseAuthTestScreen = () => {
     const {user, setUser, loggedIn, logOut} = useAuth();
-    const login = () => {
-        const userData: userDetails = {
-            nickname: "sagak",
-            userType: "ABCD",
-            token: "token1234",
+
+    const [userInfo, setUserInfo] = useState<UserInfo>();
+
+    const login = async () => {
+        try{
+            const result : userDetails = await loginTemp();
+
+            setUser(result);
+        }catch(error){
+            console.error("임시 로그인 실패 :", error);
         }
-        setUser(userData);
+    }
+
+    const getProfInfos = async () => {
+        try{
+            const result : UserInfo = await getProfileInfos();
+
+            setUserInfo(result);
+        }catch(error){
+            console.error("프로필 정보 불러오기 실패 :", error);
+        }
     }
 
     return (
         <View>
             {loggedIn ? (
                 <>
-                    <Text>{user?.nickname} ({user?.userType}) 님, 안녕하세요! 토큰 : {user?.token}</Text>
+                    <Text>nickname : {user?.nickname}</Text>
+                    <Text>userType : {user?.userType}</Text>
+                    <Text>state : {user?.state}</Text>
+                    <Text>isMember : {user?.isMember}</Text>
+                    <Text>accessToken : {user?.accessToken}</Text>
+                    <Text>refreshToken : {user?.refreshToken}</Text>
+                    
+                    <Button title="프로필 정보 조회" onPress={getProfInfos} />
+                    <Text>{userInfo?.region}, {userInfo?.religion}</Text>
                     <Button title="로그아웃" onPress={logOut} />
                 </>
             ) : (
