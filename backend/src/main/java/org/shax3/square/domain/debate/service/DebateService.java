@@ -1,11 +1,18 @@
 package org.shax3.square.domain.debate.service;
 
 import lombok.RequiredArgsConstructor;
+import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.debate.dto.DebateVotedResultResponse;
+import org.shax3.square.domain.debate.dto.SummaryDto;
 import org.shax3.square.domain.debate.dto.VoteResultDto;
+import org.shax3.square.domain.debate.dto.response.SummaryResponse;
+import org.shax3.square.domain.debate.dto.response.VoteResponse;
 import org.shax3.square.domain.debate.model.Debate;
 import org.shax3.square.domain.debate.model.Vote;
 import org.shax3.square.domain.debate.repository.DebateRepository;
+import org.shax3.square.domain.like.service.LikeService;
+import org.shax3.square.domain.scrap.service.ScrapFacadeService;
+import org.shax3.square.domain.user.model.User;
 import org.shax3.square.exception.CustomException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +29,8 @@ public class DebateService {
 
     private final DebateRepository debateRepository;
     private final VoteService voteService;
+    private final ScrapFacadeService scrapFacadeService;
+    private final SummaryService summaryService;
 
     public Debate findDebateById(Long debateId) {
         return debateRepository.findById(debateId)
@@ -44,6 +53,24 @@ public class DebateService {
 
     private VoteResultDto createVoteResultDto(List<Vote> votes) {
         return VoteResultDto.fromVotes(votes);
+    }
+
+    public SummaryResponse getSummaryResult(Long debateId, User user) {
+        Debate debate = findDebateById(debateId);
+        Boolean hasVoted;
+        Boolean isScraped;
+        if (user == null) {
+            hasVoted = null;
+            isScraped = null;
+        } else{
+            hasVoted = voteService.getVoteByUserAndDebate(user, debate).isPresent();
+            isScraped = scrapFacadeService.isScrapExist(user,debateId, TargetType.DEBATE);
+        }
+        VoteResponse voteResponse = voteService.calculateVoteResult(debate);
+
+        List<SummaryDto> summaries = summaryService.getSummariesByDebateId(debateId);
+
+        return SummaryResponse.of(debate,voteResponse,hasVoted,isScraped,summaries);
     }
 
 }
