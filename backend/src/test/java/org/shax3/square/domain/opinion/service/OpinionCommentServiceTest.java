@@ -12,6 +12,7 @@ import org.shax3.square.domain.opinion.dto.response.CommentResponse;
 import org.shax3.square.domain.opinion.model.Opinion;
 import org.shax3.square.domain.opinion.model.OpinionComment;
 import org.shax3.square.domain.opinion.repository.OpinionCommentRepository;
+import org.shax3.square.domain.proposal.model.Proposal;
 import org.shax3.square.domain.s3.service.S3Service;
 import org.shax3.square.domain.user.model.Type;
 import org.shax3.square.domain.user.model.User;
@@ -233,4 +234,17 @@ class OpinionCommentServiceTest {
         assertThat(exists).isFalse();
     }
 
+    @Test
+    @DisplayName("increaseLikeCount - likeCount 증가 로직이 잘 호출되는지 확인")
+    void increaseLikeCount_success() {
+        // given
+        OpinionComment opinionComment = mock(OpinionComment.class);
+        when(opinionCommentRepository.findById(10L)).thenReturn(Optional.of(opinionComment));
+
+        // when
+        opinionCommentService.increaseLikeCount(10L, 3);
+
+        // then
+        verify(opinionComment).increaseLikeCount(3);
+    }
 }

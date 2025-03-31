@@ -50,6 +50,7 @@ class LikeServiceTest {
 
 	private User user1;
 	private User user2;
+	private User user3;
 
 	@BeforeEach
 	void setUp() {
@@ -63,6 +64,10 @@ class LikeServiceTest {
 			.build();
 		ReflectionTestUtils.setField(user2, "id", 2L);
 
+		user3 = User.builder()
+			.nickname("TestUser3")
+			.build();
+		ReflectionTestUtils.setField(user3, "id", 3L);
 	}
 
 	@Test
@@ -120,37 +125,48 @@ class LikeServiceTest {
 	}
 
 	@Test
-	@DisplayName("persistLikes - 기존 좋아요는 toggle, 새로운 건 saveAll")
+	@DisplayName("persistLikes - 기존 좋아요 2개(toggled), 신규 1개(saveAll)")
 	void persistLikes_toggleAndSaveNew() {
 		// Given
 		Long targetId = 40L;
 		TargetType targetType = TargetType.OPINION;
 
-		List<Long> userIds = List.of(1L, 2L);
-		List<User> users = List.of(user1, user2);
+		List<Long> userIds = List.of(1L, 2L, 3L);
+		List<User> users = List.of(user1, user2, user3);
 
-		Like existingLike = Like.builder()
+		Like like1 = Like.builder()
 			.user(user1)
 			.targetId(targetId)
 			.targetType(targetType)
 			.build();
+		ReflectionTestUtils.setField(like1, "like", false); // false → true
+
+		Like like2 = Like.builder()
+			.user(user2)
+			.targetId(targetId)
+			.targetType(targetType)
+			.build();
+		ReflectionTestUtils.setField(like2, "like", true); // true → false
 
 		when(userService.findAllById(userIds)).thenReturn(users);
 		when(likeRepository.findByTargetIdAndTargetTypeAndUserIn(targetId, targetType, users))
-			.thenReturn(List.of(existingLike));
+			.thenReturn(List.of(like1, like2));
 
 		// When
 		likeService.persistLikes(userIds, targetType, targetId);
 
+
 		// Then
-		assertThat(existingLike.isLike()).isFalse(); // 기존 좋아요가 toggle 되었는지 확인
+		assertThat(like1.isLike()).isTrue();
+		assertThat(like2.isLike()).isFalse();
+
+		// user3만 신규 Like
 		verify(likeRepository).saveAll(argThat(likes -> {
 			List<Like> likeList = (List<Like>) likes;
 			return likeList.size() == 1 &&
-				likeList.get(0).getUser().getId().equals(2L) &&
-				likeList.get(0).getTargetId().equals(targetId) &&
-				likeList.get(0).getTargetType() == targetType;
+				likeList.get(0).getUser().getId().equals(3L);
 		}));
+		verify(opinionService).increaseLikeCount(targetId, 1);
 	}
 
 
