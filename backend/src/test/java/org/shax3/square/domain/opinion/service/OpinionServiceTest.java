@@ -7,8 +7,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.debate.model.Debate;
 import org.shax3.square.domain.debate.service.DebateService;
+import org.shax3.square.domain.like.service.LikeService;
 import org.shax3.square.domain.opinion.dto.request.CreateOpinionRequest;
 import org.shax3.square.domain.opinion.dto.request.UpdateOpinionRequest;
 import org.shax3.square.domain.opinion.dto.response.MyOpinionResponse;
@@ -24,6 +26,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,6 +40,9 @@ class OpinionServiceTest {
 
     @Mock
     private DebateService debateService;
+
+    @Mock
+    private LikeService likeService;
 
     @InjectMocks
     private OpinionService opinionService;
@@ -214,6 +220,8 @@ class OpinionServiceTest {
 
         List<Opinion> opinions = createTestOpinions(5L, 4L, 3L);
         when(opinionRepository.findMyOpinions(mockUser, nextCursorId, limit+1)).thenReturn(opinions);
+        when(likeService.getLikedTargetIds(eq(mockUser), eq(TargetType.OPINION), anyList()))
+            .thenReturn(Set.of(4L)); // user가 4번 opinion에 좋아요 누름
 
         // When
         MyOpinionResponse response = opinionService.getMyOpinions(mockUser, nextCursorId, limit);
@@ -225,6 +233,8 @@ class OpinionServiceTest {
         assertThat(response.opinions().get(1).opinionId()).isEqualTo(4L);
         assertThat(response.opinions().get(2).opinionId()).isEqualTo(3L);
         assertThat(response.nextCursorId()).isEqualTo(3L); // 다음 페이지 커서는 마지막 항목의 ID
+        assertThat(response.opinions().get(1).isLiked()).isTrue(); // 4L
+        assertThat(response.opinions().get(0).isLiked()).isFalse(); // 5L
     }
 
     @Test
@@ -236,6 +246,8 @@ class OpinionServiceTest {
 
         List<Opinion> opinions = createTestOpinions(2L, 1L);
         when(opinionRepository.findMyOpinions(mockUser, nextCursorId, limit+1)).thenReturn(opinions);
+        when(likeService.getLikedTargetIds(eq(mockUser), eq(TargetType.OPINION), anyList()))
+            .thenReturn(Set.of());
 
         // When
         MyOpinionResponse response = opinionService.getMyOpinions(mockUser, nextCursorId, limit);
@@ -246,6 +258,7 @@ class OpinionServiceTest {
         assertThat(response.opinions().get(0).opinionId()).isEqualTo(2L);
         assertThat(response.opinions().get(1).opinionId()).isEqualTo(1L);
         assertThat(response.nextCursorId()).isEqualTo(1L); // 다음 페이지 커서는 마지막 항목의 ID
+        assertThat(response.opinions().stream().allMatch(o -> !o.isLiked())).isTrue();
     }
 
     @Test
@@ -295,6 +308,8 @@ class OpinionServiceTest {
 
         List<Opinion> opinions = createTestOpinions(5L, 4L, 3L);
         when(opinionRepository.findMyOpinions(mockUser, nextCursorId, limit+1)).thenReturn(opinions);
+        when(likeService.getLikedTargetIds(eq(mockUser), eq(TargetType.OPINION), anyList()))
+            .thenReturn(Set.of(3L));
 
         // When
         MyOpinionResponse response = opinionService.getMyOpinions(mockUser, nextCursorId, limit);
@@ -303,6 +318,7 @@ class OpinionServiceTest {
         assertThat(response).isNotNull();
         assertThat(response.opinions()).hasSize(3);
         assertThat(response.nextCursorId()).isEqualTo(3L); // 다음 페이지 커서는 마지막 항목의 ID
+        assertThat(response.opinions().get(2).isLiked()).isTrue(); // 3L
     }
 
 
