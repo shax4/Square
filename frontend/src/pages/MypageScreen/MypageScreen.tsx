@@ -39,7 +39,7 @@ const MypageScreen = () => {
           <View style={styles.profileInfo}>
             <ProfileImage variant="large" />
             <View style={styles.profileDetails}>
-              <PersonalityTag personality={userProfile.personality} onPress={() => navigation.navigate('PersonalityResultScreen')} />
+              <PersonalityTag personality={userProfile.personality} nickname={userProfile.nickname} />
               <Text style={styles.nickname}>{userProfile.nickname}</Text>
             </View>
           </View>
@@ -53,7 +53,7 @@ const MypageScreen = () => {
             />
             <MypageButton
               title="내 가치관 정보"
-              onPress={() => navigation.navigate('PersonalityResultScreen')}
+              onPress={() => navigation.navigate('PersonalityResultScreen', {nickname: userProfile.nickname})}
               variant="secondary"
               style={styles.actionButton}
             />
