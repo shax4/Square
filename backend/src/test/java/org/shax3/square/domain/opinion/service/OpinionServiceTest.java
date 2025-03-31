@@ -213,7 +213,7 @@ class OpinionServiceTest {
         int limit = 3;
 
         List<Opinion> opinions = createTestOpinions(5L, 4L, 3L);
-        when(opinionRepository.findMyOpinions(mockUser, nextCursorId, limit)).thenReturn(opinions);
+        when(opinionRepository.findMyOpinions(mockUser, nextCursorId, limit+1)).thenReturn(opinions);
 
         // When
         MyOpinionResponse response = opinionService.getMyOpinions(mockUser, nextCursorId, limit);
@@ -235,7 +235,7 @@ class OpinionServiceTest {
         int limit = 3;
 
         List<Opinion> opinions = createTestOpinions(2L, 1L);
-        when(opinionRepository.findMyOpinions(mockUser, nextCursorId, limit)).thenReturn(opinions);
+        when(opinionRepository.findMyOpinions(mockUser, nextCursorId, limit+1)).thenReturn(opinions);
 
         // When
         MyOpinionResponse response = opinionService.getMyOpinions(mockUser, nextCursorId, limit);
@@ -256,7 +256,7 @@ class OpinionServiceTest {
         int limit = 3;
 
         List<Opinion> opinions = List.of(); // 더 이상 데이터 없음
-        when(opinionRepository.findMyOpinions(mockUser, nextCursorId, limit)).thenReturn(opinions);
+        when(opinionRepository.findMyOpinions(mockUser, nextCursorId, limit+1)).thenReturn(opinions);
 
         // When
         MyOpinionResponse response = opinionService.getMyOpinions(mockUser, nextCursorId, limit);
@@ -275,7 +275,7 @@ class OpinionServiceTest {
         int limit = 3;
 
         List<Opinion> opinions = List.of(); // 데이터 없음
-        when(opinionRepository.findMyOpinions(mockUser, nextCursorId, limit)).thenReturn(opinions);
+        when(opinionRepository.findMyOpinions(mockUser, nextCursorId, limit+1)).thenReturn(opinions);
 
         // When
         MyOpinionResponse response = opinionService.getMyOpinions(mockUser, nextCursorId, limit);
@@ -294,7 +294,7 @@ class OpinionServiceTest {
         int limit = 3;
 
         List<Opinion> opinions = createTestOpinions(5L, 4L, 3L);
-        when(opinionRepository.findMyOpinions(mockUser, nextCursorId, limit)).thenReturn(opinions);
+        when(opinionRepository.findMyOpinions(mockUser, nextCursorId, limit+1)).thenReturn(opinions);
 
         // When
         MyOpinionResponse response = opinionService.getMyOpinions(mockUser, nextCursorId, limit);

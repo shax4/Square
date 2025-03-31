@@ -6,8 +6,13 @@ import org.shax3.square.domain.s3.dto.response.PresignedPutUrlResponse;
 import org.shax3.square.exception.CustomException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
+import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
@@ -19,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import static org.shax3.square.exception.ExceptionCode.IMAGE_NOT_FOUND;
 import static org.shax3.square.exception.ExceptionCode.UNSUPPORTED_EXTENSIONS;
 
 @Service
@@ -26,6 +32,7 @@ import static org.shax3.square.exception.ExceptionCode.UNSUPPORTED_EXTENSIONS;
 public class S3Service {
 
     private final S3Presigner s3Presigner;
+    private final S3Client s3Client;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
@@ -97,6 +104,32 @@ public class S3Service {
             if (!ALLOWED_EXTENSIONS.contains(extension)) {
                 throw new CustomException(UNSUPPORTED_EXTENSIONS);
             }
+        }
+    }
+
+    public void deleteImage(String s3Key) {
+        if (!isImageExist(s3Key)) {
+            throw new CustomException(IMAGE_NOT_FOUND);
+        }
+
+        DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
+                .bucket(bucketName)
+                .key(s3Key)
+                .build();
+
+        s3Client.deleteObject(deleteRequest);
+    }
+
+    private boolean isImageExist(String s3Key) {
+        try {
+            HeadObjectRequest headRequest = HeadObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(s3Key)
+                    .build();
+            HeadObjectResponse headResponse = s3Client.headObject(headRequest);
+            return true;
+        } catch (S3Exception e) {
+            return false;
         }
     }
 }
