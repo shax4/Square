@@ -15,6 +15,7 @@ import ProfileUpdateScreen from '../../../pages/ProfileUpdateScreen/ProfileUpdat
 import DeleteAccountScreen from '../../../pages/DeleteAccountScreen/DeleteAccountScreen';
 import UseAuthTestScreen from '../../../pages/UseAuthTestScreen/UseAuthTestScreen';
 import SignupTestScreen from '../../../pages/SignupTestScreen/SignupTestScreen';
+import { ModalTestScreen } from '../../../pages';
 
 // 스택 네비게이터
 const Stack = createNativeStackNavigator();
@@ -99,6 +100,14 @@ export default function HeaderBar() {
                 component={SignupTestScreen}
                 options={{
                     title: 'SignupTestScreen',
+                    headerBackButtonDisplayMode: 'minimal',
+                }}
+            />
+            <Stack.Screen
+                name="ModalTestScreen"
+                component={ModalTestScreen}
+                options={{
+                    title: 'ModalTestScreen',
                     headerBackButtonDisplayMode: 'minimal',
                 }}
             />

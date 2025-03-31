@@ -69,6 +69,12 @@ const MypageScreen = () => {
               variant="secondary"
               style={styles.actionButton}
             />
+            <MypageButton
+              title="ModalTestScreen"
+              onPress={() => navigation.navigate('ModalTestScreen')}
+              variant="secondary"
+              style={styles.actionButton}
+            />
           </View>
         </View>
 
