@@ -1,4 +1,4 @@
-import { RouteProp, useRoute } from "@react-navigation/native";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { StyleSheet, Text, TouchableOpacity, View, ScrollView, KeyboardAvoidingView, Platform, TextInputComponent, TextInput } from "react-native";
 import { StackParamList } from "../../shared/page-stack/DebatePageStack";
 import opinionDetailTestData from './Components/opinion-detail-test-data';
@@ -6,19 +6,23 @@ import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import colors from "../../../assets/colors";
 import { Icons } from "../../../assets/icons/Icons";
 import { LikeButton, ProfileImage, TextField } from "../../components";
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 type OpinionDetailRouteProp = RouteProp<StackParamList, 'OpinionDetailScreen'>;
 
 export default function OpinionDetailScreen() {
-
+    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
     const route = useRoute<OpinionDetailRouteProp>();
     const { opinionId } = route.params;
     const response = opinionDetailTestData;
 
+    // 테스트용: 실제 APp 사용자 닉네임 가져와야 함
+    const userNickname = response.nickname;
+
     // 댓글 리스트
     const [comments, setComments] = useState(response.comments);
-    
+
     // 새로 입력하는 댓글
     const [commentText, setCommentText] = useState("");
 
@@ -27,12 +31,40 @@ export default function OpinionDetailScreen() {
         setCommentText(text);
     }
     const onPressCreateComment = () => {
-        clearCOmmentInputField;
+        clearCommentInputField;
     }
 
-    const clearCOmmentInputField = () => {
+    const clearCommentInputField = () => {
         setCommentText('');
     }
+
+
+    // 상단 탭에 수정 및 신고 버튼 설정 
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            headerRight: () => (
+                <View style={styles.headerRightItems}>
+                    {response.nickname === userNickname ? (
+                        <>
+                            <TouchableOpacity onPress={() => navigation.navigate('OpinionEditScreen', { opinionId, content: response.content },)}>
+                                <Icons.edit />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => console.log('삭제')}>
+                                <Icons.delete />
+                            </TouchableOpacity>
+                        </>
+                    ) : (
+                        <>
+                            <TouchableOpacity onPress={() => console.log('신고')}>
+                                <Icons.report />
+                            </TouchableOpacity>
+                        </>
+                    )}
+                </View>
+            ),
+        });
+    }, []);
+
 
     return (
         <View style={styles.Container}>
@@ -216,5 +248,9 @@ export const styles = StyleSheet.create({
         marginLeft: 10,
         alignItems: 'center',
         justifyContent: 'center',
-    }
+    },
+    headerRightItems: {
+        flexDirection: 'row',
+        gap: 12,
+    },
 });

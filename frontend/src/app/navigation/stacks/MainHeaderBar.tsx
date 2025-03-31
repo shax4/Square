@@ -68,14 +68,10 @@ export default function HeaderBar() {
             <Stack.Screen
                 name="OpinionDetailScreen"
                 component={OpinionDetailScreen}
-                options={({ route }) => {
-                    // 현재 사용자와 작성자 비교해 우측 아이콘 및 기능 변경
-                    const isAuthor = currentUser.nickname === opinion.nickname;
-                    const opinionId = route.params.opinionId;
+                options={() => {
                     return {
                         title: '의견 상세',
                         headerBackButtonDisplayMode: 'minimal',
-                        headerRight: () => <OpinionDetailScreenHeaderRightIcons isAuthor={isAuthor} opinionId={opinionId}/>,
                     };
                 }}
             />
@@ -130,40 +126,6 @@ function DebateCardsScreenHeaderRightIcons() {
                 <Icons.add />
             </TouchableOpacity>
         </View>
-    )
-}
-
-// 상단 바 우측 아이콘 컴포넌트: 현재 사용자와 글 작성자 여부 확인
-function OpinionDetailScreenHeaderRightIcons({ isAuthor, opinionId }: { isAuthor: boolean; opinionId: number } ) {
-    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
-    return (
-        <View style={styles.headerRightItems}>
-            {isAuthor ? (
-                <>
-                    <TouchableOpacity onPress={() => navigation.navigate('OpinionEditScreen', { opinionId })}>
-                        <Icons.edit />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => console.log('삭제')}>
-                        <Icons.delete />
-                    </TouchableOpacity>
-                </>
-            ) : (
-                <>
-                    <TouchableOpacity onPress={() => console.log('신고')}>
-                        <Icons.report />
-                    </TouchableOpacity>
-                </>
-            )}
-        </View>
-    );
-}
-
-function EditOpinionHeaderRightIcon() {
-    return (
-        <TouchableOpacity
-            onPress={() => {}}>
-            <Text>수정</Text>
-        </TouchableOpacity>
     )
 }
 

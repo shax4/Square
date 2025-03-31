@@ -11,11 +11,13 @@ type Props = {
 
 export default function OpinionEditScreen({ route }: Props) {
 
-    const { opinionId } = route.params;
+    // 수정할 의견 id, 초기 컨텐츠를 받아옴
+    const { opinionId, content: initialContent } = route.params;
+
     const submitRef = useRef<() => void>();
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
 
-    const [content, setContent] = useState("");
+    const [content, setContent] = useState(initialContent);
 
     // 수정 요청 함수
     const handleSubmit = () => {
