@@ -2,33 +2,62 @@ import type React from "react"
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from "react-native"
 import PersonalityInfoButton from "./Components/PersonalityInfoButton"
 import PersonalityGraph from "./Components/PersonalityGraph"
-import {Button} from "../../components"
+import { Button } from "../../components"
+import { TypeResult } from "./Components/TypeResult.types"
+import { useEffect, useState } from "react"
+import { useAuth } from "../../shared/hooks"
+import { userDetails } from "../../shared/stores/auth"
 
 interface PersonalityResultScreenProps {
-  nickname?: string
-  personalityType?: string
-  values?: number // -3 to -1 or 1 to 3
-  social?: number // -3 to -1 or 1 to 3
-  future?: number // -3 to -1 or 1 to 3
-  achievement?: number // -3 to -1 or 1 to 3
-  onInfoPress?: () => void
-  onRetakePress?: () => void
-  onSharePress?: () => void
-  navigation?: any
+  nickname: string;
 }
 
+// Axios 연결 필요
+// 임시 데이터로 태스트
+const mockResult: TypeResult = {
+  nickname: "반짝이는코알라",
+  userType: "PNTB",
+  score1: -2,
+  score2: 3,
+  score3: 1,
+  score4: 3,
+};
+
 const PersonalityResultScreen: React.FC<PersonalityResultScreenProps> = ({
-  nickname = "반짝이는코알라",
-  personalityType = "PNTB",
-  values = 1,
-  social = 2,
-  future = 3,
-  achievement = 1,
-  onInfoPress = () => console.log("Info button pressed"),
-  onRetakePress = () => console.log("Retake button pressed"),
-  onSharePress = () => console.log("Share button pressed"),
-  navigation,
+  nickname
 }) => {
+
+  // Zustand 로그인 사용자 데이터
+  const { user, setUser, loggedIn, logOut } = useAuth();
+  const myNickname = user?.nickname;
+
+  const [userTypeResult, setUserTypeResult] = useState<TypeResult>(mockResult);
+
+  // 내 정보 조회인지, 다른 사용자 정보 조회인지 판단
+  const [isMyType, setIsMyType] = useState(false)
+
+  // 초기 사용자 타입 설정
+  useEffect(() => {
+    setUserTypeResult(mockResult);
+    nickname === user?.nickname ? setIsMyType(true) : setIsMyType(false);
+    console.log(nickname + " : " + user?.nickname);
+  }, [nickname, user?.nickname]);
+
+  // 성향 설명 띄우기
+  const onInfoPress = () => {
+
+  }
+
+  // 성향 테스트 다시하기
+  const onRetakePress = () => {
+
+  }
+
+  // 공유하기
+  const onSharePress = () => {
+
+  }
+
   // Colors for each graph
   const colors = {
     values: "#FF5E00",
@@ -37,13 +66,14 @@ const PersonalityResultScreen: React.FC<PersonalityResultScreenProps> = ({
     achievement: "#F553DA",
   }
 
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.nicknameText}>{nickname}님의 성향은</Text>
+        <Text style={styles.nicknameText}>{userTypeResult.nickname}님의 성향은</Text>
 
         <View style={styles.personalityTypeContainer}>
-          <Text style={styles.personalityType}>{personalityType}</Text>
+          <Text style={styles.personalityType}>{userTypeResult.userType}</Text>
           <PersonalityInfoButton onPress={onInfoPress} />
         </View>
 
@@ -52,7 +82,7 @@ const PersonalityResultScreen: React.FC<PersonalityResultScreenProps> = ({
             title="가치관"
             leftLabel="P 현실"
             rightLabel="이상 I"
-            value={values}
+            value={userTypeResult.score1}
             color={colors.values}
           />
 
@@ -60,7 +90,7 @@ const PersonalityResultScreen: React.FC<PersonalityResultScreenProps> = ({
             title="사회관"
             leftLabel="N 개인"
             rightLabel="공동체 C"
-            value={social}
+            value={userTypeResult.score2}
             color={colors.social}
           />
 
@@ -68,7 +98,7 @@ const PersonalityResultScreen: React.FC<PersonalityResultScreenProps> = ({
             title="미래관"
             leftLabel="T 기술"
             rightLabel="환경 S"
-            value={future}
+            value={userTypeResult.score3}
             color={colors.future}
           />
 
@@ -76,19 +106,21 @@ const PersonalityResultScreen: React.FC<PersonalityResultScreenProps> = ({
             title="성취관"
             leftLabel="B 안정"
             rightLabel="도전 R"
-            value={achievement}
+            value={userTypeResult.score4}
             color={colors.achievement}
           />
         </View>
 
-        <View style={styles.buttonsContainer}>
+        {isMyType &&
+          <View style={styles.buttonsContainer}>
             <View style={styles.buttonContainer}>
-                <Button label="성향 테스트 다시하기" onPress={onRetakePress}/>
+              <Button label="성향 테스트 다시하기" onPress={onRetakePress} />
             </View>
             <View style={styles.buttonContainer}>
-                <Button label="공유하기" onPress={onSharePress} />
+              <Button label="공유하기" onPress={onSharePress} />
             </View>
-        </View>
+          </View>
+        }
       </View>
     </SafeAreaView>
   )
