@@ -2,6 +2,7 @@ package org.shax3.square.domain.like.service;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.shax3.square.exception.ExceptionCode.*;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.like.dto.LikeRequest;
+import org.shax3.square.domain.like.handler.LikeTargetHandler;
 import org.shax3.square.domain.like.model.Like;
 import org.shax3.square.domain.like.repository.LikeRepository;
 import org.shax3.square.domain.opinion.service.OpinionCommentService;
@@ -33,17 +35,13 @@ class LikeServiceTest {
 	@Mock
 	private LikeRepository likeRepository;
 	@Mock
-	private OpinionService opinionService;
-	@Mock
-	private OpinionCommentService opinionCommentService;
-	@Mock
-	private ProposalService proposalService;
-	@Mock
 	private RedisTemplate<String, Object> batchRedisTemplate;
 	@Mock
 	private SetOperations<String, Object> setOperations;
 	@Mock
 	private UserService userService;
+	@Mock
+	private LikeTargetHandler likeTargetHandler;
 
 	@InjectMocks
 	private LikeService likeService;
@@ -78,7 +76,7 @@ class LikeServiceTest {
 		TargetType targetType = TargetType.OPINION;
 		LikeRequest request = new LikeRequest(targetId, targetType);
 
-		when(opinionService.isOpinionExists(targetId)).thenReturn(true);
+		doNothing().when(likeTargetHandler).validateTargetExists(targetId, targetType);
 		when(batchRedisTemplate.opsForSet()).thenReturn(setOperations);
 		when(setOperations.isMember("like:batch", "OPINION:10:1")).thenReturn(false);
 
@@ -97,7 +95,7 @@ class LikeServiceTest {
 		TargetType targetType = TargetType.OPINION;
 		LikeRequest request = new LikeRequest(targetId, targetType);
 
-		when(opinionService.isOpinionExists(targetId)).thenReturn(true);
+		doNothing().when(likeTargetHandler).validateTargetExists(targetId, targetType);
 		when(batchRedisTemplate.opsForSet()).thenReturn(setOperations);
 		when(setOperations.isMember("like:batch", "OPINION:10:1")).thenReturn(true);
 
@@ -116,12 +114,13 @@ class LikeServiceTest {
 		TargetType targetType = TargetType.OPINION;
 		LikeRequest request = new LikeRequest(targetId, targetType);
 
-		when(opinionService.isOpinionExists(targetId)).thenReturn(false);
+		doThrow(new CustomException(OPINION_NOT_FOUND))
+			.when(likeTargetHandler).validateTargetExists(targetId, targetType);
 
 		// when & then
 		assertThatThrownBy(() -> likeService.like(user1, request))
 			.isInstanceOf(CustomException.class)
-			.hasMessage(ExceptionCode.NOT_FOUND.getMessage());
+			.hasMessage(ExceptionCode.OPINION_NOT_FOUND.getMessage());
 	}
 
 	@Test
@@ -166,7 +165,7 @@ class LikeServiceTest {
 			return likeList.size() == 1 &&
 				likeList.get(0).getUser().getId().equals(3L);
 		}));
-		verify(opinionService).increaseLikeCount(targetId, 1);
+		verify(likeTargetHandler).updateTargetLikeCount(targetType, targetId, 1);
 	}
 
 

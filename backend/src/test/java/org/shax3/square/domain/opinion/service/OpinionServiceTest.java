@@ -25,8 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -367,11 +366,9 @@ class OpinionServiceTest {
         Long opinionId = 3L;
         when(opinionRepository.existsById(opinionId)).thenReturn(true);
 
-        // when
-        boolean exists = opinionService.isOpinionExists(opinionId);
-
-        // then
-        assertThat(exists).isTrue();
+        // when & then
+        assertThatCode(() -> opinionService.validateOpinionExists(opinionId))
+            .doesNotThrowAnyException();
     }
 
     @Test
@@ -381,11 +378,10 @@ class OpinionServiceTest {
         Long opinionId = 4L;
         when(opinionRepository.existsById(opinionId)).thenReturn(false);
 
-        // when
-        boolean exists = opinionService.isOpinionExists(opinionId);
-
-        // then
-        assertThat(exists).isFalse();
+        // when & then
+        assertThatThrownBy(() -> opinionService.validateOpinionExists(opinionId))
+            .isInstanceOf(CustomException.class)
+            .hasMessage(ExceptionCode.OPINION_NOT_FOUND.getMessage());
     }
 
     @Test

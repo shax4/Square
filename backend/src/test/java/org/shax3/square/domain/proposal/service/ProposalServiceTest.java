@@ -160,11 +160,9 @@ class ProposalServiceTest {
         Long proposalId = 3L;
         when(proposalRepository.existsById(proposalId)).thenReturn(true);
 
-        // when
-        boolean exists = proposalService.isProposalExists(proposalId);
-
-        // then
-        assertThat(exists).isTrue();
+        // when & then
+        assertThatCode(() -> proposalService.validateProposalExists(proposalId))
+            .doesNotThrowAnyException();
     }
 
     @Test
@@ -174,11 +172,10 @@ class ProposalServiceTest {
         Long proposalId = 4L;
         when(proposalRepository.existsById(proposalId)).thenReturn(false);
 
-        // when
-        boolean exists = proposalService.isProposalExists(proposalId);
-
-        // then
-        assertThat(exists).isFalse();
+        // when & then
+        assertThatThrownBy(() -> proposalService.validateProposalExists(proposalId))
+            .isInstanceOf(CustomException.class)
+            .hasMessage(ExceptionCode.PROPOSAL_NOT_FOUND.getMessage());
     }
 
 

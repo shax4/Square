@@ -23,8 +23,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -74,17 +73,17 @@ class OpinionCommentServiceTest {
         List<OpinionComment> mockComments = List.of(mockComment);
 
         when(opinionCommentRepository.findByOpinionId(1L)).thenReturn(mockComments);
-        when(s3Service.generatePresignedGetUrl("test-key")).thenReturn("presigned-url");
+        // when(s3Service.generatePresignedGetUrl("test-key")).thenReturn("presigned-url");
 
         // When
-        List<CommentResponse> responses = opinionCommentService.getOpinionComments(1L);
+        List<OpinionComment> comments = opinionCommentService.getOpinionComments(1L);
 
         // Then
-        assertThat(responses).isNotNull().hasSize(1);
-        assertThat(responses.get(0).content()).isEqualTo("Nice!");
-        assertThat(responses.get(0).likeCount()).isEqualTo(5);
-        assertThat(responses.get(0).nickname()).isEqualTo("TestUser");
-        assertThat(responses.get(0).profileUrl()).isEqualTo("presigned-url");
+        assertThat(comments).isNotNull().hasSize(1);
+        assertThat(comments.get(0).getContent()).isEqualTo("Nice!");
+        assertThat(comments.get(0).getLikeCount()).isEqualTo(5);
+        assertThat(comments.get(0).getUser().getNickname()).isEqualTo("TestUser");
+        // assertThat(responses.get(0).profileUrl()).isEqualTo("presigned-url");
     }
 
     @Test
@@ -94,10 +93,10 @@ class OpinionCommentServiceTest {
         when(opinionCommentRepository.findByOpinionId(1L)).thenReturn(List.of());
 
         // When
-        List<CommentResponse> responses = opinionCommentService.getOpinionComments(1L);
+        List<OpinionComment> comments = opinionCommentService.getOpinionComments(1L);
 
         // Then
-        assertThat(responses).isNotNull().isEmpty();
+        assertThat(comments).isNotNull().isEmpty();
     }
 
 
@@ -213,11 +212,9 @@ class OpinionCommentServiceTest {
         Long opinionCommentId = 3L;
         when(opinionCommentRepository.existsById(opinionCommentId)).thenReturn(true);
 
-        // when
-        boolean exists = opinionCommentService.isOpinionCommentExists(opinionCommentId);
-
-        // then
-        assertThat(exists).isTrue();
+        // when & then
+        assertThatCode(() -> opinionCommentService.validateOpinionCommentExists(opinionCommentId))
+            .doesNotThrowAnyException();
     }
 
     @Test
@@ -227,11 +224,10 @@ class OpinionCommentServiceTest {
         Long opinionCommentId = 4L;
         when(opinionCommentRepository.existsById(opinionCommentId)).thenReturn(false);
 
-        // when
-        boolean exists = opinionCommentService.isOpinionCommentExists(opinionCommentId);
-
-        // then
-        assertThat(exists).isFalse();
+        // when & then
+        assertThatThrownBy(() -> opinionCommentService.validateOpinionCommentExists(opinionCommentId))
+            .isInstanceOf(CustomException.class)
+            .hasMessage(ExceptionCode.OPINION_COMMENT_NOT_FOUND.getMessage());
     }
 
     @Test

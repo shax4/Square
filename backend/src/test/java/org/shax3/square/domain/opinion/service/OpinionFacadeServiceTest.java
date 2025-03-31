@@ -7,6 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.shax3.square.common.model.TargetType;
+import org.shax3.square.domain.like.service.LikeService;
 import org.shax3.square.domain.opinion.dto.request.CreateOpinionCommentRequest;
 import org.shax3.square.domain.opinion.dto.response.CommentResponse;
 import org.shax3.square.domain.opinion.dto.response.CreateOpinionCommentResponse;
@@ -22,6 +24,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -37,6 +40,8 @@ class OpinionFacadeServiceTest {
     private OpinionCommentService opinionCommentService;
     @Mock
     private S3Service s3Service;
+    @Mock
+    private LikeService likeService;
 
     @InjectMocks
     private OpinionFacadeService opinionFacadeService;
@@ -108,13 +113,22 @@ class OpinionFacadeServiceTest {
     @Test
     @DisplayName("의견 상세 조회 성공 테스트")
     void getOpinionDetails_success() {
-        List<CommentResponse> mockComments = List.of(
-                new CommentResponse(1L, "Commenter1", "url1", Type.PNSB.name(), LocalDateTime.now(), 5, "Nice!", false)
-        );
+        // given
+        OpinionComment comment = new OpinionComment(1L, mockOpinion, mockUser, "Nice!", 5, true);
+        List<OpinionComment> mockOpinionComments = List.of(comment);
+
 
         when(opinionService.getOpinion(1L)).thenReturn(mockOpinion);
-        when(opinionCommentService.getOpinionComments(1L)).thenReturn(mockComments);
+        when(opinionCommentService.getOpinionComments(1L)).thenReturn(mockOpinionComments);
         when(s3Service.generatePresignedGetUrl("test-key")).thenReturn("presigned-url");
+
+        // opinion에 대해 유저가 좋아요 누른 상태
+        when(likeService.getLikedTargetIds(mockUser, TargetType.OPINION, List.of(1L)))
+            .thenReturn(Set.of(1L));
+
+        // comment에 대해 좋아요 누른 상태
+        when(likeService.getLikedTargetIds(mockUser, TargetType.OPINION_COMMENT, List.of(1L)))
+            .thenReturn(Set.of(1L));
 
         OpinionDetailsResponse response = opinionFacadeService.getOpinionDetails(mockUser, 1L);
 
@@ -123,7 +137,9 @@ class OpinionFacadeServiceTest {
         assertThat(response.userType()).isEqualTo(Type.PNSB.name());
         assertThat(response.nickname()).isEqualTo("TestUser");
         assertThat(response.profileUrl()).isEqualTo("presigned-url");
+        assertThat(response.isLiked()).isTrue();
         assertThat(response.comments()).hasSize(1);
+        assertThat(response.comments().get(0).isLiked()).isTrue();
     }
 
     @Test
