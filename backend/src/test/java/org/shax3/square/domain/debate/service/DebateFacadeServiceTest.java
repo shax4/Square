@@ -49,7 +49,7 @@ class DebateFacadeServiceTest {
                 .thenReturn(List.of(scrap));
         when(debateService.findDebateById(1L)).thenReturn(debate);
         when(voteService.getVoteByUserAndDebate(user, debate)).thenReturn(Optional.of(vote));
-        when(voteService.calculateVoteResult(debate)).thenReturn(VoteResponse.of(1, 0, 1));
+        when(voteService.calculateVoteResult(debate)).thenReturn(VoteResponse.of(1, 0));
 
         MyScrapedDebatesResponse response = debateFacadeService.getScrapedDebates(user, null, 2);
 
@@ -67,7 +67,7 @@ class DebateFacadeServiceTest {
 
         when(voteService.getVotesByUser(user, null, 3)).thenReturn(List.of(vote));
         when(scrapFacadeService.getScrapIds(user, TargetType.DEBATE)).thenReturn(List.of(100L));
-        when(voteService.calculateVoteResult(debate)).thenReturn(VoteResponse.of(3, 2, 5));
+        when(voteService.calculateVoteResult(debate)).thenReturn(VoteResponse.of(3, 2));
 
         MyVotedDebatesResponse response = debateFacadeService.getMyVotedDebates(user, null, 2);
 

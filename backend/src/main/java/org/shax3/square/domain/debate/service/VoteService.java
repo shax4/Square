@@ -39,7 +39,7 @@ public class VoteService {
         int total = voteRepository.countByDebate(debate);
         int left = voteRepository.countByDebateAndLeftTrue(debate);
         int right = total - left;
-        return VoteResponse.of(left, right, total);
+        return VoteResponse.of(left, right);
     }
 
 
