@@ -84,7 +84,7 @@ export default function HeaderBar() {
                     const isAuthor = currentUser.nickname === opinion.nickname;
 
                     return {
-                        title: '의견 상세',
+                        title: '의견 수정',
                         headerBackButtonDisplayMode: 'minimal',
                         // headerRight: () => <EditOpinionHeaderRightIcon />,
                     };
