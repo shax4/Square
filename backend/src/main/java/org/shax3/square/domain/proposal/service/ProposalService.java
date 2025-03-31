@@ -2,7 +2,6 @@ package org.shax3.square.domain.proposal.service;
 
 import lombok.RequiredArgsConstructor;
 
-import org.shax3.square.domain.opinion.model.OpinionComment;
 import org.shax3.square.domain.proposal.dto.request.CreateProposalRequest;
 import org.shax3.square.domain.proposal.dto.response.CreateProposalsResponse;
 import org.shax3.square.domain.proposal.dto.response.ProposalsResponse;
@@ -10,7 +9,6 @@ import org.shax3.square.domain.proposal.model.Proposal;
 import org.shax3.square.domain.proposal.repository.ProposalRepository;
 import org.shax3.square.domain.user.model.User;
 import org.shax3.square.exception.CustomException;
-import org.shax3.square.exception.ExceptionCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,7 +62,7 @@ public class ProposalService {
             .orElseThrow(() -> new CustomException(PROPOSAL_NOT_FOUND));
     }
 
-    public void validateProposalExists(Long proposalId) {
+    public void validateExists(Long proposalId) {
         if (!proposalRepository.existsById(proposalId)) {
             throw new CustomException(PROPOSAL_NOT_FOUND);
         }

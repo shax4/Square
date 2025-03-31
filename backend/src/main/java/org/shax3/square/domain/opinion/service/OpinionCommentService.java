@@ -2,10 +2,8 @@ package org.shax3.square.domain.opinion.service;
 
 import lombok.RequiredArgsConstructor;
 
-import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.opinion.dto.request.CreateOpinionCommentRequest;
 import org.shax3.square.domain.opinion.dto.request.UpdateOpinionRequest;
-import org.shax3.square.domain.opinion.dto.response.CommentResponse;
 import org.shax3.square.domain.opinion.model.Opinion;
 import org.shax3.square.domain.opinion.model.OpinionComment;
 import org.shax3.square.domain.opinion.repository.OpinionCommentRepository;
@@ -17,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Set;
 
 import static org.shax3.square.exception.ExceptionCode.OPINION_COMMENT_NOT_FOUND;
 
@@ -25,7 +22,6 @@ import static org.shax3.square.exception.ExceptionCode.OPINION_COMMENT_NOT_FOUND
 @RequiredArgsConstructor
 public class OpinionCommentService {
     private final OpinionCommentRepository opinionCommentRepository;
-    private final S3Service s3Service;
 
     public List<OpinionComment> getOpinionComments(Long opinionId) {
         return opinionCommentRepository.findByOpinionId(opinionId);
@@ -67,7 +63,7 @@ public class OpinionCommentService {
             .orElseThrow(() -> new CustomException(OPINION_COMMENT_NOT_FOUND));
     }
 
-    public void validateOpinionCommentExists(Long opinionCommentId) {
+    public void validateExists(Long opinionCommentId) {
         if (!opinionCommentRepository.existsById(opinionCommentId)) {
             throw new CustomException(OPINION_COMMENT_NOT_FOUND);
         }

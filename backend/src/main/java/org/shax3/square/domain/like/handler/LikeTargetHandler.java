@@ -22,10 +22,10 @@ public class LikeTargetHandler {
 
 	public void validateTargetExists(Long targetId, TargetType targetType) {
 		switch (targetType) {
-			case OPINION -> opinionService.validateOpinionExists(targetId);
-			case OPINION_COMMENT -> opinionCommentService.validateOpinionCommentExists(targetId);
-			case PROPOSAL -> proposalService.validateProposalExists(targetId);
-			case POST -> postService.validatePostExists(targetId);
+			case OPINION -> opinionService.validateExists(targetId);
+			case OPINION_COMMENT -> opinionCommentService.validateExists(targetId);
+			case PROPOSAL -> proposalService.validateExists(targetId);
+			case POST -> postService.validateExists(targetId);
 			//TODO : POST_COMMENT 구현 필요
 			default -> throw new CustomException(ExceptionCode.INVALID_TARGET_TYPE);
 		}

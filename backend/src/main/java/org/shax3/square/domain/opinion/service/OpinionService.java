@@ -11,7 +11,6 @@ import org.shax3.square.domain.opinion.dto.request.UpdateOpinionRequest;
 import org.shax3.square.domain.opinion.dto.response.MyOpinionResponse;
 import org.shax3.square.domain.opinion.model.Opinion;
 import org.shax3.square.domain.opinion.repository.OpinionRepository;
-import org.shax3.square.domain.s3.service.S3Service;
 import org.shax3.square.domain.user.model.User;
 import org.shax3.square.exception.CustomException;
 import org.shax3.square.exception.ExceptionCode;
@@ -26,7 +25,6 @@ import java.util.Set;
 public class OpinionService {
     private final OpinionRepository opinionRepository;
     private final DebateService debateService;
-    private final LikeService likeService;
 
     @Transactional
     public void createOpinion(User user, CreateOpinionRequest request) {
@@ -65,28 +63,21 @@ public class OpinionService {
                 .orElseThrow(() -> new CustomException(ExceptionCode.OPINION_NOT_FOUND));
     }
 
-    public void validateOpinionExists(Long opinionId) {
+    public void validateExists(Long opinionId) {
         if (!opinionRepository.existsById(opinionId)) {
             throw new CustomException(ExceptionCode.OPINION_NOT_FOUND);
         }
     }
 
     @Transactional(readOnly = true)
-    public MyOpinionResponse getMyOpinions(User user, Long nextCursorId, int limit) {
+    public List<Opinion> getMyOpinions(User user, Long nextCursorId, int limit) {
         List<Opinion> opinions = opinionRepository.findMyOpinions(user, nextCursorId, limit + 1);
-        boolean hasNext = opinions.size() > limit;
 
-        if (hasNext) {
-            opinions = opinions.subList(0, limit);
+        if (opinions.size() > limit) {
+            return opinions.subList(0, limit);
         }
 
-        List<Long> opinionIds = opinions.stream()
-            .map(Opinion::getId)
-            .toList();
-
-        Set<Long> likedOpinionIds = likeService.getLikedTargetIds(user, TargetType.OPINION, opinionIds);
-
-        return MyOpinionResponse.of(opinions, likedOpinionIds);
+        return opinions;
     }
 
     public void increaseLikeCount(Long targetId, int countDiff) {

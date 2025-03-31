@@ -7,6 +7,7 @@ import org.shax3.square.domain.like.service.LikeService;
 import org.shax3.square.domain.opinion.dto.request.CreateOpinionCommentRequest;
 import org.shax3.square.domain.opinion.dto.response.CommentResponse;
 import org.shax3.square.domain.opinion.dto.response.CreateOpinionCommentResponse;
+import org.shax3.square.domain.opinion.dto.response.MyOpinionResponse;
 import org.shax3.square.domain.opinion.dto.response.OpinionDetailsResponse;
 import org.shax3.square.domain.opinion.model.Opinion;
 import org.shax3.square.domain.opinion.model.OpinionComment;
@@ -68,6 +69,19 @@ public class OpinionFacadeService {
         String profileUrl = s3Service.generatePresignedGetUrl(user.getS3Key());
 
         return OpinionDetailsResponse.of(opinion, commentResponses, profileUrl,isLiked);
+    }
+
+    @Transactional(readOnly = true)
+    public MyOpinionResponse getMyOpinions(User user, Long nextCursorId, int limit) {
+        List<Opinion> opinions = opinionService.getMyOpinions(user, nextCursorId, limit);
+
+        List<Long> opinionIds = opinions.stream()
+            .map(Opinion::getId)
+            .toList();
+
+        Set<Long> likedOpinionIds = likeService.getLikedTargetIds(user, TargetType.OPINION, opinionIds);
+
+        return MyOpinionResponse.of(opinions, likedOpinionIds);
     }
 }
 
