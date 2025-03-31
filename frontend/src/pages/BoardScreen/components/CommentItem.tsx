@@ -130,6 +130,8 @@ export default function CommentItem({
         <LikeButton
           initialCount={comment.likeCount}
           initialLiked={comment.isLiked}
+          size="small"
+          isVertical={false}
         />
         {/* 답글 버튼 등 (나중에 추가) */}
 

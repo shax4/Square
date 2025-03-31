@@ -164,9 +164,7 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
             <CommentItem
               key={comment.commentId}
               comment={comment}
-              onDelete={() => {
-                fetchPostDetail();
-              }} // 댓글 삭제 후 게시글 데이터를 다시 불러옴
+              onCommentChange = {handleSubmitComment}
             />
           ))}
         </View>
