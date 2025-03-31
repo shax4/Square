@@ -11,8 +11,8 @@ public record SummaryResponse(
         String leftOption,
         String rightOption,
         Boolean hasVoted,
-        int leftCount,
-        int rightCount,
+        Integer leftCount,
+        Integer rightCount,
         List<SummaryDto> summaries
 ) {
     public static SummaryResponse of(Debate debate,
@@ -20,14 +20,19 @@ public record SummaryResponse(
                                      Boolean hasVoted,
                                      Boolean isScraped,
                                      List<SummaryDto> summaries) {
+
+        Integer leftCount = (voteResponse != null) ? voteResponse.leftCount() : null;
+        Integer rightCount = (voteResponse != null) ? voteResponse.rightCount() : null;
+
+
         return new SummaryResponse(
                 debate.getTopic(),
                 isScraped,
                 debate.getLeftOption(),
                 debate.getRightOption(),
                 hasVoted,
-                voteResponse.leftCount(),
-                voteResponse.rightCount(),
+                leftCount,
+                rightCount,
                 summaries
         );
     }

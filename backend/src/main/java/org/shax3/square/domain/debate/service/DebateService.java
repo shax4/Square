@@ -57,20 +57,19 @@ public class DebateService {
 
     public SummaryResponse getSummaryResult(Long debateId, User user) {
         Debate debate = findDebateById(debateId);
-        Boolean hasVoted;
-        Boolean isScraped;
-        if (user == null) {
-            hasVoted = null;
-            isScraped = null;
-        } else{
+
+        Boolean hasVoted = null;
+        Boolean isScraped = null;
+        VoteResponse voteResponse = null;
+
+        if (user != null) {
             hasVoted = voteService.getVoteByUserAndDebate(user, debate).isPresent();
-            isScraped = scrapFacadeService.isScrapExist(user,debateId, TargetType.DEBATE);
+            isScraped = scrapFacadeService.isScrapExist(user, debateId, TargetType.DEBATE);
+            voteResponse = voteService.calculateVoteResult(debate);
         }
-        VoteResponse voteResponse = voteService.calculateVoteResult(debate);
 
         List<SummaryDto> summaries = summaryService.getSummariesByDebateId(debateId);
-
-        return SummaryResponse.of(debate,voteResponse,hasVoted,isScraped,summaries);
+        return SummaryResponse.of(debate, voteResponse, hasVoted, isScraped, summaries);
     }
 
 }
