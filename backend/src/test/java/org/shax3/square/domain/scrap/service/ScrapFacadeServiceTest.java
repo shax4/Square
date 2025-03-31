@@ -21,8 +21,6 @@ class ScrapFacadeServiceTest {
 
     @Mock
     private ScrapService scrapService;
-    @Mock
-    private DebateService debateService;
 
     @InjectMocks
     private ScrapFacadeService scrapFacadeService;
@@ -33,13 +31,9 @@ class ScrapFacadeServiceTest {
         User user = User.builder().build();
         CreateScrapRequest request = mock(CreateScrapRequest.class);
 
-        when(request.targetType()).thenReturn(TargetType.DEBATE);
-        when(request.targetId()).thenReturn(1L);
-
         // When
         scrapFacadeService.create(user, request);
 
-        verify(debateService).findDebateById(1L);
         verify(scrapService).createScrap(user, request);
     }
 
