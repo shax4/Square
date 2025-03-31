@@ -1,33 +1,21 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import ProfileImage from '../../../components/ProfileImage/ProfileImage';
+import PersonalityTag from '../../../components/PersonalityTag/PersonalityTag';
+import LikeButton from '../../../components/LikeButton';
 import { BoardAPI } from '../Api/boardApi';
+import { Comment } from './CommentItem.types';
 import { Icons } from '../../../../assets/icons/Icons';
-
-// 현재 로그인한 사용자 정보 (실제로는 상태 관리나 컨텍스트에서 가져옴)
-const currentUser = {
-  nickname: '반짝이는하마', // 예시 ID
-};
-// 댓글 인터페이스
-interface Comment {
-  commentId: number; // 댓글 ID
-  nickname: string; // 작성자 닉네임
-  profileUrl?: string; // 작성자 프로필 이미지 URL
-  userType: string; // 작성자 유형
-  createdAt: string; // 작성 시간
-  content: string; // 댓글 내용
-  likeCount: number; // 좋아요 개수
-  isLiked: boolean; // 사용자가 좋아요를 눌렀는지 여부
-}
+import { useAuth } from '../../../shared/hooks/useAuth';
 
 interface CommentItemProps {
-  comment: Comment; // 댓글 데이터 객체
-  onDelete?: () => void; // 삭제 후 실행될 콜백 함수 (선택적)
+  comment: Comment; // 댓글 타입
+  onDelete?: () => void; // 부모 컴포넌트에서 전달된 콜백
 }
 
 export default function CommentItem({ comment, onDelete }: CommentItemProps) {
+  const { user } = useAuth(); // 현재 사용자
   // 현재 사용자가 댓글 작성자인지 확인
-  const isAuthor = comment.nickname === currentUser.nickname;
+  const isAuthor = user?.nickname === comment.nickname;
 
   // 댓글 삭제 함수
   const handleDelete = () => {
