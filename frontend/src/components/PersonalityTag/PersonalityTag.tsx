@@ -9,7 +9,7 @@ import { StackParamList } from "../../shared/page-stack/MyPageStack";
 const PersonalityTag = ({ personality, nickname }: PersonalityTagProps) => {
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
 
-    // 기본 동작 정의 (예: 특정 페이지로 이동)
+    // 클릭 시 성향 상세 페이지로 이동
     const onPressPersonalityTag = () => {
         navigation.navigate("PersonalityResultScreen", { nickname: nickname });
     };

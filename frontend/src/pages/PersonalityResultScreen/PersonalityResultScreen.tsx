@@ -1,16 +1,12 @@
 import type React from "react"
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from "react-native"
+import { View, Text, StyleSheet, SafeAreaView } from "react-native"
 import PersonalityInfoButton from "./Components/PersonalityInfoButton"
 import PersonalityGraph from "./Components/PersonalityGraph"
 import { Button } from "../../components"
 import { TypeResult } from "./Components/TypeResult.types"
 import { useEffect, useState } from "react"
+import { useRoute, RouteProp } from '@react-navigation/native';
 import { useAuth } from "../../shared/hooks"
-import { userDetails } from "../../shared/stores/auth"
-
-interface PersonalityResultScreenProps {
-  nickname: string;
-}
 
 // Axios 연결 필요
 // 임시 데이터로 태스트
@@ -23,9 +19,9 @@ const mockResult: TypeResult = {
   score4: 3,
 };
 
-const PersonalityResultScreen: React.FC<PersonalityResultScreenProps> = ({
-  nickname
-}) => {
+const PersonalityResultScreen = () => {
+  const route = useRoute<RouteProp<Record<string, { nickname: string }>, string>>();
+  const { nickname } = route.params;
 
   // Zustand 로그인 사용자 데이터
   const { user, setUser, loggedIn, logOut } = useAuth();

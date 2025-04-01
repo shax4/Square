@@ -21,7 +21,7 @@ function ProfileBox({
             <View style={styles.UserInfoView}>
                 <View style={styles.UserNameAndTagView}>
                     <Text style={styles.UserNameText}> {nickname} </Text>
-                    <PersonalityTag personality={userType} />
+                    <PersonalityTag personality={userType} nickname={nickname} />
                 </View>
                 <View style={styles.CreatedTimeTextView}>
                     <Text style={styles.CreatedTimeText}>{getTimeAgo(createdAt)}</Text>
