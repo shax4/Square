@@ -1,5 +1,5 @@
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
-import { Text, TouchableOpacity, View, ScrollView, KeyboardAvoidingView, Platform, TextInput, Alert } from "react-native";
+import { Text, TouchableOpacity, View, ScrollView, KeyboardAvoidingView, Platform, TextInput, Alert, Keyboard } from "react-native";
 import { StackParamList } from "../../shared/page-stack/DebatePageStack";
 import opinionDetailTestData from './Components/opinion-detail-test-data';
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
@@ -8,6 +8,7 @@ import { LikeButton, ProfileImage } from "../../components";
 import { useLayoutEffect, useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { styles } from './Components/OpinionDetailScreen.styles'
+import CommentInput from "../../components/CommentInput/CommentInput";
 
 type OpinionDetailRouteProp = RouteProp<StackParamList, 'OpinionDetailScreen'>;
 
@@ -148,43 +149,16 @@ export default function OpinionDetailScreen() {
                         <View style={styles.CommentLikeView}>
                             <LikeButton initialCount={comments[index].likeCount} initialLiked={comments[index].isLiked} size="small" />
                         </View>
-
-
                     </View>
                 ))}
             </ScrollView>
 
-
-            {/* 키보드 위로 올라가야 하는 뷰 */}
-            <KeyboardAvoidingView
-                style={styles.CommentCreateView}
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
-            >
-                <View style={styles.CommentProfileImage}>
-                    <ProfileImage
-                        variant="small"
-                    //imageUrl={response.profileUrl}
-                    />
-                </View>
-
-                <TextInput
-                    style={styles.commentInput}
-                    placeholder="댓글을 입력하세요..."
-                    value={commentText}
-                    onChangeText={setCommentText}
-                    multiline
-                />
-                <TouchableOpacity style={styles.CommentSendButton}
-                    onPress={commentText.trim() !== '' ? onPressCreateComment : () => { }}
-                >
-                    <Icons.send />
-                </TouchableOpacity>
-
-            </KeyboardAvoidingView>
-
+            <CommentInput
+                onSubmit={() => { Keyboard.dismiss()}}
+                onChangeText={setCommentText}
+                value={commentText}
+                placeholder="댓글을 입력하세요..."
+            />
         </View>
-
-
     )
 }
