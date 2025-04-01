@@ -23,10 +23,16 @@ const SurveyContent = () => {
     }
     getQuestions();
     }, []);
+
+    const convertToSurveyAnswers = (selectedOptions: { [key: number]: number}): SurveyAnswer[] => {
+      return Object.entries(selectedOptions).map(([questionId, answer]) => ({
+        questionId: Number(questionId), // string → number 변환
+        answer: answer + 1,
+      }));
+    };
   
     const onPressConfirm = async () => {
       console.log("확인 버튼을 눌렀습니다! 설문조사 결과를 전송합니다!")
-      console.log("Selected options:", selectedOptions)
   
       // Check if all questions are answered
       const unansweredQuestions = questions.filter((q) => selectedOptions[q.questionId] === undefined)
@@ -34,30 +40,23 @@ const SurveyContent = () => {
       if (unansweredQuestions.length > 0) {
         Alert.alert(
           "미완성된 설문",
-          `${unansweredQuestions.length}개의 질문에 답변하지 않았습니다. 계속 진행하시겠습니까?`,
+          `${unansweredQuestions.length}개의 질문에 답변하지 않았습니다.`,
           [
             {
-              text: "취소",
-              style: "cancel",
+              text: "확인",
             },
-            {
-              text: "계속",
-              onPress: () => submitResponses(),
-            },
-          ],
-        )
+          ]
+        );
       } else {
-        submitResponses()
-      }
+        submitResponses();
+      }      
     }
   
     const submitResponses = async () => {
       try {
-        // Show loading indicator if needed
-  
-        // Submit the responses
-        // const result = await submitSurveyAnswers(null);
-        const result = {}
+        const convertedAnswers = convertToSurveyAnswers(selectedOptions);
+        console.log("전송한 답변 : ", convertedAnswers);
+        const result = await submitSurveyAnswers(convertedAnswers);
 
         // Handle success
         console.log("Survey submitted successfully:", result)
@@ -78,7 +77,7 @@ const SurveyContent = () => {
           {/* <Text style={styles.title}>성격 유형 설문조사</Text> */}
   
           {questions.map((q) => (
-            <Question key={q.questionId} id={q.questionId} question={q.content} options={["매우 반대", "반대", "약간 반대", "약간 동의", "동의", "매우 동의"]} />
+            <Question key={q.questionId} id={q.questionId} question={q.content} options={["매우 동의", "동의", "약간 동의", "약간 반대", "반대", "매우 반대"]} />
           ))}
           <View style={styles.buttonContainer}>
             <Button label="확인" onPress={onPressConfirm} />
