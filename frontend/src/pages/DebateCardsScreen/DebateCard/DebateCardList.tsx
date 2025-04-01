@@ -4,11 +4,12 @@ import DebateCard from './DebateCard';
 import { Debate } from './Debate.types';
 import { styles } from './DebateCard.styles';
 import { getAllDebates } from '../api/DebateApi';
-
+import { debateData } from './card-data';
 const { width, height } = Dimensions.get('window');
 
 export default function DebateCardList() {
-    const [debates, setDebates] = useState<Debate[]>([]);
+    //const [debates, setDebates] = useState<Debate[]>([]);
+    const [debates, setDebates] = useState<Debate[]>(debateData);
     const [nextCursorId, setNextCursorId] = useState<number>(0);
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
