@@ -21,10 +21,10 @@ export default function OpinionListScreen() {
     const { debateId, showVoteResultModal = false } = route.params;
 
     const [isSummary, setIsSummary] = useState(true); // ai요약, 의견 토글
+    const [selectedTab, setSelectedTab] = useState<'like' | 'comment' | 'recent'>('recent');
 
     // Axios로 가져와야 함
     const debate = debateList[debateId];
-
 
     return (
         <View style={styles.container}>
@@ -32,6 +32,39 @@ export default function OpinionListScreen() {
             <View style={styles.topicView}>
                 <Text style={styles.topicViewText}>{debate.topic}</Text>
             </View>
+
+            {!isSummary && (
+                <View style={styles.tabContainer}>
+                    <Text
+                        style={[
+                            styles.tabButton,
+                            selectedTab === 'like' && styles.selectedTabButton
+                        ]}
+                        onPress={() => setSelectedTab('like')}
+                    >
+                        좋아요순
+                    </Text>
+                    <Text
+                        style={[
+                            styles.tabButton,
+                            selectedTab === 'comment' && styles.selectedTabButton
+                        ]}
+                        onPress={() => setSelectedTab('comment')}
+                    >
+                        댓글 많은순
+                    </Text>
+                    <Text
+                        style={[
+                            styles.tabButton,
+                            selectedTab === 'recent' && styles.selectedTabButton
+                        ]}
+                        onPress={() => setSelectedTab('recent')}
+                    >
+                        최신순
+                    </Text>
+                </View>
+            )}
+
 
             {/* 좌 우 의견 옵션 태그 */}
             <View style={styles.optionView}>
@@ -132,5 +165,29 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         backgroundColor: colors.white,
 
-    }
+    },
+    tabContainer: {
+        flexDirection: 'row',
+        backgroundColor: '#eeeeee',
+        borderRadius: 15,
+        marginHorizontal: 20,
+        padding: 4,
+        marginBottom: 10,
+        alignItems: 'center',
+    },
+
+    tabButton: {
+        flex: 1, // <- 동일한 너비로 분할
+        textAlign: 'center',
+        paddingVertical: 10,
+        borderRadius: 10,
+        color: '#888',
+        fontWeight: '500',
+    },
+
+    selectedTabButton: {
+        backgroundColor: '#ffffff',
+        color: '#000',
+    },
+
 });
