@@ -51,4 +51,8 @@ public class OpinionComment extends BaseTimeEntity {
     public void updateContent(String content){
         this.content = content;
     }
+
+    public void increaseLikeCount(int countDiff) {
+        this.likeCount += countDiff;
+    }
 }

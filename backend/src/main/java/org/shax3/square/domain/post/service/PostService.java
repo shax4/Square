@@ -122,7 +122,7 @@ public class PostService {
         post.softDelete();
     }
 
-    public void validatePostExists(Long id) {
+    public void validateExists(Long id) {
         if (!postRepository.existsById(id)) {
             throw new CustomException(POST_NOT_FOUND);
         }

@@ -13,12 +13,14 @@ import org.shax3.square.domain.proposal.dto.response.ProposalsResponse;
 import org.shax3.square.domain.proposal.model.Proposal;
 import org.shax3.square.domain.proposal.repository.ProposalRepository;
 import org.shax3.square.domain.user.model.User;
+import org.shax3.square.exception.CustomException;
+import org.shax3.square.exception.ExceptionCode;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -158,11 +160,9 @@ class ProposalServiceTest {
         Long proposalId = 3L;
         when(proposalRepository.existsById(proposalId)).thenReturn(true);
 
-        // when
-        boolean exists = proposalService.isProposalExists(proposalId);
-
-        // then
-        assertThat(exists).isTrue();
+        // when & then
+        assertThatCode(() -> proposalService.validateExists(proposalId))
+            .doesNotThrowAnyException();
     }
 
     @Test
@@ -172,11 +172,56 @@ class ProposalServiceTest {
         Long proposalId = 4L;
         when(proposalRepository.existsById(proposalId)).thenReturn(false);
 
+        // when & then
+        assertThatThrownBy(() -> proposalService.validateExists(proposalId))
+            .isInstanceOf(CustomException.class)
+            .hasMessage(ExceptionCode.PROPOSAL_NOT_FOUND.getMessage());
+    }
+
+
+    @Test
+    @DisplayName("getProposal - 존재하는 proposal이면 반환")
+    void getProposal_success() {
+        // given
+        Proposal proposal = Proposal.builder()
+                .user(mockUser)
+                .topic("Test Proposal")
+                .build();
+        when(proposalRepository.findById(10L)).thenReturn(Optional.of(proposal));
+
         // when
-        boolean exists = proposalService.isProposalExists(proposalId);
+        Proposal result = proposalService.getProposal(10L);
 
         // then
-        assertThat(exists).isFalse();
+        assertThat(result).isEqualTo(proposal);
+    }
+
+
+    @Test
+    @DisplayName("getProposal - 존재하지 않으면 예외 발생")
+    void getProposal_notFound() {
+        // given
+        when(proposalRepository.findById(10L)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> proposalService.getProposal(10L))
+            .isInstanceOf(CustomException.class)
+            .hasMessage(ExceptionCode.PROPOSAL_NOT_FOUND.getMessage());
+    }
+
+
+    @Test
+    @DisplayName("increaseLikeCount - likeCount 증가 로직이 잘 호출되는지 확인")
+    void increaseLikeCount_success() {
+        // given
+        Proposal proposal = mock(Proposal.class);
+        when(proposalRepository.findById(10L)).thenReturn(Optional.of(proposal));
+
+        // when
+        proposalService.increaseLikeCount(10L, 3);
+
+        // then
+        verify(proposal).increaseLikeCount(3);
     }
 }
 
