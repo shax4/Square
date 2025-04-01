@@ -1,5 +1,7 @@
 package org.shax3.square.domain.post.dto;
 
+import java.time.LocalDateTime;
+
 import org.shax3.square.domain.post.model.Post;
 
 public record PostSummaryDto(
@@ -7,7 +9,7 @@ public record PostSummaryDto(
 	String nickname,
 	String profileUrl,
 	String userType,
-	String createdAt,
+	LocalDateTime createdAt,
 	String title,
 	String content,
 	int likeCount,
@@ -20,7 +22,7 @@ public record PostSummaryDto(
 			post.getUser().getNickname(),
 			profileUrl,
 			post.getUser().getType().name(),
-			post.getCreatedAt().toString(),    // createdAt 필드 필요
+			post.getCreatedAt(),
 			post.getTitle(),
 			post.getContent(),
 			post.getLikeCount(),

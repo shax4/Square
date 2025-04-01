@@ -1,11 +1,13 @@
 package org.shax3.square.domain.post.dto;
 
+import java.time.LocalDateTime;
+
 import org.shax3.square.domain.post.model.Post;
 
 public record PopularPostDto(
 	Long postId,
 	String title,
-	String createdAt,
+	LocalDateTime createdAt,
 	int likeCount,
 	int commentCount
 ) {
@@ -13,7 +15,7 @@ public record PopularPostDto(
 		return new PopularPostDto(
 			post.getId(),
 			post.getTitle(),
-			post.getCreatedAt().toString(), // createdAt 필드가 엔티티에 없으면 추가 필요
+			post.getCreatedAt(),
 			post.getLikeCount(),
 			commentCount
 		);

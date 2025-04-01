@@ -130,4 +130,5 @@ public class PostService {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
     }
+
 }
