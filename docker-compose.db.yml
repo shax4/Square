@@ -31,15 +31,27 @@ services:
     networks:
       - app-network
 
-  redis-batch:
+#  redis-batch:
+#    image: redis:7
+#    container_name: redis-batch-container
+#    restart: unless-stopped
+#    ports:
+#      - "6380:6379"
+#    command: ["redis-server", "--bind", "0.0.0.0", "--protected-mode", "no", "--requirepass", "${REDIS_BATCH_PASSWORD}"]
+#    volumes:
+#      - redis-batch-data:/data
+#    networks:
+#      - app-network
+
+  redis-write:
     image: redis:7
-    container_name: redis-batch-container
+    container_name: redis-write-container
     restart: unless-stopped
     ports:
-      - "6380:6379"
-    command: ["redis-server", "--bind", "0.0.0.0", "--protected-mode", "no", "--requirepass", "${REDIS_BATCH_PASSWORD}"]
+      - "6389:6379"
+    command: ["redis-server", "--bind", "0.0.0.0", "--protected-mode", "no", "--requirepass", "${REDIS_WRITE_PASSWORD}"]
     volumes:
-      - redis-batch-data:/data
+      - redis-write-data:/data
     networks:
       - app-network
 
@@ -47,6 +59,8 @@ volumes:
   mysql-data:
   redis-cache-data:
   redis-batch-data:
+  redis-write-data:
+
 
 networks:
   app-network:
