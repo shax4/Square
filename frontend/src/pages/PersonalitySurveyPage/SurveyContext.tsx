@@ -3,21 +3,21 @@ import type React from "react"
 import { createContext, useContext, useState, useCallback } from "react"
 
 type SurveyContextType = {
-  selectedOptions: { [key: number]: number | null }
+  selectedOptions: { [key: number]: number }
   handleSelect: (questionId: number, optionIndex: number) => void
 }
 
 const SurveyContext = createContext<SurveyContextType | undefined>(undefined)
 
 export const SurveyProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [selectedOptions, setSelectedOptions] = useState<{ [key: number]: number | null }>({})
+  const [selectedOptions, setSelectedOptions] = useState<{ [key: number]: number}>({})
 
   const handleSelect = useCallback((questionId: number, optionIndex: number) => {
     setSelectedOptions((prev) => ({
       ...prev,
       [questionId]: optionIndex,
     }))
-    console.log(`Question ${questionId + 1}, Selected option: ${optionIndex + 1}`)
+    console.log(`Question ${questionId}, optionIndex: ${optionIndex}`)
   }, [])
 
   return <SurveyContext.Provider value={{ selectedOptions, handleSelect }}>{children}</SurveyContext.Provider>

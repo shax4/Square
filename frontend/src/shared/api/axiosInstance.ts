@@ -38,6 +38,8 @@ axiosInstance.interceptors.response.use(
         const {user, updateAccessToken, logOut} = useAuthStore.getState();
         const accessToken = user?.accessToken;
 
+        console.error("Axios 인터셉터에서 다음과 같은 에러를 발견했습니다 : ", error.response?.data);
+
         const isTokenExpired = error.response?.data?.code === 3002;
         /*
             토큰 만료 시 받게되는 response.

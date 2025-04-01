@@ -14,25 +14,5 @@ const PersonalitySurveyPage = () => {
   )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    backgroundColor: "#fff",
-    paddingBottom: 100,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginVertical: 20,
-  },
-  buttonContainer: {
-    alignItems: "center", // 가로 중앙 정렬
-    justifyContent: "center",
-    marginTop: 10,
-  },
-})
-
 export default PersonalitySurveyPage
 
