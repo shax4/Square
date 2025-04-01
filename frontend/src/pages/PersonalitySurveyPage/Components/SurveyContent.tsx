@@ -92,7 +92,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     backgroundColor: "#fff",
-    paddingBottom: 100,
   },
   title: {
     fontSize: 22,
@@ -103,7 +102,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     alignItems: "center", // 가로 중앙 정렬
     justifyContent: "center",
-    marginTop: 10,
+    margin: 30,
   },
 })
 
