@@ -47,7 +47,7 @@ const PersonalityResultScreen = () => {
     }
 
     if(isSurveyDone){
-      // 성향 테스트 페이지에서 바로 넘어오는 경우. props가 채워져있음.
+      // 성향 테스트 페이지에서 바로 넘어오는 경우.
       const resultData: TypeResult = {
         nickname: nickname || "undefined_nickname",
         userType: userType || "TEST",
@@ -58,6 +58,7 @@ const PersonalityResultScreen = () => {
       };
 
       setUserTypeResult(resultData);
+      setIsMyType(true);
     }else{
       getTypeResult();
 
