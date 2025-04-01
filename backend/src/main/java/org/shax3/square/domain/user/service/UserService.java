@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static org.shax3.square.exception.ExceptionCode.*;
@@ -132,6 +133,10 @@ public class UserService {
 
         String profileUrl = s3Service.generatePresignedGetUrl(s3Key);
         return ProfileUrlResponse.from(profileUrl);
+    }
+
+    public List<User> findAllById(List<Long> userIds) {
+        return userRepository.findAllById(userIds);
     }
 
     public User findById(Long userId) {

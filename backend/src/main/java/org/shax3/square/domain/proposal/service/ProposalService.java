@@ -1,6 +1,7 @@
 package org.shax3.square.domain.proposal.service;
 
 import lombok.RequiredArgsConstructor;
+
 import org.shax3.square.domain.proposal.dto.request.CreateProposalRequest;
 import org.shax3.square.domain.proposal.dto.response.CreateProposalsResponse;
 import org.shax3.square.domain.proposal.dto.response.ProposalsResponse;
@@ -49,17 +50,27 @@ public class ProposalService {
 
     @Transactional
     public void deleteProposal(Long id) {
-        Proposal proposal = proposalRepository.findById(id)
-                .orElseThrow(() -> new CustomException(PROPOSAL_NOT_FOUND));
-
+        Proposal proposal = getProposal(id);
         if (!proposal.isValid()) {
             throw new CustomException(ALREADY_DELETED);
         }
         proposal.softDelete();
     }
 
-    public boolean isProposalExists(Long proposalId) {
-        return proposalRepository.existsById(proposalId);
+    public Proposal getProposal(Long proposalId) {
+        return proposalRepository.findById(proposalId)
+            .orElseThrow(() -> new CustomException(PROPOSAL_NOT_FOUND));
+    }
+
+    public void validateExists(Long proposalId) {
+        if (!proposalRepository.existsById(proposalId)) {
+            throw new CustomException(PROPOSAL_NOT_FOUND);
+        }
+    }
+
+    public void increaseLikeCount(Long targetId, int countDiff) {
+        Proposal proposal = getProposal(targetId);
+        proposal.increaseLikeCount(countDiff);
     }
 }
 

@@ -69,7 +69,7 @@ public class OpinionController {
                                                             @RequestParam(defaultValue = "5") int limit
                                                      ) {
 
-        MyOpinionResponse response = opinionService.getMyOpinions(user,nextCursorId,limit);
+        MyOpinionResponse response = opinionFacadeService.getMyOpinions(user,nextCursorId,limit);
         return ResponseEntity.ok(response);
     }
 

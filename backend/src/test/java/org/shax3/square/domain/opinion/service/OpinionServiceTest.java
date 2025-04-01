@@ -7,8 +7,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.debate.model.Debate;
 import org.shax3.square.domain.debate.service.DebateService;
+import org.shax3.square.domain.like.service.LikeService;
 import org.shax3.square.domain.opinion.dto.request.CreateOpinionRequest;
 import org.shax3.square.domain.opinion.dto.request.UpdateOpinionRequest;
 import org.shax3.square.domain.opinion.dto.response.MyOpinionResponse;
@@ -21,11 +23,12 @@ import org.shax3.square.exception.ExceptionCode;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -37,6 +40,9 @@ class OpinionServiceTest {
 
     @Mock
     private DebateService debateService;
+
+    @Mock
+    private LikeService likeService;
 
     @InjectMocks
     private OpinionService opinionService;
@@ -205,126 +211,6 @@ class OpinionServiceTest {
         verify(opinionRepository, times(1)).findById(opinionId);
     }
 
-    @Test
-    @DisplayName("내 의견 목록 조회 - 첫 페이지 (데이터 있음)")
-    void getMyOpinions_FirstPage_WithData() {
-        // Given
-        Long nextCursorId = null; // 첫 페이지
-        int limit = 3;
-
-        List<Opinion> opinions = createTestOpinions(5L, 4L, 3L);
-        when(opinionRepository.findMyOpinions(mockUser, nextCursorId, limit+1)).thenReturn(opinions);
-
-        // When
-        MyOpinionResponse response = opinionService.getMyOpinions(mockUser, nextCursorId, limit);
-
-        // Then
-        assertThat(response).isNotNull();
-        assertThat(response.opinions()).hasSize(3);
-        assertThat(response.opinions().get(0).opinionId()).isEqualTo(5L);
-        assertThat(response.opinions().get(1).opinionId()).isEqualTo(4L);
-        assertThat(response.opinions().get(2).opinionId()).isEqualTo(3L);
-        assertThat(response.nextCursorId()).isEqualTo(3L); // 다음 페이지 커서는 마지막 항목의 ID
-    }
-
-    @Test
-    @DisplayName("내 의견 목록 조회 - 두 번째 페이지 (데이터 있음)")
-    void getMyOpinions_SecondPage_WithData() {
-        // Given
-        Long nextCursorId = 3L; // 이전 페이지의 마지막 ID
-        int limit = 3;
-
-        List<Opinion> opinions = createTestOpinions(2L, 1L);
-        when(opinionRepository.findMyOpinions(mockUser, nextCursorId, limit+1)).thenReturn(opinions);
-
-        // When
-        MyOpinionResponse response = opinionService.getMyOpinions(mockUser, nextCursorId, limit);
-
-        // Then
-        assertThat(response).isNotNull();
-        assertThat(response.opinions()).hasSize(2);
-        assertThat(response.opinions().get(0).opinionId()).isEqualTo(2L);
-        assertThat(response.opinions().get(1).opinionId()).isEqualTo(1L);
-        assertThat(response.nextCursorId()).isEqualTo(1L); // 다음 페이지 커서는 마지막 항목의 ID
-    }
-
-    @Test
-    @DisplayName("내 의견 목록 조회 - 마지막 페이지 (더 이상 데이터 없음)")
-    void getMyOpinions_LastPage_NoMoreData() {
-        // Given
-        Long nextCursorId = 1L; // 이전 페이지의 마지막 ID
-        int limit = 3;
-
-        List<Opinion> opinions = List.of(); // 더 이상 데이터 없음
-        when(opinionRepository.findMyOpinions(mockUser, nextCursorId, limit+1)).thenReturn(opinions);
-
-        // When
-        MyOpinionResponse response = opinionService.getMyOpinions(mockUser, nextCursorId, limit);
-
-        // Then
-        assertThat(response).isNotNull();
-        assertThat(response.opinions()).isEmpty();
-        assertThat(response.nextCursorId()).isNull(); // 더 이상 데이터가 없으므로 null
-    }
-
-    @Test
-    @DisplayName("내 의견 목록 조회 - 데이터가 없는 경우")
-    void getMyOpinions_NoData() {
-        // Given
-        Long nextCursorId = null;
-        int limit = 3;
-
-        List<Opinion> opinions = List.of(); // 데이터 없음
-        when(opinionRepository.findMyOpinions(mockUser, nextCursorId, limit+1)).thenReturn(opinions);
-
-        // When
-        MyOpinionResponse response = opinionService.getMyOpinions(mockUser, nextCursorId, limit);
-
-        // Then
-        assertThat(response).isNotNull();
-        assertThat(response.opinions()).isEmpty();
-        assertThat(response.nextCursorId()).isNull(); // 데이터가 없으므로 null
-    }
-
-    @Test
-    @DisplayName("내 의견 목록 조회 - 정확히 limit 개수만큼 데이터가 있는 경우")
-    void getMyOpinions_ExactlyLimitData() {
-        // Given
-        Long nextCursorId = null;
-        int limit = 3;
-
-        List<Opinion> opinions = createTestOpinions(5L, 4L, 3L);
-        when(opinionRepository.findMyOpinions(mockUser, nextCursorId, limit+1)).thenReturn(opinions);
-
-        // When
-        MyOpinionResponse response = opinionService.getMyOpinions(mockUser, nextCursorId, limit);
-
-        // Then
-        assertThat(response).isNotNull();
-        assertThat(response.opinions()).hasSize(3);
-        assertThat(response.nextCursorId()).isEqualTo(3L); // 다음 페이지 커서는 마지막 항목의 ID
-    }
-
-
-
-
-    // 테스트용 Opinion 목록 생성 헬퍼 메서드
-    private List<Opinion> createTestOpinions(Long... ids) {
-        List<Opinion> opinions = new ArrayList<>();
-
-        for (Long id : ids) {
-            Opinion opinion = Opinion.builder()
-                    .user(mockUser)
-                    .debate(mockDebate)
-                    .content("테스트 내용 " + id)
-                    .build();
-            ReflectionTestUtils.setField(opinion, "id", id);
-            ReflectionTestUtils.setField(opinion, "valid", true);
-            opinions.add(opinion);
-        }
-        return opinions;
-    }
-
 
     @Test
     @DisplayName("의견 존재하면 정상 반환")
@@ -366,11 +252,9 @@ class OpinionServiceTest {
         Long opinionId = 3L;
         when(opinionRepository.existsById(opinionId)).thenReturn(true);
 
-        // when
-        boolean exists = opinionService.isOpinionExists(opinionId);
-
-        // then
-        assertThat(exists).isTrue();
+        // when & then
+        assertThatCode(() -> opinionService.validateExists(opinionId))
+            .doesNotThrowAnyException();
     }
 
     @Test
@@ -380,11 +264,81 @@ class OpinionServiceTest {
         Long opinionId = 4L;
         when(opinionRepository.existsById(opinionId)).thenReturn(false);
 
+        // when & then
+        assertThatThrownBy(() -> opinionService.validateExists(opinionId))
+            .isInstanceOf(CustomException.class)
+            .hasMessage(ExceptionCode.OPINION_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("increaseLikeCount - likeCount 증가 로직이 잘 호출되는지 확인")
+    void increaseLikeCount_success() {
+        // given
+        Opinion opinion = mock(Opinion.class);
+        when(opinionRepository.findById(10L)).thenReturn(Optional.of(opinion));
+
         // when
-        boolean exists = opinionService.isOpinionExists(opinionId);
+        opinionService.increaseLikeCount(10L, 3);
 
         // then
-        assertThat(exists).isFalse();
+        verify(opinion).increaseLikeCount(3);
+    }
+
+    @Test
+    @DisplayName("getMyOpinions - limit보다 많은 경우, limit만큼 잘라서 반환")
+    void getMyOpinions_limitExceeded_returnsLimitedList() {
+        // Given
+        int limit = 3;
+        Long nextCursorId = null;
+
+        List<Opinion> mockOpinions = createTestOpinions(5L, 4L, 3L, 2L); // 총 4개
+        when(opinionRepository.findMyOpinions(mockUser, nextCursorId, limit + 1))
+            .thenReturn(mockOpinions);
+
+        // When
+        List<Opinion> result = opinionService.getMyOpinions(mockUser, nextCursorId, limit);
+
+        // Then
+        assertThat(result).hasSize(limit);
+        assertThat(result.get(0).getId()).isEqualTo(5L);
+        assertThat(result.get(2).getId()).isEqualTo(3L);
+    }
+
+    @Test
+    @DisplayName("getMyOpinions - limit 이하일 경우 그대로 반환")
+    void getMyOpinions_limitNotExceeded_returnsAll() {
+        // Given
+        int limit = 3;
+        Long nextCursorId = null;
+
+        List<Opinion> mockOpinions = createTestOpinions(2L, 1L);
+        when(opinionRepository.findMyOpinions(mockUser, nextCursorId, limit + 1))
+            .thenReturn(mockOpinions);
+
+        // When
+        List<Opinion> result = opinionService.getMyOpinions(mockUser, nextCursorId, limit);
+
+        // Then
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getId()).isEqualTo(2L);
+        assertThat(result.get(1).getId()).isEqualTo(1L);
+    }
+
+    // 테스트용 Opinion 목록 생성 헬퍼 메서드
+    private List<Opinion> createTestOpinions(Long... ids) {
+        List<Opinion> opinions = new ArrayList<>();
+
+        for (Long id : ids) {
+            Opinion opinion = Opinion.builder()
+                .user(mockUser)
+                .debate(mockDebate)
+                .content("테스트 내용 " + id)
+                .build();
+            ReflectionTestUtils.setField(opinion, "id", id);
+            ReflectionTestUtils.setField(opinion, "valid", true);
+            opinions.add(opinion);
+        }
+        return opinions;
     }
 
 }

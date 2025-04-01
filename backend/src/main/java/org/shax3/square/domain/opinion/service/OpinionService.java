@@ -1,14 +1,16 @@
 package org.shax3.square.domain.opinion.service;
 
 import lombok.RequiredArgsConstructor;
+
+import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.debate.model.Debate;
 import org.shax3.square.domain.debate.service.DebateService;
+import org.shax3.square.domain.like.service.LikeService;
 import org.shax3.square.domain.opinion.dto.request.CreateOpinionRequest;
 import org.shax3.square.domain.opinion.dto.request.UpdateOpinionRequest;
 import org.shax3.square.domain.opinion.dto.response.MyOpinionResponse;
 import org.shax3.square.domain.opinion.model.Opinion;
 import org.shax3.square.domain.opinion.repository.OpinionRepository;
-import org.shax3.square.domain.s3.service.S3Service;
 import org.shax3.square.domain.user.model.User;
 import org.shax3.square.exception.CustomException;
 import org.shax3.square.exception.ExceptionCode;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -60,19 +63,25 @@ public class OpinionService {
                 .orElseThrow(() -> new CustomException(ExceptionCode.OPINION_NOT_FOUND));
     }
 
-    public boolean isOpinionExists(Long opinionId) {
-        return opinionRepository.existsById(opinionId);
+    public void validateExists(Long opinionId) {
+        if (!opinionRepository.existsById(opinionId)) {
+            throw new CustomException(ExceptionCode.OPINION_NOT_FOUND);
+        }
     }
 
     @Transactional(readOnly = true)
-    public MyOpinionResponse getMyOpinions(User user, Long nextCursorId, int limit) {
+    public List<Opinion> getMyOpinions(User user, Long nextCursorId, int limit) {
         List<Opinion> opinions = opinionRepository.findMyOpinions(user, nextCursorId, limit + 1);
-        boolean hasNext = opinions.size() > limit;
 
-        if (hasNext) {
-            opinions = opinions.subList(0, limit);
+        if (opinions.size() > limit) {
+            return opinions.subList(0, limit);
         }
 
-        return MyOpinionResponse.of(opinions);
+        return opinions;
+    }
+
+    public void increaseLikeCount(Long targetId, int countDiff) {
+        Opinion opinion = getOpinion(targetId);
+        opinion.increaseLikeCount(countDiff);
     }
 }

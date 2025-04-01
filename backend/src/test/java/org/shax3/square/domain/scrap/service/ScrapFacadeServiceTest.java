@@ -55,12 +55,4 @@ class ScrapFacadeServiceTest {
         assertThat(result).isTrue();
     }
 
-    @Test
-    @DisplayName("스크랩 ID 목록 조회 테스트")
-    void testGetScrapIds() {
-        User user = User.builder().build();
-        when(scrapService.getScrapIds(user, TargetType.DEBATE)).thenReturn(List.of(1L, 2L));
-        List<Long> ids = scrapFacadeService.getScrapIds(user, TargetType.DEBATE);
-        assertThat(ids).containsExactly(1L, 2L);
-    }
 }

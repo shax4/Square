@@ -33,4 +33,18 @@ public class VoteRepositoryImpl implements VoteRepositoryCustom {
                 .limit(limit)
                 .fetch();
     }
+
+    @Override
+    public List<Vote> findByUserAndDebateIds(User user, List<Long> debateIds) {
+
+        QVote vote = QVote.vote;
+
+        return queryFactory
+                .selectFrom(vote)
+                .where(
+                        vote.user.eq(user),
+                        vote.debate.id.in(debateIds)
+                )
+                .fetch();
+    }
 }
