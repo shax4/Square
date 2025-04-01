@@ -58,12 +58,12 @@ const MypageScreen = () => {
               style={styles.actionButton}
             />
             <MypageButton
-              title="useAuth"
-              onPress={() => navigation.navigate('UseAuthTestScreen')}
+              title="기능 테스트"
+              onPress={() => navigation.navigate('MypageFeatureTestScreen')}
               variant="secondary"
               style={styles.actionButton}
             />
-            <MypageButton
+            {/* <MypageButton
               title="API 테스트"
               onPress={() => navigation.navigate('SignupTestScreen')}
               variant="secondary"
@@ -74,7 +74,7 @@ const MypageScreen = () => {
               onPress={() => navigation.navigate('ModalTestScreen')}
               variant="secondary"
               style={styles.actionButton}
-            />
+            /> */}
           </View>
         </View>
 
