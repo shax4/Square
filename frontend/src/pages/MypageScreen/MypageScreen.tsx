@@ -68,7 +68,7 @@ const MypageScreen = () => {
             />
             <MypageButton
               title="내 가치관 정보"
-              onPress={() => navigation.navigate('PersonalityResultScreen', {nickname: userProfile.nickname})}
+              onPress={() => navigation.navigate('PersonalityResultScreen', {isSurveyDone : false, nickname: user?.nickname || "temp_nickname", userType : "temp_userType", score1 : 1, score2 : 1, score3 : 1, score4 : 1})}
               variant="secondary"
               style={styles.actionButton}
             />
