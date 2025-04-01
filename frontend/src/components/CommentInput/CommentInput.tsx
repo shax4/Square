@@ -1,5 +1,5 @@
 import React from "react";
-import { KeyboardAvoidingView, Platform, TouchableOpacity, TextInput, View } from "react-native";
+import { KeyboardAvoidingView, Platform, TouchableOpacity, TextInput, View, Keyboard } from "react-native";
 
 import { styles } from "./Components/CommentInput.styles";
 import ProfileImage from "../ProfileImage";
@@ -46,6 +46,7 @@ const CommentInput = ({
                 onPress={() => {
                     if (value.trim() !== "") {
                         onSubmit();
+                        Keyboard.dismiss();
                     }
                 }}
                 disabled={disabled}

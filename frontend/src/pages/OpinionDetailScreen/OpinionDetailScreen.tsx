@@ -154,7 +154,7 @@ export default function OpinionDetailScreen() {
             </ScrollView>
 
             <CommentInput
-                onSubmit={() => { Keyboard.dismiss()}}
+                onSubmit={() => {}}
                 onChangeText={setCommentText}
                 value={commentText}
                 placeholder="댓글을 입력하세요..."
