@@ -2,16 +2,10 @@ package org.shax3.square.domain.scrap.service;
 
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.common.model.TargetType;
-import org.shax3.square.domain.debate.service.DebateService;
 import org.shax3.square.domain.scrap.dto.request.CreateScrapRequest;
-import org.shax3.square.domain.scrap.model.Scrap;
 import org.shax3.square.domain.user.model.User;
-import org.shax3.square.exception.CustomException;
-import org.shax3.square.exception.ExceptionCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,16 +23,8 @@ public class ScrapFacadeService {
         scrapService.deleteScrap(user, targetId, targetType);
     }
 
-    public List<Scrap> getPaginatedDebateScraps(User user, Long nextCursorId, int limit) {
-        return scrapService.getPaginatedScraps(user, TargetType.DEBATE, nextCursorId, limit + 1);
-    }
-
     public boolean isScrapExist(User user, Long targetId, TargetType targetType) {
         return scrapService.isTargetScraped(user, targetId, targetType);
-    }
-
-    public List<Long> getScrapIds(User user, TargetType targetType) {
-        return scrapService.getScrapIds(user, targetType);
     }
 
 }
