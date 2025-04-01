@@ -25,6 +25,9 @@ export default function OpinionListScreen() {
     const [selectedTab, setSelectedTab] = useState<'like' | 'comment' | 'recent'>('recent');
     const [commentText, setCommentText] = useState('');
 
+    const [summaries, setSummaries] = useState(SummariesResponse1);
+    const [opinions, setOpinions] = useState(opinionResponse1);
+
     // Axios로 가져와야 함
     const debate = debateList[debateId];
 
@@ -74,20 +77,20 @@ export default function OpinionListScreen() {
 
                 {/* 좌 우 의견 옵션 태그 */}
                 <View style={styles.optionView}>
-                    <Text style={styles.optionText}>{debate.leftOption}</Text>
-                    <Text style={styles.optionText}>{debate.rightOption}</Text>
+                    <Text style={styles.optionTextLeft}>{debate.leftOption}</Text>
+                    <Text style={styles.optionTextRight}>{debate.rightOption}</Text>
                 </View>
 
                 {/* 의견 텍스트 버블: isSummary 토글에 따라 보여주는 텍스트 버블 타입이 달라짐 */}
                 <View style={styles.opinionView}>
                     {isSummary ? (
                         <SummaryBoxList
-                            data={SummariesResponse1}
+                            data={summaries}
                             onEndReached={() => { console.log("end of Data") }}
                         />
                     ) : (
                         <OpinionBoxList
-                            data={opinionResponse1}
+                            data={opinions}
                             onEndReached={() => { console.log("end of Data") }}
                         />
                     )}
@@ -160,11 +163,20 @@ const styles = StyleSheet.create({
         marginRight: 20,
         marginBottom: 10,
     },
-    optionText: {
+    optionTextLeft: {
         width: '30%',
         height: 40,
         lineHeight: 40,
-        backgroundColor: colors.hashtag,
+        backgroundColor: colors.yesLight,
+        fontSize: 15,
+        borderRadius: 15,
+        textAlign: 'center',
+    },
+    optionTextRight: {
+        width: '30%',
+        height: 40,
+        lineHeight: 40,
+        backgroundColor: colors.noLight,
         fontSize: 15,
         borderRadius: 15,
         textAlign: 'center',
