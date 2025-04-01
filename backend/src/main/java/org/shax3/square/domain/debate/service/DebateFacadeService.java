@@ -69,12 +69,13 @@ public class DebateFacadeService {
                 })
                 .toList();
 
-        Long newNextCursorId = hasNext && !pageVotes.isEmpty() ? pageVotes.get(pageVotes. size() - 1).getId() : null;
+        Long newNextCursorId = hasNext && !pageVotes.isEmpty() ? pageVotes.get(pageVotes.size() - 1).getId() : null;
 
         return new MyVotedDebatesResponse(debates, newNextCursorId);
     }
 
     //TODO 레디스처리
+    @Transactional(readOnly = true)
     public DebatesResponse getDebates(User user, Long nextCursorId, int limit) {
         List<Debate> debates = debateService.findMainDebatesForCursor(nextCursorId, limit + 1);
         boolean hasNext = debates.size() > limit;
