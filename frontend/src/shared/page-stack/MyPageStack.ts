@@ -1,5 +1,5 @@
 export type StackParamList = {
-    PersonalityResultScreen: { nickname: string };
+    PersonalityResultScreen: { isSurveyDone : boolean, nickname: string, userType : string, score1 : number, score2 : number, score3 : number, score4 : number};
     ProfileUpdateScreen: undefined;
     MypageScreen: undefined;
     DeleteAccountScreen: undefined;
