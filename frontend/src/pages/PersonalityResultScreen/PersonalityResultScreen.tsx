@@ -36,7 +36,6 @@ const PersonalityResultScreen = () => {
   useEffect(() => {
     setUserTypeResult(mockResult);
     nickname === user?.nickname ? setIsMyType(true) : setIsMyType(false);
-    console.log(nickname + " : " + user?.nickname);
   }, [nickname, user?.nickname]);
 
   // 성향 설명 띄우기
