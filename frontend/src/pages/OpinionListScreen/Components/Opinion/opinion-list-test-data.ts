@@ -1,4 +1,4 @@
-import { OpinionsResponse } from './OpinionsResponse.types';
+import { OpinionsResponse } from '../../api/OpinionsResponse.types';
 import { debateData } from '../../../DebateCardsScreen/DebateCard';
 
 export const opinionResponse1: OpinionsResponse = {

@@ -1,5 +1,5 @@
-import { Opinion } from "./Opinion.types";
-import { Debate } from "../../../DebateCardsScreen/DebateCard";
+import { Opinion } from "../Components/Opinion/Opinion.types";
+import { Debate } from "../../DebateCardsScreen/DebateCard";
 
 export interface OpinionsResponse {
     debate: Debate;

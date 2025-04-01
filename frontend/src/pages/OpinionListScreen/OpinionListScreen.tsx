@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
+import { View, Text, KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
+import { styles } from './Components/OpinionListScreen.styles'
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { StackParamList } from '../../shared/page-stack/DebatePageStack';
 import { debateData as debateList } from '../DebateCardsScreen/DebateCard/card-data';
-import colors from '../../../assets/colors';
 import VoteButton from '../../components/VoteButton/VoteButton';
-
 import ToggleSwitch from './Components/ToggleSwitch';
-
 import SummaryBoxList from './Components/Summary/SummaryBoxList'
-import { SummariesResponse1 } from './Components/Summary';
-
+import { Summary } from './Components/Summary';
 import OpinionBoxList from './Components/Opinion/OpinionBoxList';
-import { opinionResponse1 } from './Components/Opinion/opinion-list-test-data';
 import CommentInput from '../../components/CommentInput/CommentInput';
+import { getOpinions } from './api/OpinionsApi';
+import { Opinion } from './Components/Opinion';
+import { Debate } from '../DebateCardsScreen/DebateCard';
+import { getSummaries } from './api/SummariesApi';
 
 type OpinionListScreenRouteProp = RouteProp<StackParamList, 'OpinionListScreen'>;
 
@@ -21,15 +21,89 @@ export default function OpinionListScreen() {
     const route = useRoute<OpinionListScreenRouteProp>();
     const { debateId, showVoteResultModal = false } = route.params;
 
+    // 정렬 및 토글
     const [isSummary, setIsSummary] = useState(true); // ai요약, 의견 토글
-    const [selectedTab, setSelectedTab] = useState<'like' | 'comment' | 'recent'>('recent');
+    const [sort, setSort] = useState<'like' | 'comment' | 'recent'>('recent');
     const [commentText, setCommentText] = useState('');
 
-    const [summaries, setSummaries] = useState(SummariesResponse1);
-    const [opinions, setOpinions] = useState(opinionResponse1);
+    // 요약 정보
+    const [summaries, setSummaries] = useState<Summary[]>([]);
 
-    // Axios로 가져와야 함
-    const debate = debateList[debateId];
+    // 의견 페이징
+    const [opinions, setOpinions] = useState<Opinion[]>([]);
+    const [nextLeftCursorId, setNextLeftCursorId] = useState<number | null>(null);
+    const [nextRightCursorId, setNextRightCursorId] = useState<number | null>(null);
+    const [hasMore, setHasMore] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const limit = 5;
+
+    // 논쟁: 의견을 조회할할
+    const [debate, setDebate] = useState<Debate>(debateList[0]);
+
+    useEffect(() => {
+        initOpinions();
+    }, [sort]);
+
+    useEffect(() => {
+        initAiSummaries();
+    }, []);
+
+    // AI 요약 초기 요약
+    const initAiSummaries = () => {
+        setSummaries([]);
+        fetchSummaries();
+    }
+
+    // AI 요약 정보 불러오기
+    const fetchSummaries = async () => {
+        setLoading(true);
+        try {
+            const response = await getSummaries(debateId);
+            setSummaries(response.summaries);
+
+        } catch (e) {
+            console.error("AI 요약 불러오기 실패:", e);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    // 의견 초기 리셋
+    const initOpinions = () => {
+        setOpinions([]);
+        setNextLeftCursorId(null);
+        setNextRightCursorId(null);
+        setHasMore(true);
+        fetchOpinions();
+    }
+
+    const fetchOpinions = async () => {
+        if (loading || !hasMore) return;
+
+        setLoading(true);
+
+        try {
+            const response = await getOpinions(debateId, {
+                nextLeftCursorId,
+                nextRightCursorId,
+                limit,
+            });
+
+            setOpinions((prev) => [...prev, ...response.opinions]);
+            setNextLeftCursorId(response.nextLeftCursorId);
+            setNextRightCursorId(response.nextRightCursorId);
+            setDebate(response.debate);
+
+            // 다음 커서가 모두 null이면 더 이상 불러올 게 없음
+            if (!response.nextLeftCursorId && !response.nextRightCursorId) {
+                setHasMore(false);
+            }
+        } catch (e) {
+            console.error("의견 불러오기 실패:", e);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <KeyboardAvoidingView
@@ -48,27 +122,27 @@ export default function OpinionListScreen() {
                         <Text
                             style={[
                                 styles.tabButton,
-                                selectedTab === 'like' && styles.selectedTabButton
+                                sort === 'like' && styles.selectedTabButton
                             ]}
-                            onPress={() => setSelectedTab('like')}
+                            onPress={() => setSort('like')}
                         >
                             좋아요순
                         </Text>
                         <Text
                             style={[
                                 styles.tabButton,
-                                selectedTab === 'comment' && styles.selectedTabButton
+                                sort === 'comment' && styles.selectedTabButton
                             ]}
-                            onPress={() => setSelectedTab('comment')}
+                            onPress={() => setSort('comment')}
                         >
                             댓글 많은순
                         </Text>
                         <Text
                             style={[
                                 styles.tabButton,
-                                selectedTab === 'recent' && styles.selectedTabButton
+                                sort === 'recent' && styles.selectedTabButton
                             ]}
-                            onPress={() => setSelectedTab('recent')}
+                            onPress={() => setSort('recent')}
                         >
                             최신순
                         </Text>
@@ -86,12 +160,11 @@ export default function OpinionListScreen() {
                     {isSummary ? (
                         <SummaryBoxList
                             data={summaries}
-                            onEndReached={() => { console.log("end of Data") }}
                         />
                     ) : (
                         <OpinionBoxList
                             data={opinions}
-                            onEndReached={() => { console.log("end of Data") }}
+                            onEndReached={() => { console.log("페이징 끝 도달") }}
                         />
                     )}
 
@@ -138,101 +211,3 @@ export default function OpinionListScreen() {
         </KeyboardAvoidingView>
     )
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.white,
-    },
-    topicView: {
-        maxHeight: 100,
-        minHeight: 60,
-        alignItems: 'flex-start',
-        margin: 12,
-        flexWrap: 'wrap',
-    },
-    topicViewText: {
-        margin: 10,
-        fontSize: 30,
-        fontWeight: '600',
-    },
-    optionView: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginLeft: 20,
-        marginRight: 20,
-        marginBottom: 10,
-    },
-    optionTextLeft: {
-        width: '30%',
-        height: 40,
-        lineHeight: 40,
-        backgroundColor: colors.yesLight,
-        fontSize: 15,
-        borderRadius: 15,
-        textAlign: 'center',
-    },
-    optionTextRight: {
-        width: '30%',
-        height: 40,
-        lineHeight: 40,
-        backgroundColor: colors.noLight,
-        fontSize: 15,
-        borderRadius: 15,
-        textAlign: 'center',
-    },
-    opinionView: {
-        flex: 1,
-        justifyContent: 'flex-end',
-        alignItems: 'center',
-    },
-    opinionTypeToggleView: {
-        position: 'absolute',
-        bottom: 10,
-        backgroundColor: 'rgba(0, 0, 0, 0)',
-    },
-    bottomContainer: {
-        width: '100%',
-    },
-    VoteButtonView: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: colors.white,
-        paddingVertical: 15,
-    },
-    VoteButtonViewSmall: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: colors.white,
-        paddingVertical: 10,
-    },
-    TotalVoteCountView: {
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        backgroundColor: colors.white,
-        paddingBottom: 15,
-    },
-    tabContainer: {
-        flexDirection: 'row',
-        backgroundColor: '#eeeeee',
-        borderRadius: 15,
-        marginHorizontal: 20,
-        padding: 4,
-        marginBottom: 10,
-        alignItems: 'center',
-    },
-    tabButton: {
-        flex: 1,
-        textAlign: 'center',
-        paddingVertical: 10,
-        borderRadius: 12,
-        color: '#888',
-        fontWeight: '500',
-    },
-    selectedTabButton: {
-        backgroundColor: '#ffffff',
-        color: '#000',
-    },
-});
