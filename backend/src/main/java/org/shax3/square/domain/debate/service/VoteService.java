@@ -11,6 +11,7 @@ import org.shax3.square.exception.CustomException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -57,6 +58,10 @@ public class VoteService {
     }
 
     public Map<Long, Boolean> getVoteDirectionMap(User user, List<Long> debateIds) {
+        if (user == null) {
+            return Collections.emptyMap();
+        }
+
         List<Vote> votes = voteRepository.findByUserAndDebateIds(user, debateIds);
 
         return votes.stream()

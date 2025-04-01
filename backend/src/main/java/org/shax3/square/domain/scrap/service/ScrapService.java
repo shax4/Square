@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.shax3.square.exception.ExceptionCode.SCRAP_ALREADY_EXISTS;
 
@@ -54,5 +56,12 @@ public class ScrapService {
     @Transactional(readOnly = true)
     public List<Scrap> getPaginatedScraps(User user, TargetType type, Long cursorId, int limit) {
         return scrapRepository.findScrapsByUserAndType(user, type, cursorId, limit);
+    }
+
+    public Map<Long, Boolean> getScrapMap(User user, List<Long> debateIds) {
+        List<Long> allScrapedIds = getScrapIds(user, TargetType.DEBATE);
+        return debateIds.stream()
+                .filter(allScrapedIds::contains)
+                .collect(Collectors.toMap(id -> id, id -> true));
     }
 }

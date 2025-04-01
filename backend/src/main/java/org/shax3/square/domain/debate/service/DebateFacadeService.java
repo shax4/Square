@@ -11,7 +11,7 @@ import org.shax3.square.domain.debate.dto.response.VoteResponse;
 import org.shax3.square.domain.debate.model.Debate;
 import org.shax3.square.domain.debate.model.Vote;
 import org.shax3.square.domain.scrap.model.Scrap;
-import org.shax3.square.domain.scrap.service.ScrapFacadeService;
+import org.shax3.square.domain.scrap.service.ScrapService;
 import org.shax3.square.domain.user.model.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,13 +23,13 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class DebateFacadeService {
-    private final ScrapFacadeService scrapFacadeService;
     private final DebateService debateService;
     private final VoteService voteService;
+    private final ScrapService scrapService;
 
     @Transactional(readOnly = true)
     public MyScrapedDebatesResponse getScrapedDebates(User user, Long nextCursorId, int limit) {
-        List<Scrap> scraps = scrapFacadeService.getPaginatedDebateScraps(user, nextCursorId, limit + 1);
+        List<Scrap> scraps = scrapService.getPaginatedScraps(user, TargetType.DEBATE, nextCursorId, limit + 1);
 
         boolean hasNext = scraps.size() > limit;
         List<Scrap> pageScraps = hasNext ? scraps.subList(0, limit) : scraps;
@@ -58,7 +58,7 @@ public class DebateFacadeService {
         boolean hasNext = votes.size() > limit;
         List<Vote> pageVotes = hasNext ? votes.subList(0, limit) : votes;
 
-        List<Long> userScraps = scrapFacadeService.getScrapIds(user, TargetType.DEBATE);
+        List<Long> userScraps = scrapService.getScrapIds(user, TargetType.DEBATE);
 
         List<DebateDto> debates = pageVotes.stream()
                 .map(vote -> {
@@ -86,7 +86,7 @@ public class DebateFacadeService {
                 .toList();
 
         Map<Long, Boolean> isLeftMap = voteService.getVoteDirectionMap(user, debateIds);
-        Map<Long, Boolean> isScrapedMap = scrapFacadeService.getScrapMap(user, debateIds);
+        Map<Long, Boolean> isScrapedMap = scrapService.getScrapMap(user, debateIds);
 
         List<MainDebateDto> debateDtos = pageDebates.stream()
                 .map(debate -> {

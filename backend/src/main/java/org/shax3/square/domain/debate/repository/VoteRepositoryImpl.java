@@ -36,6 +36,7 @@ public class VoteRepositoryImpl implements VoteRepositoryCustom {
 
     @Override
     public List<Vote> findByUserAndDebateIds(User user, List<Long> debateIds) {
+
         QVote vote = QVote.vote;
 
         return queryFactory
