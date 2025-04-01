@@ -8,6 +8,7 @@ import ProposalListScreen from '../../../pages/ProposalListScreen/ProposalListSc
 import ProposalCreateScreen from '../../../pages/ProposalCreateScreen/ProposalCreateScreen';
 import OpinionDetailScreen from '../../../pages/OpinionDetailScreen/OpinionDetailScreen';
 import OpinionEditScreen from '../../../pages/OpinionEditScreen/OpinionEditScreen';
+import PersonalityResultScreen from '../../../pages/PersonalityResultScreen/PersonalityResultScreen';
 
 import { StackParamList } from '../../../shared/page-stack/DebatePageStack';
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -84,7 +85,7 @@ export default function HeaderBar() {
                     const isAuthor = currentUser.nickname === opinion.nickname;
 
                     return {
-                        title: '의견 상세',
+                        title: '의견 수정',
                         headerBackButtonDisplayMode: 'minimal',
                         // headerRight: () => <EditOpinionHeaderRightIcon />,
                     };
@@ -111,6 +112,15 @@ export default function HeaderBar() {
                         title: '새로운 주제 작성하기',
                         headerBackButtonDisplayMode: 'minimal',
                     };
+                }}
+            />
+            {/* 성향 타입 그래프 페이지 */}
+            <Stack.Screen
+                name="PersonalityResultScreen"
+                component={PersonalityResultScreen}
+                options={{
+                    title: '성향 테스트 확인',
+                    headerBackButtonDisplayMode: 'minimal',
                 }}
             />
         </Stack.Navigator>
