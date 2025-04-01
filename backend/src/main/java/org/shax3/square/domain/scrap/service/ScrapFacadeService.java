@@ -2,16 +2,15 @@ package org.shax3.square.domain.scrap.service;
 
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.common.model.TargetType;
-import org.shax3.square.domain.debate.service.DebateService;
 import org.shax3.square.domain.scrap.dto.request.CreateScrapRequest;
 import org.shax3.square.domain.scrap.model.Scrap;
 import org.shax3.square.domain.user.model.User;
-import org.shax3.square.exception.CustomException;
-import org.shax3.square.exception.ExceptionCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,5 +39,13 @@ public class ScrapFacadeService {
     public List<Long> getScrapIds(User user, TargetType targetType) {
         return scrapService.getScrapIds(user, targetType);
     }
+
+    public Map<Long, Boolean> getScrapMap(User user, List<Long> debateIds) {
+        List<Long> allScrapedIds = getScrapIds(user, TargetType.DEBATE); // 또는 user 객체 그대로 넘기기
+        return debateIds.stream()
+                .filter(allScrapedIds::contains)
+                .collect(Collectors.toMap(id -> id, id -> true));
+    }
+
 
 }

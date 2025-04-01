@@ -3,6 +3,8 @@ package org.shax3.square.domain.debate.service;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.debate.dto.DebateDto;
+import org.shax3.square.domain.debate.dto.MainDebateDto;
+import org.shax3.square.domain.debate.dto.response.DebatesResponse;
 import org.shax3.square.domain.debate.dto.response.MyScrapedDebatesResponse;
 import org.shax3.square.domain.debate.dto.response.MyVotedDebatesResponse;
 import org.shax3.square.domain.debate.dto.response.VoteResponse;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -52,9 +55,7 @@ public class DebateFacadeService {
     @Transactional(readOnly = true)
     public MyVotedDebatesResponse getMyVotedDebates(User user, Long nextCursorId, int limit) {
         List<Vote> votes = voteService.getVotesByUser(user, nextCursorId, limit + 1);
-        //다음 페이지가 있는지 (repository에서 +1 하기 때문에 다음 페이지가 있다면 size가 더 커야함
         boolean hasNext = votes.size() > limit;
-        //다음 페이지가 있다면, 하나를 자름
         List<Vote> pageVotes = hasNext ? votes.subList(0, limit) : votes;
 
         List<Long> userScraps = scrapFacadeService.getScrapIds(user, TargetType.DEBATE);
@@ -68,9 +69,36 @@ public class DebateFacadeService {
                 })
                 .toList();
 
-        Long newNextCursorId = hasNext && !pageVotes.isEmpty() ? pageVotes.get(pageVotes.size() - 1).getId() : null;
+        Long newNextCursorId = hasNext && !pageVotes.isEmpty() ? pageVotes.get(pageVotes. size() - 1).getId() : null;
 
         return new MyVotedDebatesResponse(debates, newNextCursorId);
+    }
+
+    //TODO 레디스처리
+    public DebatesResponse getDebates(User user, Long nextCursorId, int limit) {
+        List<Debate> debates = debateService.findMainDebatesForCursor(nextCursorId, limit + 1);
+        boolean hasNext = debates.size() > limit;
+
+        List<Debate> pageDebates = hasNext ? debates.subList(0, limit) : debates;
+        List<Long> debateIds = pageDebates.stream()
+                .map(Debate::getId)
+                .toList();
+
+        Map<Long, Boolean> isLeftMap = voteService.getVoteDirectionMap(user, debateIds);
+        Map<Long, Boolean> isScrapedMap = scrapFacadeService.getScrapMap(user, debateIds);
+
+        List<MainDebateDto> debateDtos = pageDebates.stream()
+                .map(debate -> {
+                    VoteResponse voteResponse = voteService.calculateVoteResult(debate);
+                    return MainDebateDto.of(debate, isScrapedMap, isLeftMap, voteResponse);
+                })
+                .toList();
+
+        Long newCursorId = hasNext && !pageDebates.isEmpty()
+                ? pageDebates.get(pageDebates.size() - 1).getId()
+                : null;
+
+        return new DebatesResponse(debateDtos, newCursorId);
     }
 
 

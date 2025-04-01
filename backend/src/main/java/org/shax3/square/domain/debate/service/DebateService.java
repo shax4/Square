@@ -50,11 +50,7 @@ public class DebateService {
                 createVoteResultDto(groupedVotes.get(false))
         );
     }
-
-    private VoteResultDto createVoteResultDto(List<Vote> votes) {
-        return VoteResultDto.fromVotes(votes);
-    }
-
+    //TODO 레디스처리
     public SummaryResponse getSummaryResult(Long debateId, User user) {
         Debate debate = findDebateById(debateId);
 
@@ -72,15 +68,14 @@ public class DebateService {
         return SummaryResponse.of(debate, voteResponse, hasVoted, isScraped, summaries);
     }
 
-    public DebatesResponse getDebates(User user) {
-        Boolean isScraped, isLeft;
-        if (user == null) {
-            isScraped = null;
-            isLeft = null;
-        }else{
-
-        }
-
-
+    public List<Debate> findMainDebatesForCursor(Long nextCursorId, int limit) {
+        return debateRepository.findDebatesForMain(nextCursorId, limit);
     }
+
+    private VoteResultDto createVoteResultDto(List<Vote> votes) {
+        return VoteResultDto.fromVotes(votes);
+    }
+
+
+
 }
