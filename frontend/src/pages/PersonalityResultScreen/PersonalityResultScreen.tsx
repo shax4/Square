@@ -8,6 +8,8 @@ import { useEffect, useState } from "react"
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { useAuth } from "../../shared/hooks"
 
+import { getPersonalityResult } from "./Api/PersonalityResultAPI"
+
 // Axios 연결 필요
 // 임시 데이터로 태스트
 const mockResult: TypeResult = {
@@ -20,11 +22,11 @@ const mockResult: TypeResult = {
 };
 
 const PersonalityResultScreen = () => {
-  const route = useRoute<RouteProp<Record<string, { nickname: string }>, string>>();
-  const { nickname } = route.params;
+  const route = useRoute<RouteProp<Record<string, {  isSurveyDone : boolean, nickname: string, userType : string, score1 : number, score2 : number, score3 : number, score4 : number}>, string>>();
+  const { nickname, userType, score1, score2, score3, score4, isSurveyDone } = route.params;
 
   // Zustand 로그인 사용자 데이터
-  const { user, setUser, loggedIn, logOut } = useAuth();
+  const { user} = useAuth();
   const myNickname = user?.nickname;
 
   const [userTypeResult, setUserTypeResult] = useState<TypeResult>(mockResult);
@@ -34,23 +36,50 @@ const PersonalityResultScreen = () => {
 
   // 초기 사용자 타입 설정
   useEffect(() => {
-    setUserTypeResult(mockResult);
-    nickname === user?.nickname ? setIsMyType(true) : setIsMyType(false);
+    const getTypeResult = async () => {
+      try{
+        const resultData : TypeResult = await getPersonalityResult(nickname)
+
+        setUserTypeResult(resultData);
+      }catch(error){
+        console.error("성향 결과 데이터 가져오기 에러 발생!", error);
+      }
+    }
+
+    if(isSurveyDone){
+      // 성향 테스트 페이지에서 바로 넘어오는 경우.
+      const resultData: TypeResult = {
+        nickname: nickname || "undefined_nickname",
+        userType: userType || "TEST",
+        score1: score1 || -3,
+        score2: score2 || -3,
+        score3: score3 || -3,
+        score4: score4 || -3,
+      };
+
+      setUserTypeResult(resultData);
+      setIsMyType(true);
+    }else{
+      getTypeResult();
+
+      const isMyTypeState : boolean = nickname === user?.nickname;
+      setIsMyType(isMyTypeState);
+    }
   }, [nickname, user?.nickname]);
 
   // 성향 설명 띄우기
   const onInfoPress = () => {
-
+    console.log("성향 설명");
   }
 
   // 성향 테스트 다시하기
   const onRetakePress = () => {
-
+    console.log("성향 테스트 다시 하기");
   }
 
   // 공유하기
   const onSharePress = () => {
-
+    console.log("공유하기");
   }
 
   // Colors for each graph
