@@ -31,7 +31,7 @@ public enum ExceptionCode {
 	FAILED_TO_VALIDATE_TOKEN(3002, "토큰 검증에 실패했습니다."),
 	INVALID_ACCESS_TOKEN(3003, "사용자 식별에 실패했습니다. 다시 로그인해주세요."),
 
-	NOT_AUTHOR(4001, "작성자만 글을 수정할 수 있습니다."),
+	NOT_AUTHOR(4001, "작성자만 수정할 수 있습니다."),
 	PAGE_LIMIT(4002, "최대 페이지 수를 초과할 수 없습니다."),
 	POST_LIMIT(4003, "게시판의 최대 게시글 수를 초과했습니다."),
 	POST_NOT_FOUND(4004, "게시글을 찾을 수 없습니다."),
@@ -55,7 +55,9 @@ public enum ExceptionCode {
 	SCRAP_ALREADY_EXISTS(10001, "이미 해당 게시물/논쟁을 스크랩하고 있습니다."),
 
 	TYPE_QUESTION_DUPLICATION(11002, "같은 질문에 중복 답변이 존재합니다."),
-	TYPE_RESULT_NOT_FOUND(11003, "성향테스트 결과가 존재하지 않습니다.")
+	TYPE_RESULT_NOT_FOUND(11003, "성향테스트 결과가 존재하지 않습니다."),
+
+	INVALID_PARENT_COMMENT(12001, "유효하지 않은 부모 댓글입니다.")
 	;
 	private final int code;
 	private final String message;
