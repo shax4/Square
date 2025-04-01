@@ -171,7 +171,7 @@ export default function CommentItem({
             <ProfileImage imageUrl={comment.profileUrl} variant="small" />
             <View style={styles.userInfoText}>
               <Text style={styles.nickname}>{comment.nickname}</Text>
-              <PersonalityTag personality={comment.userType} />
+              <PersonalityTag personality={comment.userType} nickname={comment.nickname} />
             </View>
             {/* 시간은 푸터로 이동 */}
           </View>
