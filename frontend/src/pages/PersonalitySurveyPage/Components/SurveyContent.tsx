@@ -6,10 +6,17 @@ import { useSurvey } from "../SurveyContext"
 import { getSurveyQuestions, submitSurveyAnswers } from "../Api/surveyApi"
 import {SurveyAnswer, SurveyResponse, SurveyQuestion, SurveyQuestionsResponse} from "../Api/surveyApi.types"
 
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
+
+import {StackParamList} from '../../../shared/page-stack/MyPageStack'
+
 // Create a wrapper component to use the context
 const SurveyContent = () => {
     const { selectedOptions } = useSurvey()
     const [questions, setQuestions] = useState<SurveyQuestion[]>([]);
+
+    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
 
     useEffect(() => {
     const getQuestions = async () => {
@@ -19,6 +26,16 @@ const SurveyContent = () => {
             setQuestions(result.questions);
         }catch(error){
             console.error("설문조사 질문 가져오기 실패:", error);
+            Alert.alert(
+              "설문조사 에러",
+              "설문조사 질문들을 가져오는 데 에러가 발생했습니다.",
+              [
+                {
+                  text: "확인",
+                  onPress: () => {navigation.goBack()}
+                },
+              ]
+            );
         }
     }
     getQuestions();
@@ -60,9 +77,9 @@ const SurveyContent = () => {
 
         // Handle success
         console.log("Survey submitted successfully:", result)
-        Alert.alert("제출 완료", "설문조사가 성공적으로 제출되었습니다.", [{ text: "확인" }])
+        Alert.alert("제출 완료", JSON.stringify(result, null, 2), [{ text: "확인" }]);
   
-        // You can navigate to another screen here if needed
+        // 나중에 결과 페이지로 이동해주기.
         // navigation.navigate('ThankYou');
       } catch (error) {
         // Handle error
