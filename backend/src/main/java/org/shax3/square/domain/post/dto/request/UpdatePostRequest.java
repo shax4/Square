@@ -17,11 +17,4 @@ public record UpdatePostRequest(
         @NotNull
         List<String> addedImages
 ) {
-    public Post to(User user) {
-        return Post.builder()
-                .title(this.title)
-                .content(this.content)
-                .user(user)
-                .build();
-    }
 }
