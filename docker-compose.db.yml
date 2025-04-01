@@ -48,7 +48,6 @@ volumes:
   mysql-data:
   redis-cache-data:
   redis-batch-data:
-  redis-write-data:
 
 
 networks:
