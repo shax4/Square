@@ -17,7 +17,7 @@ public class Debate {
     private Long id;
 
     @Column(nullable = false)
-    private String Topic;
+    private String topic;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
@@ -34,7 +34,7 @@ public class Debate {
 
     @Builder
     public Debate(String topic, String leftOption, String rightOption) {
-        this.Topic = topic;
+        this.topic = topic;
         this.leftOption = leftOption;
         this.rightOption = rightOption;
         this.valid = true;
