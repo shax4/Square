@@ -29,7 +29,7 @@ export default function OpinionListScreen() {
     const debate = debateList[debateId];
 
     return (
-        <KeyboardAvoidingView 
+        <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={styles.container}
             keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
@@ -102,6 +102,7 @@ export default function OpinionListScreen() {
                 </View>
 
                 {/* 하단 영역: 투표 버튼과 댓글 입력창 */}
+
                 <View style={styles.bottomContainer}>
                     {/* 좌 우 투표 버튼 */}
                     <View style={isSummary ? styles.VoteButtonView : styles.VoteButtonViewSmall}>
@@ -118,18 +119,18 @@ export default function OpinionListScreen() {
                         </View>
                     )}
 
-                    {!isSummary && (
-                        <CommentInput
-                            onChangeText={setCommentText}
-                            onSubmit={() => {
-                                console.log("Comment submitted:", commentText);
-                                setCommentText('');
-                            }}
-                            value={commentText}
-                            placeholder='의견을 입력하세요...'
-                        />
-                    )}
                 </View>
+                {!isSummary && (
+                    <CommentInput
+                        onChangeText={setCommentText}
+                        onSubmit={() => {
+                            console.log("Comment submitted:", commentText);
+                            setCommentText('');
+                        }}
+                        value={commentText}
+                        placeholder='의견을 입력하세요...'
+                    />
+                )}
             </SafeAreaView>
         </KeyboardAvoidingView>
     )
@@ -141,12 +142,14 @@ const styles = StyleSheet.create({
         backgroundColor: colors.white,
     },
     topicView: {
-        height: 100,
+        maxHeight: 100,
+        minHeight: 60,
         alignItems: 'flex-start',
-        margin: 20,
+        margin: 12,
         flexWrap: 'wrap',
     },
     topicViewText: {
+        margin: 10,
         fontSize: 30,
         fontWeight: '600',
     },
