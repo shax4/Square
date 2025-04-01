@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import ProfileImage from "../../../components/ProfileImage";
 import LikeButton from "../../../components/LikeButton";
+import { getTimeAgo } from "../../../shared/utils/timeAge/timeAge";
 
 // 게시글 아이템 타입 정의
 interface BoardItemProps {
@@ -43,7 +44,7 @@ export default function BoardItem({ item, onPress }: BoardItemProps) {
         <ProfileImage imageUrl={item?.profileUrl} variant="medium" />
         <View style={styles.authorInfo}>
           <Text style={styles.authorName}>{item.nickname}</Text>
-          <Text style={styles.date}>{item.createdAt}</Text>
+            <Text style={styles.date}>{getTimeAgo(item.createdAt)}</Text>
         </View>
       </View>
 
@@ -61,6 +62,8 @@ export default function BoardItem({ item, onPress }: BoardItemProps) {
           <LikeButton
             initialCount={item.likeCount}
             initialLiked={item.isLiked}
+            isVertical={false}
+            size="small"
           />
           <View style={styles.commentInfo}>
             <Text style={styles.commentText}>댓글 {item.commentCount}개</Text>
