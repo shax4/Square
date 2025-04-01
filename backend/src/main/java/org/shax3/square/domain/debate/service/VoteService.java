@@ -11,8 +11,11 @@ import org.shax3.square.exception.CustomException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.shax3.square.exception.ExceptionCode.ALREADY_VOTED;
 
@@ -42,7 +45,6 @@ public class VoteService {
         return VoteResponse.of(left, right);
     }
 
-
     public List<Vote> getVotesByDebate(Debate debate) {
         return voteRepository.findByDebate(debate);
     }
@@ -55,7 +57,19 @@ public class VoteService {
         return voteRepository.findByUserOrderByIdDesc(user, nextCursorId, limit);
     }
 
+    public Map<Long, Boolean> getVoteDirectionMap(User user, List<Long> debateIds) {
+        if (user == null) {
+            return Collections.emptyMap();
+        }
 
+        List<Vote> votes = voteRepository.findByUserAndDebateIds(user, debateIds);
+
+        return votes.stream()
+                .collect(Collectors.toMap(
+                        vote -> vote.getDebate().getId(),
+                        Vote::isLeft
+                ));
+    }
 }
 
 

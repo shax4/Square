@@ -8,10 +8,7 @@ import org.shax3.square.domain.auth.annotation.AuthUser;
 import org.shax3.square.domain.auth.annotation.Guest;
 import org.shax3.square.domain.debate.dto.DebateVotedResultResponse;
 import org.shax3.square.domain.debate.dto.request.VoteRequest;
-import org.shax3.square.domain.debate.dto.response.MyScrapedDebatesResponse;
-import org.shax3.square.domain.debate.dto.response.MyVotedDebatesResponse;
-import org.shax3.square.domain.debate.dto.response.SummaryResponse;
-import org.shax3.square.domain.debate.dto.response.VoteResponse;
+import org.shax3.square.domain.debate.dto.response.*;
 import org.shax3.square.domain.debate.model.Debate;
 import org.shax3.square.domain.debate.service.DebateFacadeService;
 import org.shax3.square.domain.debate.service.DebateService;
@@ -77,15 +74,29 @@ public class DebateController {
     @Operation(
             summary = "AI 요약 조회 API",
             description = """
-        지정한 논쟁 ID에 해당하는 AI 요약 결과를 조회합니다. \n
-        - 로그인하지 않은 경우 `hasVoted`, `isScraped` 값은 `null`로 반환됩니다. \n
-        """
+                    지정한 논쟁 ID에 해당하는 AI 요약 결과를 조회합니다. \n
+                    - 로그인하지 않은 경우 `hasVoted`, `isScraped` 값은 `null`로 반환됩니다. \n
+                    """
     )
     @GetMapping("/{debateId}/summary")
-    public ResponseEntity<SummaryResponse> getSummary(@Guest User user, @PathVariable Long debateId){
+    public ResponseEntity<SummaryResponse> getSummary(@Guest User user, @PathVariable Long debateId) {
         SummaryResponse response = debateService.getSummaryResult(debateId, user);
         return ResponseEntity.ok(response);
     }
 
-
+    @Operation(
+            summary = "논쟁 메인 조회 API",
+            description = """
+                    메인 페이지에 노출될 논쟁 목록을 조회합니다. \n
+                    - 스크랩, 투표 여부에 따라 `isScraped`, `isLeft` 값이 달라질 수 있습니다. \n
+                    - 로그인 여부를 확인하려면 클라이언트에서 확인해야 합니다.
+                    """)
+    @GetMapping("/debates")
+    public ResponseEntity<DebatesResponse> getDebates(@Guest User user,
+                                                      @RequestParam(required = false) Long nextCursorId,
+                                                      @RequestParam(defaultValue = "5") int limit
+    ) {
+        DebatesResponse response = debateFacadeService.getDebates(user, nextCursorId, limit);
+        return ResponseEntity.ok(response);
+    }
 }

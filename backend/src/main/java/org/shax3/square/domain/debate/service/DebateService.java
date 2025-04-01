@@ -7,10 +7,10 @@ import org.shax3.square.domain.debate.dto.SummaryDto;
 import org.shax3.square.domain.debate.dto.VoteResultDto;
 import org.shax3.square.domain.debate.dto.response.SummaryResponse;
 import org.shax3.square.domain.debate.dto.response.VoteResponse;
+import org.shax3.square.domain.debate.dto.response.DebatesResponse;
 import org.shax3.square.domain.debate.model.Debate;
 import org.shax3.square.domain.debate.model.Vote;
 import org.shax3.square.domain.debate.repository.DebateRepository;
-import org.shax3.square.domain.like.service.LikeService;
 import org.shax3.square.domain.scrap.service.ScrapFacadeService;
 import org.shax3.square.domain.user.model.User;
 import org.shax3.square.exception.CustomException;
@@ -50,11 +50,7 @@ public class DebateService {
                 createVoteResultDto(groupedVotes.get(false))
         );
     }
-
-    private VoteResultDto createVoteResultDto(List<Vote> votes) {
-        return VoteResultDto.fromVotes(votes);
-    }
-
+    //TODO 레디스처리
     public SummaryResponse getSummaryResult(Long debateId, User user) {
         Debate debate = findDebateById(debateId);
 
@@ -71,5 +67,15 @@ public class DebateService {
         List<SummaryDto> summaries = summaryService.getSummariesByDebateId(debateId);
         return SummaryResponse.of(debate, voteResponse, hasVoted, isScraped, summaries);
     }
+
+    public List<Debate> findMainDebatesForCursor(Long nextCursorId, int limit) {
+        return debateRepository.findDebatesForMain(nextCursorId, limit);
+    }
+
+    private VoteResultDto createVoteResultDto(List<Vote> votes) {
+        return VoteResultDto.fromVotes(votes);
+    }
+
+
 
 }

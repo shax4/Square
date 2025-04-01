@@ -15,6 +15,7 @@ import org.shax3.square.domain.debate.model.Debate;
 import org.shax3.square.domain.debate.model.Vote;
 import org.shax3.square.domain.scrap.model.Scrap;
 import org.shax3.square.domain.scrap.service.ScrapFacadeService;
+import org.shax3.square.domain.scrap.service.ScrapService;
 import org.shax3.square.domain.user.model.User;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -27,7 +28,7 @@ import static org.mockito.Mockito.*;
 class DebateFacadeServiceTest {
 
     @Mock
-    private ScrapFacadeService scrapFacadeService;
+    private ScrapService scrapService;
     @Mock
     private DebateService debateService;
     @Mock
@@ -45,7 +46,7 @@ class DebateFacadeServiceTest {
         Scrap scrap = Scrap.builder().targetId(1L).build();
         ReflectionTestUtils.setField(scrap, "id", 10L);
 
-        when(scrapFacadeService.getPaginatedDebateScraps(user, null, 3))
+        when(scrapService.getPaginatedScraps(user, TargetType.DEBATE,null, 3))
                 .thenReturn(List.of(scrap));
         when(debateService.findDebateById(1L)).thenReturn(debate);
         when(voteService.getVoteByUserAndDebate(user, debate)).thenReturn(Optional.of(vote));
@@ -66,7 +67,7 @@ class DebateFacadeServiceTest {
         Vote vote = Vote.builder().debate(debate).user(user).left(true).build();
 
         when(voteService.getVotesByUser(user, null, 3)).thenReturn(List.of(vote));
-        when(scrapFacadeService.getScrapIds(user, TargetType.DEBATE)).thenReturn(List.of(100L));
+        when(scrapService.getScrapIds(user, TargetType.DEBATE)).thenReturn(List.of(100L));
         when(voteService.calculateVoteResult(debate)).thenReturn(VoteResponse.of(3, 2));
 
         MyVotedDebatesResponse response = debateFacadeService.getMyVotedDebates(user, null, 2);
