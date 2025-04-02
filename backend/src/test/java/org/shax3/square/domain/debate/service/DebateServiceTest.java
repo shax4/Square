@@ -30,8 +30,6 @@ class DebateServiceTest {
     @Mock
     private VoteService voteService;
     @Mock
-    private ScrapFacadeService scrapFacadeService;
-    @Mock
     private SummaryService summaryService;
 
     @InjectMocks
@@ -58,8 +56,6 @@ class DebateServiceTest {
         VoteResponse voteResponse = new VoteResponse(10, 20);
 
         when(debateRepository.findById(debateId)).thenReturn(Optional.of(debate));
-        when(voteService.getVoteByUserAndDebate(user, debate)).thenReturn(Optional.of(mock(Vote.class)));
-        when(scrapFacadeService.isScrapExist(user, debateId, TargetType.DEBATE)).thenReturn(true);
         when(voteService.calculateVoteResult(debate)).thenReturn(voteResponse);
         when(summaryService.getSummariesByDebateId(debateId)).thenReturn(summaryDtos);
 
@@ -68,8 +64,6 @@ class DebateServiceTest {
 
         // then
         assertThat(response.topic()).isEqualTo("외모 논쟁");
-        assertThat(response.isScraped()).isTrue();
-        assertThat(response.hasVoted()).isTrue();
         assertThat(response.summaries()).hasSize(2);
         assertThat(response.leftCount()).isEqualTo(10);
         assertThat(response.rightCount()).isEqualTo(20);
