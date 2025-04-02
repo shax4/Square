@@ -132,7 +132,6 @@ public class DebateService {
         }
 
         return DebateDetailResponse.of(
-                debate,
                 merged,
                 nextLeftId, nextLeftLikes, nextLeftComments,
                 nextRightId, nextRightLikes, nextRightComments,

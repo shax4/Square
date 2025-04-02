@@ -6,7 +6,6 @@ import org.shax3.square.domain.opinion.dto.OpinionDto;
 import java.util.List;
 
 public record DebateDetailResponse(
-        Long debateId,
         int leftCount,
         int rightCount,
         List<OpinionDto> opinions,
@@ -18,7 +17,6 @@ public record DebateDetailResponse(
         Integer nextRightCursorComments
 ) {
     public static DebateDetailResponse of(
-            Debate debate,
             List<OpinionDto> opinions,
             Long nextLeftCursorId,
             Integer nextLeftCursorLikes,
@@ -29,7 +27,6 @@ public record DebateDetailResponse(
             VoteResponse voteResponse
     ) {
         return new DebateDetailResponse(
-                debate.getId(),
                 voteResponse.leftCount(),
                 voteResponse.rightCount(),
                 opinions,
