@@ -74,4 +74,8 @@ public class OpinionCommentService {
         opinionComment.increaseLikeCount(countDiff);
     }
 
+    @Transactional(readOnly = true)
+    public int countByOpinionId(Long opinionId) {
+        return opinionCommentRepository.countByOpinionId(opinionId);
+    }
 }

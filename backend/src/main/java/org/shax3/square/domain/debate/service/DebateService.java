@@ -5,12 +5,16 @@ import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.debate.dto.DebateVotedResultResponse;
 import org.shax3.square.domain.debate.dto.SummaryDto;
 import org.shax3.square.domain.debate.dto.VoteResultDto;
+import org.shax3.square.domain.debate.dto.response.DebateDetailResponse;
 import org.shax3.square.domain.debate.dto.response.SummaryResponse;
 import org.shax3.square.domain.debate.dto.response.VoteResponse;
 import org.shax3.square.domain.debate.dto.response.DebatesResponse;
 import org.shax3.square.domain.debate.model.Debate;
 import org.shax3.square.domain.debate.model.Vote;
 import org.shax3.square.domain.debate.repository.DebateRepository;
+import org.shax3.square.domain.opinion.dto.OpinionDto;
+import org.shax3.square.domain.opinion.model.Opinion;
+import org.shax3.square.domain.opinion.service.OpinionService;
 import org.shax3.square.domain.scrap.service.ScrapFacadeService;
 import org.shax3.square.domain.user.model.User;
 import org.shax3.square.exception.CustomException;
@@ -31,6 +35,7 @@ public class DebateService {
     private final VoteService voteService;
     private final ScrapFacadeService scrapFacadeService;
     private final SummaryService summaryService;
+    private final OpinionService opinionService;
 
     public Debate findDebateById(Long debateId) {
         return debateRepository.findById(debateId)
@@ -77,5 +82,37 @@ public class DebateService {
     }
 
 
+    @Transactional(readOnly = true)
+    public DebateDetailResponse getDebateDetail(
+            Debate debate,
+            String sort,
+            Long nextLeftCursorId, Integer nextLeftCursorLikes, Integer nextLeftCursorComments,
+            Long nextRightCursorId, Integer nextRightCursorLikes, Integer nextRightCursorComments,
+            int limit,
+            boolean isScraped,
+            boolean hasVoted,
+            VoteResponse voteResponse
+    ) {
+        List<OpinionDto> leftOpinions = opinionService.getOpinionsBySort(
+                debate.getId(), true, sort,
+                nextLeftCursorId, nextLeftCursorLikes, nextLeftCursorComments,
+                limit
+        );
+        List<OpinionDto> rightOpinions = opinionService.getOpinionsBySort(
+                debate.getId(), false, sort,
+                nextRightCursorId, nextRightCursorLikes, nextRightCursorComments,
+                limit
+        );
+
+        List<OpinionDto> merged = mergeAlternating(leftOpinions, rightOpinions, limit);
+        CursorBundle cursor = extractCursors(merged, sort);
+
+        return DebateDetailResponse.of(
+                debate, isScraped, hasVoted, merged,
+                cursor.leftId(), cursor.leftLikes(), cursor.leftComments(),
+                cursor.rightId(), cursor.rightLikes(), cursor.rightComments(),
+                voteResponse
+        );
+    }
 
 }

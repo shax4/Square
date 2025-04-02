@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.debate.dto.DebateDto;
 import org.shax3.square.domain.debate.dto.MainDebateDto;
-import org.shax3.square.domain.debate.dto.response.DebatesResponse;
-import org.shax3.square.domain.debate.dto.response.MyScrapedDebatesResponse;
-import org.shax3.square.domain.debate.dto.response.MyVotedDebatesResponse;
-import org.shax3.square.domain.debate.dto.response.VoteResponse;
+import org.shax3.square.domain.debate.dto.response.*;
 import org.shax3.square.domain.debate.model.Debate;
 import org.shax3.square.domain.debate.model.Vote;
 import org.shax3.square.domain.scrap.model.Scrap;
@@ -102,5 +99,30 @@ public class DebateFacadeService {
         return new DebatesResponse(debateDtos, newCursorId);
     }
 
+
+    @Transactional(readOnly = true)
+    public DebateDetailResponse getDebateDetailWithUserContext(
+            Long debateId,
+            User user,
+            String sort,
+            Long nextLeftCursorId, Integer nextLeftCursorLikes, Integer nextLeftCursorComments,
+            Long nextRightCursorId, Integer nextRightCursorLikes, Integer nextRightCursorComments,
+            int limit
+    ) {
+        Debate debate = debateService.findDebateById(debateId);
+        boolean isScraped = scrapService.isTargetScraped(user, debateId, TargetType.DEBATE);
+        boolean hasVoted = voteService.getVoteByUserAndDebate(user, debate).isPresent();
+        VoteResponse voteResponse = voteService.calculateVoteResult(debate);
+
+        return debateService.getDebateDetail(
+                debate, sort,
+                nextLeftCursorId, nextLeftCursorLikes, nextLeftCursorComments,
+                nextRightCursorId, nextRightCursorLikes, nextRightCursorComments,
+                limit,
+                isScraped,
+                hasVoted,
+                voteResponse
+        );
+    }
 
 }

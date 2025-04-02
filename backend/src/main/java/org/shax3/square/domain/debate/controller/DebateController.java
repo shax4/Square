@@ -99,4 +99,23 @@ public class DebateController {
         DebatesResponse response = debateFacadeService.getDebates(user, nextCursorId, limit);
         return ResponseEntity.ok(response);
     }
+
+
+    @GetMapping("/api/debates/{debateId}")
+    public ResponseEntity<DebateDetailResponse> getDebateDetail(
+            @PathVariable Long debateId,
+            @RequestParam(defaultValue = "latest") String sort,
+            @RequestParam(required = false) Long nextLeftCursorId,
+            @RequestParam(required = false) Integer nextLeftCursorLikes,
+            @RequestParam(required = false) Integer nextLeftCursorComments,
+            @RequestParam(required = false) Long nextRightCursorId,
+            @RequestParam(required = false) Integer nextRightCursorLikes,
+            @RequestParam(required = false) Integer nextRightCursorComments,
+            @RequestParam(defaultValue = "4") Integer limit
+    ) {
+
+        DebateDetailResponse response = debateService.getDebateDetails(sort,nextLeftCursorId,nextLeftCursorLikes,)
+        return ResponseEntity.ok(response);
+    }
+
 }

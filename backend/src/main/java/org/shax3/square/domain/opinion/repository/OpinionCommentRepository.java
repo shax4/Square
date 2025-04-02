@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface OpinionCommentRepository extends JpaRepository<OpinionComment, Long> {
     List<OpinionComment> findByOpinionId(Long opinionId);
+    int countByOpinionId(Long opinionId);
 }
