@@ -25,9 +25,9 @@ public record OpinionDto(
                 commentCount,
                 opinion.isLeft(),
                 opinion.getCreatedAt(),
-                opinion.getUser().getNickname(),
+                user.getNickname(),
                 profileUrl,
-                opinion.getUser().getType().name(),
+                user.getType().name(),
                 isLiked
         );
     }

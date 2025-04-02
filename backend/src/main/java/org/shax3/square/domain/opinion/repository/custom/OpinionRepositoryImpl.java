@@ -30,6 +30,7 @@ public class OpinionRepositoryImpl implements OpinionRepositoryCustom {
 
         return queryFactory
                 .selectFrom(opinion)
+                .join(opinion.user).fetchJoin()
                 .where(builder)
                 .orderBy(opinion.id.desc())
                 .limit(limit)
@@ -50,6 +51,7 @@ public class OpinionRepositoryImpl implements OpinionRepositoryCustom {
 
         return queryFactory
                 .selectFrom(op)
+                .join(op.user).fetchJoin()
                 .where(builder)
                 .orderBy(op.id.desc())
                 .limit(limit)
@@ -74,6 +76,7 @@ public class OpinionRepositoryImpl implements OpinionRepositoryCustom {
 
         return queryFactory
                 .selectFrom(op)
+                .join(op.user).fetchJoin()
                 .where(builder)
                 .orderBy(op.likeCount.desc(), op.id.desc())
                 .limit(limit)
@@ -98,6 +101,7 @@ public class OpinionRepositoryImpl implements OpinionRepositoryCustom {
 
         return queryFactory
                 .selectFrom(op)
+                .join(op.user).fetchJoin()
                 .where(builder)
                 .orderBy(op.commentCount.desc(), op.id.desc())
                 .limit(limit)
