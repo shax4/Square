@@ -1,4 +1,4 @@
-package org.shax3.square.domain.debate.repository;
+package org.shax3.square.domain.debate.repository.custom;
 
 import org.shax3.square.domain.debate.model.Debate;
 

@@ -1,4 +1,4 @@
-package org.shax3.square.domain.opinion.repository;
+package org.shax3.square.domain.opinion.repository.custom;
 
 import org.shax3.square.domain.opinion.model.Opinion;
 import org.shax3.square.domain.user.model.User;
