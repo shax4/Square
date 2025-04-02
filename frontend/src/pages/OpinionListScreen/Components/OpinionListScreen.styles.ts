@@ -97,4 +97,8 @@ export const styles = StyleSheet.create({
         backgroundColor: '#ffffff',
         color: '#000',
     },
+    headerRightItems: {
+        flexDirection: 'row',
+        gap: 12,
+    },
 });

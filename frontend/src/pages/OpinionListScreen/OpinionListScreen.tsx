@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
+import { View, Text, KeyboardAvoidingView, Platform, SafeAreaView, TouchableOpacity } from 'react-native';
 import { styles } from './Components/OpinionListScreen.styles'
-import { RouteProp, useRoute } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackParamList } from '../../shared/page-stack/DebatePageStack';
 import VoteButton from '../../components/VoteButton/VoteButton';
 import ToggleSwitch from './Components/ToggleSwitch';
@@ -12,10 +12,14 @@ import CommentInput from '../../components/CommentInput/CommentInput';
 import { getOpinions } from './api/OpinionsApi';
 import { Opinion } from './Components/Opinion';
 import { getSummaries } from './api/SummariesApi';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import BookmarkButton from '../../components/BookmarkButton/BookmarkButton';
+import { Icons } from '../../../assets/icons/Icons';
 
 type OpinionListScreenRouteProp = RouteProp<StackParamList, 'OpinionListScreen'>;
 
 export default function OpinionListScreen() {
+    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
     const route = useRoute<OpinionListScreenRouteProp>();
     const { debateId, debate, showVoteResultModal = false } = route.params;
 
@@ -33,6 +37,7 @@ export default function OpinionListScreen() {
     const [nextRightCursorId, setNextRightCursorId] = useState<number | null>(null);
     const [hasMore, setHasMore] = useState(true);
     const [loading, setLoading] = useState(false);
+    const [scrap, setScrap] = useState(debate.isScraped);
     const limit = 5;
 
     /*
@@ -100,6 +105,28 @@ export default function OpinionListScreen() {
             setLoading(false);
         }
     };
+
+    const handleScrap = () => {
+        setScrap(!scrap);
+        // Axios 북마크 요청
+    }
+
+    // 상단 탭에 공유 및 북마크 버튼 추가
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            headerRight: () => (
+                <View style={styles.headerRightItems}>
+                    <TouchableOpacity onPress={() => console.log('공유')}>
+                        <Icons.share />
+                    </TouchableOpacity>
+                    <BookmarkButton
+                        isScraped={scrap}
+                        onPressScrap={() => { handleScrap }}
+                    />
+                </View>
+            ),
+        });
+    }, []);
 
 
     return (
