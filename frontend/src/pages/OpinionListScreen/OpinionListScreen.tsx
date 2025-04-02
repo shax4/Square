@@ -9,12 +9,13 @@ import SummaryBoxList from './Components/Summary/SummaryBoxList'
 import { Summary } from './Components/Summary';
 import OpinionBoxList from './Components/Opinion/OpinionBoxList';
 import CommentInput from '../../components/CommentInput/CommentInput';
-import { getOpinions } from './api/OpinionsApi';
+import { getOpinions, createOpinion, updateOpinion, deleteOpinion } from './api/OpinionsApi';
 import { Opinion } from './Components/Opinion';
 import { getSummaries } from './api/SummariesApi';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import BookmarkButton from '../../components/BookmarkButton/BookmarkButton';
 import { Icons } from '../../../assets/icons/Icons';
+
 
 type OpinionListScreenRouteProp = RouteProp<StackParamList, 'OpinionListScreen'>;
 
@@ -121,13 +122,28 @@ export default function OpinionListScreen() {
                     </TouchableOpacity>
                     <BookmarkButton
                         isScraped={scrap}
-                        onPressScrap={() => { handleScrap }}
+                        onPressScrap={handleScrap}
                     />
                 </View>
             ),
         });
-    }, []);
+    }, [scrap]);
 
+    const handleOpinionPosting = async () => {
+        if (debate.isLeft == null) {
+            console.debug("투표해야 의견 입력 가능");
+            return;
+        }
+        try {
+            const response = await createOpinion(debateId, debate.isLeft, commentText);
+            setCommentText('');
+        } catch (e) {
+            console.debug("OpinionListScreen.handleOpinionPosting 실패:", e);
+        } finally {
+
+        }
+
+    }
 
     return (
         <KeyboardAvoidingView
@@ -223,10 +239,7 @@ export default function OpinionListScreen() {
                 {!isSummary && (
                     <CommentInput
                         onChangeText={setCommentText}
-                        onSubmit={() => {
-                            console.log("Comment submitted:", commentText);
-                            setCommentText('');
-                        }}
+                        onSubmit={handleOpinionPosting}
                         value={commentText}
                         placeholder='의견을 입력하세요...'
                     />
