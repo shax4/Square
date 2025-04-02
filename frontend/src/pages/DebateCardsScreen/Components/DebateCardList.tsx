@@ -4,7 +4,7 @@ import DebateCard from './DebateCard';
 import { Debate } from './Debate.types';
 import { styles } from './DebateCard.styles';
 import { getAllDebates } from '../api/DebateApi';
-import { debateData } from './card-data';
+import { computeDebateListFields } from './Debate.types'; 
 const { width, height } = Dimensions.get('window');
 
 export default function DebateCardList() {
@@ -21,7 +21,7 @@ export default function DebateCardList() {
 
         try {
             const response = await getAllDebates(nextCursorId, limit);
-            const newData = response.debates;
+            const newData = computeDebateListFields(response.debates);
             const nextId = response.nextCursorId;
 
             if (newData.length > 0) {
