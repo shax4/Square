@@ -18,12 +18,14 @@ import { useAuth } from "../../../shared/hooks/useAuth";
 import { getTimeAgo } from "../../../shared/utils/timeAge/timeAge";
 
 interface CommentItemProps {
+  postId: number; // 게시글 ID
   comment: Comment; // 댓글 타입 (대댓글은 재귀 호출 시 prop 이름 변경 고려)
   onCommentChange: () => void; // 부모 컴포넌트에 변경사항 알림 콜백
   isReply?: boolean; // 이 컴포넌트가 대댓글을 랜더링하는지 여부 (스타일링용)
 }
 
 export default function CommentItem({
+  postId,
   comment,
   onCommentChange,
   isReply = false,
@@ -125,7 +127,7 @@ export default function CommentItem({
       // 대댓글 생성 API 호출
       // BoardAPI.createComment 함수 호출하여 대댓글 생성
       // 세 번째 인자로 parentCommentId 전달 (이것이 대댓글임을 나타냄)
-      await BoardAPI.createComment(0, replyText, comment.commentId);
+      await BoardAPI.createComment(postId, replyText, comment.commentId);
 
       // 입력창 초기화
       setReplyText("");
@@ -133,9 +135,6 @@ export default function CommentItem({
       setIsReplying(false);
       // 댓글 목록 갱신 (부모 컴포넌트에 알림)
       onCommentChange();
-
-      // 성공 메시지 표시(선택사항)
-      Alert.alert("알림", "답글이 등록되었습니다.");
     } catch (error) {
       // 오류 처리
       console.error("답글 작성 실패:", error);

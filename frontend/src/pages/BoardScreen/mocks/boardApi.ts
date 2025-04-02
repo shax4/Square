@@ -192,7 +192,7 @@ export const MockBoardAPI = {
   ): Promise<{ data: { replies: Reply[]; nextCursorId: number | null } }> => {
     return new Promise((resolve) => {
       console.log(
-        `[Mock API] getMoreReplies called: parentCommentId=<span class="math-inline">\{commentId\}, lastSeenId\=</span>{lastSeenId}`
+        `[Mock API] getMoreReplies called: parentCommentId=${commentId}, lastSeenId=${lastSeenId}`
       );
       const allReplies = mockAllReplies[commentId] || []; // 해당 부모 댓글의 전체 대댓글 목록 가져오기
       const limit = 9; // API 명세서 기준 (또는 원하는 개수)
