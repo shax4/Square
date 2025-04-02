@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, SafeAreaView } from "react-native"
 import PersonalityInfoButton from "./Components/PersonalityInfoButton"
 import PersonalityGraph from "./Components/PersonalityGraph"
 import { Button } from "../../components"
-import { TypeResult } from "./Components/TypeResult.types"
+import { TypeResult } from "../../shared/types/typeResult"
 import { useEffect, useState } from "react"
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { useAuth } from "../../shared/hooks"
@@ -22,8 +22,9 @@ const mockResult: TypeResult = {
 };
 
 const PersonalityResultScreen = () => {
-  const route = useRoute<RouteProp<Record<string, {  isSurveyDone : boolean, nickname: string, userType : string, score1 : number, score2 : number, score3 : number, score4 : number}>, string>>();
-  const { nickname, userType, score1, score2, score3, score4, isSurveyDone } = route.params;
+  // isAfterSurvey - 설문조사 이후 나오는 성향 결과 페이지인가? givenNickname - API 호출 시 사용되는 닉네임 정보, typeResult - isAfterSurvey가 true일 때 넘겨지는 유저 성향 데이터. 
+  const route = useRoute<RouteProp<Record<string, { isAfterSurvey : boolean, givenNickname : string, typeResult : TypeResult}>, string>>();
+  const { isAfterSurvey, typeResult, givenNickname } = route.params;
 
   // Zustand 로그인 사용자 데이터
   const { user} = useAuth();
@@ -38,7 +39,7 @@ const PersonalityResultScreen = () => {
   useEffect(() => {
     const getTypeResult = async () => {
       try{
-        const resultData : TypeResult = await getPersonalityResult(nickname)
+        const resultData : TypeResult = await getPersonalityResult(givenNickname)
 
         setUserTypeResult(resultData);
       }catch(error){
@@ -46,26 +47,17 @@ const PersonalityResultScreen = () => {
       }
     }
 
-    if(isSurveyDone){
+    if(isAfterSurvey){
       // 성향 테스트 페이지에서 바로 넘어오는 경우.
-      const resultData: TypeResult = {
-        nickname: nickname || "undefined_nickname",
-        userType: userType || "TEST",
-        score1: score1 || -3,
-        score2: score2 || -3,
-        score3: score3 || -3,
-        score4: score4 || -3,
-      };
-
-      setUserTypeResult(resultData);
+      setUserTypeResult(typeResult);
       setIsMyType(true);
     }else{
       getTypeResult();
 
-      const isMyTypeState : boolean = nickname === user?.nickname;
+      const isMyTypeState : boolean = givenNickname === myNickname;
       setIsMyType(isMyTypeState);
     }
-  }, [nickname, user?.nickname]);
+  }, [givenNickname, myNickname]);
 
   // 성향 설명 띄우기
   const onInfoPress = () => {

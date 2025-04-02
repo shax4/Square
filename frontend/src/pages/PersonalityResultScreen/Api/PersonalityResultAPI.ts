@@ -1,5 +1,5 @@
 import axiosInstance from "../../../shared/api/axiosInstance"
-import { TypeResult } from "../Components/TypeResult.types";
+import { TypeResult } from "../../../shared/types/typeResult";
 
 export const getPersonalityResult = async (nickname : string) : Promise<TypeResult> => {
   try{
