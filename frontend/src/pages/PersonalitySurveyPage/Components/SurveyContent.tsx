@@ -4,7 +4,7 @@ import { Button } from "../../../components"
 import Question from "./Question"
 import { useSurvey } from "../SurveyContext"
 import { getSurveyQuestions, submitSurveyAnswers } from "../Api/surveyApi"
-import {SurveyAnswer, SurveyResponse, SurveyQuestion, SurveyQuestionsResponse} from "../Api/surveyApi.types"
+import {SurveyAnswer, SurveyQuestion, SurveyQuestionsResponse} from "../Api/surveyApi.types"
 
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
@@ -79,7 +79,7 @@ const SurveyContent = () => {
         console.log("Survey submitted successfully:", result)
         Alert.alert("제출 완료", JSON.stringify(result, null, 2), [{ text: "확인" }]);
   
-        navigation.navigate('PersonalityResultScreen', {isSurveyDone : true, nickname: result.nickname, userType : result.userType, score1 : result.score1, score2 : result.score2, score3 : result.score3, score4 : result.score4})
+        navigation.replace('PersonalityResultScreen', { isAfterSurvey : true, givenNickname : result.nickname, typeResult : result})
       } catch (error) {
         // Handle error
         console.error("Failed to submit survey:", error)
