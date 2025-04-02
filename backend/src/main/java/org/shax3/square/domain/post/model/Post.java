@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.SQLRestriction;
+import org.shax3.square.common.entity.BaseTimeEntity;
 import org.shax3.square.domain.user.model.Type;
 import org.shax3.square.domain.user.model.User;
 
@@ -32,7 +33,7 @@ import static lombok.AccessLevel.PROTECTED;
 @AllArgsConstructor(access = PROTECTED)
 @Table(name = "post")
 @SQLRestriction("is_valid = true")
-public class Post {
+public class Post extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     @Column(name = "id")
@@ -94,5 +95,9 @@ public class Post {
 
     public void softDelete() {
         valid = false;
+    }
+
+    public void increaseLikeCount(int countDiff) {
+        this.likeCount += countDiff;
     }
 }

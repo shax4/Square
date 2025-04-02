@@ -2,6 +2,8 @@ package org.shax3.square.domain.post.service;
 
 import static org.shax3.square.exception.ExceptionCode.*;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.shax3.square.domain.post.dto.request.CreatePostCommentRequest;
@@ -75,9 +77,22 @@ public class PostCommentService {
 
 	private void verifyAuthor(User user, PostComment comment) {
 		if (!Objects.equals(comment.getUser().getId(), user.getId())) {
-			throw new CustomException(NOT_AUTHOR);
+			throw new CustomException(ExceptionCode.NOT_AUTHOR);
 		}
 	}
 
+	public void validateExists(Long id) {
+		if (!postCommentRepository.existsById(id)) {
+			throw new CustomException(ExceptionCode.COMMENT_NOT_FOUND);
+		}
+	}
 
+	public void increaseLikeCount(Long targetId, int countDiff) {
+		PostComment comment = getPostComment(targetId);
+		comment.increaseLikeCount(countDiff);
+	}
+
+	public Map<Long, Integer> getCommentCounts(List<Long> postIds) {
+		return postCommentRepository.countByPostIds(postIds);
+	}
 }

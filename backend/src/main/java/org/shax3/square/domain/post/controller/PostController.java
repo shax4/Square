@@ -7,15 +7,19 @@ import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.annotation.AuthUser;
 import org.shax3.square.domain.post.dto.request.CreatePostRequest;
 import org.shax3.square.domain.post.dto.request.UpdatePostRequest;
+import org.shax3.square.domain.post.dto.response.PostListResponse;
+import org.shax3.square.domain.post.service.PostFacadeService;
 import org.shax3.square.domain.post.service.PostService;
 import org.shax3.square.domain.user.model.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -25,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PostController {
 
     private final PostService postService;
+    private final PostFacadeService postFacadeService;
 
     @Operation(
             summary = "게시글 생성 api",
@@ -67,5 +72,22 @@ public class PostController {
         postService.deletePost(user, postId);
 
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+        summary = "게시글 목록 조회 api",
+        description = "게시글 목록을 조회합니다. (페이징 처리)"
+    )
+    @GetMapping
+    public ResponseEntity<PostListResponse> getPosts(
+            @AuthUser User user,
+            @RequestParam(defaultValue = "latest") String sort,
+            @RequestParam(required = false) Long nextCursorId,
+            @RequestParam(required = false) Integer nextCursorLikes,
+            @RequestParam(defaultValue = "10") int limit
+    ) {
+        PostListResponse response = postFacadeService.getPostList(user, sort, nextCursorId, nextCursorLikes, limit);
+
+        return ResponseEntity.ok(response);
     }
 }

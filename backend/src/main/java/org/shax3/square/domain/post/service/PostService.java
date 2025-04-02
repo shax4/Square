@@ -2,6 +2,8 @@ package org.shax3.square.domain.post.service;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import org.shax3.square.domain.opinion.model.OpinionComment;
 import org.shax3.square.domain.post.dto.request.CreatePostRequest;
 import org.shax3.square.domain.post.dto.request.UpdatePostRequest;
 import org.shax3.square.domain.post.model.Post;
@@ -61,7 +63,7 @@ public class PostService {
     }
 
     @Transactional
-    public void updatePost(User user, Long postId, UpdatePostRequest updatePostRequest) {
+    public void updatePost(User user, Long postId, @Valid UpdatePostRequest updatePostRequest) {
         Post post = getPost(postId);
 
         verifyAuthor(user, post);
@@ -130,4 +132,10 @@ public class PostService {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(POST_NOT_FOUND));
     }
+
+    public void increaseLikeCount(Long targetId, int countDiff) {
+        Post post = getPost(targetId);
+        post.increaseLikeCount(countDiff);
+    }
+
 }

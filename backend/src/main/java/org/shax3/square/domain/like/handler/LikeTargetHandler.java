@@ -3,6 +3,7 @@ package org.shax3.square.domain.like.handler;
 import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.opinion.service.OpinionCommentService;
 import org.shax3.square.domain.opinion.service.OpinionService;
+import org.shax3.square.domain.post.service.PostCommentService;
 import org.shax3.square.domain.post.service.PostService;
 import org.shax3.square.domain.proposal.service.ProposalService;
 import org.shax3.square.exception.CustomException;
@@ -19,6 +20,7 @@ public class LikeTargetHandler {
 	private final ProposalService proposalService;
 	private final OpinionCommentService opinionCommentService;
 	private final PostService postService;
+	private final PostCommentService postCommentService;
 
 	public void validateTargetExists(Long targetId, TargetType targetType) {
 		switch (targetType) {
@@ -26,7 +28,7 @@ public class LikeTargetHandler {
 			case OPINION_COMMENT -> opinionCommentService.validateExists(targetId);
 			case PROPOSAL -> proposalService.validateExists(targetId);
 			case POST -> postService.validateExists(targetId);
-			//TODO : POST_COMMENT 구현 필요
+			case POST_COMMENT -> postCommentService.validateExists(targetId);
 			default -> throw new CustomException(ExceptionCode.INVALID_TARGET_TYPE);
 		}
 	}
@@ -36,7 +38,8 @@ public class LikeTargetHandler {
 			case OPINION -> opinionService.increaseLikeCount(targetId, diff);
 			case PROPOSAL -> proposalService.increaseLikeCount(targetId, diff);
 			case OPINION_COMMENT -> opinionCommentService.increaseLikeCount(targetId, diff);
-			// TODO: POST, POST_COMMENT 등도 나중에 추가
+			case POST -> postService.increaseLikeCount(targetId, diff);
+			case POST_COMMENT -> postCommentService.increaseLikeCount(targetId, diff);
 			default -> throw new CustomException(ExceptionCode.INVALID_TARGET_TYPE);
 		}
 	}
