@@ -112,7 +112,7 @@ public class DebateController {
                     - 하위의 커서들은 클라이언트는 그대로 반환해주시면 됩니다.
                     """
     )
-    @GetMapping("/api/debates/{debateId}")
+    @GetMapping("/{debateId}")
     public ResponseEntity<DebateDetailResponse> getDebateDetail(
             @PathVariable Long debateId,
             @RequestParam(defaultValue = "latest") String sort,
