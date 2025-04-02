@@ -92,13 +92,6 @@ public class DebateService {
         Debate debate = findDebateById(debateId);
         VoteResponse voteResponse = voteService.calculateVoteResult(debate);
 
-        boolean firstRequest = (nextLeftCursorId == null && nextLeftCursorLikes == null && nextLeftCursorComments == null &&
-                nextRightCursorId == null && nextRightCursorLikes == null && nextRightCursorComments == null);
-
-        if (user != null && firstRequest) {
-            voteResponse = voteService.calculateVoteResult(debate);
-        }
-
         // 각 진영에서 최대 limit * 2개씩 불러와서 교차 병합
         List<OpinionDto> leftOpinions = opinionFacadeService.getOpinionsBySort(
                 user, debateId, true, sort,
