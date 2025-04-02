@@ -215,6 +215,39 @@ export default function CommentItem({
       Alert.alert("오류", "답글을 수정하는 중 문제가 발생했습니다.");
     }
   };
+  // 대댓글 삭제 함수
+  const handleDeleteReply = (replyId: number) => {
+    // 삭제 확인 다이얼로그 표시
+    Alert.alert(
+      "답글 삭제",
+      "정말 이 답글을 삭제하시겠습니까?",
+      [
+        {
+          text: "취소",
+          style: "cancel"
+        },
+        {
+          text: "삭제",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              // 대댓글 삭제 API 호출
+              await BoardAPI.deleteComment(replyId);
+              
+              // 삭제된 대댓글을 화면에서 제거
+              // 여기서는 간단하게 onCommentChange 호출로 처리
+              // 실제로는 상태 업데이트 로직을 추가할 수도 있음
+              onCommentChange();
+              
+            } catch (error) {
+              console.error("답글 삭제 실패:", error);
+              Alert.alert("오류", "답글을 삭제하는 중 문제가 발생했습니다.");
+            }
+          }
+        }
+      ]
+    );
+  };
 
   return (
     <View style={[styles.container, isReply && styles.replyContainer]}>
@@ -487,24 +520,24 @@ const styles = StyleSheet.create({
   editContainer: { marginVertical: 4 },
   textInput: {
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 4,
+    borderColor: "#ddd",
+    borderRadius: 8,
     padding: 8,
-    minHeight: 60,
-    textAlignVertical: "top",
+    minHeight: 80,
     marginBottom: 8,
   },
   buttonContainer: { flexDirection: "row", justifyContent: "flex-end" },
   button: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
+    padding: 8,
     marginLeft: 8,
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: "#ccc",
   },
-  saveButton: { backgroundColor: "#007bff", borderColor: "#007bff" },
-  saveButtonText: { color: "#fff" },
+  saveButton: {
+    backgroundColor: "#007AFF",
+    borderRadius: 4,
+  },
+  saveButtonText: {
+    color: "white",
+  },
   likeButton: {
     // 특별한 위치 지정보다는 alignItems: 'center' 에 의해 정렬되도록 함
     // 필요시 padding 등으로 터치 영역 확보
