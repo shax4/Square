@@ -34,3 +34,8 @@ yarn-error.*
 .env
 # typescript
 *.tsbuildinfo
+
+# ide 개인 파일 제외(서준호)
+.specstory/
+docs/
+.cursorrules
