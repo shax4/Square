@@ -43,7 +43,7 @@ const DebateCard = ({
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
 
     const navigateToOpinionListPage = () => {
-        navigation.navigate('OpinionListScreen', { debateId });
+        navigation.navigate('OpinionListScreen', { debateId, debate });
     }
 
     return (

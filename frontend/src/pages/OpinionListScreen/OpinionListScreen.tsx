@@ -19,7 +19,7 @@ type OpinionListScreenRouteProp = RouteProp<StackParamList, 'OpinionListScreen'>
 
 export default function OpinionListScreen() {
     const route = useRoute<OpinionListScreenRouteProp>();
-    const { debateId, showVoteResultModal = false } = route.params;
+    const { debateId, debate, showVoteResultModal = false } = route.params;
 
     // 정렬 및 토글
     const [isSummary, setIsSummary] = useState(true); // ai요약, 의견 토글
@@ -37,13 +37,11 @@ export default function OpinionListScreen() {
     const [loading, setLoading] = useState(false);
     const limit = 5;
 
-    // 논쟁: 의견을 조회할할
-    const [debate, setDebate] = useState<Debate>(debateList[0]);
-
+    /*
     useEffect(() => {
         initOpinions();
     }, [sort]);
-
+    */
     useEffect(() => {
         initAiSummaries();
     }, []);
@@ -59,8 +57,9 @@ export default function OpinionListScreen() {
         setLoading(true);
         try {
             const response = await getSummaries(debateId);
+            
+            // AI 요약 설정
             setSummaries(response.summaries);
-
         } catch (e) {
             console.error("AI 요약 불러오기 실패:", e);
         } finally {
@@ -92,7 +91,6 @@ export default function OpinionListScreen() {
             setOpinions((prev) => [...prev, ...response.opinions]);
             setNextLeftCursorId(response.nextLeftCursorId);
             setNextRightCursorId(response.nextRightCursorId);
-            setDebate(response.debate);
 
             // 다음 커서가 모두 null이면 더 이상 불러올 게 없음
             if (!response.nextLeftCursorId && !response.nextRightCursorId) {
@@ -104,6 +102,7 @@ export default function OpinionListScreen() {
             setLoading(false);
         }
     };
+
 
     return (
         <KeyboardAvoidingView
