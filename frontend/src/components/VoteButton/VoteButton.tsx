@@ -9,25 +9,21 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { StackParamList } from '../../shared/page-stack/DebatePageStack';
 
 import { resultData } from '../../pages/OpinionListScreen/Components/debate-result-test-data';
+import { useDebateStore } from '../../shared/stores/debates';
 
 type VoteButtonProps = {
-    debate: Debate;
+    debateId: number;
     showVoteResultModal?: boolean;
 };
 
 const leftOptionEmoji = "🙆‍♂️";
 const rightOptionEmoji = "🙅";
 
-const VoteButton = ({ debate, showVoteResultModal }: VoteButtonProps): JSX.Element => {
-    const {
-        leftOption,
-        rightOption,
-        leftPercent,
-        rightPercent,
-        leftCount,
-        rightCount,
-        isLeft,
-    } = debate;
+const VoteButton = ({ debateId, showVoteResultModal, }: VoteButtonProps): JSX.Element => {
+    // zustand
+    const { debates, updateDebate } = useDebateStore();
+    const debate = debates.find((d) => d.debateId === debateId);
+    if (!debate) return <Text>Wrong debateId</Text>;
 
     // OpinionList에서 showVoteResultModal 여부를 보내 렌더링과 동시에 모달을 띄울지 여부 결정
     useEffect(() => {
@@ -84,6 +80,9 @@ const VoteButton = ({ debate, showVoteResultModal }: VoteButtonProps): JSX.Eleme
         console.log(`debateId=${debateId}, 투표 = ${isLeft ? '왼쪽' : '오른쪽'}`);
         // API 요청 메서드 추가 필요
 
+        // zustand 저장소 isLeft 여부 변경
+        updateDebate(debateId, {isLeft: isLeft});
+
         // 모달을 띄울 페이지로 이동해야하는지, 현재 페이지에서 모달을 띄울 수 있는지 판단
         const currentRoute = navigation.getState().routes[navigation.getState().index];
 
@@ -101,8 +100,8 @@ const VoteButton = ({ debate, showVoteResultModal }: VoteButtonProps): JSX.Eleme
 
     };
 
-    const voted = isLeft !== null;
-    const widthLeft = voted ? Math.max(30, Math.min(leftPercent, 70)) - 10 : 45;
+    const voted = debate.isLeft !== null;
+    const widthLeft = voted ? Math.max(30, Math.min(debate.leftPercent, 70)) - 10 : 45;
     const widthRight = voted ? 100 - widthLeft - 10 : 45;
 
 
@@ -123,7 +122,7 @@ const VoteButton = ({ debate, showVoteResultModal }: VoteButtonProps): JSX.Eleme
                 style={[
                     styles.VoteButtonBase,
                     voted
-                        ? isLeft
+                        ? debate.isLeft
                             ? styles.VoteSelectedLeft
                             : styles.VoteNotSelectedLeft
                         : styles.VoteNotSelectedLeft,
@@ -133,9 +132,9 @@ const VoteButton = ({ debate, showVoteResultModal }: VoteButtonProps): JSX.Eleme
             >
                 <View style={styles.VoteContents}>
                     <Text style={styles.VoteIcon}>{leftOptionEmoji}</Text>
-                    <Text style={styles.VoteMainText}>{leftOption}</Text>
+                    <Text style={styles.VoteMainText}>{debate.leftOption}</Text>
                     {voted && (
-                        <Text style={styles.VoteSubText}>{leftPercent}% ({leftCount}명)</Text>
+                        <Text style={styles.VoteSubText}>{debate.leftPercent}% ({debate.leftCount}명)</Text>
                     )}
                 </View>
             </TouchableOpacity>
@@ -144,7 +143,7 @@ const VoteButton = ({ debate, showVoteResultModal }: VoteButtonProps): JSX.Eleme
                 style={[
                     styles.VoteButtonBase,
                     voted
-                        ? !isLeft
+                        ? !debate.isLeft
                             ? styles.VoteSelectedRight
                             : styles.VoteNotSelectedRight
                         : styles.VoteNotSelectedRight,
@@ -154,9 +153,9 @@ const VoteButton = ({ debate, showVoteResultModal }: VoteButtonProps): JSX.Eleme
             >
                 <View style={styles.VoteContents}>
                     <Text style={styles.VoteIcon}>{rightOptionEmoji}</Text>
-                    <Text style={styles.VoteMainText}>{rightOption}</Text>
+                    <Text style={styles.VoteMainText}>{debate.rightOption}</Text>
                     {voted && (
-                        <Text style={styles.VoteSubText}>{rightPercent}% ({rightCount}명)</Text>
+                        <Text style={styles.VoteSubText}>{debate.rightPercent}% ({debate.rightCount}명)</Text>
                     )}
                 </View>
             </TouchableOpacity>
