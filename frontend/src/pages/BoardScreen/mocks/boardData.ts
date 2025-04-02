@@ -34,8 +34,8 @@ export const mockPosts: Post[] = [
         content: "첫 번째 댓글입니다",
         likeCount: 5,
         isLiked: true,
-        replyCount: 2, // 실제 총 대댓글 개수
-        // 초기 로드 시 보여줄 대댓글 (예시: 2개만)
+        replyCount: 5, // 실제 총 대댓글 개수
+        // 초기 로드 시 보여줄 대댓글 (예시: 3개만)
         replies: [
           {
             commentId: 201,
@@ -67,28 +67,6 @@ export const mockPosts: Post[] = [
             userType: "ICTR",
             createdAt: "2025-03-25T13:25:00Z",
             content: "저도 동의해요!",
-            likeCount: 0,
-            isLiked: false,
-          },
-          {
-            commentId: 305,
-            parentId: 101,
-            nickname: "용감한호랑이",
-            profileUrl: "https://picsum.photos/id/40/50/50",
-            userType: "PNTB",
-            createdAt: "2025-03-25T13:30:00Z",
-            content: "...",
-            likeCount: 1,
-            isLiked: false,
-          },
-          {
-            commentId: 306,
-            parentId: 101,
-            nickname: "신비로운부엉이",
-            profileUrl: "",
-            userType: "ICTR",
-            createdAt: "2025-03-25T13:35:00Z",
-            content: "흥미롭네요.",
             likeCount: 0,
             isLiked: false,
           },

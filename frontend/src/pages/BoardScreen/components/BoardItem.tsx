@@ -44,7 +44,7 @@ export default function BoardItem({ item, onPress }: BoardItemProps) {
         <ProfileImage imageUrl={item?.profileUrl} variant="medium" />
         <View style={styles.authorInfo}>
           <Text style={styles.authorName}>{item.nickname}</Text>
-            <Text style={styles.date}>{getTimeAgo(item.createdAt)}</Text>
+          <Text style={styles.date}>{getTimeAgo(item.createdAt)}</Text>
         </View>
       </View>
 

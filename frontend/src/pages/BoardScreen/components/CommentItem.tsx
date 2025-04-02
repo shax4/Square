@@ -40,13 +40,14 @@ export default function CommentItem({
     comment.replies || []
   );
   const [replyLoading, setReplyLoading] = useState(false);
-  // !! 실제 API는 커서 기반 페이지네이션 필요. 여기서는 단순화를 위해 다음 로드할 개수 등으로 처리 가능 !!
-  const [nextReplyCursor, setNextReplyCursor] = useState<number | null>(
-    // 초기 로드된 마지막 대댓글 ID + 1 또는 다른 기준
-    comment.replies && comment.replies.length > 0
-      ? comment.replies[comment.replies.length - 1].commentId + 1
-      : null
-  );
+  // !! 실제 API는 커서 기반 페이지네이션 필요. !!
+  // nextReplyCursor 초기화: 로드된 마지막 댓글의 ID를 저장
+  const [nextReplyCursor, setNextReplyCursor] = useState<number | null>(() => {
+    if (comment.replies && comment.replies.length > 0) {
+        return comment.replies[comment.replies.length - 1].commentId;
+    }
+    return null; // 초기 댓글 없으면 null
+});
   const [isReplying, setIsReplying] = useState(false); // 답글 입력창 표시 상태
   const [replyText, setReplyText] = useState(""); // 답글 내용 상태
 
@@ -130,32 +131,32 @@ export default function CommentItem({
     setIsReplying(false);
     setReplyText("");
   };
-  // 대댓글 더보기 함수
+  // 대댓글 더보기 함수 : 현재 커서 전달, 다음 커서 업데이트
   const handleLoadMoreReplies = useCallback(async () => {
+    // '더보기' 버튼 자체가 hasMoreReplies 조건으로 렌더링되므로, 여기서 중복 체크 불필요
     if (replyLoading || !comment.commentId) return; // commentId 확인
 
     setReplyLoading(true);
     try {
-      // 목업 API 호출 (실제 API는 커서 필요)
-      const response = await BoardAPI.getMoreReplies(
-        comment.commentId,
-        nextReplyCursor
-      ); // getMoreReplies 구현 필요
+      // API 호출 시 현재 nextReplyCursor 상태 값 전달
+      const response = await BoardAPI.getMoreReplies(comment.commentId, nextReplyCursor);
 
-      // !! 실제 API 응답 구조에 맞춰 수정 !!
-      // 예시: response.data 가 { replies: Reply[], nextCursorId: number | null } 형태라고 가정
       const newReplies = response.data.replies || [];
-      const nextCursor = response.data.nextCursorId;
+      // API 응답에서 다음 호출에 사용할 커서 값을 가져옴
+      const nextCursorFromServer = response.data.nextCursorId;
 
-      setLoadedReplies((prevReplies) => [...prevReplies, ...newReplies]);
-      setNextReplyCursor(nextCursor);
+      setLoadedReplies(prevReplies => [...prevReplies, ...newReplies]);
+      // 다음 API 호출을 위해 커서 상태 업데이트
+      setNextReplyCursor(nextCursorFromServer);
+
     } catch (error) {
       console.error("대댓글 로드 실패:", error);
       Alert.alert("오류", "대댓글을 불러오는 중 오류가 발생했습니다.");
     } finally {
       setReplyLoading(false);
     }
-  }, [comment.commentId, replyLoading, nextReplyCursor]); // 의존성 배열
+  // 의존성 배열에서 hasMoreReplies 제거 가능 (버튼 표시 조건으로만 사용)
+  }, [comment.commentId, replyLoading, nextReplyCursor]);
 
   // 표시할 대댓글 수와 전체 대댓글 수 비교
   const hasMoreReplies = comment.replyCount > loadedReplies.length;
@@ -171,7 +172,7 @@ export default function CommentItem({
             <ProfileImage imageUrl={comment.profileUrl} variant="small" />
             <View style={styles.userInfoText}>
               <Text style={styles.nickname}>{comment.nickname}</Text>
-              <PersonalityTag personality={comment.userType} />
+              <PersonalityTag personality={comment.userType} nickname={comment.nickname} />
             </View>
             {/* 시간은 푸터로 이동 */}
           </View>

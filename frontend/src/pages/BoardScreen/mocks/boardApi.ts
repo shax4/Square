@@ -51,21 +51,46 @@ export const MockBoardAPI = {
   },
 
   // 게시글 상세 조회
-  getPostDetail: (postId: number) => {
-    const post = mockPosts.find((p) => p.postId === postId);
+  getPostDetail: (postId: number): Promise<{ data: Post }> => {
+    console.log(`[Mock API] getPostDetail called: postId=${postId}`);
+    const originalPost = mockPosts.find((p) => p.postId === postId);
 
-    if (!post) {
+    if (!originalPost) {
+      console.error(`[Mock API] Post ${postId} not found.`);
       return Promise.reject({
-        response: {
-          status: 404,
-          statusText: "Not Found",
-          data: { message: "게시글을 찾을 수 없습니다." },
-        },
+        /* ... 404 에러 ... */
       });
     }
 
+    // !! 중요: 원본 데이터를 직접 수정하지 않기 위해 깊은 복사 수행 !!
+    const postDataToSend = JSON.parse(JSON.stringify(originalPost));
+
+    // --- 👇 초기 대댓글 개수 제한 로직 추가 ---
+    const initialReplyLimit = 3; // API 명세서에 따라 초기 로드할 대댓글 개수 설정
+
+    if (postDataToSend.comments && Array.isArray(postDataToSend.comments)) {
+      postDataToSend.comments.forEach((comment: Comment) => {
+        if (
+          comment.replies &&
+          Array.isArray(comment.replies) &&
+          comment.replies.length > 0
+        ) {
+          // comment.replies 배열을 initialReplyLimit 만큼만 잘라서 다시 할당
+          comment.replies = comment.replies.slice(0, initialReplyLimit);
+        } else {
+          // replies가 없거나 빈 배열이면 빈 배열로 초기화 (타입 일관성)
+          comment.replies = [];
+        }
+        // comment.replyCount는 전체 개수를 유지해야 함 (수정 X)
+      });
+    }
+    // --- 초기 대댓글 개수 제한 로직 끝 ---
+
+    console.log(
+      `[Mock API] Returning post detail for ${postId} with limited initial replies.`
+    );
     return Promise.resolve({
-      data: post,
+      data: postDataToSend, // 수정된 데이터 반환
       status: 200,
       statusText: "OK",
       headers: {},
@@ -162,45 +187,49 @@ export const MockBoardAPI = {
    * @param limit 페이지당 개수 (목업에서는 고정값 사용 가능)
    */
   getMoreReplies: (
-    commentId: number,
-    nextCursorId?: number | null
+    commentId: number, // 부모 댓글 ID
+    lastSeenId?: number | null // 마지막으로 본 대댓글 ID(커서)
   ): Promise<{ data: { replies: Reply[]; nextCursorId: number | null } }> => {
     return new Promise((resolve) => {
       console.log(
-        `[Mock API] getMoreReplies called: parentCommentId=${commentId}, nextCursorId=${nextCursorId}`
+        `[Mock API] getMoreReplies called: parentCommentId=<span class="math-inline">\{commentId\}, lastSeenId\=</span>{lastSeenId}`
       );
       const allReplies = mockAllReplies[commentId] || []; // 해당 부모 댓글의 전체 대댓글 목록 가져오기
       const limit = 9; // API 명세서 기준 (또는 원하는 개수)
 
       let startIndex = 0;
-      if (nextCursorId) {
-        // 실제 커서는 단순 ID 비교보다 복잡할 수 있음 (예: 생성 시각 등)
-        // 여기서는 ID를 기준으로 다음 시작 인덱스를 찾음
-        const foundIndex = allReplies.findIndex(
-          (r) => r.commentId === nextCursorId
-        );
-        // 주의: 실제 API는 보통 '이 ID 다음부터'의 개념이지만, 목업에서는 '이 ID부터'로 단순화 할 수 있음
-        // 여기서는 찾은 인덱스 다음부터 가져오는 것으로 가정 (찾지 못하면 0부터)
-        startIndex = foundIndex !== -1 ? foundIndex + 1 : allReplies.length; // 못 찾으면 빈 배열 반환하도록
+      if (lastSeenId) {
+        const lastSeenIndex = allReplies.findIndex(r => r.commentId === lastSeenId);
+        if (lastSeenIndex !== -1) {
+          startIndex = lastSeenIndex + 1; // 마지막으로 본 것 *다음* 인덱스부터 시작
+        } else {
+           console.warn(`[Mock API] lastSeenId ${lastSeenId} not found for parent ${commentId}. Returning from start.`);
+           // lastSeenId를 못 찾으면 처음부터 반환 (오류 상황 대비)
+        }
       }
+      // lastSeenId가 null이나 undefined면 startIndex는 0 (처음부터)
 
       const repliesToSend = allReplies.slice(startIndex, startIndex + limit);
-      const nextCursor =
-        startIndex + limit < allReplies.length
-          ? allReplies[startIndex + limit].commentId
-          : null;
 
-      console.log(
-        `[Mock API] Returning ${repliesToSend.length} replies for parent ${commentId}, nextCursor: ${nextCursor}`
-      );
-      // API 응답 형식에 맞춰 반환
-      setTimeout(
-        () =>
-          resolve({
-            data: { replies: repliesToSend, nextCursorId: nextCursor },
-          }),
-        300
-      ); // 딜레이 시뮬레이션
+      // 다음 커서 ID는 이번에 보낸 목록의 마지막 요소 ID
+      let nextCursor: number | null = null;
+      if (repliesToSend.length > 0) {
+          // 실제로 더 보여줄 댓글이 있는지 확인
+          const lastSentIndexInAll = allReplies.findIndex(r => r.commentId === repliesToSend[repliesToSend.length - 1].commentId);
+          if (lastSentIndexInAll !== -1 && lastSentIndexInAll + 1 < allReplies.length) {
+              // 더 보여줄 댓글이 남아있다면, 이번에 보낸 마지막 댓글 ID를 다음 커서로 사용
+              nextCursor = repliesToSend[repliesToSend.length - 1].commentId;
+          } else {
+              // 이번이 마지막 페이지였으면 다음 커서는 null
+              nextCursor = null;
+          }
+      } else {
+         // 보낼 댓글이 없으면 다음 커서도 null
+         nextCursor = null;
+      }
+
+      console.log(`[Mock API] Returning ${repliesToSend.length} replies for parent ${commentId}, nextCursor for NEXT call: ${nextCursor}`);
+      setTimeout(() => resolve({ data: { replies: repliesToSend, nextCursorId: nextCursor } }), 300);
     });
   },
 
