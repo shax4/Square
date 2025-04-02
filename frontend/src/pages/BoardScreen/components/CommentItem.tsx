@@ -44,26 +44,29 @@ export default function CommentItem({
   // nextReplyCursor 초기화: 로드된 마지막 댓글의 ID를 저장
   const [nextReplyCursor, setNextReplyCursor] = useState<number | null>(() => {
     if (comment.replies && comment.replies.length > 0) {
-        return comment.replies[comment.replies.length - 1].commentId;
+      return comment.replies[comment.replies.length - 1].commentId;
     }
     return null; // 초기 댓글 없으면 null
-});
+  });
   const [isReplying, setIsReplying] = useState(false); // 답글 입력창 표시 상태
   const [replyText, setReplyText] = useState(""); // 답글 내용 상태
+
+  const [editingReplyId, setEditingReplyId] = useState<number | null>(null); // 대댓글 수정 모드 상태
+  const [editedReplyContent, setEditedReplyContent] = useState(""); // 대댓글 수정 내용 상태
 
   // 현재 사용자가 댓글 작성자인지 확인
   const isAuthor = user?.nickname === comment.nickname;
 
-  // 수정 핸들러 함수
+  // 댓글 수정 시작 함수
   const handleEditPress = () => {
     setEditedContent(comment.content);
     setIsEditing(true);
   };
-  // 취소 핸들러 함수
+  // 댓글 수정 취소 함수
   const handleCancelPress = () => {
     setIsEditing(false);
   };
-  // 저장 핸들러 함수
+  // 댓글 수정 저장 함수
   const handleSavePress = async () => {
     // 유효성 검사 (빈 내용, 변경 없음)
     if (editedContent.trim() === "" || editedContent === comment.content) {
@@ -104,46 +107,45 @@ export default function CommentItem({
       },
     ]);
   };
-  // 대댓글 활성화 함수
+  // 대댓글 생성 시작 함수
   const handleReplyPress = () => {
     setIsReplying(true);
   };
-  // 대댓글 취소 함수
+  // 대댓글 생성 취소 함수
   const handleCancelReply = () => {
     setIsReplying(false);
     setReplyText("");
   };
-  // 대댓글 작성 함수
+  // 대댓글 생성 저장 함수
   const handleSubmitReply = async () => {
     if (!replyText.trim()) return;
-  // 입력된 텍스트가 비어있는지 확인
-  if (!replyText.trim()) return;
-  
-  try {
-    // 대댓글 생성 API 호출
-    // postId는 게시글 ID, replyText는 입력한 내용, comment.commentId는 부모 댓글의 ID
-    const postId = comment.postId || 0; // postId가 없을 경우 대비(props로 받아오는 방식으로 수정 가능)
-    
-    // BoardAPI.createComment 함수 호출하여 대댓글 생성
-    // 세 번째 인자로 parentCommentId 전달 (이것이 대댓글임을 나타냄)
-    await BoardAPI.createComment(postId, replyText, comment.commentId);
-    
-    // 입력창 초기화
-    setReplyText("");
-    // 답글 입력 모드 종료
-    setIsReplying(false);
-    // 댓글 목록 갱신 (부모 컴포넌트에 알림)
-    onCommentChange();
-    
-    // 성공 메시지 표시(선택사항)
-    Alert.alert("알림", "답글이 등록되었습니다.");
-    
-  } catch (error) {
-    // 오류 처리
-    console.error("답글 작성 실패:", error);
-    Alert.alert("오류", "답글을 등록하는 중 문제가 발생했습니다.");
-  }
-};
+    // 입력된 텍스트가 비어있는지 확인
+    if (!replyText.trim()) return;
+
+    try {
+      // 대댓글 생성 API 호출
+      // postId는 게시글 ID, replyText는 입력한 내용, comment.commentId는 부모 댓글의 ID
+      const postId = comment.postId || 0; // postId가 없을 경우 대비(props로 받아오는 방식으로 수정 가능)
+
+      // BoardAPI.createComment 함수 호출하여 대댓글 생성
+      // 세 번째 인자로 parentCommentId 전달 (이것이 대댓글임을 나타냄)
+      await BoardAPI.createComment(postId, replyText, comment.commentId);
+
+      // 입력창 초기화
+      setReplyText("");
+      // 답글 입력 모드 종료
+      setIsReplying(false);
+      // 댓글 목록 갱신 (부모 컴포넌트에 알림)
+      onCommentChange();
+
+      // 성공 메시지 표시(선택사항)
+      Alert.alert("알림", "답글이 등록되었습니다.");
+    } catch (error) {
+      // 오류 처리
+      console.error("답글 작성 실패:", error);
+      Alert.alert("오류", "답글을 등록하는 중 문제가 발생했습니다.");
+    }
+  };
   // 대댓글 더보기 함수 : 현재 커서 전달, 다음 커서 업데이트
   const handleLoadMoreReplies = useCallback(async () => {
     // '더보기' 버튼 자체가 hasMoreReplies 조건으로 렌더링되므로, 여기서 중복 체크 불필요
@@ -152,27 +154,67 @@ export default function CommentItem({
     setReplyLoading(true);
     try {
       // API 호출 시 현재 nextReplyCursor 상태 값 전달
-      const response = await BoardAPI.getMoreReplies(comment.commentId, nextReplyCursor);
+      const response = await BoardAPI.getMoreReplies(
+        comment.commentId,
+        nextReplyCursor
+      );
 
       const newReplies = response.data.replies || [];
       // API 응답에서 다음 호출에 사용할 커서 값을 가져옴
       const nextCursorFromServer = response.data.nextCursorId;
 
-      setLoadedReplies(prevReplies => [...prevReplies, ...newReplies]);
+      setLoadedReplies((prevReplies) => [...prevReplies, ...newReplies]);
       // 다음 API 호출을 위해 커서 상태 업데이트
       setNextReplyCursor(nextCursorFromServer);
-
     } catch (error) {
       console.error("대댓글 로드 실패:", error);
       Alert.alert("오류", "대댓글을 불러오는 중 오류가 발생했습니다.");
     } finally {
       setReplyLoading(false);
     }
-  // 의존성 배열에서 hasMoreReplies 제거 가능 (버튼 표시 조건으로만 사용)
+    // 의존성 배열에서 hasMoreReplies 제거 가능 (버튼 표시 조건으로만 사용)
   }, [comment.commentId, replyLoading, nextReplyCursor]);
 
   // 표시할 대댓글 수와 전체 대댓글 수 비교
   const hasMoreReplies = comment.replyCount > loadedReplies.length;
+
+  // 대댓글 수정 시작 함수
+  const handleEditReply = (reply: Reply) => {
+    // 수정할 대댓글 ID 저장
+    setEditingReplyId(reply.commentId);
+    // 수정할 내용 초기값 설정
+    setEditedReplyContent(reply.content);
+  };
+  // 대댓글 수정 취소 함수
+  const handleCancelEditReply = () => {
+    // 수정 모드 종료
+    setEditingReplyId(null);
+    // 수정 내용 초기화
+    setEditedReplyContent("");
+  };
+  // 대댓글 수정 저장 함수
+  const handleSaveReply = async (replyId: number) => {
+    // 입력 내용이 비어있거나 변경되지 않았는지 확인
+    if (!editedReplyContent.trim()) {
+      Alert.alert("알림", "내용을 입력해주세요.");
+      return;
+    }
+
+    try {
+      // 대댓글 수정 API 호출
+      await BoardAPI.updateComment(replyId, editedReplyContent);
+
+      // 수정 모드 종료
+      setEditingReplyId(null);
+      // 수정 내용 초기화
+      setEditedReplyContent("");
+      // 댓글 목록 갱신
+      onCommentChange();
+    } catch (error) {
+      console.error("답글 수정 실패:", error);
+      Alert.alert("오류", "답글을 수정하는 중 문제가 발생했습니다.");
+    }
+  };
 
   return (
     <View style={[styles.container, isReply && styles.replyContainer]}>
@@ -185,7 +227,10 @@ export default function CommentItem({
             <ProfileImage imageUrl={comment.profileUrl} variant="small" />
             <View style={styles.userInfoText}>
               <Text style={styles.nickname}>{comment.nickname}</Text>
-              <PersonalityTag personality={comment.userType} nickname={comment.nickname} />
+              <PersonalityTag
+                personality={comment.userType}
+                nickname={comment.nickname}
+              />
             </View>
             {/* 시간은 푸터로 이동 */}
           </View>
@@ -265,39 +310,71 @@ export default function CommentItem({
                 <ProfileImage imageUrl={reply.profileUrl} variant="small" />
                 <View style={styles.userInfoText}>
                   <Text style={styles.nickname}>{reply.nickname}</Text>
-                  <PersonalityTag personality={reply.userType} nickname={reply.nickname} />
+                  <PersonalityTag
+                    personality={reply.userType}
+                    nickname={reply.nickname}
+                  />
                 </View>
               </View>
-              
-              {/* 대댓글 내용 */}
-              <View style={styles.replyContentContainer}>
-                <Text style={styles.contentText}>{reply.content}</Text>
-              </View>
-              
-              {/* 대댓글 푸터 (시간 + 수정/삭제) */}
-              <View style={styles.replyFooterContainer}>
-                <Text style={styles.time}>{getTimeAgo(reply.createdAt)}</Text>
-                
-                {/* 현재 사용자가 작성자인 경우에만 수정/삭제 버튼 표시 */}
-                {user?.nickname === reply.nickname && (
-                  <View style={styles.authorButtons}>
-                    <TouchableOpacity onPress={() => handleEditReply(reply)}>
-                      <Text style={styles.actionText}>수정</Text>
+
+              {/* 대댓글 내용 - 수정 중이면 수정 UI 표시 */}
+              {editingReplyId === reply.commentId ? (
+                <View style={styles.editContainer}>
+                  <TextInput
+                    style={styles.textInput}
+                    value={editedReplyContent}
+                    onChangeText={setEditedReplyContent}
+                    autoFocus={true}
+                    multiline={true}
+                  />
+                  <View style={styles.buttonContainer}>
+                    <TouchableOpacity
+                      onPress={handleCancelEditReply}
+                      style={styles.button}
+                    >
+                      <Text>취소</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => handleDeleteReply(reply.commentId)}>
-                      <Text style={styles.actionText}>삭제</Text>
+                    <TouchableOpacity
+                      onPress={() => handleSaveReply(reply.commentId)}
+                      style={[styles.button, styles.saveButton]}
+                    >
+                      <Text style={styles.saveButtonText}>저장</Text>
                     </TouchableOpacity>
                   </View>
-                )}
-              </View>
+                </View>
+              ) : (
+                <View style={styles.replyContentContainer}>
+                  <Text style={styles.contentText}>{reply.content}</Text>
+                </View>
+              )}
+
+              {/* 푸터는 수정 중이 아닐 때만 표시 */}
+              {editingReplyId !== reply.commentId && (
+                <View style={styles.replyFooterContainer}>
+                  <Text style={styles.time}>{getTimeAgo(reply.createdAt)}</Text>
+
+                  {user?.nickname === reply.nickname && (
+                    <View style={styles.authorButtons}>
+                      <TouchableOpacity onPress={() => handleEditReply(reply)}>
+                        <Text style={styles.actionText}>수정</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => handleDeleteReply(reply.commentId)}
+                      >
+                        <Text style={styles.actionText}>삭제</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </View>
+              )}
             </View>
           ))}
-          
+
           {/* 더보기 버튼 */}
           {hasMoreReplies && (
-            <TouchableOpacity 
-              style={styles.loadMoreButton} 
-              onPress={handleLoadMoreReplies} 
+            <TouchableOpacity
+              style={styles.loadMoreButton}
+              onPress={handleLoadMoreReplies}
               disabled={replyLoading}
             >
               {replyLoading ? (
@@ -313,10 +390,12 @@ export default function CommentItem({
       )}
       {/* --- 답글 입력창 (isReplying 상태에 따라 표시) --- */}
       {isReplying && (
-        <View style={[
-          styles.replyInputArea,
-          !isReply && styles.replyInputAreaIndent // isReply가 false일 때만 들여쓰기 스타일 추가
-          ]}>
+        <View
+          style={[
+            styles.replyInputArea,
+            !isReply && styles.replyInputAreaIndent, // isReply가 false일 때만 들여쓰기 스타일 추가
+          ]}
+        >
           <TextInput
             style={styles.replyInput}
             value={replyText}
@@ -469,34 +548,35 @@ const styles = StyleSheet.create({
   replyItemContainer: {
     padding: 8,
     marginVertical: 4,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: "#f9f9f9",
     borderRadius: 8,
   },
   replyContentContainer: {
     paddingVertical: 4,
   },
   replyFooterContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 4,
   },
   loadMoreButton: {
     padding: 8,
-    alignItems: 'center',
+    alignItems: "center",
   },
   loadMoreText: {
-    color: '#666',
+    color: "#666",
     fontSize: 14,
   },
   replyInputArea: {
     marginTop: 10,
   },
-  replyInputAreaIndent: { // 최상위 댓글의 답글일 때만 들여쓰기 (스타일 조정 필요)
+  replyInputAreaIndent: {
+    // 최상위 댓글의 답글일 때만 들여쓰기 (스타일 조정 필요)
     marginLeft: 40,
   },
   replyInput: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 8,
     padding: 8,
     minHeight: 80,
