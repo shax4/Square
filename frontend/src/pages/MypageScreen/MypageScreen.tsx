@@ -27,7 +27,7 @@ const MypageScreen = () => {
 
   // Mock data
   const userProfile = {
-    nickname: "사용자닉네임",
+    nickname: "test",
     personality: "PNTB",
     imageUrl: "https://example.com/profile.jpg",
   }
@@ -53,7 +53,7 @@ const MypageScreen = () => {
             />
             <MypageButton
               title="내 가치관 정보"
-              onPress={() => navigation.navigate('PersonalityResultScreen', {nickname: userProfile.nickname})}
+              onPress={() => navigation.navigate('PersonalityResultScreen', { isAfterSurvey : false, givenNickname : userProfile.nickname, typeResult : null})}
               variant="secondary"
               style={styles.actionButton}
             />
