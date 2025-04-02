@@ -2,6 +2,8 @@ package org.shax3.square.domain.post.repository.cumstom;
 
 import java.util.List;
 
+import org.shax3.square.common.model.TargetType;
+import org.shax3.square.domain.like.model.QLike;
 import org.shax3.square.domain.post.model.Post;
 import org.shax3.square.domain.post.model.QPost;
 import org.shax3.square.domain.user.model.QUser;
@@ -75,6 +77,27 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 			)
 			.orderBy(post.id.desc())
 			.limit(limit + 1)
+			.fetch();
+	}
+
+	@Override
+	public List<Post> findMyLikedPosts(User user, Long cursorId, int limit) {
+		QPost post = QPost.post;
+		QLike like = QLike.like1;
+
+		return queryFactory
+			.select(post)
+			.from(like)
+			.join(post).on(like.targetId.eq(post.id))
+			.where(
+				post.valid.isTrue(),
+				like.user.eq(user),
+				like.targetType.eq(TargetType.POST),
+				like.like.isTrue(),
+				cursorId != null ? post.id.lt(cursorId) : null
+			)
+			.orderBy(post.id.desc())
+			.limit(limit)
 			.fetch();
 	}
 

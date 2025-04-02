@@ -106,4 +106,19 @@ public class PostController {
 
         return ResponseEntity.ok(response);
     }
+
+    @Operation(
+        summary = "내가 좋아요한 게시글 목록 조회 api",
+        description = "내가 좋아요한 게시글 목록을 조회합니다. (페이징 처리)"
+    )
+    @GetMapping("/my-likes")
+    public ResponseEntity<MyPostResponse> getMyLikedPosts(
+        @AuthUser User user,
+        @RequestParam(required = false) Long nextCursorId,
+        @RequestParam(defaultValue = "10") int limit
+    ) {
+        MyPostResponse response = postFacadeService.getMyLikedPostList(user, nextCursorId, limit);
+
+        return ResponseEntity.ok(response);
+    }
 }

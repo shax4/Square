@@ -10,4 +10,5 @@ public interface PostRepositoryCustom {
 	List<Post> findByLatestCursor(Long cursorId, int limit);
 	List<Post> findByLikesCursor(Integer cursorLikes, int limit);
 	List<Post> findMyPosts(User user, Long nextCursorId, int limit);
+	List<Post> findMyLikedPosts(User user, Long nextCursorId, int limit);
 }

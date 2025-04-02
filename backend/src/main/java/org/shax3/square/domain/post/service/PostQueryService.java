@@ -32,4 +32,8 @@ public class PostQueryService {
 	public List<Post> getMyPosts(User user, Long nextCursorId, int limit) {
 		return postRepository.findMyPosts(user, nextCursorId, limit + 1);
 	}
+
+	public List<Post> getMyLikedPosts(User user, Long nextCursorId, int limit) {
+		return postRepository.findMyLikedPosts(user, nextCursorId, limit + 1);
+	}
 }

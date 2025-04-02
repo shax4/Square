@@ -95,6 +95,20 @@ public class PostFacadeService {
 		return MyPostResponse.of(postDtos, getNextCursorId(posts, hasNext));
 	}
 
+	@Transactional(readOnly = true)
+	public MyPostResponse getMyLikedPostList(User user, Long nextCursorId, int limit) {
+
+		List<Post> fetchedPosts = postQueryService.getMyLikedPosts(user, nextCursorId, limit);
+
+		boolean hasNext = fetchedPosts.size() > limit;
+		List<Post> posts = hasNext ? fetchedPosts.subList(0, limit) : fetchedPosts;
+
+		List<PostSummaryDto> postDtos = toPostDtos(posts, user);
+
+		return MyPostResponse.of(postDtos, getNextCursorId(posts, hasNext));
+	}
+
+
 	private List<PopularPostDto> toPopularDtos(List<Post> popularPosts) {
 		List<Long> popularPostIds = popularPosts.stream().map(Post::getId).toList();
 
