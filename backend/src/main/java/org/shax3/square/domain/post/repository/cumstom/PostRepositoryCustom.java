@@ -1,4 +1,4 @@
-package org.shax3.square.domain.post.repository;
+package org.shax3.square.domain.post.repository.cumstom;
 
 import java.util.List;
 
