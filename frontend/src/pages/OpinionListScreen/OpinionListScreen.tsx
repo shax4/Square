@@ -3,7 +3,6 @@ import { View, Text, KeyboardAvoidingView, Platform, SafeAreaView } from 'react-
 import { styles } from './Components/OpinionListScreen.styles'
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { StackParamList } from '../../shared/page-stack/DebatePageStack';
-import { debateData as debateList } from '../DebateCardsScreen/DebateCard/card-data';
 import VoteButton from '../../components/VoteButton/VoteButton';
 import ToggleSwitch from './Components/ToggleSwitch';
 import SummaryBoxList from './Components/Summary/SummaryBoxList'
@@ -12,7 +11,6 @@ import OpinionBoxList from './Components/Opinion/OpinionBoxList';
 import CommentInput from '../../components/CommentInput/CommentInput';
 import { getOpinions } from './api/OpinionsApi';
 import { Opinion } from './Components/Opinion';
-import { Debate } from '../DebateCardsScreen/DebateCard';
 import { getSummaries } from './api/SummariesApi';
 
 type OpinionListScreenRouteProp = RouteProp<StackParamList, 'OpinionListScreen'>;
@@ -57,7 +55,7 @@ export default function OpinionListScreen() {
         setLoading(true);
         try {
             const response = await getSummaries(debateId);
-            
+
             // AI 요약 설정
             setSummaries(response.summaries);
         } catch (e) {
