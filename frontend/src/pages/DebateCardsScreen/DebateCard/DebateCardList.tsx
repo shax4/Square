@@ -8,9 +8,8 @@ import { debateData } from './card-data';
 const { width, height } = Dimensions.get('window');
 
 export default function DebateCardList() {
-    //const [debates, setDebates] = useState<Debate[]>([]);
-    const [debates, setDebates] = useState<Debate[]>(debateData);
-    const [nextCursorId, setNextCursorId] = useState<number>(0);
+    const [debates, setDebates] = useState<Debate[]>([]);
+    const [nextCursorId, setNextCursorId] = useState<number | null>(null);
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const limit = 3;
@@ -27,7 +26,15 @@ export default function DebateCardList() {
 
             if (newData.length > 0) {
                 setDebates((prev) => [...prev, ...newData]);
-                setNextCursorId(nextId);
+
+                // 더이상 줄 데이터가 없다 알리면 페이징 막기 
+                if (nextId == null) {
+                    setHasMore(false);
+                    return;
+                } else {
+                    setNextCursorId(nextId);
+                }
+
             } else {
                 setHasMore(false);
             }
