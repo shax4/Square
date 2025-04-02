@@ -100,7 +100,18 @@ public class DebateController {
         return ResponseEntity.ok(response);
     }
 
-
+    @Operation(
+            summary = "토론 상세 의견 목록 조회 API",
+            description = """
+                    토론 상세 페이지에 보여질 의견(opinion) 목록을 조회합니다. \n
+                    - 정렬 기준: `sort` 파라미터로 의견 정렬 방식 선택 (latest, likes, comments) \n
+                    - 양 진영(left/right) 의견을 교차 병합하여 반환합니다. \n
+                    - 커서 기반 페이지네이션 적용: 각 진영별로 개별 커서(`nextLeftCursorId`, `nextRightCursorId`, 등)를 이용 \n
+                    - 로그인 시 각 opinion의 좋아요 여부(`isLiked`) 포함되어 응답됩니다. \n
+                    - 투표 결과(`voteResult`)는 항상 응답에 포함됩니다.
+                    - 하위의 커서들은 클라이언트는 그대로 반환해주시면 됩니다.
+                    """
+    )
     @GetMapping("/api/debates/{debateId}")
     public ResponseEntity<DebateDetailResponse> getDebateDetail(
             @PathVariable Long debateId,
@@ -111,10 +122,18 @@ public class DebateController {
             @RequestParam(required = false) Long nextRightCursorId,
             @RequestParam(required = false) Integer nextRightCursorLikes,
             @RequestParam(required = false) Integer nextRightCursorComments,
-            @RequestParam(defaultValue = "4") Integer limit
+            @RequestParam(defaultValue = "4") Integer limit,
+            @AuthUser User user
     ) {
 
-        DebateDetailResponse response = debateService.getDebateDetails(sort,nextLeftCursorId,nextLeftCursorLikes,)
+        DebateDetailResponse response = debateService.getDebateDetails(user, debateId, sort,
+                nextLeftCursorId,
+                nextLeftCursorLikes,
+                nextLeftCursorComments,
+                nextRightCursorId,
+                nextRightCursorLikes,
+                nextRightCursorComments,
+                limit);
         return ResponseEntity.ok(response);
     }
 

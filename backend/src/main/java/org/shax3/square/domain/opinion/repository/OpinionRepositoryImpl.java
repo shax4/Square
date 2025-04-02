@@ -35,71 +35,72 @@ public class OpinionRepositoryImpl implements OpinionRepositoryCustom {
                 .limit(limit)
                 .fetch();
     }
-
     @Override
-    public List<Opinion> findByIdCursor(Long debateId, boolean isLeft, Long cursorId, int limit) {
-        QOpinion opinion = QOpinion.opinion;
-        BooleanBuilder builder = new BooleanBuilder()
-                .and(opinion.debate.id.eq(debateId))
-                .and(opinion.left.eq(isLeft))
-                .and(opinion.valid.isTrue());
+    public List<Opinion> findOpinionsByLatest(Long debateId, boolean isLeft, Long nextCursorId, int limit) {
+        QOpinion op = QOpinion.opinion;
+        BooleanBuilder builder = new BooleanBuilder();
 
-        if (cursorId != null) {
-            builder.and(opinion.id.lt(cursorId));
+        builder.and(op.debate.id.eq(debateId));
+        builder.and(op.left.eq(isLeft));
+        builder.and(op.valid.isTrue());
+
+        if (nextCursorId != null) {
+            builder.and(op.id.lt(nextCursorId));
         }
 
         return queryFactory
-                .selectFrom(opinion)
+                .selectFrom(op)
                 .where(builder)
-                .orderBy(opinion.id.desc())
+                .orderBy(op.id.desc())
                 .limit(limit)
                 .fetch();
     }
 
     @Override
-    public List<Opinion> findByLikes(Long debateId, boolean isLeft, Long cursorId, Integer cursorLikes, int limit) {
-        QOpinion opinion = QOpinion.opinion;
-        BooleanBuilder builder = new BooleanBuilder()
-                .and(opinion.debate.id.eq(debateId))
-                .and(opinion.left.eq(isLeft))
-                .and(opinion.valid.isTrue());
+    public List<Opinion> findOpinionsByLikes(Long debateId, boolean isLeft, Long nextCursorId, Integer nextCursorLikes, int limit) {
+        QOpinion op = QOpinion.opinion;
+        BooleanBuilder builder = new BooleanBuilder();
 
-        if (cursorLikes != null && cursorId != null) {
+        builder.and(op.debate.id.eq(debateId));
+        builder.and(op.left.eq(isLeft));
+        builder.and(op.valid.isTrue());
+
+        if (nextCursorLikes != null && nextCursorId != null) {
             builder.and(
-                    opinion.likeCount.lt(cursorLikes)
-                            .or(opinion.likeCount.eq(cursorLikes).and(opinion.id.lt(cursorId)))
+                    op.likeCount.lt(nextCursorLikes)
+                            .or(op.likeCount.eq(nextCursorLikes).and(op.id.lt(nextCursorId)))
             );
         }
 
         return queryFactory
-                .selectFrom(opinion)
+                .selectFrom(op)
                 .where(builder)
-                .orderBy(opinion.likeCount.desc(), opinion.id.desc())
+                .orderBy(op.likeCount.desc(), op.id.desc())
                 .limit(limit)
                 .fetch();
     }
 
     @Override
-    public List<Opinion> findByComments(Long debateId, boolean isLeft, Long cursorId, Integer cursorComments, int limit) {
-        QOpinion opinion = QOpinion.opinion;
-        BooleanBuilder builder = new BooleanBuilder()
-                .and(opinion.debate.id.eq(debateId))
-                .and(opinion.left.eq(isLeft))
-                .and(opinion.valid.isTrue());
+    public List<Opinion> findOpinionsByComments(Long debateId, boolean isLeft, Long nextCursorId, Integer nextCursorComments, int limit) {
+        QOpinion op = QOpinion.opinion;
+        BooleanBuilder builder = new BooleanBuilder();
 
-        if (cursorComments != null && cursorId != null) {
+        builder.and(op.debate.id.eq(debateId));
+        builder.and(op.left.eq(isLeft));
+        builder.and(op.valid.isTrue());
+
+        if (nextCursorComments != null && nextCursorId != null) {
             builder.and(
-                    opinion.commentCount.lt(cursorComments)
-                            .or(opinion.commentCount.eq(cursorComments).and(opinion.id.lt(cursorId)))
+                    op.commentCount.lt(nextCursorComments)
+                            .or(op.commentCount.eq(nextCursorComments).and(op.id.lt(nextCursorId)))
             );
         }
 
         return queryFactory
-                .selectFrom(opinion)
+                .selectFrom(op)
                 .where(builder)
-                .orderBy(opinion.commentCount.desc(), opinion.id.desc())
+                .orderBy(op.commentCount.desc(), op.id.desc())
                 .limit(limit)
                 .fetch();
     }
-
 }

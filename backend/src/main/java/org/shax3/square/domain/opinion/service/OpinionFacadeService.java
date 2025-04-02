@@ -1,9 +1,9 @@
 package org.shax3.square.domain.opinion.service;
 
 import lombok.RequiredArgsConstructor;
-
 import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.like.service.LikeService;
+import org.shax3.square.domain.opinion.dto.OpinionDto;
 import org.shax3.square.domain.opinion.dto.request.CreateOpinionCommentRequest;
 import org.shax3.square.domain.opinion.dto.response.CommentResponse;
 import org.shax3.square.domain.opinion.dto.response.CreateOpinionCommentResponse;
@@ -50,25 +50,25 @@ public class OpinionFacadeService {
 
         // 좋아요 여부 판단
         boolean isLiked = likeService.getLikedTargetIds(user, TargetType.OPINION, List.of(opinionId))
-            .contains(opinionId);
+                .contains(opinionId);
 
         List<Long> commentIds = comments.stream()
-            .map(OpinionComment::getId)
-            .toList();
+                .map(OpinionComment::getId)
+                .toList();
 
         Set<Long> likedCommentIds = likeService.getLikedTargetIds(user, TargetType.OPINION_COMMENT, commentIds);
 
         List<CommentResponse> commentResponses = comments.stream()
-            .map(comment -> CommentResponse.of(
-                comment,
-                s3Service.generatePresignedGetUrl(comment.getUser().getS3Key()),
-                likedCommentIds.contains(comment.getId())
-            ))
-            .toList();
+                .map(comment -> CommentResponse.of(
+                        comment,
+                        s3Service.generatePresignedGetUrl(comment.getUser().getS3Key()),
+                        likedCommentIds.contains(comment.getId())
+                ))
+                .toList();
 
         String profileUrl = s3Service.generatePresignedGetUrl(user.getS3Key());
 
-        return OpinionDetailsResponse.of(opinion, commentResponses, profileUrl,isLiked);
+        return OpinionDetailsResponse.of(opinion, commentResponses, profileUrl, isLiked);
     }
 
     @Transactional(readOnly = true)
@@ -76,12 +76,44 @@ public class OpinionFacadeService {
         List<Opinion> opinions = opinionService.getMyOpinions(user, nextCursorId, limit);
 
         List<Long> opinionIds = opinions.stream()
-            .map(Opinion::getId)
-            .toList();
+                .map(Opinion::getId)
+                .toList();
 
         Set<Long> likedOpinionIds = likeService.getLikedTargetIds(user, TargetType.OPINION, opinionIds);
 
         return MyOpinionResponse.of(opinions, likedOpinionIds);
+    }
+
+    @Transactional(readOnly = true)
+    public List<OpinionDto> getOpinionsBySort(
+            User user,
+            Long debateId,
+            boolean isLeft,
+            String sort,
+            Long nextCursorId,
+            Integer nextCursorLikes,
+            Integer nextCursorComments,
+            int limit
+    ) {
+        List<Opinion> opinions = switch (sort) {
+            case "likes" -> opinionService.findOpinionsByLikes(debateId, isLeft, nextCursorId, nextCursorLikes, limit);
+            case "comments" ->
+                    opinionService.findOpinionsByComments(debateId, isLeft, nextCursorId, nextCursorComments, limit);
+            default -> opinionService.findOpinionsByLatest(debateId, isLeft, nextCursorId, limit);
+        };
+
+        List<Long> opinionIds = opinions.stream().map(Opinion::getId).toList();
+        Set<Long> likedOpinionIds = likeService.getLikedTargetIds(user, TargetType.OPINION, opinionIds);
+
+        return opinions.stream()
+                .map(op -> OpinionDto.of(
+                        op,
+                        likedOpinionIds.contains(op.getId()),
+                        op.getCommentCount(),
+                        op.getUser(),
+                        s3Service.generatePresignedGetUrl(op.getUser().getS3Key())
+                ))
+                .toList();
     }
 }
 
