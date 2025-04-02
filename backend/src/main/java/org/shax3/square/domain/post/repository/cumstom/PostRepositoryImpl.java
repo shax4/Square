@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.shax3.square.domain.post.model.Post;
 import org.shax3.square.domain.post.model.QPost;
+import org.shax3.square.domain.user.model.QUser;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -29,9 +30,11 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 	@Override
 	public List<Post> findByLatestCursor(Long cursorId, int limit) {
 		QPost post = QPost.post;
+		QUser user = QUser.user;
 
 		return query
 			.selectFrom(post)
+			.join(post.user, user).fetchJoin()
 			.where(
 				post.valid.isTrue(),
 				cursorId != null ? post.id.lt(cursorId) : null
@@ -44,9 +47,11 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 	@Override
 	public List<Post> findByLikesCursor(Integer cursorLikes, int limit) {
 		QPost post = QPost.post;
+		QUser user = QUser.user;
 
 		return query
 			.selectFrom(post)
+			.join(post.user, user).fetchJoin()
 			.where(
 				post.valid.isTrue(),
 				cursorLikes != null ? post.likeCount.lt(cursorLikes) : null
