@@ -96,4 +96,8 @@ public class Post extends BaseTimeEntity {
     public void softDelete() {
         valid = false;
     }
+
+    public void increaseLikeCount(int countDiff) {
+        this.likeCount += countDiff;
+    }
 }
