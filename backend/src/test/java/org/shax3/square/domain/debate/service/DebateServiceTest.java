@@ -41,7 +41,6 @@ class DebateServiceTest {
         // given
         Long debateId = 1L;
         Debate debate = Debate.builder()
-                .topic("외모 논쟁")
                 .leftOption("찬성")
                 .rightOption("반대")
                 .build();
@@ -63,7 +62,6 @@ class DebateServiceTest {
         SummaryResponse response = debateService.getSummaryResult(debateId, user);
 
         // then
-        assertThat(response.topic()).isEqualTo("외모 논쟁");
         assertThat(response.summaries()).hasSize(2);
         assertThat(response.leftCount()).isEqualTo(10);
         assertThat(response.rightCount()).isEqualTo(20);

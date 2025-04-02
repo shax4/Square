@@ -7,11 +7,6 @@ import java.util.List;
 
 public record DebateDetailResponse(
         Long debateId,
-        String topic,
-        String leftOption,
-        String rightOption,
-        boolean isScraped,
-        boolean hasVoted,
         int leftCount,
         int rightCount,
         List<OpinionDto> opinions,
@@ -24,8 +19,6 @@ public record DebateDetailResponse(
 ) {
     public static DebateDetailResponse of(
             Debate debate,
-            boolean isScraped,
-            boolean hasVoted,
             List<OpinionDto> opinions,
             Long nextLeftCursorId,
             Integer nextLeftCursorLikes,
@@ -37,11 +30,6 @@ public record DebateDetailResponse(
     ) {
         return new DebateDetailResponse(
                 debate.getId(),
-                debate.getTopic(),
-                debate.getLeftOption(),
-                debate.getRightOption(),
-                isScraped,
-                hasVoted,
                 voteResponse.leftCount(),
                 voteResponse.rightCount(),
                 opinions,
