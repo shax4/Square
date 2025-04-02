@@ -236,9 +236,12 @@ export default function CommentItem({
             // 대댓글 삭제 API 호출
             await BoardAPI.deleteComment(replyId);
 
-            // 삭제된 대댓글을 화면에서 제거
-            // 여기서는 간단하게 onCommentChange 호출로 처리
-            // 실제로는 상태 업데이트 로직을 추가할 수도 있음
+            // 로컬 상태에서 삭제된 대댓글 제거
+            setLoadedReplies((prevReplies) =>
+              prevReplies.filter((reply) => reply.commentId !== replyId)
+            );
+
+            // 댓글 목록 갱신 (부모 컴포넌트에 알림)
             onCommentChange();
           } catch (error) {
             console.error("답글 삭제 실패:", error);
