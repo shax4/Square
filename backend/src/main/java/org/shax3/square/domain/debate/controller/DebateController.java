@@ -91,7 +91,7 @@ public class DebateController {
                     - 스크랩, 투표 여부에 따라 `isScraped`, `isLeft` 값이 달라질 수 있습니다. \n
                     - 로그인 여부를 확인하려면 클라이언트에서 확인해야 합니다.
                     """)
-    @GetMapping("/debates")
+    @GetMapping
     public ResponseEntity<DebatesResponse> getDebates(@Guest User user,
                                                       @RequestParam(required = false) Long nextCursorId,
                                                       @RequestParam(defaultValue = "5") int limit
