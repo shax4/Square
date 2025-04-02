@@ -15,8 +15,6 @@ const DebateResultModal: React.FC<DebateResultModalProps> = ({ visible, onClose,
   const userAgeGroupIndex = activeData.age.findIndex((item) => item.label === activeData.userInfo.ageGroup)
   const userReligionGroupIndex = activeData.religion.findIndex((item) => item.label === activeData.userInfo.religionGroup)
 
-  console.log(userReligionGroupIndex);
-
   const screenWidth = Dimensions.get("window").width * 0.9
 
   return (

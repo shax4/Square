@@ -8,10 +8,13 @@
  * navigation.navigate('OpinionListScreen', { debateId });
  */
 
+import { Debate } from "../../pages/DebateCardsScreen/Components";
+
 export type StackParamList = {
     DebateCardsScreen: undefined;
     OpinionListScreen: {
         debateId: number;
+        debate: Debate
         showVoteResultModal?: boolean;
     };
     OpinionDetailScreen: { opinionId: number };
