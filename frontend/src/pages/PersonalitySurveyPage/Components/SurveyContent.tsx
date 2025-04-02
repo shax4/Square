@@ -79,7 +79,7 @@ const SurveyContent = () => {
         console.log("Survey submitted successfully:", result)
         Alert.alert("제출 완료", JSON.stringify(result, null, 2), [{ text: "확인" }]);
   
-        navigation.navigate('PersonalityResultScreen', { isAfterSurvey : true, givenNickname : result.nickname, typeResult : result})
+        navigation.replace('PersonalityResultScreen', { isAfterSurvey : true, givenNickname : result.nickname, typeResult : result})
       } catch (error) {
         // Handle error
         console.error("Failed to submit survey:", error)

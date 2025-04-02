@@ -8,16 +8,21 @@ import { useEffect, useState } from "react"
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { useAuth } from "../../shared/hooks"
 
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
+
+import {StackParamList} from '../../shared/page-stack/MyPageStack'
+
 import { getPersonalityResult } from "./Api/PersonalityResultAPI"
 
 // Axios 연결 필요
 // 임시 데이터로 태스트
 const mockResult: TypeResult = {
-  nickname: "반짝이는코알라",
-  userType: "PNTB",
-  score1: -2,
+  nickname: "DEBUG",
+  userType: "TEST",
+  score1: 3,
   score2: 3,
-  score3: 1,
+  score3: 3,
   score4: 3,
 };
 
@@ -25,6 +30,8 @@ const PersonalityResultScreen = () => {
   // isAfterSurvey - 설문조사 이후 나오는 성향 결과 페이지인가? givenNickname - API 호출 시 사용되는 닉네임 정보, typeResult - isAfterSurvey가 true일 때 넘겨지는 유저 성향 데이터. 
   const route = useRoute<RouteProp<Record<string, { isAfterSurvey : boolean, givenNickname : string, typeResult : TypeResult}>, string>>();
   const { isAfterSurvey, typeResult, givenNickname } = route.params;
+
+  const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
 
   // Zustand 로그인 사용자 데이터
   const { user} = useAuth();
@@ -62,11 +69,6 @@ const PersonalityResultScreen = () => {
   // 성향 설명 띄우기
   const onInfoPress = () => {
     console.log("성향 설명");
-  }
-
-  // 성향 테스트 다시하기
-  const onRetakePress = () => {
-    console.log("성향 테스트 다시 하기");
   }
 
   // 공유하기
@@ -129,9 +131,6 @@ const PersonalityResultScreen = () => {
 
         {isMyType &&
           <View style={styles.buttonsContainer}>
-            <View style={styles.buttonContainer}>
-              <Button label="성향 테스트 다시하기" onPress={onRetakePress} />
-            </View>
             <View style={styles.buttonContainer}>
               <Button label="공유하기" onPress={onSharePress} />
             </View>
