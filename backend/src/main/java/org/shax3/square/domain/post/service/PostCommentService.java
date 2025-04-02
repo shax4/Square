@@ -2,6 +2,8 @@ package org.shax3.square.domain.post.service;
 
 import static org.shax3.square.exception.ExceptionCode.*;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.shax3.square.domain.post.dto.request.CreatePostCommentRequest;
@@ -88,5 +90,9 @@ public class PostCommentService {
 	public void increaseLikeCount(Long targetId, int countDiff) {
 		PostComment comment = getPostComment(targetId);
 		comment.increaseLikeCount(countDiff);
+	}
+
+	public Map<Long, Integer> getCommentCounts(List<Long> postIds) {
+		return postCommentRepository.countByPostIds(postIds);
 	}
 }
