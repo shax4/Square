@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -9,6 +9,7 @@ import { Debate } from './Debate.types';
 import { styles } from './DebateCard.styles';
 import { Icons } from '../../../../assets/icons/Icons';
 import VoteButton from '../../../components/VoteButton/VoteButton'
+import BookmarkButton from '../../../components/BookmarkButton/BookmarkButton';
 
 const DebateCard = ({
     debateId,
@@ -43,8 +44,15 @@ const DebateCard = ({
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
 
     const navigateToOpinionListPage = () => {
-        navigation.navigate('OpinionListScreen', { debateId });
+        navigation.navigate('OpinionListScreen', { debateId, debate });
     }
+
+    const [scrap, setScrap] = useState(debate.isScraped);
+
+    const handlePressScrap = () => {
+        console.log("DebateCard.tsx scrap Button Clicked")
+        setScrap(prev => !prev);
+    };
 
     return (
         <>
@@ -56,9 +64,10 @@ const DebateCard = ({
                     {/* Header */}
                     <View style={styles.CardHeader}>
                         <Text style={styles.CardHeaderText}>Number {debateId}</Text>
-                        <TouchableOpacity>
-                            {isScraped ? <Icons.bookmarkUndo on /> : <Icons.bookmark />}
-                        </TouchableOpacity>
+                        <BookmarkButton
+                            isScraped={debate.isScraped}
+                            onPressScrap={() => { handlePressScrap }}
+                        />
                     </View>
 
                     {/* Hashtag */}
@@ -91,7 +100,6 @@ const DebateCard = ({
             </View>
         </>
     )
-
 }
 
 export default DebateCard;

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { styles } from './VoteButton.styles';
-import { Debate } from '../../pages/DebateCardsScreen/DebateCard/Debate.types';
-import VoteConfirmModal from '../../pages/DebateCardsScreen/DebateCard/VoteConfirmModal';
+import { Debate } from '../../pages/DebateCardsScreen/Components/Debate.types';
+import VoteConfirmModal from '../../pages/DebateCardsScreen/Components/VoteConfirmModal';
 import { DebateResultModal } from '../../pages';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';

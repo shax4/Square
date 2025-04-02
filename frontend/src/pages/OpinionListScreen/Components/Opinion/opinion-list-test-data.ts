@@ -1,5 +1,5 @@
-import { OpinionsResponse } from './OpinionsResponse.types';
-import { debateData } from '../../../DebateCardsScreen/DebateCard';
+import { OpinionsResponse } from '../../api/OpinionsResponse.types';
+import { debateData } from '../../../DebateCardsScreen/Components';
 
 export const opinionResponse1: OpinionsResponse = {
     debate: debateData[0],
