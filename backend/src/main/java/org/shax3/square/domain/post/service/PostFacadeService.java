@@ -29,6 +29,15 @@ public class PostFacadeService {
 	private final LikeService likeService;
 	private final S3Service s3Service;
 
+	/**
+	 * 게시글 목록 조회
+	 * @param user
+	 * @param sort
+	 * @param nextCursorId
+	 * @param nextCursorLikes
+	 * @param limit
+	 * @return
+	 */
 	@Transactional(readOnly = true)
 	public PostListResponse getPostList(
 		User user,
@@ -66,8 +75,15 @@ public class PostFacadeService {
 		);
 	}
 
+	/**
+	 * 내가 쓴 게시글 조회
+	 * @param user
+	 * @param nextCursorId
+	 * @param limit
+	 * @return
+	 */
 	@Transactional(readOnly = true)
-	public PostListResponse getMyPostList(User user, Long nextCursorId, int limit) {
+	public MyPostResponse getMyPostList(User user, Long nextCursorId, int limit) {
 
 		List<Post> fetchedPosts = postQueryService.getMyPosts(user, nextCursorId, limit);
 

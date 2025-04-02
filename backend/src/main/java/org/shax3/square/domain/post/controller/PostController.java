@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.annotation.AuthUser;
 import org.shax3.square.domain.post.dto.request.CreatePostRequest;
 import org.shax3.square.domain.post.dto.request.UpdatePostRequest;
+import org.shax3.square.domain.post.dto.response.MyPostResponse;
 import org.shax3.square.domain.post.dto.response.PostListResponse;
 import org.shax3.square.domain.post.service.PostFacadeService;
 import org.shax3.square.domain.post.service.PostService;
@@ -96,12 +97,12 @@ public class PostController {
         description = "내가 작성한 게시글 목록을 조회합니다. (페이징 처리)"
     )
     @GetMapping("/my")
-    public ResponseEntity<PostListResponse> getMyPosts(
+    public ResponseEntity<MyPostResponse> getMyPosts(
         @AuthUser User user,
         @RequestParam(required = false) Long nextCursorId,
         @RequestParam(defaultValue = "10") int limit
     ) {
-        PostListResponse response = postFacadeService.getMyPostList(user, nextCursorId, limit);
+        MyPostResponse response = postFacadeService.getMyPostList(user, nextCursorId, limit);
 
         return ResponseEntity.ok(response);
     }

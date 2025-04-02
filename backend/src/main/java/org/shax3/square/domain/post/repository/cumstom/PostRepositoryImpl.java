@@ -5,6 +5,7 @@ import java.util.List;
 import org.shax3.square.domain.post.model.Post;
 import org.shax3.square.domain.post.model.QPost;
 import org.shax3.square.domain.user.model.QUser;
+import org.shax3.square.domain.user.model.User;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -13,13 +14,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PostRepositoryImpl implements PostRepositoryCustom {
 
-	private final JPAQueryFactory query;
+	private final JPAQueryFactory queryFactory;
 
 	@Override
 	public List<Post> findPopularPosts(int count) {
 		QPost post = QPost.post;
 
-		return query
+		return queryFactory
 			.selectFrom(post)
 			.where(post.valid.isTrue())
 			.orderBy(post.likeCount.desc())
@@ -32,7 +33,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 		QPost post = QPost.post;
 		QUser user = QUser.user;
 
-		return query
+		return queryFactory
 			.selectFrom(post)
 			.join(post.user, user).fetchJoin()
 			.where(
@@ -49,7 +50,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 		QPost post = QPost.post;
 		QUser user = QUser.user;
 
-		return query
+		return queryFactory
 			.selectFrom(post)
 			.join(post.user, user).fetchJoin()
 			.where(
@@ -60,4 +61,21 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 			.limit(limit)
 			.fetch();
 	}
+
+	@Override
+	public List<Post> findMyPosts(User user, Long cursorId, int limit) {
+		QPost post = QPost.post;
+
+		return queryFactory
+			.selectFrom(post)
+			.where(
+				post.valid.isTrue(),
+				post.user.eq(user),
+				cursorId != null ? post.id.lt(cursorId) : null
+			)
+			.orderBy(post.id.desc())
+			.limit(limit + 1)
+			.fetch();
+	}
+
 }
