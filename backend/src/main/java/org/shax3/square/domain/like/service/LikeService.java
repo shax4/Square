@@ -107,9 +107,6 @@ public class LikeService {
 	 * @return
 	 */
 	public Set<Long> getLikedTargetIds(User user, TargetType targetType, List<Long> targetIds) {
-		List<Like> likes = likeRepository.findByUserAndTargetTypeAndTargetIdInAndLikeTrue(user, targetType, targetIds);
-		return likes.stream()
-			.map(Like::getTargetId)
-			.collect(Collectors.toSet());
+		return likeRepository.findLikedTargetIds(user, targetType, targetIds);
 	}
 }
