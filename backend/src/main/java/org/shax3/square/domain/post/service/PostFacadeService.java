@@ -37,22 +37,13 @@ public class PostFacadeService {
 		int limit
 	) {
 
+		// 성향테스트 해야만 게시글 조회 가능
 		if (user.getType() == null) {
 			throw new CustomException(ExceptionCode.USER_TYPE_NOT_FOUND);
 		}
 
 		// 상단 인기 게시글 조회 (3개)
-		int popularLimit = 3;
-		List<Post> popularPosts = postQueryService.getPopularPosts(popularLimit);
-		List<Long> popularPostIds = popularPosts.stream().map(Post::getId).toList();
-		Map<Long, Integer> popularCommentCounts = commentService.getCommentCounts(popularPostIds);
-
-		List<PopularPostDto> popularDtos = popularPosts.stream()
-			.map(post -> PopularPostDto.from(
-				post,
-				popularCommentCounts.getOrDefault(post.getId(), 0))
-			)
-			.toList();
+		List<PopularPostDto> popularDtos = toPopularDtos(postQueryService.getPopularPosts(3));
 
 		// 정렬 기준에 따라 게시글 조회
 		boolean isSortByLikes = "likes".equalsIgnoreCase(sort);
@@ -63,11 +54,39 @@ public class PostFacadeService {
 		boolean hasNext = fetchedPosts.size() > limit;
 		List<Post> posts = hasNext ? fetchedPosts.subList(0, limit) : fetchedPosts;
 
+		List<PostSummaryDto> postDtos = toPostDtos(posts, user);
+
+		return PostListResponse.of(
+			user.getType().name(),
+			popularDtos,
+			postDtos,
+			getNextCursorId(posts, hasNext),
+			isSortByLikes ? getNextCursorLikes(posts, hasNext) : null
+		);
+	}
+
+	private List<PopularPostDto> toPopularDtos(List<Post> popularPosts) {
+		List<Long> popularPostIds = popularPosts.stream().map(Post::getId).toList();
+
+		// key: postId, value: commentCount
+		Map<Long, Integer> commentCounts = commentService.getCommentCounts(popularPostIds);
+
+		return popularPosts.stream()
+			.map(post -> PopularPostDto.from(
+				post,
+				commentCounts.getOrDefault(post.getId(), 0)
+			))
+			.toList();
+	}
+
+	private List<PostSummaryDto> toPostDtos(List<Post> posts, User user) {
 		List<Long> postIds = posts.stream().map(Post::getId).toList();
 		Set<Long> likedPostIds = likeService.getLikedTargetIds(user, TargetType.POST, postIds);
+
+		// key: postId, value: commentCount
 		Map<Long, Integer> commentCounts = commentService.getCommentCounts(postIds);
 
-		List<PostSummaryDto> postDtos = posts.stream()
+		return posts.stream()
 			.map(post -> PostSummaryDto.from(
 				post,
 				s3Service.generatePresignedGetUrl(post.getUser().getS3Key()),
@@ -75,19 +94,13 @@ public class PostFacadeService {
 				commentCounts.getOrDefault(post.getId(), 0)
 			))
 			.toList();
+	}
 
-		// 커서 처리
-		Long newCursorId = hasNext && !posts.isEmpty() ? posts.get(posts.size() - 1).getId() : null;
-		Integer newCursorLikes = hasNext && isSortByLikes && !posts.isEmpty()
-			? posts.get(posts.size() - 1).getLikeCount()
-			: null;
+	private Long getNextCursorId(List<Post> posts, boolean hasNext) {
+		return hasNext && !posts.isEmpty() ? posts.get(posts.size() - 1).getId() : null;
+	}
 
-		return PostListResponse.of(
-			user.getType().name(),
-			popularDtos,
-			postDtos,
-			newCursorId,
-			newCursorLikes
-		);
+	private Integer getNextCursorLikes(List<Post> posts, boolean hasNext) {
+		return hasNext && !posts.isEmpty() ? posts.get(posts.size() - 1).getLikeCount() : null;
 	}
 }

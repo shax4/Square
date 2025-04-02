@@ -14,8 +14,8 @@ public class PostQueryService {
 
 	private final PostRepository postRepository;
 
-	public List<Post> getPopularPosts(int count) {
-		return postRepository.findPopularPosts(count);
+	public List<Post> getPopularPosts(int limit) {
+		return postRepository.findPopularPosts(limit);
 	}
 
 	// 최신순: id 내림차순

@@ -28,8 +28,11 @@ public class PostCommentRepositoryImpl implements PostCommentRepositoryCustom {
 			.fetch()
 			.stream()
 			.collect(Collectors.toMap(
-				tuple -> tuple.get(comment.post.id),
-				tuple -> Math.toIntExact(tuple.get(comment.count()))
-			));
+				tuple -> tuple.get(comment.post.id), // key: postId
+				tuple -> {
+					Long count = tuple.get(comment.count()); // value: comment count
+					return count == null ? 0 : Math.toIntExact(count);
+				})
+			);
 	}
 }
