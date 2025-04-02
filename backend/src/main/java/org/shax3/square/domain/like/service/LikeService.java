@@ -78,7 +78,7 @@ public class LikeService {
 			.collect(Collectors.toSet());
 
 		long toggledUp = existsLikes.stream().filter(like -> !like.isLike()).count();
-		long toggledDown = existsLikes.size() - toggledUp;
+		long toggledDown = existsLikes.stream().filter(Like::isLike).count();
 
 		// 기존 좋아요는 toggle
 		existsLikes.forEach(Like::toggleLike);
