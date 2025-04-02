@@ -8,6 +8,7 @@ import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.like.service.LikeService;
 import org.shax3.square.domain.post.dto.PopularPostDto;
 import org.shax3.square.domain.post.dto.PostSummaryDto;
+import org.shax3.square.domain.post.dto.response.MyPostResponse;
 import org.shax3.square.domain.post.dto.response.PostListResponse;
 import org.shax3.square.domain.post.model.Post;
 import org.shax3.square.domain.s3.service.S3Service;
@@ -65,6 +66,19 @@ public class PostFacadeService {
 		);
 	}
 
+	@Transactional(readOnly = true)
+	public PostListResponse getMyPostList(User user, Long nextCursorId, int limit) {
+
+		List<Post> fetchedPosts = postQueryService.getMyPosts(user, nextCursorId, limit);
+
+		boolean hasNext = fetchedPosts.size() > limit;
+		List<Post> posts = hasNext ? fetchedPosts.subList(0, limit) : fetchedPosts;
+
+		List<PostSummaryDto> postDtos = toPostDtos(posts, user);
+
+		return MyPostResponse.of(postDtos, getNextCursorId(posts, hasNext));
+	}
+
 	private List<PopularPostDto> toPopularDtos(List<Post> popularPosts) {
 		List<Long> popularPostIds = popularPosts.stream().map(Post::getId).toList();
 
@@ -103,4 +117,6 @@ public class PostFacadeService {
 	private Integer getNextCursorLikes(List<Post> posts, boolean hasNext) {
 		return hasNext && !posts.isEmpty() ? posts.get(posts.size() - 1).getLikeCount() : null;
 	}
+
+
 }

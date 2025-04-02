@@ -90,4 +90,19 @@ public class PostController {
 
         return ResponseEntity.ok(response);
     }
+
+    @Operation(
+        summary = "내가 작성한 게시글 목록 조회 api",
+        description = "내가 작성한 게시글 목록을 조회합니다. (페이징 처리)"
+    )
+    @GetMapping("/my")
+    public ResponseEntity<PostListResponse> getMyPosts(
+        @AuthUser User user,
+        @RequestParam(required = false) Long nextCursorId,
+        @RequestParam(defaultValue = "10") int limit
+    ) {
+        PostListResponse response = postFacadeService.getMyPostList(user, nextCursorId, limit);
+
+        return ResponseEntity.ok(response);
+    }
 }
