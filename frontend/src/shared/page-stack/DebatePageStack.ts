@@ -8,7 +8,7 @@
  * navigation.navigate('OpinionListScreen', { debateId });
  */
 
-import { Debate } from "../../pages/DebateCardsScreen/DebateCard";
+import { Debate } from "../../pages/DebateCardsScreen/Components";
 
 export type StackParamList = {
     DebateCardsScreen: undefined;

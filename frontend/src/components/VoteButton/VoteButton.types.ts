@@ -1,4 +1,4 @@
-import { Debate } from "../../pages/DebateCardsScreen/DebateCard";
+import { Debate } from "../../pages/DebateCardsScreen/Components";
 
 export type AfterVoteButtonViewProps = {
     debate: Debate;
