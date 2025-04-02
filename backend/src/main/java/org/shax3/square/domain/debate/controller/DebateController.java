@@ -101,7 +101,7 @@ public class DebateController {
     }
 
     @Operation(
-            summary = "토론 상세 의견 목록 조회 API",
+            summary = "토론에 해당하는 의견 목록 조회 API",
             description = """
                     토론 상세 페이지에 보여질 의견(opinion) 목록을 조회합니다. \n
                     - 정렬 기준: `sort` 파라미터로 의견 정렬 방식 선택 (latest, likes, comments) \n
