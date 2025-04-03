@@ -1,3 +1,4 @@
+import { DebateResultData } from "../../../pages/DebateResultModal/DebateResultData.types";
 import { axiosInstance } from "../../../shared";
 
 export interface voteResult {
@@ -15,6 +16,16 @@ export const voteDebate = async (debateId: number, isLeft: boolean): Promise<vot
         return response.data;
     } catch (error) {
         console.error("투표 POST 요청 실패:", error);
+        throw error;
+    }
+}
+
+export const getDebateVoteResult = async (debateId: number): Promise<DebateResultData> => {
+    try {
+        const response = await axiosInstance.get(`/api/debates/${debateId}/result`);
+        return response.data;
+    } catch (error) {
+        console.error("논쟁 통계 조회 실패:", error);
         throw error;
     }
 }

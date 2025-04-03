@@ -9,8 +9,8 @@ export const getAllDebates = async (nextCursorId: number | null, limit: number):
         if (nextCursorId !== null) {
             params.nextCursorId = nextCursorId;
         }
-        const response = await axiosInstance.get('/api/debates/debates', { params });
-        
+        const response = await axiosInstance.get('/api/debates', { params });
+
         return response.data;
     } catch (error) {
         console.error("논쟁 주제 받아오기 실패:", error);

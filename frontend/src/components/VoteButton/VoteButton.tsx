@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { styles } from './VoteButton.styles';
-import {  updateVoteState } from '../../pages/DebateCardsScreen/Components/Debate.types';
+import { updateVoteState } from '../../pages/DebateCardsScreen/Components/Debate.types';
 import VoteConfirmModal from '../../pages/DebateCardsScreen/Components/VoteConfirmModal';
 import { DebateResultModal } from '../../pages';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { StackParamList } from '../../shared/page-stack/DebatePageStack';
-import { useAuthStore } from '../../shared/stores';
 
-import { resultData } from '../../pages/OpinionListScreen/Components/debate-result-test-data';
 import { useDebateStore } from '../../shared/stores/debates';
-import { voteDebate } from './api/VoteButtonApi';
+import { getDebateVoteResult, voteDebate } from './api/VoteButtonApi';
 import { useAuth } from '../../shared/hooks';
-import { UserInfo } from '../../shared/types/user';
+import { DebateResultData } from '../../pages/DebateResultModal/DebateResultData.types';
+import { emptyResultData } from './EmptyResultData';
 
 type VoteButtonProps = {
     debateId: number;
@@ -30,7 +29,23 @@ const VoteButton = ({ debateId, showVoteResultModal, }: VoteButtonProps): JSX.El
         state.debates.find((d) => d.debateId === debateId)
     );
     if (!debate) return <Text>Wrong debateId</Text>;
-    const {user, setUser, loggedIn, logOut} = useAuth();
+    const { user, setUser, loggedIn, logOut } = useAuth();
+
+    // 투표 및 투표 확인 모달 관련
+    const [voteConfirmModalVisible, setVoteConfirmModalVisible] = useState(false);
+    const [selectedSide, setSelectedSide] = useState<boolean | null>(debate.isLeft);
+
+    // 투표 통계 데이터
+    const [debateResultData, setDebateResultData] = useState<DebateResultData>(emptyResultData);
+    const [isDebateResultLoaded, setIsDebateResultLoaded] = useState(false);
+
+
+    // 투표 통계 모달
+    const [debateResultModalVisible, setDebateResultModalVisible] = useState(false);
+
+    // 페이지 스택 관련
+    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
+    const currentRoute = navigation.getState().routes[navigation.getState().index];
 
     // OpinionList에서 showVoteResultModal 여부를 보내 렌더링과 동시에 모달을 띄울지 여부 결정
     useEffect(() => {
@@ -39,16 +54,22 @@ const VoteButton = ({ debateId, showVoteResultModal, }: VoteButtonProps): JSX.El
         }
     }, [showVoteResultModal]);
 
-    // 투표 및 투표 확인 모달 관련
-    const [voteConfirmModalVisible, setVoteConfirmModalVisible] = useState(false);
-    const [selectedSide, setSelectedSide] = useState<boolean | null>(debate.isLeft);
+    useEffect(() => {
+        const fetchDebateResult = async () => {
+            try {
+                setIsDebateResultLoaded(false);
+                const result = await getDebateVoteResult(debateId);
+                console.log(result);
+                setDebateResultData(result);
+                setIsDebateResultLoaded(true);
+            } catch (error) {
+                console.debug("투표 결과 사전 로드 실패:", error);
+            }
+        };
+        fetchDebateResult();
+    }, [debateId]);
 
-    // 투표 통계 데이터
-    const [debateResultData, setDebateResultData] = useState(resultData);
-    // 투표 통계 모달
-    const [debateResultModalVisible, setDebateResultModalVisible] = useState(false);
 
-    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
 
     // 투표 버튼 클릭 시
     const handleVote = (voteLeft: boolean) => {
@@ -85,7 +106,7 @@ const VoteButton = ({ debateId, showVoteResultModal, }: VoteButtonProps): JSX.El
         isLeft: boolean,
     ) => {
         // API 투표 요청
-        try{
+        try {
             const response = await voteDebate(debateId, isLeft);
             // left right count 및 투표결과 zustand에 반영
             const updatedDebate = {
@@ -94,13 +115,17 @@ const VoteButton = ({ debateId, showVoteResultModal, }: VoteButtonProps): JSX.El
                 leftCount: response.leftCount,
                 rightCount: response.rightCount,
             };
-    
+
             // zustand 투표 데이터 업데이트
             updateDebate(debateId, updateVoteState(updatedDebate));
-    
+
+            // 투표 통계 데이터 조회
+            const debateResultResponse = await getDebateVoteResult(debateId);
+            setDebateResultData(debateResultResponse);
+
             // 모달을 띄울 페이지로 이동해야하는지, 현재 페이지에서 모달을 띄울 수 있는지 판단
             const currentRoute = navigation.getState().routes[navigation.getState().index];
-    
+
             // 모달 컴포넌트가 있는 페이지에서 투표 버튼을 눌렀다면 모달 띄우기
             if (currentRoute.name === 'OpinionListScreen') {
                 openDebateResultModal();
@@ -113,15 +138,29 @@ const VoteButton = ({ debateId, showVoteResultModal, }: VoteButtonProps): JSX.El
                 });
             }
         } catch (error) {
-            if ( user == null) {
+            if (user == null) {
                 console.debug("로그인 필요");
-                return(
+                return (
                     <Text>로그인 창으로 이동 처리 필요</Text>
                 )
             }
         }
-        
+
     };
+
+    const onPoressModalMoreOption = () => {
+        // 모달 컴포넌트가 있는 페이지에서 투표 버튼을 눌렀다면 모달 띄우기
+        if (currentRoute.name === 'OpinionListScreen') {
+            closeDebateResultModal();
+        }
+        // 모달 컴포넌트가 없는 페이지에서 투표 버튼을 눌렀다면 페이지 이동
+        else {
+            navigation.navigate('OpinionListScreen', {
+                debateId,
+                showVoteResultModal: false,
+            });
+        }
+    }
 
     const voted = debate.isLeft !== null;
     const widthLeft = voted ? Math.max(30, Math.min(debate.leftPercent, 70)) - 5 : 45;
@@ -190,14 +229,17 @@ const VoteButton = ({ debateId, showVoteResultModal, }: VoteButtonProps): JSX.El
             />
 
             {/* 투표 통계 모달 */}
-            <DebateResultModal
-                data={debateResultData}
-                leftOption={debate.leftOption}
-                rightOption={debate.rightOption}
-                visible={debateResultModalVisible}
-                onClose={() => closeDebateResultModal()}
-                onPressMoreOpinion={() => { }}
-            />
+            {isDebateResultLoaded && debateResultData && (
+                <DebateResultModal
+                    data={debateResultData}
+                    leftOption={debate.leftOption}
+                    rightOption={debate.rightOption}
+                    visible={debateResultModalVisible}
+                    onClose={() => closeDebateResultModal()}
+                    onPressMoreOpinion={() => { onPoressModalMoreOption(); }}
+                />
+            )}
+
         </View>
     );
 };
