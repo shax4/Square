@@ -58,7 +58,7 @@ public class PostFacadeService {
 		// 정렬 기준에 따라 게시글 조회
 		boolean isSortByLikes = "likes".equalsIgnoreCase(sort);
 		List<Post> fetchedPosts = isSortByLikes
-			? postQueryService.getPostsByLikesCursor(nextCursorLikes, limit)
+			? postQueryService.getPostsByLikesCursor(nextCursorLikes, nextCursorId, limit)
 			: postQueryService.getPostsByLatestCursor(nextCursorId, limit);
 
 		boolean hasNext = fetchedPosts.size() > limit;
@@ -71,7 +71,7 @@ public class PostFacadeService {
 			popularDtos,
 			postDtos,
 			getNextCursorId(posts, hasNext),
-			isSortByLikes ? getNextCursorLikes(posts, hasNext) : null
+			getNextCursorLikes(posts, hasNext, isSortByLikes)
 		);
 	}
 
@@ -95,10 +95,36 @@ public class PostFacadeService {
 		return MyPostResponse.of(postDtos, getNextCursorId(posts, hasNext));
 	}
 
+	/**
+	 * 내가 좋아요한 게시글 조회
+	 * @param user
+	 * @param nextCursorId
+	 * @param limit
+	 * @return
+	 */
 	@Transactional(readOnly = true)
 	public MyPostResponse getMyLikedPostList(User user, Long nextCursorId, int limit) {
 
 		List<Post> fetchedPosts = postQueryService.getMyLikedPosts(user, nextCursorId, limit);
+
+		boolean hasNext = fetchedPosts.size() > limit;
+		List<Post> posts = hasNext ? fetchedPosts.subList(0, limit) : fetchedPosts;
+
+		List<PostSummaryDto> postDtos = toPostDtos(posts, user);
+
+		return MyPostResponse.of(postDtos, getNextCursorId(posts, hasNext));
+	}
+
+	/**
+	 * 내가 스크랩한 게시글 조회
+	 * @param user
+	 * @param nextCursorId
+	 * @param limit
+	 * @return
+	 */
+	@Transactional(readOnly = true)
+	public MyPostResponse getMyScrapPostList(User user, Long nextCursorId, int limit) {
+		List<Post> fetchedPosts = postQueryService.getMyScrapPosts(user, nextCursorId, limit + 1);
 
 		boolean hasNext = fetchedPosts.size() > limit;
 		List<Post> posts = hasNext ? fetchedPosts.subList(0, limit) : fetchedPosts;
@@ -144,8 +170,9 @@ public class PostFacadeService {
 		return hasNext && !posts.isEmpty() ? posts.get(posts.size() - 1).getId() : null;
 	}
 
-	private Integer getNextCursorLikes(List<Post> posts, boolean hasNext) {
-		return hasNext && !posts.isEmpty() ? posts.get(posts.size() - 1).getLikeCount() : null;
+	private Integer getNextCursorLikes(List<Post> posts, boolean hasNext, boolean isSortByLikes) {
+		if (!hasNext || posts.isEmpty() || !isSortByLikes) return null;
+		return posts.get(posts.size() - 1).getLikeCount();
 	}
 
 

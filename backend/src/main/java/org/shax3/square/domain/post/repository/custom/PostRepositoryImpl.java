@@ -6,6 +6,7 @@ import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.like.model.QLike;
 import org.shax3.square.domain.post.model.Post;
 import org.shax3.square.domain.post.model.QPost;
+import org.shax3.square.domain.scrap.model.QScrap;
 import org.shax3.square.domain.user.model.QUser;
 import org.shax3.square.domain.user.model.User;
 
@@ -48,7 +49,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 	}
 
 	@Override
-	public List<Post> findByLikesCursor(Integer cursorLikes, int limit) {
+	public List<Post> findByLikesCursor(Integer cursorLikes, Long cursorId, int limit) {
 		QPost post = QPost.post;
 		QUser user = QUser.user;
 
@@ -57,7 +58,10 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 			.join(post.user, user).fetchJoin()
 			.where(
 				post.valid.isTrue(),
-				cursorLikes != null ? post.likeCount.lt(cursorLikes) : null
+				cursorLikes != null && cursorId != null
+					? post.likeCount.lt(cursorLikes)
+					.or(post.likeCount.eq(cursorLikes).and(post.id.lt(cursorId)))
+					: null
 			)
 			.orderBy(post.likeCount.desc(), post.id.desc())
 			.limit(limit)
@@ -94,6 +98,25 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 				like.user.eq(user),
 				like.targetType.eq(TargetType.POST),
 				like.like.isTrue(),
+				cursorId != null ? post.id.lt(cursorId) : null
+			)
+			.orderBy(post.id.desc())
+			.limit(limit)
+			.fetch();
+	}
+
+	@Override
+	public List<Post> findMyScrapPosts(User user, Long cursorId, int limit) {
+		QPost post = QPost.post;
+		QScrap scrap = QScrap.scrap;
+
+		return queryFactory
+			.select(post)
+			.from(scrap)
+			.join(post).on(scrap.targetId.eq(post.id))
+			.where(
+				post.valid.isTrue(),
+				scrap.user.eq(user),
 				cursorId != null ? post.id.lt(cursorId) : null
 			)
 			.orderBy(post.id.desc())
