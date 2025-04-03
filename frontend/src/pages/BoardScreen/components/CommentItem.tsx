@@ -1,4 +1,4 @@
-import { useState, useCallback, Fragment } from "react";
+import { useState, useCallback, Fragment, useRef } from "react";
 import {
   View,
   Text,
@@ -253,42 +253,52 @@ export default function CommentItem({
 
   // 대댓글 좋아요 토글 함수 추가
   const [loadingLikes, setLoadingLikes] = useState<Set<number>>(new Set());
-  
-  const handleReplyLikeToggle = useCallback(async (replyId: number, currentLiked: boolean) => {
-    // 이미 처리 중인 경우 중복 요청 방지
-    if (loadingLikes.has(replyId)) return;
+  const loadingLikesRef = useRef<Set<number>>(new Set());
 
-    try {
-      // 로딩 상태 시작
-      setLoadingLikes(prev => new Set(prev).add(replyId));
+  const handleReplyLikeToggle = useCallback(
+    async (replyId: number, currentLiked: boolean) => {
+      // 이미 진행중인 요청이 있는지 확인
+      if (loadingLikesRef.current.has(replyId)) {
+        console.log(
+          `[중복 요청 방지] 댓글 ${replyId}의 좋아요 처리가 이미 진행 중입니다.`
+        );
+        return;
+      }
 
-      const response = await BoardAPI.toggleCommentLike(replyId);
-      const { isLiked, likeCount } = response.data;
-      // API 응답값으로 로컬 상태 업데이트
-      setLoadedReplies((prevReplies) =>
-        prevReplies.map((reply) => {
-          if (reply.commentId === replyId) {
-            return {
-              ...reply,
-              isLiked: isLiked,         // API 응답값 사용
-              likeCount: likeCount,      // API 응답값 사용
-            };
-          }
-          return reply;
-        })
-      );
-    } catch (error) {
-      console.error("좋아요 처리 실패:", error);
-      Alert.alert("오류", "좋아요 처리 중 문제가 발생했습니다.");
-    } finally {
-      // 로딩 상태 종료
-      setLoadingLikes(prev => {
-        const next = new Set(prev);
-        next.delete(replyId);
-        return next;
-      });
-    }
-  }, [loadingLikes]);
+      // 로딩 상태 설정
+      loadingLikesRef.current.add(replyId);
+      setLoadingLikes((prev) => new Set(prev).add(replyId));
+
+      try {
+        const response = await BoardAPI.toggleCommentLike(replyId);
+
+        // API 응답으로 상태 업데이트
+        setLoadedReplies((prevReplies) =>
+          prevReplies.map((reply) =>
+            reply.commentId === replyId
+              ? {
+                  ...reply,
+                  isLiked: response.data.isLiked,
+                  likeCount: response.data.likeCount,
+                }
+              : reply
+          )
+        );
+      } catch (error) {
+        console.error(`[요청 실패] 댓글 ${replyId} 좋아요 처리 실패:`, error);
+        Alert.alert("오류", "좋아요 처리 중 문제가 발생했습니다.");
+      } finally {
+        // 로딩 상태 초기화
+        setLoadingLikes((prev) => {
+          const next = new Set(prev);
+          next.delete(replyId);
+          return next;
+        });
+        loadingLikesRef.current.delete(replyId);
+      }
+    },
+    []
+  );
 
   return (
     <View style={[styles.container, isReply && styles.replyContainer]}>
@@ -432,7 +442,9 @@ export default function CommentItem({
                         initialLiked={reply.isLiked || false}
                         size="small"
                         isVertical={false}
-                        onPress={() => handleReplyLikeToggle(reply.commentId, reply.isLiked || false)}
+                        onPress={(currentLiked) =>
+                          handleReplyLikeToggle(reply.commentId, currentLiked)
+                        }
                         disabled={loadingLikes.has(reply.commentId)}
                       />
                     </View>
@@ -658,12 +670,12 @@ const styles = StyleSheet.create({
   },
   replyButtonContainer: { flexDirection: "row", justifyContent: "flex-end" },
   replyInteractionContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 2,
   },
   replyLikeContainer: {
-    alignItems: 'flex-start',
+    alignItems: "flex-start",
     marginRight: 16, // 다른 요소와의 간격
   },
 });
