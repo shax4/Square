@@ -18,9 +18,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.like.service.LikeService;
 import org.shax3.square.domain.post.dto.response.MyPostResponse;
+import org.shax3.square.domain.post.dto.response.PostDetailResponse;
 import org.shax3.square.domain.post.dto.response.PostListResponse;
 import org.shax3.square.domain.post.model.Post;
+import org.shax3.square.domain.post.model.PostComment;
+import org.shax3.square.domain.post.model.PostImage;
 import org.shax3.square.domain.s3.service.S3Service;
+import org.shax3.square.domain.scrap.service.ScrapService;
 import org.shax3.square.domain.user.model.Type;
 import org.shax3.square.domain.user.model.User;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -39,6 +43,12 @@ class PostFacadeServiceTest {
 
 	@Mock
 	private S3Service s3Service;
+
+	@Mock
+	private PostService postService;
+
+	@Mock
+	private ScrapService scrapService;
 
 	@InjectMocks
 	private PostFacadeService postFacadeService;
@@ -216,5 +226,56 @@ class PostFacadeServiceTest {
 		assertThat(response.posts()).extracting("commentCount")
 			.containsExactly(1, 2, 3);
 		assertThat(response.nextCursorId()).isNull();
+	}
+
+	@DisplayName("게시글 상세 조회 성공")
+	@Test
+	void getPostDetail_success() {
+		// given
+		Post post = posts.get(0);
+		Long postId = post.getId();
+
+		// 이미지 설정
+		PostImage image1 = PostImage.builder().post(post).s3Key("image1.jpg").build();
+		PostImage image2 = PostImage.builder().post(post).s3Key("image2.jpg").build();
+		ReflectionTestUtils.setField(image1, "id", 1L);
+		ReflectionTestUtils.setField(image2, "id", 2L);
+		post.setPostImages(List.of(image1, image2));
+
+		PostComment comment1 = PostComment.builder().post(post).user(user).content("댓글1").build();
+		PostComment comment2 = PostComment.builder().post(post).user(user).content("댓글2").build();
+		ReflectionTestUtils.setField(comment1, "id", 201L);
+		ReflectionTestUtils.setField(comment2, "id", 202L);
+
+		PostComment reply1 = PostComment.builder().post(post).user(user).content("대댓글1").parent(comment1).build();
+		PostComment reply2 = PostComment.builder().post(post).user(user).content("대댓글2").parent(comment1).build();
+		ReflectionTestUtils.setField(reply1, "id", 301L);
+		ReflectionTestUtils.setField(reply2, "id", 302L);
+
+		when(postService.getPost(postId)).thenReturn(post);
+		when(s3Service.generatePresignedGetUrl("image1.jpg")).thenReturn("https://s3.com/image1.jpg");
+		when(s3Service.generatePresignedGetUrl("image2.jpg")).thenReturn("https://s3.com/image2.jpg");
+		when(likeService.isTargetLiked(user, TargetType.POST, postId)).thenReturn(true);
+		when(scrapService.isTargetScraped(user, postId, TargetType.POST)).thenReturn(false);
+		when(postCommentService.getParentComments(post)).thenReturn(List.of(comment1, comment2));
+		when(postCommentService.getReplyCounts(List.of(201L, 202L))).thenReturn(Map.of(201L, 2, 202L, 0));
+		when(postCommentService.getFirstNRepliesByCommentIds(List.of(201L, 202L), 3)).thenReturn(Map.of(
+			201L, List.of(reply1, reply2)
+		));
+		when(likeService.getLikedTargetIds(user, TargetType.POST_COMMENT, List.of(201L, 202L))).thenReturn(Set.of(202L));
+		when(likeService.getLikedTargetIds(user, TargetType.POST_COMMENT, List.of(301L, 302L))).thenReturn(Set.of(302L));
+		when(s3Service.generatePresignedGetUrl("user/profile.jpg")).thenReturn("https://s3.com/user/profile.jpg");
+
+		// when
+		PostDetailResponse response = postFacadeService.getPostDetail(user, postId);
+
+		// then
+		assertThat(response.postId()).isEqualTo(postId);
+		assertThat(response.images()).hasSize(2);
+		assertThat(response.isLiked()).isTrue();
+		assertThat(response.isScrapped()).isFalse();
+		assertThat(response.commentCount()).isEqualTo(2);
+		assertThat(response.comments()).hasSize(2);
+		assertThat(response.comments().get(0).replies()).hasSize(2);
 	}
 }
