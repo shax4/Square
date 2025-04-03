@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.annotation.AuthUser;
 import org.shax3.square.domain.post.dto.request.CreatePostRequest;
 import org.shax3.square.domain.post.dto.request.UpdatePostRequest;
-import org.shax3.square.domain.post.dto.response.PostDetailResponse;
 import org.shax3.square.domain.post.dto.response.PostListResponse;
 import org.shax3.square.domain.post.service.PostFacadeService;
 import org.shax3.square.domain.post.service.PostService;
@@ -102,6 +101,51 @@ public class PostController {
         @PathVariable Long postId
     ) {
         PostDetailResponse response = postFacadeService.getPostDetail(user, postId);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+        summary = "내가 작성한 게시글 목록 조회 api",
+        description = "내가 작성한 게시글 목록을 조회합니다. (페이징 처리)"
+    )
+    @GetMapping("/my")
+    public ResponseEntity<MyPostResponse> getMyPosts(
+        @AuthUser User user,
+        @RequestParam(required = false) Long nextCursorId,
+        @RequestParam(defaultValue = "10") int limit
+    ) {
+        MyPostResponse response = postFacadeService.getMyPostList(user, nextCursorId, limit);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+        summary = "내가 좋아요한 게시글 목록 조회 api",
+        description = "내가 좋아요한 게시글 목록을 조회합니다. (페이징 처리)"
+    )
+    @GetMapping("/my-likes")
+    public ResponseEntity<MyPostResponse> getMyLikedPosts(
+        @AuthUser User user,
+        @RequestParam(required = false) Long nextCursorId,
+        @RequestParam(defaultValue = "10") int limit
+    ) {
+        MyPostResponse response = postFacadeService.getMyLikedPostList(user, nextCursorId, limit);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+        summary = "내가 스크랩한 게시글 목록 조회 api",
+        description = "내가 스크랩한 게시글 목록을 조회합니다. (페이징 처리)"
+    )
+    @GetMapping("/my-scraps")
+    public ResponseEntity<MyPostResponse> getMyScrapPosts(
+        @AuthUser User user,
+        @RequestParam(required = false) Long nextCursorId,
+        @RequestParam(defaultValue = "10") int limit
+    ) {
+        MyPostResponse response = postFacadeService.getMyScrapPostList(user, nextCursorId, limit);
 
         return ResponseEntity.ok(response);
     }
