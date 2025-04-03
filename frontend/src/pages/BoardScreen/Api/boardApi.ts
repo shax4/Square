@@ -5,6 +5,7 @@ export const BoardAPI = MockBoardAPI;
 
 // 실제 API 코드
 // import axios from "../../../shared/api/axiosInstance";
+// import { LikeResponse } from "../board.types";
 
 // export const BoardAPI = {
 //   // 게시글 목록 조회
@@ -35,11 +36,20 @@ export const BoardAPI = MockBoardAPI;
 //   deletePost: (postId: number) => axios.delete(`/api/posts/${postId}`),
 
 //   // 대댓글 목록 조회 (GET /api/comments/{commentId})
-//   getMoreReplies: (commentId: number, nextCursorId?: number | null): Promise<AxiosResponse<RepliesResponse>> => // RepliesResponse 타입 정의 필요
-//      axios.get(`/api/comments/${commentId}`, { params: { nextCursorId, limit: 9 } }), // limit는 9로 정의
+//   getMoreReplies: (
+//     commentId: number,
+//     nextCursorId?: number | null
+//   ): Promise<AxiosResponse<RepliesResponse>> => // RepliesResponse 타입 정의 필요
+//     axios.get(`/api/comments/${commentId}`, {
+//       params: { nextCursorId, limit: 9 },
+//     }), // limit는 9로 정의
 
 //   // 댓글 생성 (parentCommentId 추가)
-//   createComment: (postId: number, content: string, parentCommentId?: number): Promise<any> =>
+//   createComment: (
+//     postId: number,
+//     content: string,
+//     parentCommentId?: number
+//   ): Promise<any> =>
 //     axios.post(`/api/comments`, { postId, content, parentCommentId }),
 
 //   // 댓글 수정
@@ -49,4 +59,18 @@ export const BoardAPI = MockBoardAPI;
 //   // 댓글 삭제
 //   deleteComment: (commentId: number) =>
 //     axios.delete(`/api/comments/${commentId}`),
+
+//   // 댓글/대댓글 좋아요 토글 함수
+//   toggleCommentLike: async (
+//     commentId: number
+//   ): Promise<{ data: LikeResponse }> => {
+//     try {
+//       // 실제 API 호출
+//       const response = await axios.post(`/api/comments/${commentId}/like`);
+//       return response;
+//     } catch (error) {
+//       // 에러 처리를 위해 throw
+//       throw new Error("Failed to toggle comment like");
+//     }
+//   },
 // };

@@ -5,6 +5,10 @@ import {
   currentUser,
   mockAllReplies,
 } from "./boardData";
+import { LikeResponse } from "../board.types";
+
+// 댓글 좋아요 상태 저장용 맵
+const mockLikeStore = new Map<number, boolean>();
 
 export const MockBoardAPI = {
   // 게시글 목록 조회
@@ -199,12 +203,16 @@ export const MockBoardAPI = {
 
       let startIndex = 0;
       if (lastSeenId) {
-        const lastSeenIndex = allReplies.findIndex(r => r.commentId === lastSeenId);
+        const lastSeenIndex = allReplies.findIndex(
+          (r) => r.commentId === lastSeenId
+        );
         if (lastSeenIndex !== -1) {
           startIndex = lastSeenIndex + 1; // 마지막으로 본 것 *다음* 인덱스부터 시작
         } else {
-           console.warn(`[Mock API] lastSeenId ${lastSeenId} not found for parent ${commentId}. Returning from start.`);
-           // lastSeenId를 못 찾으면 처음부터 반환 (오류 상황 대비)
+          console.warn(
+            `[Mock API] lastSeenId ${lastSeenId} not found for parent ${commentId}. Returning from start.`
+          );
+          // lastSeenId를 못 찾으면 처음부터 반환 (오류 상황 대비)
         }
       }
       // lastSeenId가 null이나 undefined면 startIndex는 0 (처음부터)
@@ -214,22 +222,36 @@ export const MockBoardAPI = {
       // 다음 커서 ID는 이번에 보낸 목록의 마지막 요소 ID
       let nextCursor: number | null = null;
       if (repliesToSend.length > 0) {
-          // 실제로 더 보여줄 댓글이 있는지 확인
-          const lastSentIndexInAll = allReplies.findIndex(r => r.commentId === repliesToSend[repliesToSend.length - 1].commentId);
-          if (lastSentIndexInAll !== -1 && lastSentIndexInAll + 1 < allReplies.length) {
-              // 더 보여줄 댓글이 남아있다면, 이번에 보낸 마지막 댓글 ID를 다음 커서로 사용
-              nextCursor = repliesToSend[repliesToSend.length - 1].commentId;
-          } else {
-              // 이번이 마지막 페이지였으면 다음 커서는 null
-              nextCursor = null;
-          }
+        // 실제로 더 보여줄 댓글이 있는지 확인
+        const lastSentIndexInAll = allReplies.findIndex(
+          (r) =>
+            r.commentId === repliesToSend[repliesToSend.length - 1].commentId
+        );
+        if (
+          lastSentIndexInAll !== -1 &&
+          lastSentIndexInAll + 1 < allReplies.length
+        ) {
+          // 더 보여줄 댓글이 남아있다면, 이번에 보낸 마지막 댓글 ID를 다음 커서로 사용
+          nextCursor = repliesToSend[repliesToSend.length - 1].commentId;
+        } else {
+          // 이번이 마지막 페이지였으면 다음 커서는 null
+          nextCursor = null;
+        }
       } else {
-         // 보낼 댓글이 없으면 다음 커서도 null
-         nextCursor = null;
+        // 보낼 댓글이 없으면 다음 커서도 null
+        nextCursor = null;
       }
 
-      console.log(`[Mock API] Returning ${repliesToSend.length} replies for parent ${commentId}, nextCursor for NEXT call: ${nextCursor}`);
-      setTimeout(() => resolve({ data: { replies: repliesToSend, nextCursorId: nextCursor } }), 300);
+      console.log(
+        `[Mock API] Returning ${repliesToSend.length} replies for parent ${commentId}, nextCursor for NEXT call: ${nextCursor}`
+      );
+      setTimeout(
+        () =>
+          resolve({
+            data: { replies: repliesToSend, nextCursorId: nextCursor },
+          }),
+        300
+      );
     });
   },
 
@@ -239,7 +261,6 @@ export const MockBoardAPI = {
    * @param content 댓글/대댓글 내용
    * @param parentCommentId 부모 댓글 ID (대댓글일 경우), 없으면 최상위 댓글
    */
-  // 댓글 생성
   createComment: (
     postId: number,
     content: string,
@@ -531,5 +552,25 @@ export const MockBoardAPI = {
         setTimeout(() => reject({ message: "댓글을 찾을 수 없습니다." }), 300);
       }
     });
+  },
+  // 좋아요 토글 함수
+  toggleCommentLike: async (
+    commentId: number
+  ): Promise<{ data: LikeResponse }> => {
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
+    // 현재 좋아요 상태 가져오기 (없으면 false로 초기화)
+    const currentLiked = mockLikeStore.get(commentId) || false;
+
+    // 상태 토글
+    const newLiked = !currentLiked;
+    mockLikeStore.set(commentId, newLiked);
+
+    return {
+      data: {
+        isLiked: newLiked,
+        likeCount: newLiked ? 1 : 0, // 실제 환경에서는 서버에서 전체 좋아요 수를 계산
+      },
+    };
   },
 }; // End of MockBoardAPI object
