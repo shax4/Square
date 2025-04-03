@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.like.service.LikeService;
+import org.shax3.square.domain.post.dto.response.MyPostResponse;
 import org.shax3.square.domain.post.dto.response.PostListResponse;
 import org.shax3.square.domain.post.model.Post;
 import org.shax3.square.domain.s3.service.S3Service;
@@ -106,7 +107,7 @@ class PostFacadeServiceTest {
 		List<Long> postIds = posts.stream().map(Post::getId).toList();
 		when(postQueryService.getPopularPosts(3)).thenReturn(List.of());
 		when(postCommentService.getCommentCounts(List.of())).thenReturn(Map.of());
-		when(postQueryService.getPostsByLikesCursor(null, 3)).thenReturn(posts);
+		when(postQueryService.getPostsByLikesCursor(null, null,3)).thenReturn(posts);
 		when(postCommentService.getCommentCounts(postIds)).thenReturn(Map.of(
 			101L, 1,
 			102L, 2,
@@ -128,5 +129,92 @@ class PostFacadeServiceTest {
 			.containsExactly(1, 2, 3);
 		assertThat(response.nextCursorId()).isNull();
 		assertThat(response.nextCursorLikes()).isNull();
+	}
+
+	@DisplayName("내가 작성한 게시글 조회 성공")
+	@Test
+	void getMyPosts_success() {
+		// given
+		List<Long> postIds = posts.stream().map(Post::getId).toList();
+
+		when(postQueryService.getMyPosts(user, null, 4)).thenReturn(posts);
+		when(postCommentService.getCommentCounts(postIds)).thenReturn(Map.of(
+			101L, 1,
+			102L, 2,
+			103L, 3
+		));
+		when(likeService.getLikedTargetIds(eq(user), eq(TargetType.POST), anyList())).thenReturn(Set.of(101L));
+		when(s3Service.generatePresignedGetUrl("user/profile.jpg")).thenReturn("https://s3.com/user/profile.jpg");
+
+		// when
+		MyPostResponse response = postFacadeService.getMyPostList(user, null, 3);
+
+		// then
+		assertThat(response.posts()).hasSize(3);
+		assertThat(response.posts()).extracting("title")
+			.containsExactly("title1", "title2", "title3");
+		assertThat(response.posts()).extracting("isLiked")
+			.containsExactly(true, false, false);
+		assertThat(response.posts()).extracting("commentCount")
+			.containsExactly(1, 2, 3);
+		assertThat(response.nextCursorId()).isNull();
+	}
+
+	@DisplayName("내가 좋아요한 게시글 조회 성공")
+	@Test
+	void getMyLikedPosts_success() {
+		// given
+		List<Long> postIds = posts.stream().map(Post::getId).toList();
+
+		when(postQueryService.getMyLikedPosts(user, null, 4)).thenReturn(posts);
+		when(postCommentService.getCommentCounts(postIds)).thenReturn(Map.of(
+			101L, 1,
+			102L, 2,
+			103L, 3
+		));
+		when(likeService.getLikedTargetIds(eq(user), eq(TargetType.POST), anyList())).thenReturn(Set.of(103L));
+		when(s3Service.generatePresignedGetUrl("user/profile.jpg")).thenReturn("https://s3.com/user/profile.jpg");
+
+		// when
+		MyPostResponse response = postFacadeService.getMyLikedPostList(user, null, 3);
+
+		// then
+		assertThat(response.posts()).hasSize(3);
+		assertThat(response.posts()).extracting("title")
+			.containsExactly("title1", "title2", "title3");
+		assertThat(response.posts()).extracting("isLiked")
+			.containsExactly(false, false, true);
+		assertThat(response.posts()).extracting("commentCount")
+			.containsExactly(1, 2, 3);
+		assertThat(response.nextCursorId()).isNull();
+	}
+
+	@DisplayName("내가 스크랩한 게시글 조회 성공")
+	@Test
+	void getMyScrapPosts_success() {
+		// given
+		List<Long> postIds = posts.stream().map(Post::getId).toList();
+
+		when(postQueryService.getMyScrapPosts(user, null, 4)).thenReturn(posts);
+		when(postCommentService.getCommentCounts(postIds)).thenReturn(Map.of(
+			101L, 1,
+			102L, 2,
+			103L, 3
+		));
+		when(likeService.getLikedTargetIds(eq(user), eq(TargetType.POST), anyList())).thenReturn(Set.of(102L, 103L));
+		when(s3Service.generatePresignedGetUrl("user/profile.jpg")).thenReturn("https://s3.com/user/profile.jpg");
+
+		// when
+		MyPostResponse response = postFacadeService.getMyScrapPostList(user, null, 3);
+
+		// then
+		assertThat(response.posts()).hasSize(3);
+		assertThat(response.posts()).extracting("title")
+			.containsExactly("title1", "title2", "title3");
+		assertThat(response.posts()).extracting("isLiked")
+			.containsExactly(false, true, true);
+		assertThat(response.posts()).extracting("commentCount")
+			.containsExactly(1, 2, 3);
+		assertThat(response.nextCursorId()).isNull();
 	}
 }
