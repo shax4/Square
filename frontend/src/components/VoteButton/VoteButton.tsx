@@ -59,7 +59,6 @@ const VoteButton = ({ debateId, showVoteResultModal, }: VoteButtonProps): JSX.El
             try {
                 setIsDebateResultLoaded(false);
                 const result = await getDebateVoteResult(debateId);
-                console.log(result);
                 setDebateResultData(result);
                 setIsDebateResultLoaded(true);
             } catch (error) {
@@ -81,14 +80,12 @@ const VoteButton = ({ debateId, showVoteResultModal, }: VoteButtonProps): JSX.El
         }
         // 투표를 한 상태일 때: 투표 통계 모달 띄우기
         else {
-            console.log(debate.debateId + " " + (voteLeft ? " 왼쪽" : " 오른쪽"));
             openDebateResultModal();
         }
     }
 
     // 투표 모달 취소
     const handleVoteCancel = () => {
-        console.log("투표 취소");
         setVoteConfirmModalVisible(false);
     };
 

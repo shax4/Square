@@ -9,8 +9,13 @@ import { DebateResultModalProps } from './DebateResultModal.types'
 const DebateResultModal: React.FC<DebateResultModalProps> = ({ visible, onClose, onPressMoreOpinion, data, leftOption, rightOption }) => {
 
   const convertRecordToArray = (record: Record<string, number>) => {
-    return Object.entries(record).map(([label, value]) => ({ label, value }))
+    const total = Object.values(record).reduce((sum, value) => sum + value, 0)
+    return Object.entries(record).map(([label, value]) => ({
+      label,
+      value: total === 0 ? 0 : Math.round((value / total) * 100)
+    }))
   }
+
   const getMaxIndex = (arr: { label: string, value: number }[]) =>
     arr.reduce((maxIdx, item, idx, array) =>
       item.value > array[maxIdx].value ? idx : maxIdx
