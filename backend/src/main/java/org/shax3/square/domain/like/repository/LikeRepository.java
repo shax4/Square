@@ -11,4 +11,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface LikeRepository extends JpaRepository<Like, Long>, LikeRepositoryCustom {
 
 	List<Like> findByTargetIdAndTargetTypeAndUserIn(Long targetId, TargetType targetType, List<User> users);
+	boolean existsByUserAndTargetTypeAndTargetIdAndLikeTrue(User user, TargetType targetType, Long targetId);
+
 }
