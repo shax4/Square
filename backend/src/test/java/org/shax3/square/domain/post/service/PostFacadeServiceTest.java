@@ -137,7 +137,7 @@ class PostFacadeServiceTest {
 		// given
 		List<Long> postIds = posts.stream().map(Post::getId).toList();
 
-		when(postQueryService.getMyPosts(user, null, 4)).thenReturn(posts);
+		when(postQueryService.getMyPosts(user, null, 3)).thenReturn(posts);
 		when(postCommentService.getCommentCounts(postIds)).thenReturn(Map.of(
 			101L, 1,
 			102L, 2,
@@ -166,7 +166,7 @@ class PostFacadeServiceTest {
 		// given
 		List<Long> postIds = posts.stream().map(Post::getId).toList();
 
-		when(postQueryService.getMyLikedPosts(user, null, 4)).thenReturn(posts);
+		when(postQueryService.getMyLikedPosts(user, null, 3)).thenReturn(posts);
 		when(postCommentService.getCommentCounts(postIds)).thenReturn(Map.of(
 			101L, 1,
 			102L, 2,
