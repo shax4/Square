@@ -17,7 +17,7 @@ export const getOpinions = async (
     params: GetOpinionsParams = {}
 ): Promise<OpinionsResponse> => {
     try {
-        const response = await axiosInstance.get(`/api/debates/${debateId}/opinions`, {
+        const response = await axiosInstance.get(`/api/debates/${debateId}`, {
             params: {
                 sort: params.sort ?? 'latest',
                 nextLeftCursorId: params.nextLeftCursorId,
