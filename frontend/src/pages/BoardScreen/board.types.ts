@@ -33,3 +33,9 @@ export interface Post {
   isScrapped: boolean;
   comments: Comment[];
 }
+
+// 좋아요 타입
+export interface LikeResponse {
+  isLiked: boolean;
+  likeCount: number;
+}
