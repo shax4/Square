@@ -11,7 +11,7 @@ const PersonalityTag = ({ personality, nickname }: PersonalityTagProps) => {
 
     // 클릭 시 성향 상세 페이지로 이동
     const onPressPersonalityTag = () => {
-        navigation.navigate("PersonalityResultScreen", { isAfterSurvey : false, givenNickname: nickname, typeResult: null });
+        navigation.navigate("PersonalityResultScreen", { isAfterSurvey : false, givenNickname : nickname, typeResult : null});
     };
 
     return (
