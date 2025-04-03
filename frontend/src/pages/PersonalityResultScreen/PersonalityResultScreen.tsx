@@ -13,7 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 
 import {StackParamList} from '../../shared/page-stack/MyPageStack'
 
-import { getPersonalityResult } from "./Api/PersonalityResultAPI"
+import { getMyPersonalityResult, getOthersPersonalityResult } from "./Api/PersonalityResultAPI"
 
 // Axios 연결 필요
 // 임시 데이터로 태스트
@@ -44,11 +44,15 @@ const PersonalityResultScreen = () => {
 
   // 초기 사용자 타입 설정
   useEffect(() => {
-    const getTypeResult = async () => {
+    const getTypeResult = async (isMyTypeBool : boolean) => {
       try{
-        const resultData : TypeResult = await getPersonalityResult(givenNickname)
-
-        setUserTypeResult(resultData);
+        if(isMyTypeBool){
+          const resultData : TypeResult = await getMyPersonalityResult()
+          setUserTypeResult(resultData);
+        }else{
+          const resultData : TypeResult = await getOthersPersonalityResult(givenNickname)
+          setUserTypeResult(resultData);          
+        }
       }catch(error){
         console.error("성향 결과 데이터 가져오기 에러 발생!", error);
       }
@@ -59,10 +63,9 @@ const PersonalityResultScreen = () => {
       setUserTypeResult(typeResult);
       setIsMyType(true);
     }else{
-      getTypeResult();
-
       const isMyTypeState : boolean = givenNickname === myNickname;
       setIsMyType(isMyTypeState);
+      getTypeResult(isMyTypeState);
     }
   }, [givenNickname, myNickname]);
 
