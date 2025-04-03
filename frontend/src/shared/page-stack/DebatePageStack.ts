@@ -14,7 +14,6 @@ export type StackParamList = {
     DebateCardsScreen: undefined;
     OpinionListScreen: {
         debateId: number;
-        debate: Debate
         showVoteResultModal?: boolean;
     };
     OpinionDetailScreen: { opinionId: number };

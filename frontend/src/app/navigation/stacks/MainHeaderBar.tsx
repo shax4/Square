@@ -13,7 +13,6 @@ import PersonalityResultScreen from '../../../pages/PersonalityResultScreen/Pers
 import { StackParamList } from '../../../shared/page-stack/DebatePageStack';
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
-import BookmarkButton from '../../../components/BookmarkButton/BookmarkButton';
 const Stack = createNativeStackNavigator<StackParamList>();
 
 // 테스트용 예시 사용자 정보(전역 상태관리로 받아오도록 수정 필요)

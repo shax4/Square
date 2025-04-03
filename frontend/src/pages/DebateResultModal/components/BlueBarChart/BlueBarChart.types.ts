@@ -1,7 +1,7 @@
 export interface BarChartComponentProps {
-    highlightIdx: number;
-    data: {
-      value: number;
-      label: string;
-    }[];
-  }
+  highlightIdx: number;
+  data: {
+    value: number;
+    label: string;
+  }[];
+}
