@@ -18,18 +18,41 @@ export const getOpinions = async (
     params: GetOpinionsParams = {}
 ): Promise<OpinionsResponse> => {
     try {
+        
         const response = await axiosInstance.get(`/api/debates/${debateId}`, {
             params: {
-                sort: params.sort ?? 'latest',
+                sort: params.sort ?? SortType.Latest,
                 nextLeftCursorId: params.nextLeftCursorId,
                 nextLeftCursorLikes: params.nextLeftCursorLikes,
                 nextLeftCursorComments: params.nextLeftCursorComments,
                 nextRightCursorId: params.nextRightCursorId,
                 nextRightCursorLikes: params.nextRightCursorLikes,
                 nextRightCursorComments: params.nextRightCursorComments,
-                limit: params.limit ?? 10,
+                limit: params.limit ?? 5,
             },
         });
+
+        const queryParams = {
+            sort: params.sort ?? SortType.Latest,
+            nextLeftCursorId: params.nextLeftCursorId,
+            nextLeftCursorLikes: params.nextLeftCursorLikes,
+            nextLeftCursorComments: params.nextLeftCursorComments,
+            nextRightCursorId: params.nextRightCursorId,
+            nextRightCursorLikes: params.nextRightCursorLikes,
+            nextRightCursorComments: params.nextRightCursorComments,
+            limit: params.limit ?? 5,
+        };
+
+        // URL 문자열 생성 및 출력
+        const queryString = new URLSearchParams(
+            Object.entries(queryParams)
+                .filter(([_, value]) => value !== undefined && value !== null)
+                .map(([key, value]) => [key, String(value)])
+        ).toString();
+
+        const fullUrl = `/api/debates/${debateId}?${queryString}`;
+        console.log("📡 생성된 요청 URL:", fullUrl);
+
 
         return response.data;
     } catch (error) {

@@ -56,13 +56,15 @@ export default function OpinionListScreen() {
         initAiSummaries();
     }, []);
 
+    // 처음 로드 시 각 정렬 방식에 맞춰 의견들 가져오기
     const fetchAllSorts = async () => {
         for (const sortType of [SortType.Latest, SortType.Likes, SortType.Comments] as SortType[]) {
-            await fetchOpinionsBySort(sortType);
+            await fetchOpinionsBySort(sortType, true);
         }
     };
 
-    const fetchOpinionsBySort = async (sortType: SortType) => {
+    // 정렬 방식에 맞춰 의견 목록 조회 요청
+    const fetchOpinionsBySort = async (sortType: SortType, force = false) => {
         const current = opinionStateMap[sortType];
         if (!current.hasMore || loading) return;
 
@@ -71,20 +73,44 @@ export default function OpinionListScreen() {
         try {
             const response = await getOpinions(debateId, {
                 sort: sortType,
-                nextLeftCursorId: current.nextLeftCursorId,
-                nextRightCursorId: current.nextRightCursorId,
+                nextLeftCursorId: force ? null : current.nextLeftCursorId,
+                nextRightCursorId: force ? null : current.nextRightCursorId,
                 limit,
             });
 
-            setOpinionStateMap(prev => ({
-                ...prev,
-                [sortType]: {
-                    opinions: [...prev[sortType].opinions, ...response.opinions],
-                    nextLeftCursorId: response.nextLeftCursorId,
-                    nextRightCursorId: response.nextRightCursorId,
-                    hasMore: !!(response.nextLeftCursorId || response.nextRightCursorId),
-                }
-            }));
+            // 이전 커서 ID와 현재 응답의 커서 ID 비교
+            const leftCursorChanged = response.nextLeftCursorId !== current.nextLeftCursorId;
+            const rightCursorChanged = response.nextRightCursorId !== current.nextRightCursorId;
+
+            // 커서가 변경되었으면 더 불러올 데이터가 있음
+            const hasMoreData = leftCursorChanged || rightCursorChanged;
+
+            if (force) {
+                setOpinionStateMap(prev => ({
+                    ...prev,
+                    [sortType]: {
+                        opinions: response.opinions,
+                        nextLeftCursorId: response.nextLeftCursorId,
+                        nextRightCursorId: response.nextRightCursorId,
+                        hasMore: hasMoreData
+                    }
+                }));
+            } else {
+                // 중복 방지를 위한 필터링
+                const existingIds = new Set(current.opinions.map(op => op.opinionId));
+                const newOpinions = response.opinions.filter(op => !existingIds.has(op.opinionId));
+
+                setOpinionStateMap(prev => ({
+                    ...prev,
+                    [sortType]: {
+                        opinions: [...prev[sortType].opinions, ...newOpinions],
+                        nextLeftCursorId: response.nextLeftCursorId,
+                        nextRightCursorId: response.nextRightCursorId,
+                        hasMore: hasMoreData
+                    }
+                }));
+            }
+
         } catch (e) {
             console.error(`의견 불러오기 실패 (${sortType}):`, e);
         } finally {
@@ -92,6 +118,7 @@ export default function OpinionListScreen() {
         }
     };
 
+    // AI 요약 초기 업데이트
     const initAiSummaries = () => {
         setSummaries([]);
         fetchSummaries();
@@ -109,12 +136,15 @@ export default function OpinionListScreen() {
         }
     };
 
+    // 스크랩 북마크 요청
     const handleScrap = () => {
         const newScrap = !scrap;
         setScrap(newScrap);
         updateDebate(debateId, { isScraped: newScrap });
+        // axios 추가 필요
     };
 
+    // 상단바 기능 버튼 추가
     useLayoutEffect(() => {
         navigation.setOptions({
             headerRight: () => (
@@ -131,14 +161,27 @@ export default function OpinionListScreen() {
         });
     }, [debate.isScraped]);
 
+    // 투표한 사람만 입력 가능하도록 검사 후 의견 등록
     const handleOpinionPosting = async () => {
         if (debate.isLeft == null) {
             console.debug("투표해야 의견 입력 가능");
             return;
         }
+
         try {
-            const response = await createOpinion(debateId, debate.isLeft, commentText);
+            await createOpinion(debateId, debate.isLeft, commentText);
             setCommentText('');
+
+            // 의견 상태 맵 초기화 먼저 수행
+            setOpinionStateMap({
+                latest: { opinions: [], nextLeftCursorId: null, nextRightCursorId: null, hasMore: true },
+                likes: { opinions: [], nextLeftCursorId: null, nextRightCursorId: null, hasMore: true },
+                comments: { opinions: [], nextLeftCursorId: null, nextRightCursorId: null, hasMore: true },
+            });
+
+            // 초기화 후 데이터 다시 불러오기
+            await fetchAllSorts();
+
         } catch (e) {
             console.debug("OpinionListScreen.handleOpinionPosting 실패:", e);
         }
