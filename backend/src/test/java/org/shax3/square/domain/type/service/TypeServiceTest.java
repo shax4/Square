@@ -3,10 +3,9 @@ package org.shax3.square.domain.type.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 import static org.shax3.square.exception.ExceptionCode.TYPE_RESULT_NOT_FOUND;
+import static org.shax3.square.exception.ExceptionCode.USER_TYPE_NOT_FOUND;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -169,14 +168,15 @@ public class TypeServiceTest {
     }
 
     @Test
-    @DisplayName("유저 ID로 타입 정보 조회(getTypeInfo) - 정상 케이스")
+    @DisplayName("닉네임으로 타입 정보 조회(getTypeInfo) - 정상 케이스")
     public void getTypeInfo_ShouldReturnCorrectResponse() {
         // given
-        Long userId = 1L;
+        String nickname = "TestUser";
         User user = mock(User.class);
-        when(userService.findById(userId)).thenReturn(user);
-        when(user.getNickname()).thenReturn("TestUser");
+        when(userService.findByNickname(nickname)).thenReturn(user);
+        when(user.getNickname()).thenReturn(nickname);
         when(user.getType()).thenReturn(Type.valueOf("ICSR"));
+
         int[] scores = new int[]{2, 2, 2, 2};
         TypeResult typeResult = TypeResult.builder()
                 .score(scores)
@@ -185,16 +185,35 @@ public class TypeServiceTest {
         when(typeRepository.findByUser(user)).thenReturn(Optional.of(typeResult));
 
         // when
-        TypeInfoResponse response = typeService.getTypeInfo(userId);
+        TypeInfoResponse response = typeService.getTypeInfo(nickname);
 
         // then
         assertThat(response).isNotNull();
-        assertThat(response.nickname()).isEqualTo("TestUser");
+        assertThat(response.nickname()).isEqualTo(nickname);
         assertThat(response.userType()).isEqualTo("ICSR");
         assertThat(response.score1()).isEqualTo(scores[0]);
         assertThat(response.score2()).isEqualTo(scores[1]);
         assertThat(response.score3()).isEqualTo(scores[2]);
         assertThat(response.score4()).isEqualTo(scores[3]);
-        verify(userService).findById(userId);
+        verify(userService).findByNickname(nickname);
     }
+
+    @Test
+    @DisplayName("닉네임으로 타입 정보 조회 - 유저 타입이 null일 경우 예외 발생")
+    void getTypeInfo_ShouldThrowException_WhenUserTypeIsNull() {
+        // given
+        String nickname = "TestUser";
+        User user = mock(User.class);
+        when(userService.findByNickname(nickname)).thenReturn(user);
+        when(user.getType()).thenReturn(null);
+
+        // when & then
+        assertThatThrownBy(() -> typeService.getTypeInfo(nickname))
+                .isInstanceOf(CustomException.class)
+                .hasMessageContaining(USER_TYPE_NOT_FOUND.getMessage());
+
+        verify(userService).findByNickname(nickname);
+        verify(user, times(1)).getType();
+    }
+
 }

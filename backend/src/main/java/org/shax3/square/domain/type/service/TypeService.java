@@ -148,9 +148,11 @@ public class TypeService {
     }
 
     @Transactional(readOnly = true)
-    public TypeInfoResponse getTypeInfo(Long userId) {
-        User user = userService.findById(userId);
-
+    public TypeInfoResponse getTypeInfo(String nickname) {
+        User user = userService.findByNickname(nickname);
+        if (user.getType() == null) {
+            throw new CustomException(USER_TYPE_NOT_FOUND);
+        }
         return getMyTypeInfo(user);
     }
 }

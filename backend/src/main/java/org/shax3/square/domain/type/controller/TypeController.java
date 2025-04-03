@@ -68,11 +68,11 @@ public class TypeController {
             summary = "타인의 성향테스트 결과 조회 api",
             description = "userId를 입력하면 해당 유저의 성향테스트 결과를 반환합니다."
     )
-    @GetMapping("{userId}")
+    @GetMapping("{nickname}")
     public ResponseEntity<TypeInfoResponse> getMyTypeTestResult(
-            @PathVariable Long userId
+            @PathVariable String nickname
     ) {
-        TypeInfoResponse typeInfoResponse = typeService.getTypeInfo(userId);
+        TypeInfoResponse typeInfoResponse = typeService.getTypeInfo(nickname);
 
         return ResponseEntity.ok(typeInfoResponse);
     }
