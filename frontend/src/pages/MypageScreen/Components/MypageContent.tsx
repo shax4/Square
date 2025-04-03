@@ -17,7 +17,7 @@ const MypageContent = ({ activeTab, activePostSection, activeVoteSection}: Props
             case "작성글":
               return (
                 <View style={styles.contentContainer}>
-                    <PostList />
+                    <PostList type="작성글"/>
                 </View>
               )
             case "댓글":
@@ -29,13 +29,13 @@ const MypageContent = ({ activeTab, activePostSection, activeVoteSection}: Props
             case "스크랩":
               return (
                 <View style={styles.contentContainer}>
-                    <PostList />
+                    <PostList type="스크랩"/>
                 </View>
               )
             case "좋아요":
               return (
                 <View style={styles.contentContainer}>
-                    <PostList />
+                    <PostList type="좋아요"/>
                 </View>
               )
             default:
