@@ -475,3 +475,46 @@ export const mockAllReplies: { [key: number]: Reply[] } = {
   ],
   // ... 다른 부모 댓글 ID에 대한 대댓글 목록 ...
 };
+
+// 댓글 ID로 해당 댓글/대댓글 찾기 함수
+export const findReplyById = (commentId: number): Reply | undefined => {
+  // 1. mockAllReplies에서 먼저 찾기 (전체 대댓글 목록)
+  for (const [parentId, replies] of Object.entries(mockAllReplies)) {
+    const foundReply = replies.find((reply) => reply.commentId === commentId);
+    if (foundReply) return foundReply;
+  }
+
+  // 2. mockPosts의 모든 댓글과 대댓글에서 찾기
+  for (const post of mockPosts) {
+    // 댓글 확인
+    const foundComment = post.comments.find(
+      (comment) => comment.commentId === commentId
+    );
+    if (foundComment) {
+      // 댓글 자체를 Reply 타입으로 변환하여 반환 (필요한 속성만)
+      return {
+        commentId: foundComment.commentId,
+        parentId: foundComment.parentId || 0,
+        nickname: foundComment.nickname,
+        profileUrl: foundComment.profileUrl,
+        userType: foundComment.userType,
+        createdAt: foundComment.createdAt,
+        content: foundComment.content,
+        likeCount: foundComment.likeCount,
+        isLiked: foundComment.isLiked,
+      };
+    }
+
+    // 각 댓글의 대댓글들 확인
+    for (const comment of post.comments) {
+      if (comment.replies && comment.replies.length > 0) {
+        const foundReply = comment.replies.find(
+          (reply) => reply.commentId === commentId
+        );
+        if (foundReply) return foundReply;
+      }
+    }
+  }
+
+  return undefined; // 찾지 못한 경우
+};
