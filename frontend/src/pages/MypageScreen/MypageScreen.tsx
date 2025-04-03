@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { StyleSheet, Text, View, ScrollView, SafeAreaView } from "react-native"
 import {ProfileImage, PersonalityTag} from "../../components"
 import SectionToggle from "./Components/SectionToggle"
@@ -13,8 +13,16 @@ import { useNavigation } from '@react-navigation/native';
 
 import {StackParamList} from '../../shared/page-stack/MyPageStack'
 
+import { getProfileInfos } from "./Api/userAPI"
+
+import { useAuth } from "../../shared/hooks"
+import { UserInfo } from "../../shared/types/user"
+
 const MypageScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
+  const { user} = useAuth();
+
+  const [userInfo, setUserInfo] = useState<UserInfo>();
 
   // Main tab toggle (Posts vs Votes)
   const [activeTab, setActiveTab] = useState("게시글")
@@ -25,22 +33,29 @@ const MypageScreen = () => {
   // Sub-sections for Votes
   const [activeVoteSection, setActiveVoteSection] = useState("내가 한 투표")
 
-  // Mock data
-  const userProfile = {
-    nickname: "test",
-    personality: "PNTB",
-    imageUrl: "https://example.com/profile.jpg",
-  }
+  useEffect(() => {
+    const getUserInfo = async () => {
+      try{
+        const userInfo : UserInfo = await getProfileInfos();
+
+        setUserInfo(userInfo);
+      }catch(error : any){
+        console.error("getUserInfo 에러 발생 : ", error);
+      }
+    }
+
+    getUserInfo();
+  },[])
 
   return (
     <SafeAreaView style={styles.container}>
         {/* Profile Header */}
         <View style={styles.profileHeader}>
           <View style={styles.profileInfo}>
-            <ProfileImage variant="large" />
+            <ProfileImage variant="large" imageUrl={userInfo?.profileUrl}/>
             <View style={styles.profileDetails}>
-              <PersonalityTag personality={userProfile.personality} nickname={userProfile.nickname} />
-              <Text style={styles.nickname}>{userProfile.nickname}</Text>
+              <PersonalityTag personality={user?.userType || "TEST"} nickname={user?.nickname || "temp_nickname"} />
+              <Text style={styles.nickname}>{user?.nickname}</Text>
             </View>
           </View>
 
@@ -53,7 +68,7 @@ const MypageScreen = () => {
             />
             <MypageButton
               title="내 가치관 정보"
-              onPress={() => navigation.navigate('PersonalityResultScreen', { isAfterSurvey : false, givenNickname : userProfile.nickname, typeResult : null})}
+              onPress={() => navigation.navigate('PersonalityResultScreen', { isAfterSurvey : false, givenNickname : user?.nickname!, typeResult : null})}
               variant="secondary"
               style={styles.actionButton}
             />
