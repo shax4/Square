@@ -1,4 +1,4 @@
-package org.shax3.square.domain.like.repository;
+package org.shax3.square.domain.like.repository.custom;
 
 import java.util.HashSet;
 import java.util.List;

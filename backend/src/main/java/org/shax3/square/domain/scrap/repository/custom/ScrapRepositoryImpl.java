@@ -1,4 +1,4 @@
-package org.shax3.square.domain.scrap.repository;
+package org.shax3.square.domain.scrap.repository.custom;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;

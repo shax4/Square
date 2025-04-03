@@ -1,10 +1,10 @@
 package org.shax3.square.domain.like.repository;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.like.model.Like;
+import org.shax3.square.domain.like.repository.custom.LikeRepositoryCustom;
 import org.shax3.square.domain.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 

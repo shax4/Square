@@ -6,19 +6,12 @@ import org.shax3.square.domain.debate.model.Debate;
 import java.util.List;
 
 public record SummaryResponse(
-        String topic,
-        Boolean isScraped,
-        String leftOption,
-        String rightOption,
-        Boolean hasVoted,
         Integer leftCount,
         Integer rightCount,
         List<SummaryDto> summaries
 ) {
-    public static SummaryResponse of(Debate debate,
+    public static SummaryResponse of(
                                      VoteResponse voteResponse,
-                                     Boolean hasVoted,
-                                     Boolean isScraped,
                                      List<SummaryDto> summaries) {
 
         Integer leftCount = (voteResponse != null) ? voteResponse.leftCount() : null;
@@ -26,11 +19,6 @@ public record SummaryResponse(
 
 
         return new SummaryResponse(
-                debate.getTopic(),
-                isScraped,
-                debate.getLeftOption(),
-                debate.getRightOption(),
-                hasVoted,
                 leftCount,
                 rightCount,
                 summaries

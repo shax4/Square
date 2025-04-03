@@ -1,4 +1,4 @@
-package org.shax3.square.domain.post.repository.cumstom;
+package org.shax3.square.domain.post.repository.custom;
 
 import java.util.List;
 import java.util.Map;
