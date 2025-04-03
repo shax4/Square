@@ -11,12 +11,7 @@ import org.shax3.square.domain.type.dto.response.TypeInfoResponse;
 import org.shax3.square.domain.type.service.TypeService;
 import org.shax3.square.domain.user.model.User;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/type")
@@ -66,11 +61,11 @@ public class TypeController {
 
     @Operation(
             summary = "타인의 성향테스트 결과 조회 api",
-            description = "userId를 입력하면 해당 유저의 성향테스트 결과를 반환합니다."
+            description = "타인의 닉네임을 입력하면 해당 유저의 성향테스트 결과를 반환합니다."
     )
-    @GetMapping("{nickname}")
+    @GetMapping("/other")
     public ResponseEntity<TypeInfoResponse> getMyTypeTestResult(
-            @PathVariable String nickname
+            @RequestParam String nickname
     ) {
         TypeInfoResponse typeInfoResponse = typeService.getTypeInfo(nickname);
 
