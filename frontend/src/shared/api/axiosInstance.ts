@@ -57,6 +57,7 @@ axiosInstance.interceptors.response.use(
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                     },
+                    withCredentials: true,
                 });
 
                 const authHeader = response.headers["authorization"]; // "Bearer {newAccessToken}"
