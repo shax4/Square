@@ -1,4 +1,4 @@
-package org.shax3.square.domain.scrap.repository;
+package org.shax3.square.domain.scrap.repository.custom;
 
 import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.scrap.model.Scrap;

@@ -17,6 +17,7 @@ import org.shax3.square.domain.user.repository.UserRepository;
 import org.shax3.square.exception.CustomException;
 import org.shax3.square.exception.ExceptionCode;
 
+import java.util.Date;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -151,20 +152,33 @@ class AuthServiceTest {
         // Given
         String validAccessToken = "validAccessToken";
         String authHeader = "Bearer " + validAccessToken;
-        String dummyRefreshToken = "dummyRefreshToken"; // 사용되지 않음
+        String dummyRefreshToken = "dummyRefreshToken";
+        Long fakeUserId = 1L;
+
+        RefreshToken dummyRefresh = RefreshToken.createRefreshToken(
+                fakeUserId,
+                "storedRefreshToken",
+                new Date(System.currentTimeMillis() + 1000000L)
+        );
 
         when(tokenUtil.isTokenValid(validAccessToken)).thenReturn(true);
+        when(tokenUtil.getSubject(validAccessToken)).thenReturn(String.valueOf(fakeUserId));
+        when(refreshTokenRepository.findByUserId(fakeUserId)).thenReturn(Optional.of(dummyRefresh));
 
         // When
-        String result = authService.reissueAccessToken(dummyRefreshToken, authHeader);
+        UserTokenDto result = authService.reissueTokens(dummyRefreshToken, authHeader);
 
         // Then
-        assertThat(result).isEqualTo(validAccessToken);
+        assertThat(result.accessToken()).isEqualTo(validAccessToken);
+        assertThat(result.refreshToken()).isEqualTo(dummyRefresh);
+
         verify(tokenUtil, times(1)).isTokenValid(validAccessToken);
-        verify(tokenUtil, never()).isAccessTokenExpired(anyString());
-        verify(refreshTokenRepository, never()).findByUserId(anyLong());
         verify(tokenUtil, never()).createLoginToken(anyLong());
+
+        verify(refreshTokenRepository, times(1)).findByUserId(fakeUserId);
+
     }
+
 
     @Test
     @DisplayName("reissueAccessToken - 액세스 토큰이 만료된 경우 새 토큰 발급")
@@ -190,7 +204,7 @@ class AuthServiceTest {
         when(tokenUtil.createLoginToken(userId)).thenReturn(newTokens);
 
         // When
-        String result = authService.reissueAccessToken(providedRefreshToken, authHeader);
+        String result = authService.reissueTokens(providedRefreshToken, authHeader).accessToken();
 
         // Then
         assertThat(result).isEqualTo(newAccessToken);
@@ -213,7 +227,7 @@ class AuthServiceTest {
         when(tokenUtil.isAccessTokenExpired(invalidAccessToken)).thenReturn(null);
 
         // When & Then
-        assertThatThrownBy(() -> authService.reissueAccessToken(dummyRefreshToken, authHeader))
+        assertThatThrownBy(() -> authService.reissueTokens(dummyRefreshToken, authHeader))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ExceptionCode.FAILED_TO_VALIDATE_TOKEN.getMessage());
     }
@@ -235,7 +249,7 @@ class AuthServiceTest {
         when(refreshTokenRepository.findByUserId(userId)).thenReturn(Optional.of(foundRefreshToken));
 
         // When & Then
-        assertThatThrownBy(() -> authService.reissueAccessToken(providedRefreshToken, authHeader))
+        assertThatThrownBy(() -> authService.reissueTokens(providedRefreshToken, authHeader))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ExceptionCode.INVALID_REQUEST.getMessage());
     }
@@ -254,7 +268,7 @@ class AuthServiceTest {
         when(refreshTokenRepository.findByUserId(userId)).thenReturn(Optional.empty());
 
         // When & Then
-        assertThatThrownBy(() -> authService.reissueAccessToken(providedRefreshToken, authHeader))
+        assertThatThrownBy(() -> authService.reissueTokens(providedRefreshToken, authHeader))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ExceptionCode.INVALID_REFRESH_TOKEN.getMessage());
     }

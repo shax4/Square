@@ -32,6 +32,8 @@ public class OpinionCommentService {
             Opinion opinion,
             User user
     ) {
+
+        opinion.increaseCommentCount();
         return opinionCommentRepository.save(request.to(opinion, user));
     }
 
@@ -44,7 +46,10 @@ public class OpinionCommentService {
             throw new CustomException(ExceptionCode.NOT_AUTHOR);
         }
 
-        comment.softDelete();
+        if (comment.isValid()) {
+            comment.softDelete();
+            comment.getOpinion().decreaseCommentCount();
+        }
     }
 
     @Transactional

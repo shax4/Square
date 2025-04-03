@@ -30,14 +30,12 @@ class OpinionCommentServiceTest {
     @Mock
     private OpinionCommentRepository opinionCommentRepository;
 
-    @Mock
-    private S3Service s3Service;
-
     @InjectMocks
     private OpinionCommentService opinionCommentService;
 
     private User mockUser;
     private OpinionComment mockComment;
+    private Opinion mockOpinion;
 
     @BeforeEach
     void setUp() {
@@ -48,14 +46,14 @@ class OpinionCommentServiceTest {
                 .build();
         ReflectionTestUtils.setField(mockUser, "id", 1L);
 
-        Opinion mockOpinion = Opinion.builder()
+        mockOpinion = Opinion.builder()
                 .content("Sample Opinion Content")
                 .build();
         ReflectionTestUtils.setField(mockOpinion, "id", 1L);
 
-
         mockComment = OpinionComment.builder()
                 .user(mockUser)
+                .opinion(mockOpinion)
                 .content("Sample Comment")
                 .build();
         ReflectionTestUtils.setField(mockComment, "id", 1L);
@@ -113,7 +111,6 @@ class OpinionCommentServiceTest {
         verify(opinionCommentRepository, times(1)).findById(1L);
         verify(opinionCommentRepository, never()).delete(any(OpinionComment.class));
     }
-
 
     @Test
     @DisplayName("답글 삭제 실패 테스트 - 댓글이 존재하지 않을 경우")

@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.TokenUtil;
 import org.shax3.square.domain.auth.dto.UserLoginDto;
+import org.shax3.square.domain.auth.dto.UserTokenDto;
 import org.shax3.square.domain.auth.dto.response.TestUserInfoResponse;
 import org.shax3.square.domain.auth.dto.response.UserInfoResponse;
 import org.shax3.square.domain.auth.service.AuthService;
@@ -153,9 +154,18 @@ public class AuthController {
             @RequestHeader("Authorization") String authHeader,
             HttpServletResponse response
     ) {
-        String reissuedToken = authService.reissueAccessToken(refreshToken, authHeader);
+        UserTokenDto tokenDto = authService.reissueTokens(refreshToken, authHeader);
 
-        response.setHeader("Authorization", "Bearer " + reissuedToken);
+        response.setHeader("Authorization", "Bearer " + tokenDto.accessToken());
+
+        Cookie cookie = new Cookie("refresh-token", tokenDto.refreshToken().getToken());
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false);
+        cookie.setPath("/");
+        response.addCookie(cookie);
+
+
+
         return ResponseEntity.ok().build();
     }
 

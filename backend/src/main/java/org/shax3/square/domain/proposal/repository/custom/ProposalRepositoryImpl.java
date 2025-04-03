@@ -1,7 +1,6 @@
-package org.shax3.square.domain.proposal.repository;
+package org.shax3.square.domain.proposal.repository.custom;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.proposal.model.Proposal;

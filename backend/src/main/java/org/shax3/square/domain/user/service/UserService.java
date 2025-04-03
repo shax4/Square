@@ -143,4 +143,10 @@ public class UserService {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
     }
+
+    public User findByNickname(String nickname) {
+
+        return userRepository.findByNickname(nickname)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+    }
 }
