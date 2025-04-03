@@ -1,14 +1,9 @@
 package org.shax3.square.domain.opinion.service;
 
 import lombok.RequiredArgsConstructor;
-
-import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.debate.model.Debate;
-import org.shax3.square.domain.debate.service.DebateService;
-import org.shax3.square.domain.like.service.LikeService;
 import org.shax3.square.domain.opinion.dto.request.CreateOpinionRequest;
 import org.shax3.square.domain.opinion.dto.request.UpdateOpinionRequest;
-import org.shax3.square.domain.opinion.dto.response.MyOpinionResponse;
 import org.shax3.square.domain.opinion.model.Opinion;
 import org.shax3.square.domain.opinion.repository.OpinionRepository;
 import org.shax3.square.domain.user.model.User;
@@ -18,20 +13,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class OpinionService {
     private final OpinionRepository opinionRepository;
-    private final DebateService debateService;
 
     @Transactional
-    public void createOpinion(User user, CreateOpinionRequest request) {
-        Debate debate = debateService.findDebateById(request.debateId());
-
+    public void createOpinion(User user, CreateOpinionRequest request, Debate debate) {
         Opinion opinion = request.to(user, debate);
-
         opinionRepository.save(opinion);
     }
 
@@ -83,5 +73,18 @@ public class OpinionService {
     public void increaseLikeCount(Long targetId, int countDiff) {
         Opinion opinion = getOpinion(targetId);
         opinion.increaseLikeCount(countDiff);
+    }
+
+
+    public List<Opinion> findOpinionsByLikes(Long debateId, boolean isLeft, Long nextCursorId, Integer nextCursorLikes, int limit) {
+        return opinionRepository.findOpinionsByLikes(debateId, isLeft, nextCursorId, nextCursorLikes, limit);
+    }
+
+    public List<Opinion> findOpinionsByComments(Long debateId, boolean isLeft, Long nextCursorId, Integer nextCursorComments, int limit) {
+        return opinionRepository.findOpinionsByComments(debateId, isLeft, nextCursorId, nextCursorComments, limit);
+    }
+
+    public List<Opinion> findOpinionsByLatest(Long debateId, boolean isLeft, Long nextCursorId, int limit) {
+        return opinionRepository.findOpinionsByLatest(debateId, isLeft, nextCursorId, limit);
     }
 }

@@ -102,5 +102,4 @@ public class DebateFacadeService {
         return new DebatesResponse(debateDtos, newCursorId);
     }
 
-
 }

@@ -41,8 +41,6 @@ class OpinionServiceTest {
     @Mock
     private DebateService debateService;
 
-    @Mock
-    private LikeService likeService;
 
     @InjectMocks
     private OpinionService opinionService;
@@ -70,11 +68,8 @@ class OpinionServiceTest {
     void createOpinion_success() {
         // Given
         CreateOpinionRequest request = new CreateOpinionRequest(1L, true, "Sample Opinion");
-        when(debateService.findDebateById(1L)).thenReturn(mockDebate);
-
         // When
-        opinionService.createOpinion(mockUser, request);
-
+        opinionService.createOpinion(mockUser, request,mockDebate);
         // Then
         verify(opinionRepository, times(1)).save(any(Opinion.class));
     }
