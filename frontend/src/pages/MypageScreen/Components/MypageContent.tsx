@@ -46,7 +46,7 @@ const MypageContent = ({ activeTab, activePostSection, activeVoteSection}: Props
             case "내가 한 투표":
               return (
                 <View style={styles.contentContainer}>
-                    <VotingList/>
+                    <VotingList type="my-votes"/>
                 </View>
               )
             case "의견":
@@ -58,7 +58,7 @@ const MypageContent = ({ activeTab, activePostSection, activeVoteSection}: Props
             case "스크랩":
               return (
                 <View style={styles.contentContainer}>
-                    <VotingList/>
+                    <VotingList type="my-scrap"/>
                 </View>
               )
             default:
