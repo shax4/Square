@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { StyleSheet, FlatList, ActivityIndicator } from "react-native";
-import {mockComments} from "./mocks"
+import { StyleSheet, FlatList, ActivityIndicator, View, Text } from "react-native";
 import CommentCard from "./CommentCard"
 import { CommentResponse, Comment } from "../Type/mypageComment";
 import { getMypageComments } from "../Api/commentAPI";
@@ -9,6 +8,7 @@ const CommentList = () => {
     const [comments, setComments] = useState<Comment[]>([]);
     const [nextCursorId, setNextCursorId] = useState<number | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
+    const [isEmpty, setIsEmpty] = useState<boolean>(false);
 
     const fetchComments = async (cursorId: number | null) => {
         if(loading) return;
@@ -16,6 +16,12 @@ const CommentList = () => {
         setLoading(true);
         try{
             const data : CommentResponse = await getMypageComments(cursorId, 10);
+
+            if (cursorId === null && data.comments.length === 0) {
+                setIsEmpty(true);
+            } else {
+                setIsEmpty(false);
+            }
 
             setComments((prev) => [...prev, ...data.comments])
             setNextCursorId(data.nextCursorId || null);
@@ -56,6 +62,13 @@ const CommentList = () => {
             onEndReached={loadMore}
             onEndReachedThreshold={0.5}
             ListFooterComponent={loading? <ActivityIndicator size="small"/> : null}
+            ListEmptyComponent={
+                isEmpty ? (
+                    <View style={styles.emptyContainer}>
+                        <Text style={styles.emptyText}>투표가 없습니다.</Text>
+                    </View>
+                ) : null
+            }
         />
     )
 }
@@ -63,6 +76,16 @@ const CommentList = () => {
 const styles = StyleSheet.create({
     listContent: {
         padding: 16,
+    },
+    emptyContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 20,
+    },
+    emptyText: {
+        fontSize: 16,
+        color: "gray",
     },
 });
 
