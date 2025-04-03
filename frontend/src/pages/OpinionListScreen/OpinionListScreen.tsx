@@ -9,19 +9,26 @@ import SummaryBoxList from './Components/Summary/SummaryBoxList'
 import { Summary } from './Components/Summary';
 import OpinionBoxList from './Components/Opinion/OpinionBoxList';
 import CommentInput from '../../components/CommentInput/CommentInput';
-import { getOpinions } from './api/OpinionsApi';
+import { getOpinions, createOpinion, updateOpinion, deleteOpinion } from './api/OpinionsApi';
 import { Opinion } from './Components/Opinion';
 import { getSummaries } from './api/SummariesApi';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import BookmarkButton from '../../components/BookmarkButton/BookmarkButton';
 import { Icons } from '../../../assets/icons/Icons';
+import { useDebateStore } from '../../shared/stores/debates';
+
 
 type OpinionListScreenRouteProp = RouteProp<StackParamList, 'OpinionListScreen'>;
 
 export default function OpinionListScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
     const route = useRoute<OpinionListScreenRouteProp>();
-    const { debateId, debate, showVoteResultModal = false } = route.params;
+    const { debateId, showVoteResultModal = false } = route.params;
+
+    // zustand
+    const { debates, updateDebate } = useDebateStore();
+    const debate = debates.find((d) => d.debateId === debateId);
+    if (!debate) return <Text>Wrong debateId</Text>;
 
     // 정렬 및 토글
     const [isSummary, setIsSummary] = useState(true); // ai요약, 의견 토글
@@ -107,7 +114,9 @@ export default function OpinionListScreen() {
     };
 
     const handleScrap = () => {
-        setScrap(!scrap);
+        const newScrap = !scrap;
+        setScrap(newScrap);
+        updateDebate(debateId, { isScraped: newScrap });
         // Axios 북마크 요청
     }
 
@@ -120,14 +129,29 @@ export default function OpinionListScreen() {
                         <Icons.share />
                     </TouchableOpacity>
                     <BookmarkButton
-                        isScraped={scrap}
-                        onPressScrap={() => { handleScrap }}
+                        isScraped={debate.isScraped}
+                        onPressScrap={() => handleScrap()}
                     />
                 </View>
             ),
         });
-    }, []);
+    }, [debate.isScraped]);
 
+    const handleOpinionPosting = async () => {
+        if (debate.isLeft == null) {
+            console.debug("투표해야 의견 입력 가능");
+            return;
+        }
+        try {
+            const response = await createOpinion(debateId, debate.isLeft, commentText);
+            setCommentText('');
+        } catch (e) {
+            console.debug("OpinionListScreen.handleOpinionPosting 실패:", e);
+        } finally {
+
+        }
+
+    }
 
     return (
         <KeyboardAvoidingView
@@ -207,7 +231,7 @@ export default function OpinionListScreen() {
                     {/* 좌 우 투표 버튼 */}
                     <View style={isSummary ? styles.VoteButtonView : styles.VoteButtonViewSmall}>
                         <VoteButton
-                            debate={debate}
+                            debateId={debateId}
                             showVoteResultModal={showVoteResultModal}
                         />
                     </View>
@@ -223,10 +247,7 @@ export default function OpinionListScreen() {
                 {!isSummary && (
                     <CommentInput
                         onChangeText={setCommentText}
-                        onSubmit={() => {
-                            console.log("Comment submitted:", commentText);
-                            setCommentText('');
-                        }}
+                        onSubmit={handleOpinionPosting}
                         value={commentText}
                         placeholder='의견을 입력하세요...'
                     />

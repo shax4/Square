@@ -7,13 +7,32 @@ import { styles } from './DebateResultModal.styles'
 import { DebateResultModalProps } from './DebateResultModal.types'
 
 const DebateResultModal: React.FC<DebateResultModalProps> = ({ visible, onClose, onPressMoreOpinion, data, leftOption, rightOption }) => {
-  const [activeTab, setActiveTab] = useState<"left" | "right">("left")
 
+  const convertRecordToArray = (record: Record<string, number>) => {
+    const total = Object.values(record).reduce((sum, value) => sum + value, 0)
+    return Object.entries(record).map(([label, value]) => ({
+      label,
+      value: total === 0 ? 0 : Math.round((value / total) * 100)
+    }))
+  }
+
+  const getMaxIndex = (arr: { label: string, value: number }[]) =>
+    arr.reduce((maxIdx, item, idx, array) =>
+      item.value > array[maxIdx].value ? idx : maxIdx
+      , 0)
+
+  const [activeTab, setActiveTab] = useState<"left" | "right">("left")
   // 현재 활성화된 탭에 따라 데이터 선택
   const activeData = activeTab === "left" ? data.leftResult : data.rightResult
 
-  const userAgeGroupIndex = activeData.age.findIndex((item) => item.label === activeData.userInfo.ageGroup)
-  const userReligionGroupIndex = activeData.religion.findIndex((item) => item.label === activeData.userInfo.religionGroup)
+  const ageData = convertRecordToArray(activeData.ageRange)
+  const genderData = convertRecordToArray(activeData.gender)
+  const typeData = convertRecordToArray(activeData.userType)
+  const regionData = convertRecordToArray(activeData.region)
+  const religionData = convertRecordToArray(activeData.religion)
+
+  const userAgeGroupIndex = getMaxIndex(ageData)
+  const userReligionGroupIndex = getMaxIndex(religionData)
 
   const screenWidth = Dimensions.get("window").width * 0.9
 
@@ -51,34 +70,34 @@ const DebateResultModal: React.FC<DebateResultModalProps> = ({ visible, onClose,
               {/* 성별 */}
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>성별</Text>
-                <GenderChart data={activeData.gender} />
+                <GenderChart data={genderData} />
               </View>
 
               {/* 연령대 */}
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>연령대</Text>
                 <View style={styles.chartContainer}>
-                  <BlueBarChart data={activeData.age} highlightIdx={userAgeGroupIndex} />
+                  <BlueBarChart data={ageData} highlightIdx={userAgeGroupIndex} />
                 </View>
               </View>
 
               {/* 유형 */}
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>유형</Text>
-                <BubbleChart data={activeData.type} height={200} width={screenWidth} />
+                <BubbleChart data={typeData} height={200} width={screenWidth} />
               </View>
 
               {/* 지역 */}
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>지역</Text>
-                <BubbleChart data={activeData.region} height={200} width={screenWidth} />
+                <BubbleChart data={regionData} height={200} width={screenWidth} />
               </View>
 
               {/* 종교 */}
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>종교</Text>
                 <View style={styles.chartContainer}>
-                  <BlueBarChart data={activeData.religion} highlightIdx={userReligionGroupIndex} />
+                  <BlueBarChart data={religionData} highlightIdx={userReligionGroupIndex} />
                 </View>
               </View>
             </View>

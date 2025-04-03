@@ -7,52 +7,38 @@ import { StackParamList } from '../../../shared/page-stack/DebatePageStack';
 
 import { Debate } from './Debate.types';
 import { styles } from './DebateCard.styles';
-import { Icons } from '../../../../assets/icons/Icons';
 import VoteButton from '../../../components/VoteButton/VoteButton'
 import BookmarkButton from '../../../components/BookmarkButton/BookmarkButton';
+import { useDebateStore } from '../../../shared/stores/debates';
 
-const DebateCard = ({
-    debateId,
-    category,
-    topic,
-    leftOption,
-    rightOption,
-    isScraped,
-    isLeft,
-    leftCount,
-    rightCount,
-    leftPercent,
-    rightPercent,
-    totalVoteCount
-}: Debate): JSX.Element => {
 
-    const debate: Debate = {
-        debateId,
-        category,
-        topic,
-        leftOption,
-        rightOption,
-        isScraped,
-        isLeft,
-        leftCount,
-        rightCount,
-        leftPercent,
-        rightPercent,
-        totalVoteCount,
-    };
+interface DebateCardProps {
+    debateId: number;
+}
+
+const DebateCard = ({ debateId }: DebateCardProps): JSX.Element => {
 
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
 
-    const navigateToOpinionListPage = () => {
-        navigation.navigate('OpinionListScreen', { debateId, debate });
-    }
+    // zustand
+    const { debates, updateDebate } = useDebateStore();
+    const debate = debates.find((d) => d.debateId === debateId);
+    if (!debate) return <Text>Wrong debateId</Text>;
 
-    const [scrap, setScrap] = useState(debate.isScraped);
+    const navigateToOpinionListPage = () => {
+        navigation.navigate('OpinionListScreen', { debateId });
+    }
 
     const handlePressScrap = () => {
         console.log("DebateCard.tsx scrap Button Clicked")
-        setScrap(prev => !prev);
+        const newScrap = !debate.isScraped;
+        updateDebate(debateId, { isScraped: newScrap });
     };
+
+    // 투표 완료시 처리
+    const onVoteComplete = (isLeft: boolean) => {
+        debate.isLeft = isLeft;
+    }
 
     return (
         <>
@@ -66,32 +52,32 @@ const DebateCard = ({
                         <Text style={styles.CardHeaderText}>Number {debateId}</Text>
                         <BookmarkButton
                             isScraped={debate.isScraped}
-                            onPressScrap={() => { handlePressScrap }}
+                            onPressScrap={() => { handlePressScrap() }}
                         />
                     </View>
 
                     {/* Hashtag */}
                     <View style={styles.CardHashtag}>
-                        <Text style={styles.CardHashtagText}># {category}</Text>
+                        <Text style={styles.CardHashtagText}># {debate.category}</Text>
                     </View>
 
                     {/* Topic */}
                     <TouchableOpacity
                         style={styles.CardTopic}
                         onPress={() => navigateToOpinionListPage()}>
-                        <Text style={styles.CardTopicText}>{topic}</Text>
+                        <Text style={styles.CardTopicText}>{debate.topic}</Text>
                     </TouchableOpacity>
 
                     {/* Vote Buttons: 투표 여부(isLeft에 따라 다르게 렌더링*/}
                     <View style={styles.CardVote}>
                         <VoteButton
-                            debate={debate}
+                            debateId={debateId}
                         />
                     </View>
 
                     {/* Footer */}
                     <View style={styles.CardFooter}>
-                        <Text style={styles.CardFooterText}>지금까지 {totalVoteCount}명 참여중</Text>
+                        <Text style={styles.CardFooterText}>지금까지 {debate.totalVoteCount}명 참여중</Text>
                     </View>
                 </View>
 
