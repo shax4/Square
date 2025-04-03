@@ -559,7 +559,7 @@ export const MockBoardAPI = {
   toggleCommentLike: async (
     commentId: number
   ): Promise<{ data: LikeResponse }> => {
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
     // 현재 좋아요 상태 가져오기 (없으면 false로 초기화)
     const currentLiked = mockLikeStore.get(commentId) || false;

@@ -266,8 +266,8 @@ export default function CommentItem({
       }
 
       // 로딩 상태 설정
-      loadingLikesRef.current.add(replyId);
-      setLoadingLikes((prev) => new Set(prev).add(replyId));
+      loadingLikesRef.current.add(replyId); // 동기적 상태 업데이트 (즉시 적용)
+      setLoadingLikes((prev) => new Set(prev).add(replyId)); // UI 업데이트용 (비동기)
 
       try {
         const response = await BoardAPI.toggleCommentLike(replyId);
@@ -430,12 +430,8 @@ export default function CommentItem({
               ) : (
                 // 대댓글 일반 모드 UI
                 <Fragment>
-                  <View style={styles.replyContentContainer}>
+                  <View style={styles.replyContentRow}>
                     <Text style={styles.contentText}>{reply.content}</Text>
-                  </View>
-                  {/* 대댓글 좋아요 영역 추가 */}
-                  <View style={styles.replyInteractionContainer}>
-                    {/* 좋아요 버튼 */}
                     <View style={styles.replyLikeContainer}>
                       <LikeButton
                         initialCount={reply.likeCount || 0}
@@ -636,9 +632,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#f9f9f9",
     borderRadius: 8,
   },
-  replyContentContainer: {
+  replyContentRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: 4,
-    marginBottom: 4, // 좋아요 버튼과의 간격
   },
   replyFooterContainer: {
     flexDirection: "row",
@@ -669,13 +667,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   replyButtonContainer: { flexDirection: "row", justifyContent: "flex-end" },
-  replyInteractionContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 2,
-  },
   replyLikeContainer: {
-    alignItems: "flex-start",
-    marginRight: 16, // 다른 요소와의 간격
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: "auto", // 오른쪽 끝으로 밀어내기
   },
 });
