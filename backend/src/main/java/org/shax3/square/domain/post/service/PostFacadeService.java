@@ -11,6 +11,7 @@ import org.shax3.square.domain.post.dto.PopularPostDto;
 import org.shax3.square.domain.post.dto.PostImageDto;
 import org.shax3.square.domain.post.dto.PostSummaryDto;
 import org.shax3.square.domain.post.dto.ReplyDto;
+import org.shax3.square.domain.post.dto.response.MyPostResponse;
 import org.shax3.square.domain.post.dto.response.PostDetailResponse;
 import org.shax3.square.domain.post.dto.response.PostListResponse;
 import org.shax3.square.domain.post.model.Post;
@@ -205,7 +206,7 @@ public class PostFacadeService {
 
 		// 댓글 목록 (parent만)
 		List<PostComment> comments = commentService.getParentComments(post);
-		List<Long> commentIds = comments.stream().map(PostComment::getId).toList();
+		List<Long> commentIds = extractCommentIds(comments);
 
 		// 대댓글 개수 및 3개씩 조회
 		Map<Long, Integer> replyCounts = commentService.getReplyCounts(commentIds);
@@ -213,8 +214,7 @@ public class PostFacadeService {
 
 		// 댓글, 대댓글 좋아요 정보
 		Set<Long> likedCommentIds = likeService.getLikedTargetIds(user, TargetType.POST_COMMENT, commentIds);
-		Set<Long> likedReplyIds = likeService.getLikedTargetIds(user, TargetType.POST_COMMENT,
-			replyMap.values().stream().flatMap(List::stream).map(PostComment::getId).toList());
+		Set<Long> likedReplyIds = likeService.getLikedTargetIds(user, TargetType.POST_COMMENT, extractReplyIds(replyMap));
 
 
 		List<CommentDto> commentDtos = comments.stream()
@@ -240,5 +240,13 @@ public class PostFacadeService {
 			commentDtos,
 			commentDtos.size()
 		);
+	}
+
+	private List<Long> extractCommentIds(List<PostComment> comments) {
+		return comments.stream().map(PostComment::getId).toList();
+	}
+
+	private List<Long> extractReplyIds(Map<Long, List<PostComment>> replyMap) {
+		return replyMap.values().stream().flatMap(List::stream).map(PostComment::getId).toList();
 	}
 }
