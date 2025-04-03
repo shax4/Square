@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { styles } from './VoteButton.styles';
-import { Debate } from '../../pages/DebateCardsScreen/Components/Debate.types';
+import { computeDebateListFields, Debate, updateVoteState } from '../../pages/DebateCardsScreen/Components/Debate.types';
 import VoteConfirmModal from '../../pages/DebateCardsScreen/Components/VoteConfirmModal';
 import { DebateResultModal } from '../../pages';
 import { useNavigation } from '@react-navigation/native';
@@ -22,7 +22,9 @@ const rightOptionEmoji = "🙅";
 const VoteButton = ({ debateId, showVoteResultModal, }: VoteButtonProps): JSX.Element => {
     // zustand
     const { debates, updateDebate } = useDebateStore();
-    const debate = debates.find((d) => d.debateId === debateId);
+    const debate = useDebateStore((state) =>
+        state.debates.find((d) => d.debateId === debateId)
+    );
     if (!debate) return <Text>Wrong debateId</Text>;
 
     // OpinionList에서 showVoteResultModal 여부를 보내 렌더링과 동시에 모달을 띄울지 여부 결정
@@ -80,8 +82,10 @@ const VoteButton = ({ debateId, showVoteResultModal, }: VoteButtonProps): JSX.El
         console.log(`debateId=${debateId}, 투표 = ${isLeft ? '왼쪽' : '오른쪽'}`);
         // API 요청 메서드 추가 필요
 
-        // zustand 저장소 isLeft 여부 변경
-        updateDebate(debateId, {isLeft: isLeft});
+
+        // zustand 투표 데이터 업데이트
+        updateDebate(debateId, updateVoteState(debate, isLeft));
+        console.log(debate.isLeft);
 
         // 모달을 띄울 페이지로 이동해야하는지, 현재 페이지에서 모달을 띄울 수 있는지 판단
         const currentRoute = navigation.getState().routes[navigation.getState().index];
@@ -97,15 +101,11 @@ const VoteButton = ({ debateId, showVoteResultModal, }: VoteButtonProps): JSX.El
                 showVoteResultModal: true,
             });
         }
-
     };
 
     const voted = debate.isLeft !== null;
-    const widthLeft = voted ? Math.max(30, Math.min(debate.leftPercent, 70)) - 10 : 45;
+    const widthLeft = voted ? Math.max(30, Math.min(debate.leftPercent, 70)) - 5 : 45;
     const widthRight = voted ? 100 - widthLeft - 10 : 45;
-
-
-
 
     // 투표 통계 모달 닫기
     const closeDebateResultModal = () => {

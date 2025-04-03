@@ -18,13 +18,29 @@ export const computeDebateListFields = (debates: Debate[]): Debate[] => {
     return debates.map(computeDebateFields);
 };
 
+export const updateVoteState = (debate: Debate, voteSide: boolean): Debate => {
+    const newDebate = { ...debate };
+    newDebate.isLeft = voteSide;
+
+    if (voteSide) {
+        newDebate.leftCount++;
+    } else {
+        newDebate.rightCount++;
+    }
+
+    return computeDebateFields(newDebate);
+};
 
 // 각 Debate 누락 필드 계산
 export const computeDebateFields = (debate: Debate): Debate => {
-    debate.totalVoteCount = debate.leftCount + debate.rightCount;
+    const totalVoteCount = debate.leftCount + debate.rightCount;
+    const leftPercent = totalVoteCount > 0 ? Math.round((debate.leftCount / totalVoteCount) * 100) : 0;
+    const rightPercent = totalVoteCount > 0 ? 100 - leftPercent : 0;
 
-    debate.leftPercent = debate.leftPercent > 0 ? Math.round((debate.leftCount / debate.totalVoteCount) * 100) : 0;
-    debate.rightPercent = debate.leftPercent > 0 ? 100 - debate.leftPercent : 0;
-
-    return debate;
+    return {
+        ...debate,
+        totalVoteCount,
+        leftPercent,
+        rightPercent,
+    };
 };
