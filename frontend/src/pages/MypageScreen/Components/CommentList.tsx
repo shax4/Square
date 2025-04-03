@@ -1,8 +1,12 @@
+import { useState, useEffect, useCallback } from "react";
 import { StyleSheet, FlatList } from "react-native";
 import {mockComments} from "./mocks"
 import CommentCard from "./CommentCard"
 
 const CommentList = () => {
+    const [comments, setComments] = useState<Comment[]>([]);
+
+
     return (
         <FlatList
             data={mockComments}
