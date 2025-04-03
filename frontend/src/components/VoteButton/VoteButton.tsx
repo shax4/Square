@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { styles } from './VoteButton.styles';
-import { computeDebateListFields, Debate, updateVoteState } from '../../pages/DebateCardsScreen/Components/Debate.types';
+import {  updateVoteState } from '../../pages/DebateCardsScreen/Components/Debate.types';
 import VoteConfirmModal from '../../pages/DebateCardsScreen/Components/VoteConfirmModal';
 import { DebateResultModal } from '../../pages';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { StackParamList } from '../../shared/page-stack/DebatePageStack';
+import { useAuthStore } from '../../shared/stores';
 
 import { resultData } from '../../pages/OpinionListScreen/Components/debate-result-test-data';
 import { useDebateStore } from '../../shared/stores/debates';
+import { voteDebate } from './api/VoteButtonApi';
+import { useAuth } from '../../shared/hooks';
+import { UserInfo } from '../../shared/types/user';
 
 type VoteButtonProps = {
     debateId: number;
@@ -26,6 +30,7 @@ const VoteButton = ({ debateId, showVoteResultModal, }: VoteButtonProps): JSX.El
         state.debates.find((d) => d.debateId === debateId)
     );
     if (!debate) return <Text>Wrong debateId</Text>;
+    const {user, setUser, loggedIn, logOut} = useAuth();
 
     // OpinionList에서 showVoteResultModal 여부를 보내 렌더링과 동시에 모달을 띄울지 여부 결정
     useEffect(() => {
@@ -75,32 +80,47 @@ const VoteButton = ({ debateId, showVoteResultModal, }: VoteButtonProps): JSX.El
     };
 
     // 투표 모달 확인 클릭 시 동작하는 메서드
-    const voteConfirm = (
+    const voteConfirm = async (
         debateId: number,
         isLeft: boolean,
     ) => {
-        console.log(`debateId=${debateId}, 투표 = ${isLeft ? '왼쪽' : '오른쪽'}`);
-        // API 요청 메서드 추가 필요
-
-
-        // zustand 투표 데이터 업데이트
-        updateDebate(debateId, updateVoteState(debate, isLeft));
-        console.log(debate.isLeft);
-
-        // 모달을 띄울 페이지로 이동해야하는지, 현재 페이지에서 모달을 띄울 수 있는지 판단
-        const currentRoute = navigation.getState().routes[navigation.getState().index];
-
-        // 모달 컴포넌트가 있는 페이지에서 투표 버튼을 눌렀다면 모달 띄우기
-        if (currentRoute.name === 'OpinionListScreen') {
-            openDebateResultModal();
+        // API 투표 요청
+        try{
+            const response = await voteDebate(debateId, isLeft);
+            // left right count 및 투표결과 zustand에 반영
+            const updatedDebate = {
+                ...debate,
+                isLeft,
+                leftCount: response.leftCount,
+                rightCount: response.rightCount,
+            };
+    
+            // zustand 투표 데이터 업데이트
+            updateDebate(debateId, updateVoteState(updatedDebate));
+    
+            // 모달을 띄울 페이지로 이동해야하는지, 현재 페이지에서 모달을 띄울 수 있는지 판단
+            const currentRoute = navigation.getState().routes[navigation.getState().index];
+    
+            // 모달 컴포넌트가 있는 페이지에서 투표 버튼을 눌렀다면 모달 띄우기
+            if (currentRoute.name === 'OpinionListScreen') {
+                openDebateResultModal();
+            }
+            // 모달 컴포넌트가 없는 페이지에서 투표 버튼을 눌렀다면 페이지 이동
+            else {
+                navigation.navigate('OpinionListScreen', {
+                    debateId,
+                    showVoteResultModal: true,
+                });
+            }
+        } catch (error) {
+            if ( user == null) {
+                console.debug("로그인 필요");
+                return(
+                    <Text>로그인 창으로 이동 처리 필요</Text>
+                )
+            }
         }
-        // 모달 컴포넌트가 없는 페이지에서 투표 버튼을 눌렀다면 페이지 이동
-        else {
-            navigation.navigate('OpinionListScreen', {
-                debateId,
-                showVoteResultModal: true,
-            });
-        }
+        
     };
 
     const voted = debate.isLeft !== null;

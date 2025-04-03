@@ -18,15 +18,8 @@ export const computeDebateListFields = (debates: Debate[]): Debate[] => {
     return debates.map(computeDebateFields);
 };
 
-export const updateVoteState = (debate: Debate, voteSide: boolean): Debate => {
+export const updateVoteState = (debate: Debate): Debate => {
     const newDebate = { ...debate };
-    newDebate.isLeft = voteSide;
-
-    if (voteSide) {
-        newDebate.leftCount++;
-    } else {
-        newDebate.rightCount++;
-    }
 
     return computeDebateFields(newDebate);
 };
