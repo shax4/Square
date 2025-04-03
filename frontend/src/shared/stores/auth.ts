@@ -9,6 +9,7 @@ interface AuthStoreProps {
   setUser: (user: userDetails) => void;
   logOut: () => void;
   updateAccessToken: (newAccessToken: string) => void;
+  updateRefreshToken: (newRefreshToken: string) => void;
 }
 
 export const useAuthStore = create<AuthStoreProps>()(
@@ -20,6 +21,8 @@ export const useAuthStore = create<AuthStoreProps>()(
       logOut: () => set({ user: null, loggedIn: false }),
       updateAccessToken: (newAccessToken: string) => 
         set(state => state.user ? { user: { ...state.user, accessToken: newAccessToken } } : state),
+      updateRefreshToken: (newRefreshToken: string) =>
+        set(state => state.user ? { user: { ...state.user, refreshToken: newRefreshToken } } : state),
     }),
     {
       name: 'user-storage',

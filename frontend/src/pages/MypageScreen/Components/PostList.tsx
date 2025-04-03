@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { StyleSheet, FlatList, ActivityIndicator } from "react-native";
-import {mockPosts} from "./mocks"
+import { StyleSheet, FlatList, ActivityIndicator, View, Text } from "react-native";
 import PostCard from "./PostCard"
 import { getMypagePosts } from "../Api/postAPI";
 import { Post, PostResponse } from "../Type/mypagePost";
@@ -19,6 +18,7 @@ const PostList = ({type} : Props) => {
     const [posts, setPosts] = useState<Post[]>([]);
     const [nextCursorId, setNextCursorId] = useState<number | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
+    const [isEmpty, setIsEmpty] = useState<boolean>(false);
 
     const fetchPosts = async (cursorId: number | null) => {
         if(loading) return;
@@ -26,6 +26,12 @@ const PostList = ({type} : Props) => {
         setLoading(true);
         try{
             const data : PostResponse = await getMypagePosts(API_URLS[type], cursorId, 10)
+
+            if (cursorId === null && data.posts.length === 0) {
+                setIsEmpty(true);
+            } else {
+                setIsEmpty(false);
+            }
 
             setPosts((prev) => [...prev, ...data.posts])
             setNextCursorId(data.nextCursorId || null);
@@ -72,6 +78,13 @@ const PostList = ({type} : Props) => {
             onEndReached={loadMore}
             onEndReachedThreshold={0.5}
             ListFooterComponent={loading? <ActivityIndicator size="small"/> : null}
+            ListEmptyComponent={
+                isEmpty ? (
+                    <View style={styles.emptyContainer}>
+                        <Text style={styles.emptyText}>투표가 없습니다.</Text>
+                    </View>
+                ) : null
+            }
         />
     )
 }
@@ -79,6 +92,16 @@ const PostList = ({type} : Props) => {
 const styles = StyleSheet.create({
     listContent: {
         padding: 16,
+    },
+    emptyContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 20,
+    },
+    emptyText: {
+        fontSize: 16,
+        color: "gray",
     },
 });
 
