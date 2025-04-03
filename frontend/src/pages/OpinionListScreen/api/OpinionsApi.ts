@@ -1,8 +1,9 @@
 import { axiosInstance } from "../../../shared";
 import { OpinionsResponse } from "./OpinionsResponse.types";
+import { SortType } from "../OpinionSortType";
 
 export interface GetOpinionsParams {
-    sort?: 'latest' | 'likes' | 'comments';
+    sort?: SortType;
     nextLeftCursorId?: number | null;
     nextLeftCursorLikes?: number | null;
     nextLeftCursorComments?: number | null;

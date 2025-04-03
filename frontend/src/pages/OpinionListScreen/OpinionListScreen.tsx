@@ -9,105 +9,101 @@ import SummaryBoxList from './Components/Summary/SummaryBoxList'
 import { Summary } from './Components/Summary';
 import OpinionBoxList from './Components/Opinion/OpinionBoxList';
 import CommentInput from '../../components/CommentInput/CommentInput';
-import { getOpinions, createOpinion, updateOpinion, deleteOpinion } from './api/OpinionsApi';
+import { getOpinions, createOpinion } from './api/OpinionsApi';
 import { Opinion } from './Components/Opinion';
 import { getSummaries } from './api/SummariesApi';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import BookmarkButton from '../../components/BookmarkButton/BookmarkButton';
 import { Icons } from '../../../assets/icons/Icons';
 import { useDebateStore } from '../../shared/stores/debates';
-
+import { SortType } from './OpinionSortType';
 
 type OpinionListScreenRouteProp = RouteProp<StackParamList, 'OpinionListScreen'>;
+
 
 export default function OpinionListScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
     const route = useRoute<OpinionListScreenRouteProp>();
     const { debateId, showVoteResultModal = false } = route.params;
 
-    // zustand
     const { debates, updateDebate } = useDebateStore();
     const debate = debates.find((d) => d.debateId === debateId);
     if (!debate) return <Text>Wrong debateId</Text>;
 
-    // 정렬 및 토글
-    const [isSummary, setIsSummary] = useState(true); // ai요약, 의견 토글
-    const [sort, setSort] = useState<'like' | 'comment' | 'recent'>('recent');
+    const [isSummary, setIsSummary] = useState(true);
+    const [sort, setSort] = useState<SortType>(SortType.Latest);
     const [commentText, setCommentText] = useState('');
 
-    // 요약 정보
     const [summaries, setSummaries] = useState<Summary[]>([]);
 
-    // 의견 페이징
-    const [opinions, setOpinions] = useState<Opinion[]>([]);
-    const [nextLeftCursorId, setNextLeftCursorId] = useState<number | null>(null);
-    const [nextRightCursorId, setNextRightCursorId] = useState<number | null>(null);
-    const [hasMore, setHasMore] = useState(true);
+    const [opinionStateMap, setOpinionStateMap] = useState<Record<SortType, {
+        opinions: Opinion[];
+        nextLeftCursorId: number | null;
+        nextRightCursorId: number | null;
+        hasMore: boolean;
+    }>>({
+        latest: { opinions: [], nextLeftCursorId: null, nextRightCursorId: null, hasMore: true },
+        likes: { opinions: [], nextLeftCursorId: null, nextRightCursorId: null, hasMore: true },
+        comments: { opinions: [], nextLeftCursorId: null, nextRightCursorId: null, hasMore: true },
+    });
+
     const [loading, setLoading] = useState(false);
     const [scrap, setScrap] = useState(debate.isScraped);
     const limit = 5;
 
-    /*
     useEffect(() => {
-        initOpinions();
-    }, [sort]);
-    */
-    useEffect(() => {
+        fetchAllSorts();
         initAiSummaries();
     }, []);
 
-    // AI 요약 초기 요약
-    const initAiSummaries = () => {
-        setSummaries([]);
-        fetchSummaries();
-    }
-
-    // AI 요약 정보 불러오기
-    const fetchSummaries = async () => {
-        setLoading(true);
-        try {
-            const response = await getSummaries(debateId);
-
-            // AI 요약 설정
-            setSummaries(response.summaries);
-        } catch (e) {
-            console.error("AI 요약 불러오기 실패:", e);
-        } finally {
-            setLoading(false);
+    const fetchAllSorts = async () => {
+        for (const sortType of [SortType.Latest, SortType.Likes, SortType.Comments] as SortType[]) {
+            await fetchOpinionsBySort(sortType);
         }
-    }
+    };
 
-    // 의견 초기 리셋
-    const initOpinions = () => {
-        setOpinions([]);
-        setNextLeftCursorId(null);
-        setNextRightCursorId(null);
-        setHasMore(true);
-        fetchOpinions();
-    }
-
-    const fetchOpinions = async () => {
-        if (loading || !hasMore) return;
+    const fetchOpinionsBySort = async (sortType: SortType) => {
+        const current = opinionStateMap[sortType];
+        if (!current.hasMore || loading) return;
 
         setLoading(true);
 
         try {
             const response = await getOpinions(debateId, {
-                nextLeftCursorId,
-                nextRightCursorId,
+                sort: sortType,
+                nextLeftCursorId: current.nextLeftCursorId,
+                nextRightCursorId: current.nextRightCursorId,
                 limit,
             });
 
-            setOpinions((prev) => [...prev, ...response.opinions]);
-            setNextLeftCursorId(response.nextLeftCursorId);
-            setNextRightCursorId(response.nextRightCursorId);
-
-            // 다음 커서가 모두 null이면 더 이상 불러올 게 없음
-            if (!response.nextLeftCursorId && !response.nextRightCursorId) {
-                setHasMore(false);
-            }
+            setOpinionStateMap(prev => ({
+                ...prev,
+                [sortType]: {
+                    opinions: [...prev[sortType].opinions, ...response.opinions],
+                    nextLeftCursorId: response.nextLeftCursorId,
+                    nextRightCursorId: response.nextRightCursorId,
+                    hasMore: !!(response.nextLeftCursorId || response.nextRightCursorId),
+                }
+            }));
         } catch (e) {
-            console.error("의견 불러오기 실패:", e);
+            console.error(`의견 불러오기 실패 (${sortType}):`, e);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const initAiSummaries = () => {
+        setSummaries([]);
+        fetchSummaries();
+    };
+
+    const fetchSummaries = async () => {
+        setLoading(true);
+        try {
+            const response = await getSummaries(debateId);
+            setSummaries(response.summaries);
+        } catch (e) {
+            console.error("AI 요약 불러오기 실패:", e);
         } finally {
             setLoading(false);
         }
@@ -117,10 +113,8 @@ export default function OpinionListScreen() {
         const newScrap = !scrap;
         setScrap(newScrap);
         updateDebate(debateId, { isScraped: newScrap });
-        // Axios 북마크 요청
-    }
+    };
 
-    // 상단 탭에 공유 및 북마크 버튼 추가
     useLayoutEffect(() => {
         navigation.setOptions({
             headerRight: () => (
@@ -147,11 +141,10 @@ export default function OpinionListScreen() {
             setCommentText('');
         } catch (e) {
             console.debug("OpinionListScreen.handleOpinionPosting 실패:", e);
-        } finally {
-
         }
+    };
 
-    }
+    const currentOpinions = opinionStateMap[sort].opinions;
 
     return (
         <KeyboardAvoidingView
@@ -160,63 +153,58 @@ export default function OpinionListScreen() {
             keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
         >
             <SafeAreaView style={styles.container}>
-                {/* 토론 주제 표시 */}
                 <View style={styles.topicView}>
                     <Text style={styles.topicViewText}>{debate.topic}</Text>
                 </View>
 
+                {/* 의견 목록 */}
                 {!isSummary && (
                     <View style={styles.tabContainer}>
                         <Text
                             style={[
                                 styles.tabButton,
-                                sort === 'like' && styles.selectedTabButton
+                                sort === SortType.Likes && styles.selectedTabButton
                             ]}
-                            onPress={() => setSort('like')}
+                            onPress={() => setSort(SortType.Likes)}
                         >
                             좋아요순
                         </Text>
                         <Text
                             style={[
                                 styles.tabButton,
-                                sort === 'comment' && styles.selectedTabButton
+                                sort === SortType.Comments && styles.selectedTabButton
                             ]}
-                            onPress={() => setSort('comment')}
+                            onPress={() => setSort(SortType.Comments)}
                         >
                             댓글 많은순
                         </Text>
                         <Text
                             style={[
                                 styles.tabButton,
-                                sort === 'recent' && styles.selectedTabButton
+                                sort === SortType.Latest && styles.selectedTabButton
                             ]}
-                            onPress={() => setSort('recent')}
+                            onPress={() => setSort(SortType.Latest)}
                         >
                             최신순
                         </Text>
                     </View>
                 )}
 
-                {/* 좌 우 의견 옵션 태그 */}
                 <View style={styles.optionView}>
                     <Text style={styles.optionTextLeft}>{debate.leftOption}</Text>
                     <Text style={styles.optionTextRight}>{debate.rightOption}</Text>
                 </View>
 
-                {/* 의견 텍스트 버블: isSummary 토글에 따라 보여주는 텍스트 버블 타입이 달라짐 */}
                 <View style={styles.opinionView}>
                     {isSummary ? (
-                        <SummaryBoxList
-                            data={summaries}
-                        />
+                        <SummaryBoxList data={summaries} />
                     ) : (
                         <OpinionBoxList
-                            data={opinions}
-                            onEndReached={() => { console.log("페이징 끝 도달") }}
+                            data={currentOpinions}
+                            onEndReached={() => fetchOpinionsBySort(sort)}
                         />
                     )}
 
-                    {/* AI 요약 및 전체 의견 텍스트 토글 */}
                     <View style={styles.opinionTypeToggleView}>
                         <ToggleSwitch
                             isSummary={isSummary}
@@ -225,10 +213,7 @@ export default function OpinionListScreen() {
                     </View>
                 </View>
 
-                {/* 하단 영역: 투표 버튼과 댓글 입력창 */}
-
                 <View style={styles.bottomContainer}>
-                    {/* 좌 우 투표 버튼 */}
                     <View style={isSummary ? styles.VoteButtonView : styles.VoteButtonViewSmall}>
                         <VoteButton
                             debateId={debateId}
@@ -236,14 +221,13 @@ export default function OpinionListScreen() {
                         />
                     </View>
 
-                    {/* 참여중 인원 출력 */}
                     {isSummary && (
                         <View style={styles.TotalVoteCountView}>
                             <Text>지금까지 {debate.totalVoteCount}명 참여중</Text>
                         </View>
                     )}
-
                 </View>
+
                 {!isSummary && (
                     <CommentInput
                         onChangeText={setCommentText}
@@ -254,5 +238,5 @@ export default function OpinionListScreen() {
                 )}
             </SafeAreaView>
         </KeyboardAvoidingView>
-    )
+    );
 }
