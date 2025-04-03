@@ -1,15 +1,18 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { View, ActivityIndicator, FlatList, Dimensions } from 'react-native';
 import DebateCard from './DebateCard';
-import { Debate } from './Debate.types';
 import { styles } from './DebateCard.styles';
 import { getAllDebates } from '../api/DebateApi';
 import { computeDebateListFields } from './Debate.types';
 import { useDebateStore } from '../../../shared/stores/debates';
+import { useAuthStore } from '../../../shared/stores/auth';
 
 const { width, height } = Dimensions.get('window');
 
 export default function DebateCardList() {
+
+    const { loggedIn } = useAuthStore();
+
     const { debates, addDebates, clearDebates } = useDebateStore();
     const [nextCursorId, setNextCursorId] = useState<number | null>(null);
     const [loading, setLoading] = useState(false);
@@ -51,8 +54,12 @@ export default function DebateCardList() {
     }, [nextCursorId, loading, hasMore]);
 
     useEffect(() => {
+        if (!loggedIn) {
+            clearDebates();
+        }
         fetchData();
-    }, []);
+    }, [loggedIn]);
+
 
     const loadMore = () => {
         if (!loading && hasMore) {
