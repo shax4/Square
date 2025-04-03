@@ -125,6 +125,7 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
             <CommentItem
               key={comment.commentId}
               comment={comment}
+              postId={boardId}
               onCommentChange={fetchPostDetail}
             />
           ))}
