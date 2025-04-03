@@ -76,7 +76,7 @@ public class PostCommentRepositoryImpl implements PostCommentRepositoryCustom {
 					comment.valid.isTrue(),
 					comment.parent.id.eq(parentId)
 				)
-				.orderBy(comment.id.desc()) // 최신순
+				.orderBy(comment.id.asc()) // 오래된 순
 				.limit(limit)
 				.fetch();
 
