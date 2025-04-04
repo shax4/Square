@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, Fragment, useRef } from "react";
 import {
   View,
   Text,
@@ -251,6 +251,55 @@ export default function CommentItem({
     ]);
   };
 
+  // 대댓글 좋아요 토글 함수 추가
+  const [loadingLikes, setLoadingLikes] = useState<Set<number>>(new Set());
+  const loadingLikesRef = useRef<Set<number>>(new Set());
+
+  const handleReplyLikeToggle = useCallback(
+    async (replyId: number, currentLiked: boolean) => {
+      // 이미 진행중인 요청이 있는지 확인
+      if (loadingLikesRef.current.has(replyId)) {
+        console.log(
+          `[중복 요청 방지] 댓글 ${replyId}의 좋아요 처리가 이미 진행 중입니다.`
+        );
+        return;
+      }
+
+      // 로딩 상태 설정
+      loadingLikesRef.current.add(replyId); // 동기적 상태 업데이트 (즉시 적용)
+      setLoadingLikes((prev) => new Set(prev).add(replyId)); // UI 업데이트용 (비동기)
+
+      try {
+        const response = await BoardAPI.toggleCommentLike(replyId);
+
+        // API 응답으로 상태 업데이트
+        setLoadedReplies((prevReplies) =>
+          prevReplies.map((reply) =>
+            reply.commentId === replyId
+              ? {
+                  ...reply,
+                  isLiked: response.data.isLiked,
+                  likeCount: response.data.likeCount,
+                }
+              : reply
+          )
+        );
+      } catch (error) {
+        console.error(`[요청 실패] 댓글 ${replyId} 좋아요 처리 실패:`, error);
+        Alert.alert("오류", "좋아요 처리 중 문제가 발생했습니다.");
+      } finally {
+        // 로딩 상태 초기화
+        setLoadingLikes((prev) => {
+          const next = new Set(prev);
+          next.delete(replyId);
+          return next;
+        });
+        loadingLikesRef.current.delete(replyId);
+      }
+    },
+    []
+  );
+
   return (
     <View style={[styles.container, isReply && styles.replyContainer]}>
       {/* 1. 상단 영역 (메인 내용 + 좋아요 버튼) */}
@@ -354,6 +403,7 @@ export default function CommentItem({
 
               {/* 대댓글 내용 - 수정 중이면 수정 UI 표시 */}
               {editingReplyId === reply.commentId ? (
+                // 대댓글 수정 모드 UI
                 <View style={styles.editContainer}>
                   <TextInput
                     style={styles.textInput}
@@ -378,9 +428,24 @@ export default function CommentItem({
                   </View>
                 </View>
               ) : (
-                <View style={styles.replyContentContainer}>
-                  <Text style={styles.contentText}>{reply.content}</Text>
-                </View>
+                // 대댓글 일반 모드 UI
+                <Fragment>
+                  <View style={styles.replyContentRow}>
+                    <Text style={styles.contentText}>{reply.content}</Text>
+                    <View style={styles.replyLikeContainer}>
+                      <LikeButton
+                        initialCount={reply.likeCount || 0}
+                        initialLiked={reply.isLiked || false}
+                        size="small"
+                        isVertical={false}
+                        onPress={(currentLiked) =>
+                          handleReplyLikeToggle(reply.commentId, currentLiked)
+                        }
+                        disabled={loadingLikes.has(reply.commentId)}
+                      />
+                    </View>
+                  </View>
+                </Fragment>
               )}
 
               {/* 푸터는 수정 중이 아닐 때만 표시 */}
@@ -567,7 +632,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#f9f9f9",
     borderRadius: 8,
   },
-  replyContentContainer: {
+  replyContentRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: 4,
   },
   replyFooterContainer: {
@@ -599,4 +667,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   replyButtonContainer: { flexDirection: "row", justifyContent: "flex-end" },
+  replyLikeContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: "auto", // 오른쪽 끝으로 밀어내기
+  },
 });

@@ -9,118 +9,196 @@ import SummaryBoxList from './Components/Summary/SummaryBoxList'
 import { Summary } from './Components/Summary';
 import OpinionBoxList from './Components/Opinion/OpinionBoxList';
 import CommentInput from '../../components/CommentInput/CommentInput';
-import { getOpinions, createOpinion, updateOpinion, deleteOpinion } from './api/OpinionsApi';
+import { getOpinions, createOpinion } from './api/OpinionsApi';
 import { Opinion } from './Components/Opinion';
 import { getSummaries } from './api/SummariesApi';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import BookmarkButton from '../../components/BookmarkButton/BookmarkButton';
 import { Icons } from '../../../assets/icons/Icons';
 import { useDebateStore } from '../../shared/stores/debates';
-
+import { SortType } from './OpinionSortType';
 
 type OpinionListScreenRouteProp = RouteProp<StackParamList, 'OpinionListScreen'>;
+
+interface PagingCursor {
+    // 왼쪽 의견 커서
+    nextLeftCursorId: number | null;
+    nextLeftCursorLikes: number | null;
+    nextLeftCursorComments: number | null;
+    // 오른쪽 의견 커서
+    nextRightCursorId: number | null;
+    nextRightCursorLikes: number | null;
+    nextRightCursorComments: number | null;
+}
 
 export default function OpinionListScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
     const route = useRoute<OpinionListScreenRouteProp>();
     const { debateId, showVoteResultModal = false } = route.params;
 
-    // zustand
     const { debates, updateDebate } = useDebateStore();
     const debate = debates.find((d) => d.debateId === debateId);
     if (!debate) return <Text>Wrong debateId</Text>;
 
-    // 정렬 및 토글
-    const [isSummary, setIsSummary] = useState(true); // ai요약, 의견 토글
-    const [sort, setSort] = useState<'like' | 'comment' | 'recent'>('recent');
+    const [isSummary, setIsSummary] = useState(true);
     const [commentText, setCommentText] = useState('');
-
-    // 요약 정보
     const [summaries, setSummaries] = useState<Summary[]>([]);
 
-    // 의견 페이징
-    const [opinions, setOpinions] = useState<Opinion[]>([]);
-    const [nextLeftCursorId, setNextLeftCursorId] = useState<number | null>(null);
-    const [nextRightCursorId, setNextRightCursorId] = useState<number | null>(null);
-    const [hasMore, setHasMore] = useState(true);
-    const [loading, setLoading] = useState(false);
-    const [scrap, setScrap] = useState(debate.isScraped);
+    const [sort, setSort] = useState<SortType>(SortType.Latest);
+    const [opinionStateMap, setOpinionStateMap] = useState<Record<SortType, {
+        opinions: Opinion[];
+        hasMore: boolean;
+    }>>({
+        latest: {
+            opinions: [],
+            hasMore: true
+        },
+        likes: {
+            opinions: [],
+            hasMore: true
+        },
+        comments: {
+            opinions: [],
+            hasMore: true
+        },
+    });
+    const emptyCursor = {
+        nextLeftCursorId: null,
+        nextLeftCursorLikes: null,
+        nextLeftCursorComments: null,
+        nextRightCursorId: null,
+        nextRightCursorLikes: null,
+        nextRightCursorComments: null,
+    }
+    // 페이징 커서 관리
+    const [cursor, setCursor] = useState<PagingCursor>(emptyCursor);
     const limit = 5;
 
-    /*
+    // 로딩을 통한 데이터 초기화 중 렌더링 방지 
+    const [loading, setLoading] = useState(false);
+    // 스크랩 버튼 관리
+    const [scrap, setScrap] = useState(debate.isScraped);
+
+    // 햔재 탭의 의견
+    const currentOpinions = opinionStateMap[sort].opinions;
+
     useEffect(() => {
-        initOpinions();
-    }, [sort]);
-    */
-    useEffect(() => {
+        fetchAllSorts();
         initAiSummaries();
     }, []);
 
-    // AI 요약 초기 요약
+    // 처음 로드 시 각 정렬 방식에 맞춰 의견들 가져오기
+    const fetchAllSorts = async () => {
+        for (const sortType of [SortType.Latest, SortType.Likes, SortType.Comments] as SortType[]) {
+            await fetchOpinionsBySort(sortType, true);
+        }
+    };
+
+    // 정렬 방식에 맞춰 의견 목록 조회 요청
+    const fetchOpinionsBySort = async (sortType: SortType, force = false) => {
+        const current = opinionStateMap[sortType];
+        if (!current.hasMore || loading) return;
+
+        setLoading(true);
+
+        try {
+            const response = await getOpinions(debateId, {
+                sort: sortType,
+                nextLeftCursorId: force ? null : cursor.nextLeftCursorId,
+                nextLeftCursorLikes: force ? null : cursor.nextLeftCursorLikes,
+                nextLeftCursorComments: force ? null : cursor.nextLeftCursorComments,
+
+                nextRightCursorId: force ? null : cursor.nextRightCursorId,
+                nextRightCursorLikes: force ? null : cursor.nextRightCursorLikes,
+                nextRightCursorComments: force ? null : cursor.nextRightCursorComments,
+
+                limit,
+            });
+
+            let hasMoreData = false;
+
+            // 이전 커서 ID와 현재 응답의 커서 ID 비교해 더 불러올 데이터가 존재하는지 판단
+            if (sortType === SortType.Latest) {
+                hasMoreData =
+                    response.nextLeftCursorId !== cursor.nextLeftCursorId ||
+                    response.nextRightCursorId !== cursor.nextRightCursorId;
+            } else if (sortType === SortType.Likes) {
+                hasMoreData =
+                    response.nextLeftCursorLikes !== cursor.nextLeftCursorLikes ||
+                    response.nextRightCursorLikes !== cursor.nextRightCursorLikes;
+            } else if (sortType === SortType.Comments) {
+                hasMoreData =
+                    response.nextLeftCursorComments !== cursor.nextLeftCursorComments ||
+                    response.nextRightCursorComments !== cursor.nextRightCursorComments;
+            }
+
+            // 새 커서로 설정
+            setCursor({
+                nextLeftCursorId: response.nextLeftCursorId,
+                nextLeftCursorLikes: response.nextLeftCursorLikes,
+                nextLeftCursorComments: response.nextLeftCursorComments,
+
+                nextRightCursorId: response.nextRightCursorId,
+                nextRightCursorLikes: response.nextRightCursorLikes,
+                nextRightCursorComments: response.nextRightCursorComments,
+            })
+
+            if (force) {
+                setOpinionStateMap(prev => ({
+                    ...prev,
+                    [sortType]: {
+                        opinions: response.opinions,
+                        hasMore: hasMoreData
+                    }
+                }));
+            } else {
+                // 중복 방지를 위한 필터링
+                const existingIds = new Set(current.opinions.map(op => op.opinionId));
+                const newOpinions = response.opinions.filter(op => !existingIds.has(op.opinionId));
+
+                setOpinionStateMap(prev => ({
+                    ...prev,
+                    [sortType]: {
+                        opinions: [...prev[sortType].opinions, ...newOpinions],
+                        hasMore: hasMoreData
+                    }
+                }));
+            }
+
+        } catch (e) {
+            console.error(`의견 불러오기 실패 (${sortType}):`, e);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // AI 요약 초기 업데이트
     const initAiSummaries = () => {
         setSummaries([]);
         fetchSummaries();
-    }
+    };
 
-    // AI 요약 정보 불러오기
     const fetchSummaries = async () => {
         setLoading(true);
         try {
             const response = await getSummaries(debateId);
-
-            // AI 요약 설정
             setSummaries(response.summaries);
         } catch (e) {
             console.error("AI 요약 불러오기 실패:", e);
         } finally {
             setLoading(false);
         }
-    }
-
-    // 의견 초기 리셋
-    const initOpinions = () => {
-        setOpinions([]);
-        setNextLeftCursorId(null);
-        setNextRightCursorId(null);
-        setHasMore(true);
-        fetchOpinions();
-    }
-
-    const fetchOpinions = async () => {
-        if (loading || !hasMore) return;
-
-        setLoading(true);
-
-        try {
-            const response = await getOpinions(debateId, {
-                nextLeftCursorId,
-                nextRightCursorId,
-                limit,
-            });
-
-            setOpinions((prev) => [...prev, ...response.opinions]);
-            setNextLeftCursorId(response.nextLeftCursorId);
-            setNextRightCursorId(response.nextRightCursorId);
-
-            // 다음 커서가 모두 null이면 더 이상 불러올 게 없음
-            if (!response.nextLeftCursorId && !response.nextRightCursorId) {
-                setHasMore(false);
-            }
-        } catch (e) {
-            console.error("의견 불러오기 실패:", e);
-        } finally {
-            setLoading(false);
-        }
     };
 
+    // 스크랩 북마크 요청
     const handleScrap = () => {
         const newScrap = !scrap;
         setScrap(newScrap);
         updateDebate(debateId, { isScraped: newScrap });
-        // Axios 북마크 요청
-    }
+        // axios 추가 필요
+    };
 
-    // 상단 탭에 공유 및 북마크 버튼 추가
+    // 상단바 기능 버튼 추가
     useLayoutEffect(() => {
         navigation.setOptions({
             headerRight: () => (
@@ -137,21 +215,34 @@ export default function OpinionListScreen() {
         });
     }, [debate.isScraped]);
 
+    // 투표한 사람만 입력 가능하도록 검사 후 의견 등록
     const handleOpinionPosting = async () => {
         if (debate.isLeft == null) {
             console.debug("투표해야 의견 입력 가능");
             return;
         }
+
         try {
-            const response = await createOpinion(debateId, debate.isLeft, commentText);
+            await createOpinion(debateId, debate.isLeft, commentText);
             setCommentText('');
+
+            // 의견 상태 맵 초기화 먼저 수행
+            setOpinionStateMap({
+                latest: { opinions: [], hasMore: true },
+                likes: { opinions: [], hasMore: true },
+                comments: { opinions: [], hasMore: true },
+            });
+            // 페이징 커서 초기화
+            setCursor(emptyCursor);
+
+            // 초기화 후 데이터 다시 불러오기
+            await fetchAllSorts();
+
         } catch (e) {
             console.debug("OpinionListScreen.handleOpinionPosting 실패:", e);
-        } finally {
-
         }
+    };
 
-    }
 
     return (
         <KeyboardAvoidingView
@@ -160,63 +251,58 @@ export default function OpinionListScreen() {
             keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
         >
             <SafeAreaView style={styles.container}>
-                {/* 토론 주제 표시 */}
                 <View style={styles.topicView}>
                     <Text style={styles.topicViewText}>{debate.topic}</Text>
                 </View>
 
+                {/* 의견 목록 */}
                 {!isSummary && (
                     <View style={styles.tabContainer}>
                         <Text
                             style={[
                                 styles.tabButton,
-                                sort === 'like' && styles.selectedTabButton
+                                sort === SortType.Likes && styles.selectedTabButton
                             ]}
-                            onPress={() => setSort('like')}
+                            onPress={() => setSort(SortType.Likes)}
                         >
                             좋아요순
                         </Text>
                         <Text
                             style={[
                                 styles.tabButton,
-                                sort === 'comment' && styles.selectedTabButton
+                                sort === SortType.Comments && styles.selectedTabButton
                             ]}
-                            onPress={() => setSort('comment')}
+                            onPress={() => setSort(SortType.Comments)}
                         >
                             댓글 많은순
                         </Text>
                         <Text
                             style={[
                                 styles.tabButton,
-                                sort === 'recent' && styles.selectedTabButton
+                                sort === SortType.Latest && styles.selectedTabButton
                             ]}
-                            onPress={() => setSort('recent')}
+                            onPress={() => setSort(SortType.Latest)}
                         >
                             최신순
                         </Text>
                     </View>
                 )}
 
-                {/* 좌 우 의견 옵션 태그 */}
                 <View style={styles.optionView}>
                     <Text style={styles.optionTextLeft}>{debate.leftOption}</Text>
                     <Text style={styles.optionTextRight}>{debate.rightOption}</Text>
                 </View>
 
-                {/* 의견 텍스트 버블: isSummary 토글에 따라 보여주는 텍스트 버블 타입이 달라짐 */}
                 <View style={styles.opinionView}>
                     {isSummary ? (
-                        <SummaryBoxList
-                            data={summaries}
-                        />
+                        <SummaryBoxList data={summaries} />
                     ) : (
                         <OpinionBoxList
-                            data={opinions}
-                            onEndReached={() => { console.log("페이징 끝 도달") }}
+                            data={currentOpinions}
+                            onEndReached={() => fetchOpinionsBySort(sort)}
                         />
                     )}
 
-                    {/* AI 요약 및 전체 의견 텍스트 토글 */}
                     <View style={styles.opinionTypeToggleView}>
                         <ToggleSwitch
                             isSummary={isSummary}
@@ -225,10 +311,7 @@ export default function OpinionListScreen() {
                     </View>
                 </View>
 
-                {/* 하단 영역: 투표 버튼과 댓글 입력창 */}
-
                 <View style={styles.bottomContainer}>
-                    {/* 좌 우 투표 버튼 */}
                     <View style={isSummary ? styles.VoteButtonView : styles.VoteButtonViewSmall}>
                         <VoteButton
                             debateId={debateId}
@@ -236,14 +319,13 @@ export default function OpinionListScreen() {
                         />
                     </View>
 
-                    {/* 참여중 인원 출력 */}
                     {isSummary && (
                         <View style={styles.TotalVoteCountView}>
                             <Text>지금까지 {debate.totalVoteCount}명 참여중</Text>
                         </View>
                     )}
-
                 </View>
+
                 {!isSummary && (
                     <CommentInput
                         onChangeText={setCommentText}
@@ -254,5 +336,5 @@ export default function OpinionListScreen() {
                 )}
             </SafeAreaView>
         </KeyboardAvoidingView>
-    )
+    );
 }
