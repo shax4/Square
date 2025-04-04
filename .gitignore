@@ -1,3 +1,5 @@
 .idea
 backend/.env
+.env
+
 devops/firebase/firebase-service-key.json
