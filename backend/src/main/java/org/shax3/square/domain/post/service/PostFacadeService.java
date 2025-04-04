@@ -100,7 +100,7 @@ public class PostFacadeService {
 
 		List<PostSummaryDto> postDtos = toPostDtos(posts, user);
 
-		return MyPostResponse.of(postDtos, getNextCursorId(posts, hasNext));
+		return new MyPostResponse(postDtos, getNextCursorId(posts, hasNext));
 	}
 
 	/**
@@ -120,7 +120,7 @@ public class PostFacadeService {
 
 		List<PostSummaryDto> postDtos = toPostDtos(posts, user);
 
-		return MyPostResponse.of(postDtos, getNextCursorId(posts, hasNext));
+		return new MyPostResponse(postDtos, getNextCursorId(posts, hasNext));
 	}
 
 	/**
@@ -139,7 +139,7 @@ public class PostFacadeService {
 
 		List<PostSummaryDto> postDtos = toPostDtos(posts, user);
 
-		return MyPostResponse.of(postDtos, getNextCursorId(posts, hasNext));
+		return new MyPostResponse(postDtos, getNextCursorId(posts, hasNext));
 	}
 
 
@@ -195,7 +195,7 @@ public class PostFacadeService {
 
 		// 이미지 DTO 변환
 		List<PostImageDto> imageDtos = post.getPostImages().stream()
-			.map(image -> PostImageDto.of(
+			.map(image -> new PostImageDto(
 				s3Service.generatePresignedGetUrl(image.getS3Key()),
 				image.getS3Key()))
 			.toList();

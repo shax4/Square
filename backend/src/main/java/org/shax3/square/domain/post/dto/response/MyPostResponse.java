@@ -8,7 +8,4 @@ public record MyPostResponse(
 	List<PostSummaryDto> posts,
 	Long nextCursorId
 ) {
-	public static MyPostResponse of(List<PostSummaryDto> posts, Long nextCursorId) {
-		return new MyPostResponse(posts, nextCursorId);
-	}
 }
