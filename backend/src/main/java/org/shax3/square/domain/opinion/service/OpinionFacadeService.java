@@ -3,6 +3,7 @@ package org.shax3.square.domain.opinion.service;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.like.service.LikeService;
+import org.shax3.square.domain.opinion.dto.MyOpinionDto;
 import org.shax3.square.domain.opinion.dto.OpinionDto;
 import org.shax3.square.domain.opinion.dto.request.CreateOpinionCommentRequest;
 import org.shax3.square.domain.opinion.dto.response.CommentResponse;
@@ -13,6 +14,7 @@ import org.shax3.square.domain.opinion.model.Opinion;
 import org.shax3.square.domain.opinion.model.OpinionComment;
 import org.shax3.square.domain.s3.service.S3Service;
 import org.shax3.square.domain.user.model.User;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,7 @@ public class OpinionFacadeService {
     private final OpinionCommentService opinionCommentService;
     private final S3Service s3Service;
     private final LikeService likeService;
+    private final RedisTemplate<String, Object> batchRedisTemplate;
 
     /* 답글을 생성하기 위한 메서드
     - 답글에 opinionId가 필요하기 때문에
@@ -52,6 +55,9 @@ public class OpinionFacadeService {
         boolean isLiked = likeService.getLikedTargetIds(user, TargetType.OPINION, List.of(opinionId))
                 .contains(opinionId);
 
+        Set<Object> entries = batchRedisTemplate.opsForSet().members("like:batch");
+        int likeCount = opinion.getLikeCount() + likeService.getLikeCountInRedis(entries, opinionId, TargetType.OPINION);
+
         List<Long> commentIds = comments.stream()
                 .map(OpinionComment::getId)
                 .toList();
@@ -59,16 +65,17 @@ public class OpinionFacadeService {
         Set<Long> likedCommentIds = likeService.getLikedTargetIds(user, TargetType.OPINION_COMMENT, commentIds);
 
         List<CommentResponse> commentResponses = comments.stream()
-                .map(comment -> CommentResponse.of(
-                        comment,
-                        s3Service.generatePresignedGetUrl(comment.getUser().getS3Key()),
-                        likedCommentIds.contains(comment.getId())
-                ))
-                .toList();
+            .map(comment -> CommentResponse.of(
+                comment,
+                s3Service.generatePresignedGetUrl(comment.getUser().getS3Key()),
+                likedCommentIds.contains(comment.getId()),
+                comment.getLikeCount() + likeService.getLikeCountInRedis(entries, comment.getId(), TargetType.OPINION_COMMENT)
+            ))
+            .toList();
 
         String profileUrl = s3Service.generatePresignedGetUrl(user.getS3Key());
 
-        return OpinionDetailsResponse.of(opinion, commentResponses, profileUrl, isLiked);
+        return OpinionDetailsResponse.of(opinion, commentResponses, profileUrl, isLiked, likeCount);
     }
 
     @Transactional(readOnly = true)
@@ -81,7 +88,19 @@ public class OpinionFacadeService {
 
         Set<Long> likedOpinionIds = likeService.getLikedTargetIds(user, TargetType.OPINION, opinionIds);
 
-        return MyOpinionResponse.of(opinions, likedOpinionIds);
+        Long newNextCursorId = opinions.isEmpty() ? null : opinions.get(opinions.size() - 1).getId();
+
+        Set<Object> entries = batchRedisTemplate.opsForSet().members("like:batch");
+
+        List<MyOpinionDto> opinionDtos = opinions.stream()
+            .map(opinion -> {
+                boolean isLiked = likedOpinionIds.contains(opinion.getId());
+                int likeCount = opinion.getLikeCount() + likeService.getLikeCountInRedis(entries, opinion.getId(), TargetType.OPINION);
+                return MyOpinionDto.from(opinion, isLiked, likeCount);
+            })
+            .toList();
+
+        return MyOpinionResponse.of(opinionDtos, newNextCursorId);
     }
 
     @Transactional(readOnly = true)
@@ -105,13 +124,16 @@ public class OpinionFacadeService {
         List<Long> opinionIds = opinions.stream().map(Opinion::getId).toList();
         Set<Long> likedOpinionIds = likeService.getLikedTargetIds(user, TargetType.OPINION, opinionIds);
 
+        Set<Object> entries = batchRedisTemplate.opsForSet().members("like:batch");
+
         return opinions.stream()
-                .map(op -> OpinionDto.of(
-                        op,
-                        likedOpinionIds.contains(op.getId()),
-                        op.getCommentCount(),
-                        op.getUser(),
-                        s3Service.generatePresignedGetUrl(op.getUser().getS3Key())
+                .map(opinion -> OpinionDto.of(
+                        opinion,
+                        likedOpinionIds.contains(opinion.getId()),
+                        opinion.getCommentCount(),
+                        opinion.getUser(),
+                        s3Service.generatePresignedGetUrl(opinion.getUser().getS3Key()),
+                        opinion.getLikeCount() + likeService.getLikeCountInRedis(entries, opinion.getId(), TargetType.OPINION)
                 ))
                 .toList();
     }

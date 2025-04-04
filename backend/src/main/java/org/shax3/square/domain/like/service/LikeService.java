@@ -131,8 +131,7 @@ public class LikeService {
 		return likeRepository.existsByUserAndTargetTypeAndTargetIdAndLikeTrue(user, targetType, targetId);
 	}
 
-	public int getPendingLikeCountInRedis(Long targetId, TargetType targetType) {
-		Set<Object> entries = batchRedisTemplate.opsForSet().members("like:batch");
+	public int getLikeCountInRedis(Set<Object> entries, Long targetId, TargetType targetType) {
 		if (entries == null) return 0;
 
 		return (int) entries.stream()

@@ -22,7 +22,8 @@ public record CommentDto(
 		String profileUrl,
 		boolean isLiked,
 		int replyCount,
-		List<ReplyDto> replies
+		List<ReplyDto> replies,
+		int likeCount
 	) {
 		return new CommentDto(
 			comment.getId(),
@@ -31,7 +32,7 @@ public record CommentDto(
 			comment.getUser().getType().name(),
 			comment.getCreatedAt(),
 			comment.getContent(),
-			comment.getLikeCount(),
+			likeCount,
 			isLiked,
 			replyCount,
 			replies

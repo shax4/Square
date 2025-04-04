@@ -10,15 +10,7 @@ public record MyOpinionResponse(
         List<MyOpinionDto> opinions,
         Long nextCursorId
 ) {
-    public static MyOpinionResponse of(List<Opinion> opinions, Set<Long> likedOpinionIds) {
-        Long newNextCursorId = opinions.isEmpty() ? null : opinions.get(opinions.size() - 1).getId();
-
-        List<MyOpinionDto> opinionDtos = opinions.stream()
-            .map(opinion -> {
-                boolean isLiked = likedOpinionIds.contains(opinion.getId());
-                return MyOpinionDto.from(opinion, isLiked);
-            })
-            .toList();
+    public static MyOpinionResponse of(List<MyOpinionDto> opinionDtos, Long newNextCursorId) {
 
         return new MyOpinionResponse(opinionDtos, newNextCursorId);
     }

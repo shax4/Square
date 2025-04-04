@@ -14,14 +14,14 @@ public record CommentResponse(
         String content,
         boolean isLiked
 ) {
-    public static CommentResponse of(OpinionComment comment, String profileUrl,boolean isLiked) {
+    public static CommentResponse of(OpinionComment comment, String profileUrl, boolean isLiked, int likeCount) {
         return new CommentResponse(
                 comment.getId(),
                 comment.getUser().getNickname(),
                 profileUrl,
                 comment.getUser().getType().name(),
                 comment.getCreatedAt(),
-                comment.getLikeCount(),
+                likeCount,
                 comment.getContent(),
                 isLiked
         );

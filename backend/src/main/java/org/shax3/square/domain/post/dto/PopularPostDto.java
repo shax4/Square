@@ -11,12 +11,12 @@ public record PopularPostDto(
 	int likeCount,
 	int commentCount
 ) {
-	public static PopularPostDto from(Post post, int commentCount) {
+	public static PopularPostDto from(Post post, int commentCount, int likeCount) {
 		return new PopularPostDto(
 			post.getId(),
 			post.getTitle(),
 			post.getCreatedAt(),
-			post.getLikeCount(),
+			likeCount,
 			commentCount
 		);
 	}
