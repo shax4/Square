@@ -2,6 +2,10 @@ import { axiosInstance } from "../../../shared";
 import { Comment } from "../Components/Comment.types";
 import { OpinionsResponse } from "../Components/OpinionsResponse.types";
 
+interface commentResponse {
+    commentId: number,
+    profileUrl: string,
+}
 
 export const getOpinionDetail = async (
     commentId: number,
@@ -16,13 +20,13 @@ export const getOpinionDetail = async (
 }
 
 export const createComment = async (
-    commentId: number,
+    opinionId: number,
     content: String,
-): Promise<Comment> => {
+): Promise<commentResponse> => {
     try {
         const response = await axiosInstance.post('/api/opinions/comments',
             {
-                commentId: commentId,
+                opinionId: opinionId,
                 content: content,
             }
         );
@@ -36,7 +40,7 @@ export const createComment = async (
 export const updateComment = async (
     commentId: number,
     content: String,
-): Promise<Comment> => {
+): Promise<commentResponse> => {
     try {
         const response = await axiosInstance.put(`/api/opinions/comments/${commentId}`,
             {

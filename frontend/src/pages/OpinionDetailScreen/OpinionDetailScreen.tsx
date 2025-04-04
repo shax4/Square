@@ -1,10 +1,10 @@
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
-import { Text, TouchableOpacity, View, ScrollView, Alert, } from "react-native";
+import { Text, TouchableOpacity, View, ScrollView, Alert, InteractionManager } from "react-native";
 import { StackParamList } from "../../shared/page-stack/DebatePageStack";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { Icons } from "../../../assets/icons/Icons";
 import { LikeButton } from "../../components";
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState, useRef } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { styles } from './Components/OpinionDetailScreen.styles'
 import CommentInput from "../../components/CommentInput/CommentInput";
@@ -20,6 +20,10 @@ export default function OpinionDetailScreen() {
     const route = useRoute<OpinionDetailRouteProp>();
     const { opinionId } = route.params;
 
+    // 스크롤 관리
+    const scrollRef = useRef<ScrollView>(null);
+
+    // 로그인 사용자
     const { loggedIn, user } = useAuthStore();
 
     // 의견 상세페이지 정보
@@ -36,9 +40,47 @@ export default function OpinionDetailScreen() {
     const onChangeText = (text: string) => {
         setCommentText(text);
     }
-    const onPressCreateComment = () => {
-        clearCommentInputField;
-    }
+
+    const onPressCreateComment = async () => {
+        const trimmedComment = commentText.trim();
+        if (!trimmedComment || trimmedComment.length < 5 || trimmedComment.length > 150) {
+            // 네이티브 모달로 글자 수 보내 경고
+            return;
+        }
+
+        try {
+            const commentResponse = await createComment(opinionId, commentText);
+            clearCommentInputField();
+
+            // 새 댓글을 직접 만들어 추가
+            const newComment: Comment = {
+                commentId: commentResponse.commentId,
+                nickname: user!.nickname,
+                profileUrl: commentResponse.profileUrl,
+                userType: user!.userType,
+                createdAt: new Date().toISOString(),
+                content: commentText,
+                likeCount: 0,
+                isLiked: false,
+            };
+
+            // 기존 댓글 리스트에 새 댓글 추가
+            setComments((prev) => [...prev, newComment]);
+
+            // 의견 댓글 수 +1 갱신
+            setOpinionDetail((prev) =>
+                prev
+                    ? { ...prev, commentCount: prev.commentCount + 1 }
+                    : prev
+            );
+            // 렌더링 끝난 후 실행
+            setTimeout(() => {
+                scrollRef.current?.scrollToEnd({ animated: true });
+            }, 100);
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     const clearCommentInputField = () => {
         setCommentText('');
@@ -176,6 +218,7 @@ export default function OpinionDetailScreen() {
 
             {/* 댓글 스크롤 뷰 */}
             <ScrollView
+                ref={scrollRef}
                 style={styles.ScrollViewContent}
                 keyboardShouldPersistTaps="handled"
             >
@@ -212,8 +255,8 @@ export default function OpinionDetailScreen() {
             </ScrollView>
 
             <CommentInput
-                onSubmit={() => { }}
-                onChangeText={setCommentText}
+                onSubmit={() => onPressCreateComment()}
+                onChangeText={onChangeText}
                 value={commentText}
                 placeholder="댓글을 입력하세요..."
             />
