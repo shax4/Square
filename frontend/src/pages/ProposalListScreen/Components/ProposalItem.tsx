@@ -19,7 +19,7 @@ const ProposalItem = ({
             <Text style={styles.Title}>{item.topic}</Text>
             <TouchableOpacity
                 style={styles.LikeButton}
-                onPress={() => console.log("청원 좋아요 기능")}>
+                onPress={() => console.log(`청원 ID : ${item.proposalId}, 청원 좋아요 기능`)}>
                 <Icons.heartBlank />
                 <Text style={styles.LikesText}>{item.likeCount}</Text>
             </TouchableOpacity>
