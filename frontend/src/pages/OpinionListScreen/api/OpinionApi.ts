@@ -18,7 +18,6 @@ export const getOpinions = async (
     params: GetOpinionsParams = {}
 ): Promise<OpinionsResponse> => {
     try {
-        
         const response = await axiosInstance.get(`/api/debates/${debateId}`, {
             params: {
                 sort: params.sort ?? SortType.Latest,
@@ -31,29 +30,6 @@ export const getOpinions = async (
                 limit: params.limit ?? 5,
             },
         });
-
-        const queryParams = {
-            sort: params.sort ?? SortType.Latest,
-            nextLeftCursorId: params.nextLeftCursorId,
-            nextLeftCursorLikes: params.nextLeftCursorLikes,
-            nextLeftCursorComments: params.nextLeftCursorComments,
-            nextRightCursorId: params.nextRightCursorId,
-            nextRightCursorLikes: params.nextRightCursorLikes,
-            nextRightCursorComments: params.nextRightCursorComments,
-            limit: params.limit ?? 5,
-        };
-
-        // URL 문자열 생성 및 출력
-        const queryString = new URLSearchParams(
-            Object.entries(queryParams)
-                .filter(([_, value]) => value !== undefined && value !== null)
-                .map(([key, value]) => [key, String(value)])
-        ).toString();
-
-        const fullUrl = `/api/debates/${debateId}?${queryString}`;
-        console.log("📡 생성된 요청 URL:", fullUrl);
-
-
         return response.data;
     } catch (error) {
         console.error("의견 받아오기 실패:", error);
@@ -91,7 +67,7 @@ export const updateOpinion = async (opinionId: number, content: string) => {
 
 export const deleteOpinion = async (opinionId: number) => {
     try {
-        const response = await axiosInstance.put(`/api/opinions/${opinionId}`);
+        const response = await axiosInstance.delete(`/api/opinions/${opinionId}`);
         return response.data;
     } catch (error) {
         console.error("SummariesApi.deleteOpinion DELETE 요청 실패:", error);

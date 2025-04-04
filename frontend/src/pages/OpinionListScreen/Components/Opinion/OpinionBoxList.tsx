@@ -5,6 +5,7 @@ import { Opinion } from "./Opinion.types";
 
 interface Props {
     data: Opinion[];
+    debateId: number,
     onEndReached?: () => void;
 }
 
