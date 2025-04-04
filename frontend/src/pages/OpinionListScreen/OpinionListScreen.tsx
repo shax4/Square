@@ -20,6 +20,16 @@ import { SortType } from './OpinionSortType';
 
 type OpinionListScreenRouteProp = RouteProp<StackParamList, 'OpinionListScreen'>;
 
+interface PagingCursor {
+    // 왼쪽 의견 커서
+    nextLeftCursorId: number | null;
+    nextLeftCursorLikes: number | null;
+    nextLeftCursorComments: number | null;
+    // 오른쪽 의견 커서
+    nextRightCursorId: number | null;
+    nextRightCursorLikes: number | null;
+    nextRightCursorComments: number | null;
+}
 
 export default function OpinionListScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
@@ -31,25 +41,46 @@ export default function OpinionListScreen() {
     if (!debate) return <Text>Wrong debateId</Text>;
 
     const [isSummary, setIsSummary] = useState(true);
-    const [sort, setSort] = useState<SortType>(SortType.Latest);
     const [commentText, setCommentText] = useState('');
-
     const [summaries, setSummaries] = useState<Summary[]>([]);
 
+    const [sort, setSort] = useState<SortType>(SortType.Latest);
     const [opinionStateMap, setOpinionStateMap] = useState<Record<SortType, {
         opinions: Opinion[];
-        nextLeftCursorId: number | null;
-        nextRightCursorId: number | null;
         hasMore: boolean;
     }>>({
-        latest: { opinions: [], nextLeftCursorId: null, nextRightCursorId: null, hasMore: true },
-        likes: { opinions: [], nextLeftCursorId: null, nextRightCursorId: null, hasMore: true },
-        comments: { opinions: [], nextLeftCursorId: null, nextRightCursorId: null, hasMore: true },
+        latest: {
+            opinions: [],
+            hasMore: true
+        },
+        likes: {
+            opinions: [],
+            hasMore: true
+        },
+        comments: {
+            opinions: [],
+            hasMore: true
+        },
     });
-
-    const [loading, setLoading] = useState(false);
-    const [scrap, setScrap] = useState(debate.isScraped);
+    const emptyCursor = {
+        nextLeftCursorId: null,
+        nextLeftCursorLikes: null,
+        nextLeftCursorComments: null,
+        nextRightCursorId: null,
+        nextRightCursorLikes: null,
+        nextRightCursorComments: null,
+    }
+    // 페이징 커서 관리
+    const [cursor, setCursor] = useState<PagingCursor>(emptyCursor);
     const limit = 5;
+
+    // 로딩을 통한 데이터 초기화 중 렌더링 방지 
+    const [loading, setLoading] = useState(false);
+    // 스크랩 버튼 관리
+    const [scrap, setScrap] = useState(debate.isScraped);
+
+    // 햔재 탭의 의견
+    const currentOpinions = opinionStateMap[sort].opinions;
 
     useEffect(() => {
         fetchAllSorts();
@@ -73,25 +104,50 @@ export default function OpinionListScreen() {
         try {
             const response = await getOpinions(debateId, {
                 sort: sortType,
-                nextLeftCursorId: force ? null : current.nextLeftCursorId,
-                nextRightCursorId: force ? null : current.nextRightCursorId,
+                nextLeftCursorId: force ? null : cursor.nextLeftCursorId,
+                nextLeftCursorLikes: force ? null : cursor.nextLeftCursorLikes,
+                nextLeftCursorComments: force ? null : cursor.nextLeftCursorComments,
+
+                nextRightCursorId: force ? null : cursor.nextRightCursorId,
+                nextRightCursorLikes: force ? null : cursor.nextRightCursorLikes,
+                nextRightCursorComments: force ? null : cursor.nextRightCursorComments,
+
                 limit,
             });
 
-            // 이전 커서 ID와 현재 응답의 커서 ID 비교
-            const leftCursorChanged = response.nextLeftCursorId !== current.nextLeftCursorId;
-            const rightCursorChanged = response.nextRightCursorId !== current.nextRightCursorId;
+            let hasMoreData = false;
 
-            // 커서가 변경되었으면 더 불러올 데이터가 있음
-            const hasMoreData = leftCursorChanged || rightCursorChanged;
+            // 이전 커서 ID와 현재 응답의 커서 ID 비교해 더 불러올 데이터가 존재하는지 판단
+            if (sortType === SortType.Latest) {
+                hasMoreData =
+                    response.nextLeftCursorId !== cursor.nextLeftCursorId ||
+                    response.nextRightCursorId !== cursor.nextRightCursorId;
+            } else if (sortType === SortType.Likes) {
+                hasMoreData =
+                    response.nextLeftCursorLikes !== cursor.nextLeftCursorLikes ||
+                    response.nextRightCursorLikes !== cursor.nextRightCursorLikes;
+            } else if (sortType === SortType.Comments) {
+                hasMoreData =
+                    response.nextLeftCursorComments !== cursor.nextLeftCursorComments ||
+                    response.nextRightCursorComments !== cursor.nextRightCursorComments;
+            }
+
+            // 새 커서로 설정
+            setCursor({
+                nextLeftCursorId: response.nextLeftCursorId,
+                nextLeftCursorLikes: response.nextLeftCursorLikes,
+                nextLeftCursorComments: response.nextLeftCursorComments,
+
+                nextRightCursorId: response.nextRightCursorId,
+                nextRightCursorLikes: response.nextRightCursorLikes,
+                nextRightCursorComments: response.nextRightCursorComments,
+            })
 
             if (force) {
                 setOpinionStateMap(prev => ({
                     ...prev,
                     [sortType]: {
                         opinions: response.opinions,
-                        nextLeftCursorId: response.nextLeftCursorId,
-                        nextRightCursorId: response.nextRightCursorId,
                         hasMore: hasMoreData
                     }
                 }));
@@ -104,8 +160,6 @@ export default function OpinionListScreen() {
                     ...prev,
                     [sortType]: {
                         opinions: [...prev[sortType].opinions, ...newOpinions],
-                        nextLeftCursorId: response.nextLeftCursorId,
-                        nextRightCursorId: response.nextRightCursorId,
                         hasMore: hasMoreData
                     }
                 }));
@@ -174,10 +228,12 @@ export default function OpinionListScreen() {
 
             // 의견 상태 맵 초기화 먼저 수행
             setOpinionStateMap({
-                latest: { opinions: [], nextLeftCursorId: null, nextRightCursorId: null, hasMore: true },
-                likes: { opinions: [], nextLeftCursorId: null, nextRightCursorId: null, hasMore: true },
-                comments: { opinions: [], nextLeftCursorId: null, nextRightCursorId: null, hasMore: true },
+                latest: { opinions: [], hasMore: true },
+                likes: { opinions: [], hasMore: true },
+                comments: { opinions: [], hasMore: true },
             });
+            // 페이징 커서 초기화
+            setCursor(emptyCursor);
 
             // 초기화 후 데이터 다시 불러오기
             await fetchAllSorts();
@@ -187,7 +243,6 @@ export default function OpinionListScreen() {
         }
     };
 
-    const currentOpinions = opinionStateMap[sort].opinions;
 
     return (
         <KeyboardAvoidingView
