@@ -9,7 +9,7 @@ import SummaryBoxList from './Components/Summary/SummaryBoxList'
 import { Summary } from './Components/Summary';
 import OpinionBoxList from './Components/Opinion/OpinionBoxList';
 import CommentInput from '../../components/CommentInput/CommentInput';
-import { getOpinions, createOpinion } from './api/OpinionListApi';
+import { getOpinions, createOpinion } from './api/OpinionApi';
 import { Opinion } from './Components/Opinion';
 import { getSummaries } from './api/SummariesApi';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
