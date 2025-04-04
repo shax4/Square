@@ -21,6 +21,7 @@ import { Post, Comment, Reply } from "./board.types";
 import { getTimeAgo } from "../../shared/utils/timeAge/timeAge";
 import LikeButton from "../../components/LikeButton";
 import { Icons } from "../../../assets/icons/Icons";
+import PersonalityTag from "../../components/PersonalityTag/PersonalityTag";
 
 // 네비게이션 프롭 타입 정의
 type Props = StackScreenProps<BoardStackParamList, "BoardDetail">;
@@ -119,7 +120,13 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
         <View style={styles.postHeader}>
           <ProfileImage imageUrl={post?.profileUrl} variant="medium" />
           <View style={styles.authorInfo}>
-            <Text style={styles.authorName}>{post?.nickname}</Text>
+            <View style={styles.nameContainer}>
+              <Text style={styles.authorName}>{post?.nickname}</Text>
+              <PersonalityTag
+                personality={post?.userType || ""}
+                nickname={post?.nickname || ""}
+              />
+            </View>
             <Text style={styles.postDate}>
               {post?.createdAt ? getTimeAgo(post.createdAt) : ""}
             </Text>
@@ -212,6 +219,7 @@ const styles = StyleSheet.create({
   authorName: {
     fontSize: 16,
     fontWeight: "bold",
+    marginRight: 4,
   },
   postDate: {
     fontSize: 12,
@@ -281,5 +289,9 @@ const styles = StyleSheet.create({
   commentSubmitText: {
     color: "white",
     fontWeight: "bold",
+  },
+  nameContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
 });

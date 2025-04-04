@@ -563,19 +563,30 @@ export const MockBoardAPI = {
   ): Promise<{ data: LikeResponse }> => {
     await new Promise((resolve) => setTimeout(resolve, 300));
 
-    // 현재 좋아요 상태 가져오기 (없으면 false로 초기화)
-    const currentLiked = mockLikeStore.get(targetId) || false;
-
-    // 현재 좋아요 수 가져오기 (없으면 초기값 사용)
-    let currentCount = mockLikeCountStore.get(targetId);
-    if (currentCount === undefined) {
-      // 댓글 데이터에서 초기 좋아요 수 찾기
-      const foundReply = findReplyById(targetId);
-      currentCount = foundReply?.likeCount || 0;
-      mockLikeCountStore.set(targetId, currentCount);
+    // 1. 처음 호출 시 mockLikeStore 초기화 - 이 부분이 중요!
+    if (!mockLikeStore.has(targetId)) {
+      if (targetType === "POST") {
+        // 게시글 좋아요 초기화
+        const post = mockPosts.find((p) => p.postId === targetId);
+        if (post) {
+          mockLikeStore.set(targetId, post.isLiked);
+          mockLikeCountStore.set(targetId, post.likeCount);
+        }
+      } else {
+        // 댓글/대댓글 좋아요 초기화
+        const reply = findReplyById(targetId);
+        if (reply) {
+          mockLikeStore.set(targetId, reply.isLiked);
+          mockLikeCountStore.set(targetId, reply.likeCount);
+        }
+      }
     }
 
-    // 상태 토글
+    // 2. 현재 좋아요 상태 가져오기 (초기화 후)
+    const currentLiked = mockLikeStore.get(targetId) || false;
+    let currentCount = mockLikeCountStore.get(targetId) || 0;
+
+    // 3. 상태 토글 및 좋아요 수 업데이트
     const newLiked = !currentLiked;
     mockLikeStore.set(targetId, newLiked);
 
@@ -584,6 +595,9 @@ export const MockBoardAPI = {
       ? currentCount + 1
       : Math.max(0, currentCount - 1);
     mockLikeCountStore.set(targetId, newCount);
+
+    // 4. 원본 데이터도 업데이트 (이 부분은 이전과 동일)
+    // ...원본 데이터 업데이트 로직...
 
     return {
       data: {

@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import ProfileImage from "../../../components/ProfileImage";
 import LikeButton from "../../../components/LikeButton";
 import { getTimeAgo } from "../../../shared/utils/timeAge/timeAge";
 import { Icons } from "../../../../assets/icons/Icons";
 import { BoardAPI } from "../Api/boardApi";
+import PersonalityTag from "../../../components/PersonalityTag/PersonalityTag";
 
 // 게시글 아이템 타입 정의
 interface BoardItemProps {
@@ -29,6 +30,10 @@ interface BoardItemProps {
  * @param onPress - 게시글 클릭 시 실행될 함수
  */
 export default function BoardItem({ item, onPress }: BoardItemProps) {
+  // 로컬 상태 추가
+  const [likeCount, setLikeCount] = useState(item.likeCount);
+  const [isLiked, setIsLiked] = useState(item.isLiked);
+
   // 게시글 내용을 미리보기 형태로 자름 (최대 100자)
   const contentPreview =
     item.content.length > 100
@@ -45,7 +50,13 @@ export default function BoardItem({ item, onPress }: BoardItemProps) {
       <View style={styles.header}>
         <ProfileImage imageUrl={item?.profileUrl} variant="medium" />
         <View style={styles.authorInfo}>
-          <Text style={styles.authorName}>{item.nickname}</Text>
+          <View style={styles.nameContainer}>
+            <Text style={styles.authorName}>{item.nickname}</Text>
+            <PersonalityTag
+              personality={item.userType}
+              nickname={item.nickname}
+            />
+          </View>
           <Text style={styles.date}>{getTimeAgo(item.createdAt)}</Text>
         </View>
       </View>
@@ -64,11 +75,12 @@ export default function BoardItem({ item, onPress }: BoardItemProps) {
           <LikeButton
             targetId={item.postId}
             targetType="POST"
-            initialCount={item.likeCount}
-            initialLiked={item.isLiked}
+            initialCount={likeCount}
+            initialLiked={isLiked}
             apiToggleFunction={BoardAPI.toggleLike}
             onLikeChange={(newState) => {
-              /* 상태 변경 시 적용할 로직 (옵션) */
+              setLikeCount(newState.likeCount);
+              setIsLiked(newState.isLiked);
             }}
             size="small"
             isVertical={false}
@@ -109,6 +121,7 @@ const styles = StyleSheet.create({
   authorName: {
     fontSize: 14,
     fontWeight: "bold",
+    marginRight: 4,
   },
   date: {
     fontSize: 12,
@@ -152,5 +165,9 @@ const styles = StyleSheet.create({
     color: "gray",
     marginLeft: 4,
     paddingTop: 2, // 텍스트를 아이콘과 정렬
+  },
+  nameContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
 });
