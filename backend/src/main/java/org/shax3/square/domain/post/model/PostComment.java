@@ -5,6 +5,7 @@ import static jakarta.persistence.GenerationType.*;
 import static lombok.AccessLevel.*;
 
 import org.hibernate.annotations.SQLRestriction;
+import org.shax3.square.common.entity.BaseTimeEntity;
 import org.shax3.square.domain.user.model.User;
 
 import jakarta.persistence.Column;
@@ -25,7 +26,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = PROTECTED)
 @Table(name = "post_comment")
 @SQLRestriction("is_valid = true")
-public class PostComment {
+public class PostComment extends BaseTimeEntity {
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)

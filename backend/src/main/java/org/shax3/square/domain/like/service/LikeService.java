@@ -109,4 +109,8 @@ public class LikeService {
 	public Set<Long> getLikedTargetIds(User user, TargetType targetType, List<Long> targetIds) {
 		return likeRepository.findLikedTargetIds(user, targetType, targetIds);
 	}
+
+	public boolean isTargetLiked(User user, TargetType targetType, Long targetId) {
+		return likeRepository.existsByUserAndTargetTypeAndTargetIdAndLikeTrue(user, targetType, targetId);
+	}
 }

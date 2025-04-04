@@ -8,6 +8,7 @@ import org.shax3.square.domain.auth.annotation.AuthUser;
 import org.shax3.square.domain.post.dto.request.CreatePostRequest;
 import org.shax3.square.domain.post.dto.request.UpdatePostRequest;
 import org.shax3.square.domain.post.dto.response.MyPostResponse;
+import org.shax3.square.domain.post.dto.response.PostDetailResponse;
 import org.shax3.square.domain.post.dto.response.PostListResponse;
 import org.shax3.square.domain.post.service.PostFacadeService;
 import org.shax3.square.domain.post.service.PostService;
@@ -88,6 +89,20 @@ public class PostController {
             @RequestParam(defaultValue = "10") int limit
     ) {
         PostListResponse response = postFacadeService.getPostList(user, sort, nextCursorId, nextCursorLikes, limit);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+        summary = "게시글 상세 조회 api",
+        description = "게시글 id로 게시글과 댓글 목록을 조회합니다. 댓글은 전부 불러오고, 대댓글만 페이징 처리합니다."
+    )
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostDetailResponse> getPostDetail(
+        @AuthUser User user,
+        @PathVariable Long postId
+    ) {
+        PostDetailResponse response = postFacadeService.getPostDetail(user, postId);
 
         return ResponseEntity.ok(response);
     }
