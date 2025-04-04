@@ -253,20 +253,27 @@ export default function CommentItem({
 
   // 좋아요 상태 변경 핸들러
   const handleLikeChange = (
-    replyId: number,
-    newState: { isLiked: boolean; likeCount: number }
+    commentId: number,
+    newState: { isLiked: boolean; likeCount: number },
+    isParentComment: boolean = false
   ) => {
-    setLoadedReplies((prevReplies) =>
-      prevReplies.map((reply) =>
-        reply.commentId === replyId
-          ? {
-              ...reply,
-              isLiked: newState.isLiked,
-              likeCount: newState.likeCount,
-            }
-          : reply
-      )
-    );
+    if (isParentComment) {
+      // 부모 컴포넌트에 변경 사항 알림 (전체 목록 새로고침)
+      onCommentChange();
+    } else {
+      // 대댓글의 경우 로컬 상태만 업데이트
+      setLoadedReplies((prevReplies) =>
+        prevReplies.map((reply) =>
+          reply.commentId === commentId
+            ? {
+                ...reply,
+                isLiked: newState.isLiked,
+                likeCount: newState.likeCount,
+              }
+            : reply
+        )
+      );
+    }
   };
 
   return (
@@ -315,17 +322,26 @@ export default function CommentItem({
               </View>
             </View>
           ) : (
-            <Text style={styles.contentText}>{comment.content}</Text>
+            <View style={styles.contentRow}>
+              <Text style={styles.contentText}>{comment.content}</Text>
+              {/* 좋아요 버튼 - 내용 안에 배치 */}
+              <View style={styles.replyLikeContainer}>
+                <LikeButton
+                  targetId={comment.commentId}
+                  targetType="POST_COMMENT"
+                  initialCount={comment.likeCount || 0}
+                  initialLiked={comment.isLiked || false}
+                  apiToggleFunction={BoardAPI.toggleLike}
+                  onLikeChange={(newState) =>
+                    handleLikeChange(comment.commentId, newState, true)
+                  }
+                  size="small"
+                  isVertical={false}
+                />
+              </View>
+            </View>
           )}
         </View>
-
-        {/* 1-2. 좋아요 버튼 */}
-        <LikeButton
-          initialCount={comment.likeCount}
-          initialLiked={comment.isLiked}
-          size="small" // 또는 아이콘 크기에 맞는 크기
-          isVertical={false} // 아이콘만 표시되도록 가정
-        />
       </View>
 
       {/* 2. 하단 푸터 영역 (시간/답글 + 수정/삭제) */}
@@ -639,8 +655,14 @@ const styles = StyleSheet.create({
   },
   replyButtonContainer: { flexDirection: "row", justifyContent: "flex-end" },
   replyLikeContainer: {
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    marginLeft: "auto", // 오른쪽 끝으로 밀어내기
+    marginRight: 8,
+  },
+  contentRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 4,
   },
 });
