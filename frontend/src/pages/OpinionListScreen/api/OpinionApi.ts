@@ -67,7 +67,7 @@ export const updateOpinion = async (opinionId: number, content: string) => {
 
 export const deleteOpinion = async (opinionId: number) => {
     try {
-        const response = await axiosInstance.put(`/api/opinions/${opinionId}`);
+        const response = await axiosInstance.delete(`/api/opinions/${opinionId}`);
         return response.data;
     } catch (error) {
         console.error("SummariesApi.deleteOpinion DELETE 요청 실패:", error);

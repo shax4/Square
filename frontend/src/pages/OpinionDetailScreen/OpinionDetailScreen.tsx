@@ -155,7 +155,10 @@ export default function OpinionDetailScreen() {
                 },
                 {
                     text: '삭제',
-                    onPress: () => { deleteOpinion(opinionId) },
+                    onPress: () => {
+                        deleteOpinion(opinionId);
+                        navigation.goBack();
+                    },
                     style: 'destructive',
                 },
             ],
