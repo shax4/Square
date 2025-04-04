@@ -56,7 +56,10 @@ const OpinionBox = ({ opinion }: Props) => {
                         variant="small"
                     />
                     <Text style={styles.nickname}>{nickname}</Text>
-                    <PersonalityTag personality={userType} />
+                    <PersonalityTag
+                        personality={userType}
+                        nickname={nickname}
+                    />
                 </View>
 
                 {/* 본문 */}
