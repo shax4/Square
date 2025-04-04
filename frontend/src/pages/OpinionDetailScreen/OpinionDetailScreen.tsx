@@ -1,5 +1,5 @@
-import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
-import { Text, TouchableOpacity, View, ScrollView, Alert, InteractionManager } from "react-native";
+import { RouteProp, useNavigation, useRoute, useIsFocused } from "@react-navigation/native";
+import { Text, TouchableOpacity, View, ScrollView, Alert } from "react-native";
 import { StackParamList } from "../../shared/page-stack/DebatePageStack";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { Icons } from "../../../assets/icons/Icons";
@@ -19,6 +19,7 @@ export default function OpinionDetailScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
     const route = useRoute<OpinionDetailRouteProp>();
     const { opinionId } = route.params;
+    const isFocused = useIsFocused();
 
     // 스크롤 관리
     const scrollRef = useRef<ScrollView>(null);
@@ -106,7 +107,7 @@ export default function OpinionDetailScreen() {
         };
 
         fetchOpinionDetail();
-    }, [opinionId]);
+    }, [opinionId, opinionId]);
 
 
     // 상단 탭에 수정 및 신고 버튼 설정 
@@ -122,7 +123,7 @@ export default function OpinionDetailScreen() {
                                 onPress={() =>
                                     navigation.navigate('OpinionEditScreen', {
                                         opinionId,
-                                        content: opinionDetail.content ?? '',
+                                        content: opinionDetail.content!,
                                     })
                                 }
                             >
