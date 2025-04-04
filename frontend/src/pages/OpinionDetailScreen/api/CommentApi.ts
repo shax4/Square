@@ -66,3 +66,20 @@ export const deleteComment = async (
         throw error;
     }
 };
+
+
+export const likesComment = async (
+    targetId: number,
+) => {
+    try {
+        const targetType = 'OPINION_COMMENT';
+        const response = await axiosInstance.post('/api/likes', {
+            targetType: targetType,
+            targetId: targetId
+        });
+        return response.data;
+    } catch (error) {
+        console.error("댓글 좋아요 실패:", error);
+        throw error;
+    }
+}

@@ -8,7 +8,7 @@ import React, { useEffect, useLayoutEffect, useState, useRef } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { styles } from './Components/OpinionDetailScreen.styles'
 import CommentInput from "../../components/CommentInput/CommentInput";
-import { getOpinionDetail, createComment } from "./api/CommentApi";
+import { getOpinionDetail, createComment, likesComment } from "./api/CommentApi";
 import { deleteOpinion } from "../OpinionListScreen/api/OpinionApi";
 import { OpinionsResponse } from "./Components/OpinionsResponse.types";
 import { Comment } from "./Components/Comment.types";
@@ -248,6 +248,7 @@ export default function OpinionDetailScreen() {
                                     initialCount={comment.likeCount}
                                     initialLiked={comment.isLiked}
                                     size="small"
+                                    onPress={() => {likesComment(comment.commentId)}}
                                 />
                             </View>
                         </View>
