@@ -15,8 +15,13 @@ const PersonalityTag = ({ personality, nickname }: PersonalityTagProps) => {
     };
 
     return (
-        <TouchableOpacity style={styles.container} onPress={onPressPersonalityTag} activeOpacity={0.7}>
-            <Text style={styles.text}>{personality}</Text>
+        <TouchableOpacity
+            style={[styles.container, !personality && styles.disabled]}
+            onPress={personality ? onPressPersonalityTag : undefined}
+            activeOpacity={personality ? 0.7 : 1}
+            disabled={!personality}
+        >
+            <Text style={[styles.text, !personality && styles.disabledText]}>{personality ?? "성향 없음"}</Text>
         </TouchableOpacity>
     );
 };
