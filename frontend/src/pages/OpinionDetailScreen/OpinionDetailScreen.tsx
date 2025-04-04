@@ -25,7 +25,7 @@ export default function OpinionDetailScreen() {
     const scrollRef = useRef<ScrollView>(null);
 
     // 로그인 사용자
-    const { loggedIn, user } = useAuthStore();
+    const { user } = useAuthStore();
 
     // 의견 상세페이지 정보
     const [opinionDetail, setOpinionDetail] = useState<OpinionsResponse | null>(null);

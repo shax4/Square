@@ -14,6 +14,7 @@ export default function OpinionEditScreen({ route }: Props) {
 
     // 수정할 의견 id, 초기 컨텐츠를 받아옴
     const { opinionId, content: initialContent } = route.params;
+    const [showWarning, setShowWarning] = useState(false);
 
     const submitRef = useRef<() => void>();
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
@@ -22,6 +23,16 @@ export default function OpinionEditScreen({ route }: Props) {
 
     // 수정 요청 함수
     const handleSubmit = () => {
+        const trimmedContent = content.trim();
+        const isInvalid = trimmedContent.length < 10 || trimmedContent.length > 150;
+
+        if (isInvalid) {
+            setShowWarning(true);
+            return;
+        }
+
+        setShowWarning(false);
+
         Alert.alert(
             "수정 확인",
             "정말로 이 의견을 수정하시겠습니까?",
@@ -80,12 +91,8 @@ export default function OpinionEditScreen({ route }: Props) {
     return (
         <View>
             <View>
-
-            </View>
-
-            <View>
                 {/* 내용 입력 영역 */}
-                <View style={styles.inputGroup}>
+                <View>
                     <TextInput
                         style={styles.contentInput}
                         placeholder="내용을 입력하세요"
@@ -95,13 +102,20 @@ export default function OpinionEditScreen({ route }: Props) {
                         textAlignVertical="top" // 안드로이드에서 텍스트가 상단부터 시작하도록 설정
                     />
                 </View>
+                {showWarning && (
+                    <Text style={styles.WarningText}>
+                        의견은 최소 10자 이상, 최대 150자 이하이어야 합니다.
+                    </Text>
+                )}
             </View>
-
         </View>
     )
 }
 
 export const styles = StyleSheet.create({
+    TextEditArea: {
+        backgroundColor: colors.white,
+    },
     EditButton: {
 
     },
@@ -109,13 +123,16 @@ export const styles = StyleSheet.create({
         color: colors.primary,
         fontSize: 16,
     },
-    inputGroup: {
-        marginBottom: 20,
-    },
     contentInput: {
         margin: 15,
         padding: 10,
         fontSize: 16,
-        minHeight: 400, // 내용 입력 필드 최소 높이
+        minHeight: 200, // 내용 입력 필드 최소 높이
+        borderRadius: 15,
+        backgroundColor: colors.white,
     },
+    WarningText: {
+        margin: 15,
+        color: colors.warnRed,
+    }
 });
