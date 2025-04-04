@@ -8,9 +8,19 @@ interface Props {
 }
 
 const SummaryBoxList = ({ data }: Props) => {
+
+    // 좌 우 의견 순서 조정
+    const pivot = data.length / 2;
+    const separatedDatas: Summary[] = [];
+
+    for(let i = 0; i < pivot; i++){ 
+        separatedDatas.push(data[i]);
+        separatedDatas.push(data[pivot + i]);
+    }
+
     return (
         <FlatList
-            data={data}
+            data={separatedDatas }
             keyExtractor={(item) => item.summaryId.toString()}
             renderItem={({ item }) => <SummaryBox summary={item} />}
             contentContainerStyle={styles.listContainer}
