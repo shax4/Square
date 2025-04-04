@@ -3,8 +3,10 @@ package org.shax3.square.domain.post.controller;
 import org.shax3.square.domain.auth.annotation.AuthUser;
 import org.shax3.square.domain.post.dto.request.CreatePostCommentRequest;
 import org.shax3.square.domain.post.dto.request.UpdatePostCommetRequest;
+import org.shax3.square.domain.post.dto.response.MyCommentListResponse;
 import org.shax3.square.domain.post.dto.response.PostCommentResponse;
 import org.shax3.square.domain.post.dto.response.RepliesResponse;
+import org.shax3.square.domain.post.service.CommentFacadeService;
 import org.shax3.square.domain.post.service.PostCommentService;
 import org.shax3.square.domain.post.service.PostFacadeService;
 import org.shax3.square.domain.user.model.User;
@@ -31,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class PostCommentController {
 
 	private final PostCommentService postCommentService;
-	private final PostFacadeService postFacadeService;
+	private final CommentFacadeService commentFacadeService;
 
 	@Operation(
 		summary = "게시글 댓글 생성 api",
@@ -87,10 +89,23 @@ public class PostCommentController {
 		@RequestParam(required = false) Long nextCursorId,
 		@RequestParam(defaultValue = "5") int limit
 	) {
-		RepliesResponse response = postFacadeService.getReplies(user, commentId, nextCursorId, limit);
+		RepliesResponse response = commentFacadeService.getReplies(user, commentId, nextCursorId, limit);
 
 		return ResponseEntity.ok(response);
 	}
 
+	@Operation(
+		summary = "내가 작성한 댓글 목록 조회 api",
+		description = "내가 작성한 댓글 목록을 조회합니다."
+	)
+	@GetMapping("/{commentId}")
+	public ResponseEntity<MyCommentListResponse> getMyCommentList(
+		@AuthUser User user,
+		@RequestParam(required = false) Long nextCursorId,
+		@RequestParam(defaultValue = "5") int limit
+	) {
+		MyCommentListResponse response = commentFacadeService.getMyComments(user, nextCursorId, limit);
 
+		return ResponseEntity.ok(response);
+	}
 }

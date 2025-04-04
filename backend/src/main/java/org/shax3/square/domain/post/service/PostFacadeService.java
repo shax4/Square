@@ -237,38 +237,7 @@ public class PostFacadeService {
 		);
 	}
 
-	/**
-	 * 대댓글 더보기 조회
-	 * @param user
-	 * @param commentId
-	 * @param cursorId
-	 * @param limit
-	 * @return
-	 */
-	@Transactional(readOnly = true)
-	public RepliesResponse getReplies(User user, Long commentId, Long cursorId, int limit) {
-		List<PostComment> fetchedReplies  = commentService.getReplies(commentId, cursorId, limit);
 
-		boolean hasNext = hasNext(fetchedReplies, limit);
-		List<PostComment> replies = hasNext ? fetchedReplies.subList(0, limit) : fetchedReplies;
-
-		// 좋아요 여부
-		List<Long> replyIds = replies.stream().map(PostComment::getId).toList();
-		Set<Long> likedReplyIds = likeService.getLikedTargetIds(user, TargetType.POST_COMMENT, replyIds);
-
-		List<ReplyDto> replyDtos = replies.stream()
-			.map(reply -> ReplyDto.from(
-				reply,
-				s3Service.generatePresignedGetUrl(reply.getUser().getS3Key()),
-				likedReplyIds.contains(reply.getId())))
-			.toList();
-
-		Long nextCursorId = hasNext && !replies.isEmpty()
-			? replies.get(replies.size() - 1).getId()
-			: null;
-
-		return new RepliesResponse(replyDtos, getNextCursor(replies, hasNext, PostComment::getId));
-	}
 
 	private List<Long> extractCommentIds(List<PostComment> comments) {
 		return comments.stream().map(PostComment::getId).toList();
