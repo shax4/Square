@@ -251,54 +251,23 @@ export default function CommentItem({
     ]);
   };
 
-  // 대댓글 좋아요 토글 함수 추가
-  const [loadingLikes, setLoadingLikes] = useState<Set<number>>(new Set());
-  const loadingLikesRef = useRef<Set<number>>(new Set());
-
-  const handleReplyLikeToggle = useCallback(
-    async (replyId: number, currentLiked: boolean) => {
-      // 이미 진행중인 요청이 있는지 확인
-      if (loadingLikesRef.current.has(replyId)) {
-        console.log(
-          `[중복 요청 방지] 댓글 ${replyId}의 좋아요 처리가 이미 진행 중입니다.`
-        );
-        return;
-      }
-
-      // 로딩 상태 설정
-      loadingLikesRef.current.add(replyId); // 동기적 상태 업데이트 (즉시 적용)
-      setLoadingLikes((prev) => new Set(prev).add(replyId)); // UI 업데이트용 (비동기)
-
-      try {
-        const response = await BoardAPI.toggleCommentLike(replyId);
-
-        // API 응답으로 상태 업데이트
-        setLoadedReplies((prevReplies) =>
-          prevReplies.map((reply) =>
-            reply.commentId === replyId
-              ? {
-                  ...reply,
-                  isLiked: response.data.isLiked,
-                  likeCount: response.data.likeCount,
-                }
-              : reply
-          )
-        );
-      } catch (error) {
-        console.error(`[요청 실패] 댓글 ${replyId} 좋아요 처리 실패:`, error);
-        Alert.alert("오류", "좋아요 처리 중 문제가 발생했습니다.");
-      } finally {
-        // 로딩 상태 초기화
-        setLoadingLikes((prev) => {
-          const next = new Set(prev);
-          next.delete(replyId);
-          return next;
-        });
-        loadingLikesRef.current.delete(replyId);
-      }
-    },
-    []
-  );
+  // 좋아요 상태 변경 핸들러
+  const handleLikeChange = (
+    replyId: number,
+    newState: { isLiked: boolean; likeCount: number }
+  ) => {
+    setLoadedReplies((prevReplies) =>
+      prevReplies.map((reply) =>
+        reply.commentId === replyId
+          ? {
+              ...reply,
+              isLiked: newState.isLiked,
+              likeCount: newState.likeCount,
+            }
+          : reply
+      )
+    );
+  };
 
   return (
     <View style={[styles.container, isReply && styles.replyContainer]}>
@@ -434,14 +403,15 @@ export default function CommentItem({
                     <Text style={styles.contentText}>{reply.content}</Text>
                     <View style={styles.replyLikeContainer}>
                       <LikeButton
+                        itemId={reply.commentId}
                         initialCount={reply.likeCount || 0}
                         initialLiked={reply.isLiked || false}
+                        apiToggleFunction={BoardAPI.toggleCommentLike}
+                        onLikeChange={(newState) =>
+                          handleLikeChange(reply.commentId, newState)
+                        }
                         size="small"
                         isVertical={false}
-                        onPress={(currentLiked) =>
-                          handleReplyLikeToggle(reply.commentId, currentLiked)
-                        }
-                        disabled={loadingLikes.has(reply.commentId)}
                       />
                     </View>
                   </View>
