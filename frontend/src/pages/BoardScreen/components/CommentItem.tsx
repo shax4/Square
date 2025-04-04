@@ -403,10 +403,11 @@ export default function CommentItem({
                     <Text style={styles.contentText}>{reply.content}</Text>
                     <View style={styles.replyLikeContainer}>
                       <LikeButton
-                        itemId={reply.commentId}
+                        targetId={reply.commentId}
+                        targetType="POST_COMMENT"
                         initialCount={reply.likeCount || 0}
                         initialLiked={reply.isLiked || false}
-                        apiToggleFunction={BoardAPI.toggleCommentLike}
+                        apiToggleFunction={BoardAPI.toggleLike}
                         onLikeChange={(newState) =>
                           handleLikeChange(reply.commentId, newState)
                         }

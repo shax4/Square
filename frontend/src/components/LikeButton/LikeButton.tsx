@@ -11,27 +11,31 @@ const LikeButton = ({
   isVertical = true,
 
   // 기능 기본값
-  itemId,
+  targetId,
   initialCount = 0,
   initialLiked = false,
   apiToggleFunction,
   onLikeChange,
   onPress,
   disabled = false,
+  targetType,
 }: LikeButtonProps) => {
   // 상태 관리
   const [liked, setLiked] = useState<boolean>(initialLiked);
   const [likeCount, setLikeCount] = useState<number>(initialCount);
 
   // Zustand 스토어 (조건부)
-  const { toggleLike, isLoading } = useLikeStore();
+  const { toggleLike, isLoading, hasError, clearError } = useLikeStore();
 
-  // API 모드인지 확인 (itemId와 apiToggleFunction이 모두 제공된 경우)
-  const isApiMode = !!(itemId && apiToggleFunction);
+  // API 모드인지 확인 (targetId와 apiToggleFunction이 모두 제공된 경우)
+  const isApiMode = !!(targetId && apiToggleFunction);
 
   // disabled 상태 계산
   const isDisabled =
-    disabled || (isApiMode && itemId ? isLoading(itemId) : false);
+    disabled || (isApiMode && targetId ? isLoading(targetId) : false);
+
+  // 에러 상태 계산 추가
+  const isErrored = isApiMode && targetId ? hasError(targetId) : false;
 
   // 핸들러 통합
   const handleLike = async () => {
@@ -40,10 +44,14 @@ const LikeButton = ({
       return;
     }
 
-    if (isApiMode && itemId) {
+    if (isApiMode && targetId && targetType) {
       // API 모드 처리
       try {
-        const response = await toggleLike(itemId, apiToggleFunction!, liked);
+        const response = await toggleLike(
+          targetId,
+          targetType,
+          apiToggleFunction!
+        );
 
         if (response) {
           // 내부 상태 업데이트
@@ -71,6 +79,13 @@ const LikeButton = ({
     }
   };
 
+  // 에러 상태 클릭 핸들러
+  const handleErrorClick = () => {
+    if (isErrored && targetId) {
+      clearError(targetId);
+    }
+  };
+
   // props 변경 시 상태 업데이트
   useEffect(() => {
     setLiked(initialLiked);
@@ -83,21 +98,28 @@ const LikeButton = ({
 
   return (
     <TouchableOpacity
-      onPress={handleLike}
+      onPress={isErrored ? handleErrorClick : handleLike}
       style={[
         isVertical ? styles.container : styles.containerHorizontal,
         isDisabled && { opacity: 0.4 },
+        isErrored && styles.errorContainer,
       ]}
       activeOpacity={0.7}
-      disabled={isDisabled}
+      disabled={isDisabled && !isErrored}
     >
       <Ionicons
-        name={liked ? "heart" : "heart-outline"}
+        name={isErrored ? "alert-circle" : liked ? "heart" : "heart-outline"}
         size={iconSize}
-        color={liked ? "red" : "gray"}
+        color={isErrored ? "red" : liked ? "red" : "gray"}
       />
-      <Text style={[styles.likeCount, { fontSize: textSize }]}>
-        {likeCount}
+      <Text
+        style={[
+          styles.likeCount,
+          { fontSize: textSize },
+          isErrored && styles.errorText,
+        ]}
+      >
+        {isErrored ? "재시도" : likeCount}
       </Text>
     </TouchableOpacity>
   );
