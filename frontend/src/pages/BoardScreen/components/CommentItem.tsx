@@ -1,4 +1,4 @@
-import { useState, useCallback, Fragment, useRef } from "react";
+import React, { useState, useCallback, Fragment, useRef } from "react";
 import {
   View,
   Text,
@@ -277,234 +277,235 @@ export default function CommentItem({
   };
 
   return (
-    <View style={[styles.container, isReply && styles.replyContainer]}>
-      {/* 1. 상단 영역 (메인 내용 + 좋아요 버튼) */}
-      <View style={styles.topContainer}>
-        {/* 1-1. 메인 내용 블록 (사용자 정보 + 댓글 내용/수정) */}
-        <View style={styles.mainContentBlock}>
-          {/* 사용자 정보 */}
-          <View style={styles.userInfoContainer}>
-            <ProfileImage imageUrl={comment.profileUrl} variant="small" />
-            <View style={styles.userInfoText}>
-              <Text style={styles.nickname}>{comment.nickname}</Text>
-              <PersonalityTag
-                personality={comment.userType}
-                nickname={comment.nickname}
-              />
-            </View>
-            {/* 시간은 푸터로 이동 */}
-          </View>
-
-          {/* 댓글 내용 또는 수정 UI */}
-          {isEditing ? (
-            <View style={styles.editContainer}>
-              {/* TextInput 및 저장/취소 버튼 (이전과 동일) */}
-              <TextInput
-                style={styles.textInput}
-                value={editedContent}
-                onChangeText={setEditedContent}
-                autoFocus={true}
-                multiline={true}
-              />
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                  onPress={handleCancelPress}
-                  style={styles.button}
-                >
-                  <Text>취소</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={handleSavePress}
-                  style={[styles.button, styles.saveButton]}
-                >
-                  <Text style={styles.saveButtonText}>저장</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          ) : (
-            <View style={styles.contentRow}>
-              <Text style={styles.contentText}>{comment.content}</Text>
-              {/* 좋아요 버튼 - 내용 안에 배치 */}
-              <View style={styles.replyLikeContainer}>
-                <LikeButton
-                  targetId={comment.commentId}
-                  targetType="POST_COMMENT"
-                  initialCount={comment.likeCount || 0}
-                  initialLiked={comment.isLiked || false}
-                  apiToggleFunction={BoardAPI.toggleLike}
-                  onLikeChange={(newState) =>
-                    handleLikeChange(comment.commentId, newState, true)
-                  }
-                  size="small"
-                  isVertical={false}
+    <>
+      {/* 댓글 컨테이너 */}
+      <View style={styles.container}>
+        {/* 1. 상단 영역 (메인 내용 + 좋아요 버튼) */}
+        <View style={styles.topContainer}>
+          {/* 1-1. 메인 내용 블록 (사용자 정보 + 댓글 내용/수정) */}
+          <View style={styles.mainContentBlock}>
+            {/* 사용자 정보 */}
+            <View style={styles.userInfoContainer}>
+              <ProfileImage imageUrl={comment.profileUrl} variant="small" />
+              <View style={styles.userInfoText}>
+                <Text style={styles.nickname}>{comment.nickname}</Text>
+                <PersonalityTag
+                  personality={comment.userType}
+                  nickname={comment.nickname}
                 />
               </View>
+              {/* 시간은 푸터로 이동 */}
+            </View>
+
+            {/* 댓글 내용 또는 수정 UI */}
+            {isEditing ? (
+              <View style={styles.editContainer}>
+                {/* TextInput 및 저장/취소 버튼 (이전과 동일) */}
+                <TextInput
+                  style={styles.textInput}
+                  value={editedContent}
+                  onChangeText={setEditedContent}
+                  autoFocus={true}
+                  multiline={true}
+                />
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity
+                    onPress={handleCancelPress}
+                    style={styles.button}
+                  >
+                    <Text>취소</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={handleSavePress}
+                    style={[styles.button, styles.saveButton]}
+                  >
+                    <Text style={styles.saveButtonText}>저장</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ) : (
+              <View style={styles.contentRow}>
+                <Text style={styles.contentText}>{comment.content}</Text>
+                {/* 좋아요 버튼 - 내용 안에 배치 */}
+                <View style={styles.replyLikeContainer}>
+                  <LikeButton
+                    targetId={comment.commentId}
+                    targetType="POST_COMMENT"
+                    initialCount={comment.likeCount || 0}
+                    initialLiked={comment.isLiked || false}
+                    apiToggleFunction={BoardAPI.toggleLike}
+                    onLikeChange={(newState) =>
+                      handleLikeChange(comment.commentId, newState, true)
+                    }
+                    size="small"
+                    isVertical={false}
+                  />
+                </View>
+              </View>
+            )}
+          </View>
+        </View>
+
+        {/* 2. 하단 푸터 영역 (시간/답글 + 수정/삭제) */}
+        <View style={styles.footerContainer}>
+          {/* 2-1. 왼쪽 그룹 (시간 + 답글 달기) */}
+          <View style={styles.leftFooterGroup}>
+            <Text style={styles.time}>{getTimeAgo(comment.createdAt)}</Text>
+            {/* 답글 달기 버튼 */}
+            {!isEditing && ( // 수정 중 아닐 때만 표시
+              <TouchableOpacity onPress={handleReplyPress}>
+                <Text style={styles.replyButtonText}>답글 달기</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {/* 2-2. 오른쪽 그룹 (수정/삭제 버튼) */}
+          {isAuthor && !isEditing && (
+            <View style={styles.authorButtons}>
+              <TouchableOpacity onPress={handleEditPress}>
+                <Text style={styles.actionText}>수정</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleDeletePress}>
+                <Text style={styles.actionText}>삭제</Text>
+              </TouchableOpacity>
             </View>
           )}
         </View>
-      </View>
 
-      {/* 2. 하단 푸터 영역 (시간/답글 + 수정/삭제) */}
-      <View style={styles.footerContainer}>
-        {/* 2-1. 왼쪽 그룹 (시간 + 답글 달기) */}
-        <View style={styles.leftFooterGroup}>
-          <Text style={styles.time}>{getTimeAgo(comment.createdAt)}</Text>
-          {/* 답글 달기 버튼 */}
-          {!isEditing && ( // 수정 중 아닐 때만 표시
-            <TouchableOpacity onPress={handleReplyPress}>
-              <Text style={styles.replyButtonText}>답글 달기</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-
-        {/* 2-2. 오른쪽 그룹 (수정/삭제 버튼) */}
-        {isAuthor && !isEditing && (
-          <View style={styles.authorButtons}>
-            <TouchableOpacity onPress={handleEditPress}>
-              <Text style={styles.actionText}>수정</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleDeletePress}>
-              <Text style={styles.actionText}>삭제</Text>
-            </TouchableOpacity>
+        {/* 답글 입력창 (isReplying 상태에 따라 표시) */}
+        {isReplying && (
+          <View style={styles.replyInputArea}>
+            <TextInput
+              style={styles.replyInput}
+              value={replyText}
+              onChangeText={setReplyText}
+              placeholder={`${comment.nickname}에게 답글 달기...`}
+              autoFocus={true}
+              multiline={true}
+            />
+            <View style={styles.replyButtonContainer}>
+              <TouchableOpacity
+                onPress={handleCancelReply}
+                style={styles.button}
+              >
+                <Text>취소</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleSubmitReply}
+                style={[styles.button, styles.saveButton]}
+              >
+                <Text style={styles.saveButtonText}>등록</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         )}
       </View>
-      {/* --- 대댓글 영역 --- */}
-      {loadedReplies && loadedReplies.length > 0 && (
-        <View style={styles.repliesContainer}>
-          {loadedReplies.map((reply) => (
-            <View key={reply.commentId} style={styles.replyItemContainer}>
-              {/* 사용자 정보 */}
-              <View style={styles.userInfoContainer}>
-                <ProfileImage imageUrl={reply.profileUrl} variant="small" />
-                <View style={styles.userInfoText}>
-                  <Text style={styles.nickname}>{reply.nickname}</Text>
-                  <PersonalityTag
-                    personality={reply.userType}
-                    nickname={reply.nickname}
-                  />
+
+      {/* 대댓글들을 별도의 독립 컨테이너로 렌더링 */}
+      {loadedReplies &&
+        loadedReplies.length > 0 &&
+        loadedReplies.map((reply) => (
+          <View key={reply.commentId} style={styles.replyItemContainer}>
+            {/* 사용자 정보 */}
+            <View style={styles.userInfoContainer}>
+              <ProfileImage imageUrl={reply.profileUrl} variant="small" />
+              <View style={styles.userInfoText}>
+                <Text style={styles.nickname}>{reply.nickname}</Text>
+                <PersonalityTag
+                  personality={reply.userType}
+                  nickname={reply.nickname}
+                />
+              </View>
+            </View>
+
+            {/* 대댓글 내용 - 수정 중이면 수정 UI 표시 */}
+            {editingReplyId === reply.commentId ? (
+              // 대댓글 수정 모드 UI
+              <View style={styles.editContainer}>
+                <TextInput
+                  style={styles.textInput}
+                  value={editedReplyContent}
+                  onChangeText={setEditedReplyContent}
+                  autoFocus={true}
+                  multiline={true}
+                />
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity
+                    onPress={handleCancelEditReply}
+                    style={styles.button}
+                  >
+                    <Text>취소</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handleSaveReply(reply.commentId)}
+                    style={[styles.button, styles.saveButton]}
+                  >
+                    <Text style={styles.saveButtonText}>저장</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
-
-              {/* 대댓글 내용 - 수정 중이면 수정 UI 표시 */}
-              {editingReplyId === reply.commentId ? (
-                // 대댓글 수정 모드 UI
-                <View style={styles.editContainer}>
-                  <TextInput
-                    style={styles.textInput}
-                    value={editedReplyContent}
-                    onChangeText={setEditedReplyContent}
-                    autoFocus={true}
-                    multiline={true}
-                  />
-                  <View style={styles.buttonContainer}>
-                    <TouchableOpacity
-                      onPress={handleCancelEditReply}
-                      style={styles.button}
-                    >
-                      <Text>취소</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => handleSaveReply(reply.commentId)}
-                      style={[styles.button, styles.saveButton]}
-                    >
-                      <Text style={styles.saveButtonText}>저장</Text>
-                    </TouchableOpacity>
+            ) : (
+              // 대댓글 일반 모드 UI
+              <Fragment>
+                <View style={styles.replyContentRow}>
+                  <Text style={styles.contentText}>{reply.content}</Text>
+                  <View style={styles.replyLikeContainer}>
+                    <LikeButton
+                      targetId={reply.commentId}
+                      targetType="POST_COMMENT"
+                      initialCount={reply.likeCount || 0}
+                      initialLiked={reply.isLiked || false}
+                      apiToggleFunction={BoardAPI.toggleLike}
+                      onLikeChange={(newState) =>
+                        handleLikeChange(reply.commentId, newState)
+                      }
+                      size="small"
+                      isVertical={false}
+                    />
                   </View>
                 </View>
-              ) : (
-                // 대댓글 일반 모드 UI
-                <Fragment>
-                  <View style={styles.replyContentRow}>
-                    <Text style={styles.contentText}>{reply.content}</Text>
-                    <View style={styles.replyLikeContainer}>
-                      <LikeButton
-                        targetId={reply.commentId}
-                        targetType="POST_COMMENT"
-                        initialCount={reply.likeCount || 0}
-                        initialLiked={reply.isLiked || false}
-                        apiToggleFunction={BoardAPI.toggleLike}
-                        onLikeChange={(newState) =>
-                          handleLikeChange(reply.commentId, newState)
-                        }
-                        size="small"
-                        isVertical={false}
-                      />
-                    </View>
+              </Fragment>
+            )}
+
+            {/* 푸터는 수정 중이 아닐 때만 표시 */}
+            {editingReplyId !== reply.commentId && (
+              <View style={styles.replyFooterContainer}>
+                <Text style={styles.time}>{getTimeAgo(reply.createdAt)}</Text>
+
+                {user?.nickname === reply.nickname && (
+                  <View style={styles.authorButtons}>
+                    <TouchableOpacity onPress={() => handleEditReply(reply)}>
+                      <Text style={styles.actionText}>수정</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => handleDeleteReply(reply.commentId)}
+                    >
+                      <Text style={styles.actionText}>삭제</Text>
+                    </TouchableOpacity>
                   </View>
-                </Fragment>
-              )}
-
-              {/* 푸터는 수정 중이 아닐 때만 표시 */}
-              {editingReplyId !== reply.commentId && (
-                <View style={styles.replyFooterContainer}>
-                  <Text style={styles.time}>{getTimeAgo(reply.createdAt)}</Text>
-
-                  {user?.nickname === reply.nickname && (
-                    <View style={styles.authorButtons}>
-                      <TouchableOpacity onPress={() => handleEditReply(reply)}>
-                        <Text style={styles.actionText}>수정</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        onPress={() => handleDeleteReply(reply.commentId)}
-                      >
-                        <Text style={styles.actionText}>삭제</Text>
-                      </TouchableOpacity>
-                    </View>
-                  )}
-                </View>
-              )}
-            </View>
-          ))}
-
-          {/* 더보기 버튼 */}
-          {hasMoreReplies && (
-            <TouchableOpacity
-              style={styles.loadMoreButton}
-              onPress={handleLoadMoreReplies}
-              disabled={replyLoading}
-            >
-              {replyLoading ? (
-                <ActivityIndicator size="small" color="#0000ff" />
-              ) : (
-                <Text style={styles.loadMoreText}>
-                  답글 {comment.replyCount - loadedReplies.length}개 더보기
-                </Text>
-              )}
-            </TouchableOpacity>
-          )}
-        </View>
-      )}
-      {/* --- 답글 입력창 (isReplying 상태에 따라 표시) --- */}
-      {isReplying && (
-        <View
-          style={[
-            styles.replyInputArea,
-            !isReply && styles.replyInputAreaIndent, // isReply가 false일 때만 들여쓰기 스타일 추가
-          ]}
-        >
-          <TextInput
-            style={styles.replyInput}
-            value={replyText}
-            onChangeText={setReplyText}
-            placeholder={`${comment.nickname}에게 답글 달기...`}
-            autoFocus={true}
-            multiline={true}
-          />
-          <View style={styles.replyButtonContainer}>
-            <TouchableOpacity onPress={handleCancelReply} style={styles.button}>
-              <Text>취소</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleSubmitReply}
-              style={[styles.button, styles.saveButton]}
-            >
-              <Text style={styles.saveButtonText}>등록</Text>
-            </TouchableOpacity>
+                )}
+              </View>
+            )}
           </View>
-        </View>
+        ))}
+
+      {/* 더보기 버튼 */}
+      {hasMoreReplies && (
+        <TouchableOpacity
+          style={styles.loadMoreButton}
+          onPress={handleLoadMoreReplies}
+          disabled={replyLoading}
+        >
+          {replyLoading ? (
+            <ActivityIndicator size="small" color="#0000ff" />
+          ) : (
+            <Text style={styles.loadMoreText}>
+              답글 {comment.replyCount - loadedReplies.length}개 더보기
+            </Text>
+          )}
+        </TouchableOpacity>
       )}
-    </View>
+    </>
   );
 }
 
@@ -514,16 +515,24 @@ const styles = StyleSheet.create({
     // 전체 댓글 아이템 컨테이너
     paddingVertical: 12,
     paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
+    backgroundColor: "#fafafa", // 배경색 통일
+    marginBottom: 8, // 댓글 간 간격 추가
+    borderRadius: 8, // 모서리 둥글게
+    borderWidth: 1, // 테두리 추가
+    borderColor: "#eeeeee", // 테두리 색상
   },
-  replyContainer: {
-    // 대댓글 들여쓰기
-    marginLeft: 30, // 예시 값
-    paddingLeft: 10, // 예시 값
-    borderLeftWidth: 1, // 구분선 (선택적)
-    borderLeftColor: "#eee", // 구분선 색상
-    marginTop: 10, // 위 댓글과의 간격
+  replyItemContainer: {
+    // 대댓글 컨테이너 (독립적 컨테이너)
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: "#fafafa", // 댓글과 같은 배경색
+    marginBottom: 8, // 간격 추가
+    borderRadius: 8, // 모서리 둥글게
+    borderWidth: 1, // 테두리 추가
+    borderColor: "#eeeeee", // 테두리 색상
+    marginLeft: 24, // 들여쓰기
+    borderLeftWidth: 3, // 왼쪽 경계선
+    borderLeftColor: "#e0e0e0", // 경계선 색상
   },
   topContainer: {
     // 상단 영역: 내용 블록과 좋아요 버튼을 가로로 배치
@@ -560,6 +569,7 @@ const styles = StyleSheet.create({
     padding: 8,
     minHeight: 80,
     marginBottom: 8,
+    backgroundColor: "#fff", // 입력창 배경색 유지
   },
   buttonContainer: { flexDirection: "row", justifyContent: "flex-end" },
   button: {
@@ -574,9 +584,7 @@ const styles = StyleSheet.create({
     color: "white",
   },
   likeButton: {
-    // 특별한 위치 지정보다는 alignItems: 'center' 에 의해 정렬되도록 함
-    // 필요시 padding 등으로 터치 영역 확보
-    padding: 4, // 예시
+    padding: 4,
   },
   footerContainer: {
     // 하단 푸터 영역
@@ -609,16 +617,6 @@ const styles = StyleSheet.create({
     color: "#888",
     marginLeft: 12, // 수정 버튼과 삭제 버튼 사이 간격
   },
-  repliesContainer: {
-    marginLeft: 20,
-    marginTop: 8,
-  },
-  replyItemContainer: {
-    padding: 8,
-    marginVertical: 4,
-    backgroundColor: "#f9f9f9",
-    borderRadius: 8,
-  },
   replyContentRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -633,17 +631,18 @@ const styles = StyleSheet.create({
   loadMoreButton: {
     padding: 8,
     alignItems: "center",
+    marginVertical: 6, // 간격 추가
+    marginLeft: 24, // 들여쓰기 적용
   },
   loadMoreText: {
     color: "#666",
     fontSize: 14,
   },
   replyInputArea: {
-    marginTop: 10,
-  },
-  replyInputAreaIndent: {
-    // 최상위 댓글의 답글일 때만 들여쓰기 (스타일 조정 필요)
-    marginLeft: 40,
+    marginTop: 12, // 간격 증가
+    backgroundColor: "#f8f8f8", // 입력창 영역 배경색
+    padding: 8, // 패딩 추가
+    borderRadius: 8, // 모서리 둥글게
   },
   replyInput: {
     borderWidth: 1,
@@ -652,6 +651,7 @@ const styles = StyleSheet.create({
     padding: 8,
     minHeight: 80,
     marginBottom: 8,
+    backgroundColor: "#fff", // 입력창 배경색 유지 (흰색)
   },
   replyButtonContainer: { flexDirection: "row", justifyContent: "flex-end" },
   replyLikeContainer: {
