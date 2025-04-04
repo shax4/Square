@@ -17,6 +17,7 @@ export const styles = StyleSheet.create({
   likeCount: {
     fontWeight: "bold",
     color: "gray",
+    marginLeft: 3,
   },
   errorContainer: {
     borderWidth: 1,

@@ -19,6 +19,8 @@ import { useFocusEffect } from "@react-navigation/native";
 import { BoardStackParamList } from "../../shared/page-stack/BoardPageStack";
 import { Post, Comment, Reply } from "./board.types";
 import { getTimeAgo } from "../../shared/utils/timeAge/timeAge";
+import LikeButton from "../../components/LikeButton";
+import { Icons } from "../../../assets/icons/Icons";
 
 // 네비게이션 프롭 타입 정의
 type Props = StackScreenProps<BoardStackParamList, "BoardDetail">;
@@ -83,6 +85,20 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
     }
   };
 
+  // 게시글 좋아요 상태 변경 핸들러
+  const handlePostLikeChange = useCallback(
+    (newState: { isLiked: boolean; likeCount: number }) => {
+      if (post) {
+        setPost({
+          ...post,
+          isLiked: newState.isLiked,
+          likeCount: newState.likeCount,
+        });
+      }
+    },
+    [post]
+  );
+
   // 로딩 중이면 로딩 인디케이터 표시
   if (loading) {
     return (
@@ -104,7 +120,9 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
           <ProfileImage imageUrl={post?.profileUrl} variant="medium" />
           <View style={styles.authorInfo}>
             <Text style={styles.authorName}>{post?.nickname}</Text>
-            <Text style={styles.postDate}>{post?.createdAt ? getTimeAgo(post.createdAt) : ""}</Text>
+            <Text style={styles.postDate}>
+              {post?.createdAt ? getTimeAgo(post.createdAt) : ""}
+            </Text>
           </View>
         </View>
 
@@ -116,9 +134,26 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
 
         {/* 댓글 영역 */}
         <View style={styles.commentsSection}>
-          <Text style={styles.commentSectionTitle}>
-            댓글 {post?.commentCount ?? 0}개
-          </Text>
+          <View style={styles.commentsSectionHeader}>
+            <View style={styles.interactionContainer}>
+              <LikeButton
+                targetId={post?.postId}
+                targetType="POST"
+                initialCount={post?.likeCount || 0}
+                initialLiked={post?.isLiked || false}
+                apiToggleFunction={BoardAPI.toggleLike}
+                onLikeChange={handlePostLikeChange}
+                size="small"
+                isVertical={false}
+              />
+              <View style={styles.commentCountContainer}>
+                <Icons.commentNew />
+                <Text style={styles.commentCountText}>
+                  {post?.commentCount || 0}
+                </Text>
+              </View>
+            </View>
+          </View>
 
           {/* 댓글 목록 */}
           {post?.comments.map((comment) => (
@@ -198,10 +233,27 @@ const styles = StyleSheet.create({
   commentsSection: {
     marginTop: 16,
   },
-  commentSectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
+  commentsSectionHeader: {
     marginBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+    paddingBottom: 12,
+  },
+  interactionContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  commentCountContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginLeft: 16,
+  },
+  commentCountText: {
+    fontWeight: "bold",
+    fontSize: 12,
+    color: "gray",
+    marginLeft: 4,
+    paddingTop: 2, // 텍스트를 아이콘과 정렬
   },
   commentInputContainer: {
     flexDirection: "row",
