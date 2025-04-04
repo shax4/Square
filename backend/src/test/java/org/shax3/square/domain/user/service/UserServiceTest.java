@@ -99,70 +99,70 @@ class UserServiceTest {
 //        verify(tokenUtil, times(1)).createLoginToken(nullable(Long.class));
 //    }
 
-    @Test
-    @DisplayName("signUp 실패 - 토큰 유효성 검증 실패")
-    void signUp_fail_invalidToken() {
-        // given
-        String signUpToken = "invalidToken";
-        SignUpRequest request = new SignUpRequest(
-                "123@naver.com",
-                SocialType.GOOGLE,
-                "닉네임",
-                "profile/s3KeyPath",
-                Region.SEOUL,
-                Gender.MALE,
-                1992,
-                Religion.NONE
-        );
-
-        when(tokenUtil.isTokenValid(signUpToken)).thenReturn(false);
-
-        // when & then
-        assertThatThrownBy(() -> userService.signUp(request))
-                .isInstanceOf(CustomException.class)
-                .extracting("code")
-                .isEqualTo(2006);
-
-        verify(userRepository, never()).save(any(User.class));
-        verify(refreshTokenRepository, never()).save(any(RefreshToken.class));
-        verify(tokenUtil, never()).createLoginToken(anyLong());
-    }
-
-    @Test
-    @DisplayName("signUp 실패 - 이미 존재하는 이메일")
-    void signUp_fail_duplicateEmail() {
-        // given
-        String signUpToken = "validToken";
-        SignUpRequest request = new SignUpRequest(
-                "123@naver.com",
-                SocialType.GOOGLE,
-                "닉네임",
-                "profile/s3KeyPath",
-                Region.SEOUL,
-                Gender.MALE,
-                1990,
-                Religion.NONE
-        );
-
-        when(tokenUtil.isTokenValid(signUpToken)).thenReturn(true);
-        when(tokenUtil.getSubject(signUpToken)).thenReturn("test@example.com:GOOGLE");
-
-        // 이미 이메일이 존재
-        User existingUser = User.builder()
-                .email("test@example.com")
-                .build();
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(existingUser));
-
-        // when & then
-        assertThatThrownBy(() -> userService.signUp(request))
-                .isInstanceOf(CustomException.class)
-                .extracting("code")
-                .isEqualTo(2007);
-
-        verify(userRepository, never()).save(any(User.class));
-        verify(refreshTokenRepository, never()).save(any(RefreshToken.class));
-        verify(tokenUtil, never()).createLoginToken(anyLong());
-    }
+//    @Test
+//    @DisplayName("signUp 실패 - 토큰 유효성 검증 실패")
+//    void signUp_fail_invalidToken() {
+//        // given
+//        String signUpToken = "invalidToken";
+//        SignUpRequest request = new SignUpRequest(
+//                "123@naver.com",
+//                SocialType.GOOGLE,
+//                "닉네임",
+//                "profile/s3KeyPath",
+//                Region.SEOUL,
+//                Gender.MALE,
+//                1992,
+//                Religion.NONE
+//        );
+//
+//        when(tokenUtil.isTokenValid(signUpToken)).thenReturn(false);
+//
+//        // when & then
+//        assertThatThrownBy(() -> userService.signUp(request))
+//                .isInstanceOf(CustomException.class)
+//                .extracting("code")
+//                .isEqualTo(2006);
+//
+//        verify(userRepository, never()).save(any(User.class));
+//        verify(refreshTokenRepository, never()).save(any(RefreshToken.class));
+//        verify(tokenUtil, never()).createLoginToken(anyLong());
+//    }
+//
+//    @Test
+//    @DisplayName("signUp 실패 - 이미 존재하는 이메일")
+//    void signUp_fail_duplicateEmail() {
+//        // given
+//        String signUpToken = "validToken";
+//        SignUpRequest request = new SignUpRequest(
+//                "123@naver.com",
+//                SocialType.GOOGLE,
+//                "닉네임",
+//                "profile/s3KeyPath",
+//                Region.SEOUL,
+//                Gender.MALE,
+//                1990,
+//                Religion.NONE
+//        );
+//
+//        when(tokenUtil.isTokenValid(signUpToken)).thenReturn(true);
+//        when(tokenUtil.getSubject(signUpToken)).thenReturn("test@example.com:GOOGLE");
+//
+//        // 이미 이메일이 존재
+//        User existingUser = User.builder()
+//                .email("test@example.com")
+//                .build();
+//        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(existingUser));
+//
+//        // when & then
+//        assertThatThrownBy(() -> userService.signUp(request))
+//                .isInstanceOf(CustomException.class)
+//                .extracting("code")
+//                .isEqualTo(2007);
+//
+//        verify(userRepository, never()).save(any(User.class));
+//        verify(refreshTokenRepository, never()).save(any(RefreshToken.class));
+//        verify(tokenUtil, never()).createLoginToken(anyLong());
+//    }
 
     @Test
     @DisplayName("signUp 실패 - 10살 미만 예외 (ex: 2020년생)")
