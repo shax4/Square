@@ -98,7 +98,7 @@ public class PostCommentController {
 		summary = "내가 작성한 댓글 목록 조회 api",
 		description = "내가 작성한 댓글 목록을 조회합니다."
 	)
-	@GetMapping("/{commentId}")
+	@GetMapping("/my")
 	public ResponseEntity<MyCommentListResponse> getMyCommentList(
 		@AuthUser User user,
 		@RequestParam(required = false) Long nextCursorId,
