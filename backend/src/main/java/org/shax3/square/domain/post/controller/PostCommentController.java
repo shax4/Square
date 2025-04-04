@@ -10,6 +10,7 @@ import org.shax3.square.domain.post.service.PostFacadeService;
 import org.shax3.square.domain.user.model.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -79,7 +80,7 @@ public class PostCommentController {
 		summary = "대댓글 목록 조회 (더보기) api",
 		description = "대댓글 목록을 조회합니다. 더보기를 누를 때 사용합니다."
 	)
-	@DeleteMapping("/{commentId}")
+	@GetMapping("/{commentId}")
 	public ResponseEntity<RepliesResponse> getReplyList(
 		@AuthUser User user,
 		@PathVariable Long commentId,
