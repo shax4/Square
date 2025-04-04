@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.annotation.AuthUser;
+import org.shax3.square.domain.auth.dto.UserLoginDto;
+import org.shax3.square.domain.auth.dto.response.FirebaseLoginResponse;
 import org.shax3.square.domain.user.dto.UserSignUpDto;
 import org.shax3.square.domain.user.dto.request.CheckNicknameRequest;
 import org.shax3.square.domain.user.dto.request.SignUpRequest;
@@ -41,21 +43,12 @@ public class UserController {
             description = "회원가입을 위한 정보를 보내주시면 AccessToken과 RefreshToken을 발급해줍니다"
     )
     @PostMapping
-    public ResponseEntity<SignUpUserInfoResponse> userSignUp(
+    public ResponseEntity<FirebaseLoginResponse> userSignUp(
             HttpServletResponse response,
-            @CookieValue("sign-up-token") String signUpToken,
             @Valid @RequestBody SignUpRequest signUpRequest
     ) {
-        UserSignUpDto userSignUpDto = userService.signUp(signUpRequest,signUpToken);
-
-        Cookie cookie = new Cookie("refresh-token", userSignUpDto.refreshToken().getToken());
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
-        cookie.setPath("/");
-        response.addCookie(cookie);
-        response.setHeader("Authorization", "Bearer " + userSignUpDto.accessToken());
-
-        return ResponseEntity.ok().body(SignUpUserInfoResponse.from(userSignUpDto));
+        UserLoginDto userLoginDto = userService.signUp(signUpRequest);
+        return ResponseEntity.ok(FirebaseLoginResponse.member(userLoginDto));
     }
 
     @Operation(
