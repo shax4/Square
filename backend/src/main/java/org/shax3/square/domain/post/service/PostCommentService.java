@@ -107,6 +107,7 @@ public class PostCommentService {
 	}
 
 	public List<PostComment> getReplies(Long parentId, Long cursorId, int limit) {
+		validateExists(parentId);
 		return postCommentRepository.getRepliesByParentId(parentId, cursorId, limit + 1);
 	}
 }
