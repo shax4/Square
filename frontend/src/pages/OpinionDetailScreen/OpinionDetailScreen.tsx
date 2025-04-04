@@ -13,6 +13,7 @@ import { deleteOpinion } from "../OpinionListScreen/api/OpinionApi";
 import { OpinionsResponse } from "./Components/OpinionsResponse.types";
 import { Comment } from "./Components/Comment.types";
 import { useAuthStore } from "../../shared/stores";
+import { likesOpinion } from "./api/OpinionApi";
 type OpinionDetailRouteProp = RouteProp<StackParamList, 'OpinionDetailScreen'>;
 
 export default function OpinionDetailScreen() {
@@ -209,7 +210,12 @@ export default function OpinionDetailScreen() {
 
             {/* 좋아요 및 댓글 수 */}
             <View style={styles.LikeAndCommentCountView}>
-                <LikeButton initialCount={opinionDetail!.likeCount} initialLiked={opinionDetail!.isLiked} isVertical={false} />
+                <LikeButton
+                    initialCount={opinionDetail!.likeCount}
+                    initialLiked={opinionDetail!.isLiked}
+                    isVertical={false}
+                    onPress={ () => {likesOpinion(opinionId)}}
+                />
 
                 <View style={styles.CommentCountButton}>
                     <Icons.comment />
@@ -248,7 +254,7 @@ export default function OpinionDetailScreen() {
                                     initialCount={comment.likeCount}
                                     initialLiked={comment.isLiked}
                                     size="small"
-                                    onPress={() => {likesComment(comment.commentId)}}
+                                    //onPress={() => { likesComment(comment.commentId) }}
                                 />
                             </View>
                         </View>
