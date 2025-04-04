@@ -11,6 +11,7 @@ import org.shax3.square.domain.post.model.PostComment;
 import org.shax3.square.domain.post.model.QPostComment;
 import org.shax3.square.domain.user.model.QUser;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -100,6 +101,27 @@ public class PostCommentRepositoryImpl implements PostCommentRepositoryCustom {
 				comment.parent.isNull()
 			)
 			.orderBy(comment.id.asc())
+			.fetch();
+	}
+
+	@Override
+	public List<PostComment> getRepliesByParentId(Long parentId, Long cursorId, int limit) {
+		QPostComment comment = QPostComment.postComment;
+		QUser user = QUser.user;
+
+		BooleanExpression baseCondition = comment.valid.isTrue()
+			.and(comment.parent.id.eq(parentId));
+
+		if (cursorId != null) {
+			baseCondition = baseCondition.and(comment.id.gt(cursorId));
+		}
+
+		return queryFactory
+			.selectFrom(comment)
+			.join(comment.user, user).fetchJoin()
+			.where(baseCondition)
+			.orderBy(comment.id.asc())
+			.limit(limit)
 			.fetch();
 	}
 }

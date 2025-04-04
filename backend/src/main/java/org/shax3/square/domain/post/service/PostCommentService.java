@@ -105,4 +105,8 @@ public class PostCommentService {
 	public List<PostComment> getParentComments(Post post) {
 		return postCommentRepository.findParentCommentsByPost(post);
 	}
+
+	public List<PostComment> getReplies(Long parentId, Long cursorId, int limit) {
+		return postCommentRepository.getRepliesByParentId(parentId, cursorId, limit + 1);
+	}
 }

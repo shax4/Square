@@ -14,6 +14,7 @@ import org.shax3.square.domain.post.dto.ReplyDto;
 import org.shax3.square.domain.post.dto.response.MyPostResponse;
 import org.shax3.square.domain.post.dto.response.PostDetailResponse;
 import org.shax3.square.domain.post.dto.response.PostListResponse;
+import org.shax3.square.domain.post.dto.response.RepliesResponse;
 import org.shax3.square.domain.post.model.Post;
 import org.shax3.square.domain.post.model.PostComment;
 import org.shax3.square.domain.s3.service.S3Service;
@@ -174,15 +175,6 @@ public class PostFacadeService {
 			.toList();
 	}
 
-	private Long getNextCursorId(List<Post> posts, boolean hasNext) {
-		return hasNext && !posts.isEmpty() ? posts.get(posts.size() - 1).getId() : null;
-	}
-
-	private Integer getNextCursorLikes(List<Post> posts, boolean hasNext, boolean isSortByLikes) {
-		if (!hasNext || posts.isEmpty() || !isSortByLikes) return null;
-		return posts.get(posts.size() - 1).getLikeCount();
-	}
-
 	/**
 	 * 게시글 상세 조회
 	 * @param user
@@ -241,6 +233,41 @@ public class PostFacadeService {
 			commentDtos.size()
 		);
 	}
+
+	@Transactional(readOnly = true)
+	public RepliesResponse getReplies(User user, Long commentId, Long cursorId, int limit) {
+		List<PostComment> fetchedReplies  = commentService.getReplies(commentId, cursorId, limit);
+
+		boolean hasNext = fetchedReplies.size() > limit;
+		List<PostComment> replies = hasNext ? fetchedReplies.subList(0, limit) : fetchedReplies;
+
+		// 좋아요 여부
+		List<Long> replyIds = replies.stream().map(PostComment::getId).toList();
+		Set<Long> likedReplyIds = likeService.getLikedTargetIds(user, TargetType.POST_COMMENT, replyIds);
+
+		List<ReplyDto> replyDtos = replies.stream()
+			.map(reply -> ReplyDto.from(
+				reply,
+				s3Service.generatePresignedGetUrl(reply.getUser().getS3Key()),
+				likedReplyIds.contains(reply.getId())))
+			.toList();
+
+		Long nextCursorId = hasNext && !replies.isEmpty()
+			? replies.get(replies.size() - 1).getId()
+			: null;
+
+		return new RepliesResponse(replyDtos, nextCursorId);
+	}
+
+	private Long getNextCursorId(List<Post> posts, boolean hasNext) {
+		return hasNext && !posts.isEmpty() ? posts.get(posts.size() - 1).getId() : null;
+	}
+
+	private Integer getNextCursorLikes(List<Post> posts, boolean hasNext, boolean isSortByLikes) {
+		if (!hasNext || posts.isEmpty() || !isSortByLikes) return null;
+		return posts.get(posts.size() - 1).getLikeCount();
+	}
+
 
 	private List<Long> extractCommentIds(List<PostComment> comments) {
 		return comments.stream().map(PostComment::getId).toList();

@@ -14,4 +14,6 @@ public interface PostCommentRepositoryCustom {
 	Map<Long, List<PostComment>> findTopNRepliesByParentIds(List<Long> parentCommentIds, int limit);
 
 	List<PostComment> findParentCommentsByPost(Post post);
+
+	List<PostComment> getRepliesByParentId(Long parentId, Long cursorId, int limit);
 }
