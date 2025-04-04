@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import ProfileImage from "../../../components/ProfileImage";
 import LikeButton from "../../../components/LikeButton";
 import { getTimeAgo } from "../../../shared/utils/timeAge/timeAge";
+import { Icons } from "../../../../assets/icons/Icons";
+import { BoardAPI } from "../Api/boardApi";
 
 // 게시글 아이템 타입 정의
 interface BoardItemProps {
@@ -58,15 +60,22 @@ export default function BoardItem({ item, onPress }: BoardItemProps) {
 
       {/* 하단 정보 영역 (좋아요 수, 댓글 수) */}
       <View style={styles.footer}>
-        <View style={styles.stats}>
+        <View style={styles.interactionContainer}>
           <LikeButton
+            targetId={item.postId}
+            targetType="POST"
             initialCount={item.likeCount}
             initialLiked={item.isLiked}
-            isVertical={false}
+            apiToggleFunction={BoardAPI.toggleLike}
+            onLikeChange={(newState) => {
+              /* 상태 변경 시 적용할 로직 (옵션) */
+            }}
             size="small"
+            isVertical={false}
           />
-          <View style={styles.commentInfo}>
-            <Text style={styles.commentText}>댓글 {item.commentCount}개</Text>
+          <View style={styles.commentCountContainer}>
+            <Icons.commentNew />
+            <Text style={styles.commentCountText}>{item.commentCount}</Text>
           </View>
         </View>
       </View>
@@ -128,14 +137,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  commentInfo: {
+  interactionContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  commentCountContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginLeft: 16,
   },
-  commentText: {
+  commentCountText: {
+    fontWeight: "bold",
     fontSize: 12,
-    color: "#666",
+    color: "gray",
     marginLeft: 4,
+    paddingTop: 2, // 텍스트를 아이콘과 정렬
   },
 });
