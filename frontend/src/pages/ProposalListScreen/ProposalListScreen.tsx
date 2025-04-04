@@ -2,80 +2,82 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Text, View, StyleSheet, FlatList, TouchableOpacity, ListRenderItem, ActivityIndicator } from "react-native";
 import colors from "../../../assets/colors";
 import { Button } from "../../components";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { StackParamList } from "../../shared/page-stack/DebatePageStack";
 import { Proposal } from "./Components/ProposalProps";
 import ProposalItem from './Components/ProposalItem'
 import { getAllProposals } from "./Api/proposalListAPI";
 import { ProposalResponse } from "./Type/proposalListType";
-const PAGE_SIZE = 10;
+
+const PAGE_SIZE = 15;
 
 export default function ProposalListScreen() {
-    const [sortOption, setSortOption] = useState<"latest" | "popular">("latest");
+    const [sortOption, setSortOption] = useState<"latest" | "likes">("latest");
     const [nextCursorId, setNextCursorId] = useState<number | null>(null);
     const [nextCursorLikes, setNextCursorLikes] = useState<number | null>(null);
-
     const [loading, setLoading] = useState<boolean>(false);
     const [isEmpty, setIsEmpty] = useState<boolean>(false);
     const [renderedProposals, setRenderedProposals] = useState<Proposal[]>([]);
-
+    
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
 
-
-    const fetchProposals = async (cursorId : number | null, cursorLikes : number | null) => {
-        if(loading) return;
+    const fetchProposals = async (cursorId: number | null, cursorLikes: number | null) => {
+        if (loading) return;
 
         setLoading(true);
-        try{
-            const data : ProposalResponse = await getAllProposals(sortOption, cursorId, cursorLikes, PAGE_SIZE)
+        try {
+            const data: ProposalResponse = await getAllProposals(sortOption, cursorId, cursorLikes, PAGE_SIZE);
 
-            if(cursorId === null && cursorLikes === null && data.proposals.length === 0){
+            if (cursorId === null && cursorLikes === null && data.proposals.length === 0) {
                 setIsEmpty(true);
-            }else{
+            } else {
                 setIsEmpty(false);
             }
 
-            setRenderedProposals((prev) => [...prev, ...data.proposals])
-            setNextCursorId(data.nextCursorId || null)
-            setNextCursorLikes(data.nextCursorLikes || null)
-        }catch(error){
-            console.error("fetchProposals 에러 발생", error)
-        }finally{
+            setRenderedProposals((prev) => (cursorId === null ? data.proposals : [...prev, ...data.proposals]));
+            setNextCursorId(data.nextCursorId || null);
+            setNextCursorLikes(data.nextCursorLikes || null);
+        } catch (error) {
+            console.error("fetchProposals 에러 발생", error);
+        } finally {
             setLoading(false);
         }
-    }
+    };
 
-    useEffect(() => {
-        setRenderedProposals([]);
-        setNextCursorId(null)
-        setNextCursorLikes(null)
-        fetchProposals(null, null)
-    }, [sortOption]);
+    // ✅ goBack() 후 화면이 다시 포커스될 때 자동 새로고침
+    useFocusEffect(
+        useCallback(() => {
+            setRenderedProposals([]);
+            setNextCursorId(null);
+            setNextCursorLikes(null);
+            fetchProposals(null, null);
+        }, [sortOption])
+    );
 
     const loadMore = useCallback(() => {
-        if(nextCursorId && nextCursorLikes && !loading){
-            fetchProposals(nextCursorId, nextCursorLikes)
+        if (nextCursorId && nextCursorLikes && !loading) {
+            fetchProposals(nextCursorId, nextCursorLikes);
         }
-    }, [nextCursorId, nextCursorLikes, loading])
+    }, [nextCursorId, nextCursorLikes, loading]);
 
     return (
         <View style={styles.Container}>
             {/* 정렬 버튼 */}
             <View style={styles.SortingTypeButtonView}>
                 <TouchableOpacity
-                    style={[styles.SortingTypeButton, sortOption === "latest" && styles.activeButton,]}
+                    style={[styles.SortingTypeButton, sortOption === "latest" && styles.activeButton]}
                     onPress={() => setSortOption("latest")}
                 >
-                    <Text style={[styles.SortingTypeButtonText, sortOption === "latest" && styles.activeText,]} >
+                    <Text style={[styles.SortingTypeButtonText, sortOption === "latest" && styles.activeText]}>
                         최신순
                     </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    style={[styles.SortingTypeButton, sortOption === "popular" && styles.activeButton,]}
-                    onPress={() => setSortOption("popular")}
+                    style={[styles.SortingTypeButton, sortOption === "likes" && styles.activeButton]}
+                    onPress={() => setSortOption("likes")}
                 >
-                    <Text style={[styles.SortingTypeButtonText, sortOption === "popular" && styles.activeText,]} >
+                    <Text style={[styles.SortingTypeButtonText, sortOption === "likes" && styles.activeText]}>
                         인기순
                     </Text>
                 </TouchableOpacity>
@@ -85,11 +87,11 @@ export default function ProposalListScreen() {
             <View style={styles.ProposalListView}>
                 <FlatList
                     data={renderedProposals}
-                    renderItem={(nextData) => <ProposalItem{...nextData} />}
+                    renderItem={(nextData) => <ProposalItem {...nextData} />}
                     keyExtractor={(item) => item.proposalId.toString()}
                     onEndReached={loadMore}
-                    onEndReachedThreshold={0.2}
-                    ListFooterComponent={loading? <ActivityIndicator size="small"/> : null}
+                    onEndReachedThreshold={0.5}
+                    ListFooterComponent={loading ? <ActivityIndicator size="small" /> : null}
                     ListEmptyComponent={
                         isEmpty ? (
                             <View style={styles.emptyContainer}>
@@ -102,10 +104,7 @@ export default function ProposalListScreen() {
 
             {/* 버튼 */}
             <View style={styles.ProposalButtonView}>
-                <Button
-                    label="새로운 주제 작성하기"
-                    onPress={() => navigation.navigate("ProposalCreateScreen")}
-                />
+                <Button label="새로운 주제 작성하기" onPress={() => navigation.navigate("ProposalCreateScreen")} />
             </View>
             <View style={styles.BottomPadding} />
         </View>
