@@ -1,7 +1,5 @@
 package org.shax3.square.domain.post.service;
 
-import static org.shax3.square.exception.ExceptionCode.*;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -61,11 +59,6 @@ public class PostCommentService {
 		comment.updateContent(request.content());
 	}
 
-	public PostComment getPostComment(Long postCommentId) {
-		return postCommentRepository.findById(postCommentId)
-			.orElseThrow(() -> new CustomException(ExceptionCode.COMMENT_NOT_FOUND));
-	}
-
 	@Transactional
 	public void deletePostComment(User user, Long commentId) {
 		PostComment comment = getPostComment(commentId);
@@ -73,6 +66,11 @@ public class PostCommentService {
 		verifyAuthor(user, comment);
 
 		comment.softDelete();
+	}
+
+	public PostComment getPostComment(Long postCommentId) {
+		return postCommentRepository.findById(postCommentId)
+			.orElseThrow(() -> new CustomException(ExceptionCode.COMMENT_NOT_FOUND));
 	}
 
 	private void verifyAuthor(User user, PostComment comment) {
@@ -93,6 +91,18 @@ public class PostCommentService {
 	}
 
 	public Map<Long, Integer> getCommentCounts(List<Long> postIds) {
-		return postCommentRepository.countByPostIds(postIds);
+		return postCommentRepository.countCommentsByPostIds(postIds);
+	}
+
+	public Map<Long, Integer> getReplyCounts(List<Long> parentCommentIds) {
+		return postCommentRepository.countRepliesByParentIds(parentCommentIds);
+	}
+
+	public Map<Long, List<PostComment>> getFirstNRepliesByCommentIds(List<Long> parentCommentIds, int limit) {
+		return postCommentRepository.findTopNRepliesByParentIds(parentCommentIds, limit);
+	}
+
+	public List<PostComment> getParentComments(Post post) {
+		return postCommentRepository.findParentCommentsByPost(post);
 	}
 }
