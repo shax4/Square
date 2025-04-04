@@ -1,10 +1,13 @@
 package org.shax3.square.domain.post.service;
 
+import static org.shax3.square.common.util.CursorUtil.*;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.shax3.square.common.model.TargetType;
+import org.shax3.square.common.util.CursorUtil;
 import org.shax3.square.domain.like.service.LikeService;
 import org.shax3.square.domain.post.dto.CommentDto;
 import org.shax3.square.domain.post.dto.PopularPostDto;
@@ -14,6 +17,7 @@ import org.shax3.square.domain.post.dto.ReplyDto;
 import org.shax3.square.domain.post.dto.response.MyPostResponse;
 import org.shax3.square.domain.post.dto.response.PostDetailResponse;
 import org.shax3.square.domain.post.dto.response.PostListResponse;
+import org.shax3.square.domain.post.dto.response.RepliesResponse;
 import org.shax3.square.domain.post.model.Post;
 import org.shax3.square.domain.post.model.PostComment;
 import org.shax3.square.domain.s3.service.S3Service;
@@ -69,7 +73,7 @@ public class PostFacadeService {
 			? postQueryService.getPostsByLikesCursor(nextCursorLikes, nextCursorId, limit)
 			: postQueryService.getPostsByLatestCursor(nextCursorId, limit);
 
-		boolean hasNext = fetchedPosts.size() > limit;
+		boolean hasNext = hasNext(fetchedPosts, limit);
 		List<Post> posts = hasNext ? fetchedPosts.subList(0, limit) : fetchedPosts;
 
 		List<PostSummaryDto> postDtos = toPostDtos(posts, user);
@@ -78,8 +82,8 @@ public class PostFacadeService {
 			user.getType().name(),
 			popularDtos,
 			postDtos,
-			getNextCursorId(posts, hasNext),
-			getNextCursorLikes(posts, hasNext, isSortByLikes)
+			getNextCursor(posts, hasNext, Post::getId),
+			isSortByLikes ? getNextCursor(posts, hasNext, Post::getLikeCount) : null
 		);
 	}
 
@@ -95,12 +99,12 @@ public class PostFacadeService {
 
 		List<Post> fetchedPosts = postQueryService.getMyPosts(user, nextCursorId, limit);
 
-		boolean hasNext = fetchedPosts.size() > limit;
+		boolean hasNext = hasNext(fetchedPosts, limit);
 		List<Post> posts = hasNext ? fetchedPosts.subList(0, limit) : fetchedPosts;
 
 		List<PostSummaryDto> postDtos = toPostDtos(posts, user);
 
-		return new MyPostResponse(postDtos, getNextCursorId(posts, hasNext));
+		return new MyPostResponse(postDtos, getNextCursor(posts, hasNext, Post::getId));
 	}
 
 	/**
@@ -115,12 +119,12 @@ public class PostFacadeService {
 
 		List<Post> fetchedPosts = postQueryService.getMyLikedPosts(user, nextCursorId, limit);
 
-		boolean hasNext = fetchedPosts.size() > limit;
+		boolean hasNext = hasNext(fetchedPosts, limit);
 		List<Post> posts = hasNext ? fetchedPosts.subList(0, limit) : fetchedPosts;
 
 		List<PostSummaryDto> postDtos = toPostDtos(posts, user);
 
-		return new MyPostResponse(postDtos, getNextCursorId(posts, hasNext));
+		return new MyPostResponse(postDtos, getNextCursor(posts, hasNext, Post::getId));
 	}
 
 	/**
@@ -134,12 +138,12 @@ public class PostFacadeService {
 	public MyPostResponse getMyScrapPostList(User user, Long nextCursorId, int limit) {
 		List<Post> fetchedPosts = postQueryService.getMyScrapPosts(user, nextCursorId, limit + 1);
 
-		boolean hasNext = fetchedPosts.size() > limit;
+		boolean hasNext = hasNext(fetchedPosts, limit);
 		List<Post> posts = hasNext ? fetchedPosts.subList(0, limit) : fetchedPosts;
 
 		List<PostSummaryDto> postDtos = toPostDtos(posts, user);
 
-		return new MyPostResponse(postDtos, getNextCursorId(posts, hasNext));
+		return new MyPostResponse(postDtos, getNextCursor(posts, hasNext, Post::getId));
 	}
 
 
@@ -172,15 +176,6 @@ public class PostFacadeService {
 				commentCounts.getOrDefault(post.getId(), 0)
 			))
 			.toList();
-	}
-
-	private Long getNextCursorId(List<Post> posts, boolean hasNext) {
-		return hasNext && !posts.isEmpty() ? posts.get(posts.size() - 1).getId() : null;
-	}
-
-	private Integer getNextCursorLikes(List<Post> posts, boolean hasNext, boolean isSortByLikes) {
-		if (!hasNext || posts.isEmpty() || !isSortByLikes) return null;
-		return posts.get(posts.size() - 1).getLikeCount();
 	}
 
 	/**
@@ -241,6 +236,8 @@ public class PostFacadeService {
 			commentDtos.size()
 		);
 	}
+
+
 
 	private List<Long> extractCommentIds(List<PostComment> comments) {
 		return comments.stream().map(PostComment::getId).toList();
