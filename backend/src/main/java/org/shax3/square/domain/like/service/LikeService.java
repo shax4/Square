@@ -99,18 +99,51 @@ public class LikeService {
 		likeTargetHandler.updateTargetLikeCount(targetType, targetId, likeDiff);
 	}
 
-	/**
-	 * 좋아요 여부를 확인하기 위한 메서드
-	 * @param user
-	 * @param targetType
-	 * @param targetIds
-	 * @return
-	 */
+	// 좋아요 되어있는 타겟 ID들을 가져오는 메서드
 	public Set<Long> getLikedTargetIds(User user, TargetType targetType, List<Long> targetIds) {
-		return likeRepository.findLikedTargetIds(user, targetType, targetIds);
+		Set<Long> likedInDb = likeRepository.findLikedTargetIds(user, targetType, targetIds);
+		Set<Long> likedInRedis = getLikedTargetIdsFromRedis(user, targetType, targetIds);
+
+		likedInDb.addAll(likedInRedis);
+		return likedInDb;
 	}
 
+	// Redis에 저장된 타겟 ID들을 가져오는 메서드
+	private Set<Long> getLikedTargetIdsFromRedis(User user, TargetType targetType, List<Long> targetIds) {
+		Set<Object> entries = batchRedisTemplate.opsForSet().members("like:batch");
+		if (entries == null) return Set.of();
+
+		return entries.stream()
+			.map(Object::toString) // POST:123:1
+			.filter(e -> {
+				String[] parts = e.split(":");
+				return parts.length == 3
+					&& parts[0].equals(targetType.name())
+					&& parts[2].equals(user.getId().toString())
+					&& targetIds.contains(Long.valueOf(parts[1]));
+			})
+			.map(e -> Long.valueOf(e.split(":")[1]))
+			.collect(Collectors.toSet());
+	}
+
+	// 특정 타겟에 대해 좋아요를 눌렀는지 확인하는 메서드
 	public boolean isTargetLiked(User user, TargetType targetType, Long targetId) {
 		return likeRepository.existsByUserAndTargetTypeAndTargetIdAndLikeTrue(user, targetType, targetId);
 	}
+
+	public int getPendingLikeCountInRedis(Long targetId, TargetType targetType) {
+		Set<Object> entries = batchRedisTemplate.opsForSet().members("like:batch");
+		if (entries == null) return 0;
+
+		return (int) entries.stream()
+			.map(Object::toString) // POST:123:1
+			.filter(e -> {
+				String[] parts = e.split(":");
+				return parts.length == 3
+					&& parts[0].equals(targetType.name())
+					&& Long.valueOf(parts[1]).equals(targetId);
+			})
+			.count();
+	}
+
 }
