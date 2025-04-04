@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Text, View, StyleSheet, FlatList, TouchableOpacity, ListRenderItem } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import { Text, View, StyleSheet, FlatList, TouchableOpacity, ListRenderItem, ActivityIndicator } from "react-native";
 import colors from "../../../assets/colors";
 import { Button } from "../../components";
 import { useNavigation } from "@react-navigation/native";
@@ -23,7 +23,7 @@ export default function ProposalListScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
 
 
-    const fetchProposals = async (cursorId : number, cursorLikes : number) => {
+    const fetchProposals = async (cursorId : number | null, cursorLikes : number | null) => {
         if(loading) return;
 
         setLoading(true);
@@ -47,32 +47,17 @@ export default function ProposalListScreen() {
     }
 
     useEffect(() => {
-        const getInitialProposals = async () => {
-            try{
-                const data : ProposalResponse = await getAllProposals(sortOption, null, null, PAGE_SIZE);
-                const initialPage = data.proposals;
-                setRenderedProposals(initialPage);
-            }catch(error){
-                console.error("초기 주제 리스트 불러오기 에러 : ", error);
-            }
-        }
-
-        getInitialProposals();
-        // 서버에서 정렬된 데이터를 제공한다고 가정하고, 현재 정렬 기준에 해당하는 데이터라고 가정
-        // setCurrentPage(1);
-        // const initialPage = allProposals.slice(0, PAGE_SIZE);
-        // setRenderedProposals(initialPage);
+        setRenderedProposals([]);
+        setNextCursorId(null)
+        setNextCursorLikes(null)
+        fetchProposals(null, null)
     }, [sortOption]);
 
-    const handleLoadMore = () => {
-        // const nextPage = currentPage + 1;
-        // const nextData = allProposals.slice(0, nextPage * PAGE_SIZE);
-        // console.log(nextData.length)
-        // if (nextData.length > renderedProposals.length) {
-        //     setRenderedProposals(nextData);
-        //     setCurrentPage(nextPage);
-        // }
-    };
+    const loadMore = useCallback(() => {
+        if(nextCursorId && nextCursorLikes && !loading){
+            fetchProposals(nextCursorId, nextCursorLikes)
+        }
+    }, [nextCursorId, nextCursorLikes, loading])
 
     return (
         <View style={styles.Container}>
@@ -102,8 +87,16 @@ export default function ProposalListScreen() {
                     data={renderedProposals}
                     renderItem={(nextData) => <ProposalItem{...nextData} />}
                     keyExtractor={(item) => item.proposalId.toString()}
-                    onEndReached={handleLoadMore}
+                    onEndReached={loadMore}
                     onEndReachedThreshold={0.2}
+                    ListFooterComponent={loading? <ActivityIndicator size="small"/> : null}
+                    ListEmptyComponent={
+                        isEmpty ? (
+                            <View style={styles.emptyContainer}>
+                                <Text style={styles.emptyText}>청원된 주제가 없습니다.</Text>
+                            </View>
+                        ) : null
+                    }
                 />
             </View>
 
@@ -161,5 +154,15 @@ const styles = StyleSheet.create({
     },
     BottomPadding: {
         flex: 1,
+    },
+    emptyContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 20,
+    },
+    emptyText: {
+        fontSize: 16,
+        color: "gray",
     },
 });
