@@ -11,4 +11,5 @@ export type StackParamList = {
     ModalTestScreen: undefined;
     MypageFeatureTestScreen: undefined;
     PersonalitySurveyPage: undefined;
+    LandingScreen: undefined;
 };
