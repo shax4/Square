@@ -12,4 +12,5 @@ export type StackParamList = {
     MypageFeatureTestScreen: undefined;
     PersonalitySurveyPage: undefined;
     LandingScreen: undefined;
+    SignupScreen: undefined;
 };

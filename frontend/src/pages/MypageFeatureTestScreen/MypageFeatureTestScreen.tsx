@@ -41,6 +41,12 @@ const MypageFeatureTestScreen = () => {
               variant="secondary"
               style={styles.actionButton}
             />
+            <MypageButton
+              title="SignupScreen"
+              onPress={() => navigation.navigate('SignupScreen')}
+              variant="secondary"
+              style={styles.actionButton}
+            />
         </View>
     );
 }

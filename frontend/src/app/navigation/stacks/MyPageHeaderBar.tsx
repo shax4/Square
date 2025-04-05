@@ -16,6 +16,7 @@ import DeleteAccountScreen from '../../../pages/DeleteAccountScreen/DeleteAccoun
 import UseAuthTestScreen from '../../../pages/UseAuthTestScreen/UseAuthTestScreen';
 import SignupTestScreen from '../../../pages/SignupTestScreen/SignupTestScreen';
 import MypageFeatureTestScreen from '../../../pages/MypageFeatureTestScreen/MypageFeatureTestScreen';
+import SignUpScreen from '../../../pages/SignupScreen/SignupScreen';
 import LandingScreen from '../../../pages/LandingScreen/LandingScreen';
 import { ModalTestScreen } from '../../../pages';
 
@@ -127,6 +128,14 @@ export default function HeaderBar() {
                 component={LandingScreen}
                 options={{
                     title: 'LandingScreen',
+                    headerBackButtonDisplayMode: 'minimal',
+                }}
+            />
+            <Stack.Screen
+                name="SignupScreen"
+                component={SignUpScreen}
+                options={{
+                    title: 'SignupScreen',
                     headerBackButtonDisplayMode: 'minimal',
                 }}
             />
