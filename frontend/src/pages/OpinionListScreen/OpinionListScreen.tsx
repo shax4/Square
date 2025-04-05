@@ -17,6 +17,7 @@ import ScrapButton from '../../components/ScrapButton/ScrapButton';
 import { Icons } from '../../../assets/icons/Icons';
 import { useDebateStore } from '../../shared/stores/debates';
 import { SortType } from './Components/OpinionSortType';
+import { useAuthStore } from '../../shared/stores';
 
 type OpinionListScreenRouteProp = RouteProp<StackParamList, 'OpinionListScreen'>;
 
@@ -33,6 +34,8 @@ interface PagingCursor {
 
 export default function OpinionListScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
+
+    const { loggedIn } = useAuthStore();
 
     const isFocused = useIsFocused();
 
@@ -87,7 +90,12 @@ export default function OpinionListScreen() {
 
     // 화면 새로 도달 시 새로고침
     useEffect(() => {
-        if (isFocused) {
+        // AI 요약 로드
+        setSummaries([]);
+        initAiSummaries();
+
+        // 의견 목록: 화면 조회될때마다 로드, 로그인 필요
+        if (isFocused && loggedIn) {
             // 페이지 진입 시 항상 초기화 후 다시 불러옴
             setOpinionStateMap({
                 latest: { opinions: [], hasMore: true },
@@ -95,10 +103,8 @@ export default function OpinionListScreen() {
                 comments: { opinions: [], hasMore: true },
             });
             setCursor(emptyCursor);
-            setSummaries([]);
 
             fetchAllSorts();
-            initAiSummaries();
         }
 
     }, [isFocused, debateId]);
@@ -110,11 +116,10 @@ export default function OpinionListScreen() {
         }
     }, [debateId, cursor]); // 필요한 의존성 추가
 
-
     // 정렬 방식에 맞춰 의견 목록 조회 요청
     const fetchOpinionsBySort = async (sortType: SortType, force = false) => {
         const current = opinionStateMap[sortType];
-        if (!current.hasMore || loading) return;
+        if (!current.hasMore || loading || !loggedIn) return;
 
         setLoading(true);
 
