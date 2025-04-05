@@ -13,3 +13,16 @@ export const getAllProposals = async (sort : string | null, nextCursorId : numbe
         throw error;
     }
 }
+
+export const likeProposal = async (targetId : number) => {
+    try{
+        const targetType = "PROPOSAL"
+        const response = await axiosInstance.post('/api/likes', {
+            targetId,
+            targetType
+        })
+    }catch(error){
+        console.error(`주제 좋아요 실패 :`, error);
+        throw error;
+    }
+}
