@@ -88,19 +88,19 @@ export default function OpinionListScreen() {
     // 화면 새로 도달 시 새로고침
     useEffect(() => {
         if (isFocused) {
-            console.log('called!!');
-        }
-        // 페이지 진입 시 항상 초기화 후 다시 불러옴
-        setOpinionStateMap({
-            latest: { opinions: [], hasMore: true },
-            likes: { opinions: [], hasMore: true },
-            comments: { opinions: [], hasMore: true },
-        });
-        setCursor(emptyCursor);
-        setSummaries([]);
+            // 페이지 진입 시 항상 초기화 후 다시 불러옴
+            setOpinionStateMap({
+                latest: { opinions: [], hasMore: true },
+                likes: { opinions: [], hasMore: true },
+                comments: { opinions: [], hasMore: true },
+            });
+            setCursor(emptyCursor);
+            setSummaries([]);
 
-        fetchAllSorts();
-        initAiSummaries();
+            fetchAllSorts();
+            initAiSummaries();
+        }
+
     }, [isFocused, debateId]);
 
 
