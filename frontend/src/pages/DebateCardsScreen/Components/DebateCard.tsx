@@ -10,7 +10,7 @@ import { styles } from './DebateCard.styles';
 import VoteButton from '../../../components/VoteButton/VoteButton'
 import BookmarkButton from '../../../components/BookmarkButton/BookmarkButton';
 import { useDebateStore } from '../../../shared/stores/debates';
-
+import { scrapDebate, scrapDebateUndo } from '../api/DebateApi';
 
 interface DebateCardProps {
     debateId: number;
@@ -29,10 +29,12 @@ const DebateCard = ({ debateId }: DebateCardProps): JSX.Element => {
         navigation.navigate('OpinionListScreen', { debateId });
     }
 
-    const handlePressScrap = () => {
-        console.log("DebateCard.tsx scrap Button Clicked")
+    const handlePressScrap = async () => {
         const newScrap = !debate.isScraped;
         updateDebate(debateId, { isScraped: newScrap });
+
+        // 스크랩 API 요청
+        newScrap ? scrapDebate(debateId) : scrapDebateUndo(debateId);
     };
 
     // 투표 완료시 처리

@@ -20,3 +20,35 @@ export const getAllDebates = async (
     throw error;
   }
 };
+
+export const scrapDebate = async (
+  targetId: number
+) => {
+  try {
+    const response = await axiosInstance.post("/api/scraps", {
+      targetId: targetId,
+      targetType: "DEBATE"
+    });
+    return response.data;
+  } catch (error) {
+    console.debug("스크랩 실패:", targetId);
+    throw error;
+  }
+};
+
+export const scrapDebateUndo = async (
+  targetId: number
+) => {
+  try {
+    const response = await axiosInstance.delete("/api/scraps", {
+      params: {
+        targetId: targetId,
+        targetType: "DEBATE"
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.debug("스크랩 취소 실패:", targetId);
+    throw error;
+  }
+};
