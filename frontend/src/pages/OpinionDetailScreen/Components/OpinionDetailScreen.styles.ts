@@ -32,9 +32,10 @@ export const styles = StyleSheet.create({
         fontSize: 14,
     },
     Separator: {
-        height: 0.7,
+        height: 1,
         backgroundColor: colors.disabledText,
-        margin: 12,
+        marginHorizontal: 12,
+        marginTop: 12,
     },
     ScrollViewContent: {
         flex: 1,
@@ -42,14 +43,16 @@ export const styles = StyleSheet.create({
     CommentView: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
-        marginHorizontal: 20,
+        alignItems: 'flex-start',
+        margin: 12,
     },
     ProfileAndCommentView: {
+        flex: 1,
     },
     CommentLikeView: {
-        flex: 1,
         alignItems: 'flex-end',
+        marginTop: 30,
+        marginHorizontal: 12,
     },
     CommentTextView: {
         marginVertical: 15,
@@ -90,4 +93,10 @@ export const styles = StyleSheet.create({
         flexDirection: 'row',
         gap: 12,
     },
+    CommentSeparator: {
+        height: 0.5,
+        backgroundColor: colors.black,
+        marginHorizontal: 12,
+    }
+
 });

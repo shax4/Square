@@ -1,7 +1,7 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState, useCallback } from 'react';
 import { View, Text, KeyboardAvoidingView, Platform, SafeAreaView, TouchableOpacity } from 'react-native';
 import { styles } from './Components/OpinionListScreen.styles'
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { StackParamList } from '../../shared/page-stack/DebatePageStack';
 import VoteButton from '../../components/VoteButton/VoteButton';
 import ToggleSwitch from './Components/ToggleSwitch';
@@ -9,7 +9,7 @@ import SummaryBoxList from './Components/Summary/SummaryBoxList'
 import { Summary } from './Components/Summary';
 import OpinionBoxList from './Components/Opinion/OpinionBoxList';
 import CommentInput from '../../components/CommentInput/CommentInput';
-import { getOpinions, createOpinion } from './api/OpinionsApi';
+import { getOpinions, createOpinion } from './api/OpinionApi';
 import { Opinion } from './Components/Opinion';
 import { getSummaries } from './api/SummariesApi';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -33,6 +33,9 @@ interface PagingCursor {
 
 export default function OpinionListScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
+
+    const isFocused = useIsFocused();
+
     const route = useRoute<OpinionListScreenRouteProp>();
     const { debateId, showVoteResultModal = false } = route.params;
 
@@ -82,17 +85,33 @@ export default function OpinionListScreen() {
     // 햔재 탭의 의견
     const currentOpinions = opinionStateMap[sort].opinions;
 
+    // 화면 새로 도달 시 새로고침
     useEffect(() => {
+        if (isFocused) {
+            console.log('called!!');
+        }
+        // 페이지 진입 시 항상 초기화 후 다시 불러옴
+        setOpinionStateMap({
+            latest: { opinions: [], hasMore: true },
+            likes: { opinions: [], hasMore: true },
+            comments: { opinions: [], hasMore: true },
+        });
+        setCursor(emptyCursor);
+        setSummaries([]);
+
         fetchAllSorts();
         initAiSummaries();
-    }, []);
+    }, [isFocused, debateId]);
+
+
 
     // 처음 로드 시 각 정렬 방식에 맞춰 의견들 가져오기
-    const fetchAllSorts = async () => {
+    const fetchAllSorts = useCallback(async () => {
         for (const sortType of [SortType.Latest, SortType.Likes, SortType.Comments] as SortType[]) {
             await fetchOpinionsBySort(sortType, true);
         }
-    };
+    }, [debateId, cursor]); // 필요한 의존성 추가
+
 
     // 정렬 방식에 맞춰 의견 목록 조회 요청
     const fetchOpinionsBySort = async (sortType: SortType, force = false) => {
@@ -173,10 +192,11 @@ export default function OpinionListScreen() {
     };
 
     // AI 요약 초기 업데이트
-    const initAiSummaries = () => {
+    const initAiSummaries = useCallback(() => {
         setSummaries([]);
         fetchSummaries();
-    };
+    }, [debateId]);
+
 
     const fetchSummaries = async () => {
         setLoading(true);
@@ -299,6 +319,7 @@ export default function OpinionListScreen() {
                     ) : (
                         <OpinionBoxList
                             data={currentOpinions}
+                            debateId={debateId}
                             onEndReached={() => fetchOpinionsBySort(sort)}
                         />
                     )}
