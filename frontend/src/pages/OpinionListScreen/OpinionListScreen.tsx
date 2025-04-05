@@ -13,7 +13,7 @@ import { getOpinions, createOpinion } from './api/OpinionApi';
 import { Opinion } from './Components/Opinion';
 import { getSummaries } from './api/SummariesApi';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import BookmarkButton from '../../components/BookmarkButton/BookmarkButton';
+import ScrapButton from '../../components/ScrapButton/ScrapButton';
 import { Icons } from '../../../assets/icons/Icons';
 import { useDebateStore } from '../../shared/stores/debates';
 import { SortType } from './OpinionSortType';
@@ -226,7 +226,7 @@ export default function OpinionListScreen() {
                     <TouchableOpacity onPress={() => console.log('공유')}>
                         <Icons.share />
                     </TouchableOpacity>
-                    <BookmarkButton
+                    <ScrapButton
                         isScraped={debate.isScraped}
                         onPressScrap={() => handleScrap()}
                     />

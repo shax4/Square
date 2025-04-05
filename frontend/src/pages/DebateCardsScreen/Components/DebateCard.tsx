@@ -8,7 +8,7 @@ import { StackParamList } from '../../../shared/page-stack/DebatePageStack';
 import { Debate } from './Debate.types';
 import { styles } from './DebateCard.styles';
 import VoteButton from '../../../components/VoteButton/VoteButton'
-import BookmarkButton from '../../../components/BookmarkButton/BookmarkButton';
+import ScrapButton from '../../../components/ScrapButton/ScrapButton';
 import { useDebateStore } from '../../../shared/stores/debates';
 import { scrapDebate, scrapDebateUndo } from '../api/DebateApi';
 
@@ -52,7 +52,7 @@ const DebateCard = ({ debateId }: DebateCardProps): JSX.Element => {
                     {/* Header */}
                     <View style={styles.CardHeader}>
                         <Text style={styles.CardHeaderText}>Number {debateId}</Text>
-                        <BookmarkButton
+                        <ScrapButton
                             isScraped={debate.isScraped}
                             onPressScrap={() => { handlePressScrap() }}
                         />

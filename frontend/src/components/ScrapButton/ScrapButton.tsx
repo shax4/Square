@@ -1,15 +1,15 @@
 import { TouchableOpacity } from "react-native";
 import { Icons } from "../../../assets/icons/Icons";
 
-interface BookmarkButtonProps {
+interface ScrapButtonProps {
     isScraped: boolean;
     onPressScrap: () => void;
 }
 
-const BookmarkButton = ({
+const ScrapButton = ({
     isScraped = false,
     onPressScrap
-}: BookmarkButtonProps) => {
+}: ScrapButtonProps) => {
     return (
         <TouchableOpacity onPress={onPressScrap}>
             {isScraped ? <Icons.bookmarkUndo /> : <Icons.bookmark />}
@@ -17,4 +17,4 @@ const BookmarkButton = ({
     );
 };
 
-export default BookmarkButton;
+export default ScrapButton;
