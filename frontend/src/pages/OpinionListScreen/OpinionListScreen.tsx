@@ -16,7 +16,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import ScrapButton from '../../components/ScrapButton/ScrapButton';
 import { Icons } from '../../../assets/icons/Icons';
 import { useDebateStore } from '../../shared/stores/debates';
-import { SortType } from './OpinionSortType';
+import { SortType } from './Components/OpinionSortType';
 
 type OpinionListScreenRouteProp = RouteProp<StackParamList, 'OpinionListScreen'>;
 
@@ -102,8 +102,6 @@ export default function OpinionListScreen() {
         }
 
     }, [isFocused, debateId]);
-
-
 
     // 처음 로드 시 각 정렬 방식에 맞춰 의견들 가져오기
     const fetchAllSorts = useCallback(async () => {
