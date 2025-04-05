@@ -183,7 +183,7 @@ export default function OpinionListScreen() {
             }
 
         } catch (e) {
-            console.error(`의견 불러오기 실패 (${sortType}):`, e);
+            console.debug(`의견 불러오기 실패 (${sortType}):`, e);
         } finally {
             setLoading(false);
         }

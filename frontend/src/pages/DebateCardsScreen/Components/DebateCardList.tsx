@@ -1,11 +1,12 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, ActivityIndicator, FlatList, Dimensions, RefreshControl } from 'react-native';
+import { View, ActivityIndicator, FlatList, Dimensions, RefreshControl, TouchableOpacity, Text } from 'react-native';
 import DebateCard from './DebateCard';
 import { styles } from './DebateCard.styles';
 import { getAllDebates } from '../api/DebateApi';
 import { computeDebateListFields } from './Debate.types';
 import { useDebateStore } from '../../../shared/stores/debates';
 import { useAuthStore } from '../../../shared/stores/auth';
+import { Button } from '../../../components';
 
 const { width, height } = Dimensions.get('window');
 
@@ -54,7 +55,7 @@ export default function DebateCardList() {
                 setHasMore(false);
             }
         } catch (error) {
-            console.error("데이터 로드 실패:", error);
+            console.debug("논쟁 데이터 로드 실패:", error);
             setHasMore(false);
         }
 

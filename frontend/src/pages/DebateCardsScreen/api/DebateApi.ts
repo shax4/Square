@@ -16,7 +16,7 @@ export const getAllDebates = async (
 
     return response.data;
   } catch (error) {
-    console.error("논쟁 주제 받아오기 실패:", error);
+    console.debug("논쟁 주제 받아오기 실패:", error);
     throw error;
   }
 };

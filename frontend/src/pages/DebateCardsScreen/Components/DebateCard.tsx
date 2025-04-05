@@ -37,11 +37,6 @@ const DebateCard = ({ debateId }: DebateCardProps): JSX.Element => {
         newScrap ? scrapDebate(debateId) : scrapDebateUndo(debateId);
     };
 
-    // 투표 완료시 처리
-    const onVoteComplete = (isLeft: boolean) => {
-        debate.isLeft = isLeft;
-    }
-
     return (
         <>
             <View style={styles.CardContainer}>
