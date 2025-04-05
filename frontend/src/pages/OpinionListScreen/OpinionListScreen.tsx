@@ -87,16 +87,18 @@ export default function OpinionListScreen() {
 
     // 햔재 탭의 의견
     const currentOpinions = opinionStateMap[sort].opinions;
-
+    
     // 화면 새로 도달 시 새로고침
-    useEffect(() => {
-        // AI 요약 로드
-        setSummaries([]);
-        initAiSummaries();
+    useFocusEffect(
+        useCallback(() => {
 
-        // 의견 목록: 화면 조회될때마다 로드, 로그인 필요
-        if (isFocused && loggedIn) {
-            // 페이지 진입 시 항상 초기화 후 다시 불러옴
+            // AI 요약 초기화
+            setSummaries([]);
+            initAiSummaries();
+
+            if (!loggedIn) return;
+
+            // 의견 목록 초기화 및 다시 불러오기
             setOpinionStateMap({
                 latest: { opinions: [], hasMore: true },
                 likes: { opinions: [], hasMore: true },
@@ -105,9 +107,9 @@ export default function OpinionListScreen() {
             setCursor(emptyCursor);
 
             fetchAllSorts();
-        }
 
-    }, [isFocused, debateId]);
+        }, [debateId, loggedIn])
+    ); 
 
     // 처음 로드 시 각 정렬 방식에 맞춰 의견들 가져오기
     const fetchAllSorts = useCallback(async () => {
