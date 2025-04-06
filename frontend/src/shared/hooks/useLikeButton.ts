@@ -1,8 +1,9 @@
-import { BoardAPI } from "../../pages/BoardScreen/Api/boardApi";
+import { toggleLikeAPI, LikeChangeCallback } from "../services/likeService";
 import { TargetType } from "../../components/LikeButton/LikeButton.types";
 
 /**
  * 좋아요 버튼 사용을 위한 커스텀 훅
+ * 백엔드 API와 연결하여 좋아요 기능을 제공합니다.
  *
  * @example
  * // 기본 사용법
@@ -30,7 +31,7 @@ export const useLikeButton = (
   targetType: TargetType,
   initialLiked: boolean,
   initialCount: number,
-  onLikeChange?: (state: { isLiked: boolean; likeCount: number }) => void
+  onLikeChange?: LikeChangeCallback
 ) => {
   /**
    * 에러 처리 공통 함수
@@ -38,7 +39,27 @@ export const useLikeButton = (
    */
   const handleError = (error: any) => {
     console.error(`${targetType} ${targetId} 좋아요 처리 중 오류:`, error);
-    // 공통 에러 로직 (필요에 따라 추가)
+
+    // 사용자에게 표시할 에러 메시지 설정
+    let errorMessage = "좋아요 처리 중 오류가 발생했습니다.";
+
+    // 네트워크 오류인 경우
+    if (error.message === "Network Error") {
+      errorMessage = "네트워크 연결을 확인해주세요.";
+    }
+
+    // 서버 오류인 경우
+    if (error.response?.status >= 500) {
+      errorMessage = "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+    }
+
+    // 권한 오류인 경우
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      errorMessage = "로그인이 필요하거나 권한이 없습니다.";
+    }
+
+    // 필요에 따라 추가 로직 구현
+    return errorMessage;
   };
 
   // LikeButton에 전달할 공통 props 반환
@@ -47,7 +68,7 @@ export const useLikeButton = (
     targetType,
     initialLiked,
     initialCount,
-    apiToggleFunction: BoardAPI.toggleLike,
+    apiToggleFunction: toggleLikeAPI, // 새로 만든 API 함수 사용
     onLikeChange,
     onError: handleError,
     errorDisplayMode: "simple" as const, // 명시적 타입 지정
