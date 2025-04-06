@@ -200,8 +200,24 @@ const LikeButtonApiTestExample = () => {
             </View>
           </View>
 
-          <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
-            <Text style={styles.resetButtonText}>상태 초기화</Text>
+          <TouchableOpacity
+            style={[styles.resetButton, { backgroundColor: "#f44336" }]}
+            onPress={async () => {
+              try {
+                setLoading(true);
+                // 모든 좋아요 상태 초기화
+                await LikeService.clearLikeStatus();
+                // 테스트 상태 다시 불러오기
+                await fetchInitialLikeStatus();
+              } catch (err) {
+                console.error("상태 초기화 실패:", err);
+                setError("상태 초기화에 실패했습니다.");
+              } finally {
+                setLoading(false);
+              }
+            }}
+          >
+            <Text style={styles.resetButtonText}>모든 좋아요 상태 초기화</Text>
           </TouchableOpacity>
         </>
       )}
