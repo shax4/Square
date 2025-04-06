@@ -13,4 +13,5 @@ export type StackParamList = {
     PersonalitySurveyPage: undefined;
     LandingScreen: undefined;
     SignupScreen: undefined;
+    BoardDetail: { boardId: number; refresh?: boolean };
 };
