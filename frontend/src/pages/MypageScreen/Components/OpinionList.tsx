@@ -3,8 +3,12 @@ import { useState, useEffect, useCallback } from "react";
 import OpinionCard from "./OpinionCard";
 import { Opinion, OpinionResponse } from "../Type/mypageOpinion";
 import { getMypageOpinions } from "../Api/opinionAPI";
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
 
+import {StackParamList} from '../../../shared/page-stack/MyPageStack'
 const OpinionList = () => {
+    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
     const [opinions, setOpinions] = useState<Opinion[]>([]);
     const [nextCursorId, setNextCursorId] = useState<number | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
@@ -44,6 +48,10 @@ const OpinionList = () => {
         }
     }, [nextCursorId, loading])
 
+    const onClickOpinionCard = (debateId : number, opinionId : number) => {
+        navigation.navigate('OpinionDetailScreen', { debateId, opinionId });
+    }
+
     return (
         <FlatList
             data={opinions}
@@ -55,7 +63,7 @@ const OpinionList = () => {
                 likeCount={item.likeCount}
                 isLiked={item.isLiked}
                 onLikeToggle={(isLiked) => console.log(`Like toggled to ${isLiked} for opinion ${item.opinionId}`)}
-                onCardPress={() => console.log(`Opinion card pressed: ${item.opinionId}`)}
+                onCardPress={() => onClickOpinionCard(1, item.opinionId)} // WIP
             />
             )}
             contentContainerStyle={styles.listContent}

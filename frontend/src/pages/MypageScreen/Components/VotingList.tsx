@@ -1,15 +1,20 @@
 import { StyleSheet, FlatList, ActivityIndicator, View, Text } from "react-native";
 import {mockVotes} from "./mocks"
 import VotingCard from "./VotingCard";
-import { Voting, VotingResponse } from "../Type/mypageVoting";
+import { Voting, VotingResponse, VotingScrapResponse } from "../Type/mypageVoting";
 import { useState, useEffect, useCallback } from "react";
-import { getMypageVotings } from "../Api/votingAPI";
+import { getMypageVotings, getMypageVotingScraps } from "../Api/votingAPI";
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
 
+import {StackParamList} from '../../../shared/page-stack/MyPageStack'
 interface Props {
     type : string;
 }
 
 const VotingList = ({type} : Props) => {
+    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
+
     const [votings, setVotings] = useState<Voting[]>([]);
     const [nextCursorId, setNextCursorId] = useState<number | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
@@ -20,27 +25,57 @@ const VotingList = ({type} : Props) => {
 
         setLoading(true);
         try{
-            const data : VotingResponse = await getMypageVotings(type, cursorId, 10);
-            const processedVotings = (data.votings ?? []).map((vote) => {
-                const totalVotes = vote.leftCount + vote.rightCount;
-                const leftPercent = totalVotes > 0 ? (vote.leftCount / totalVotes) * 100 : 0;
-                const rightPercent = totalVotes > 0 ? (vote.rightCount / totalVotes) * 100 : 0;
+            if(type === 'my-votes'){
+                const data : VotingResponse = await getMypageVotings(cursorId, 10);
+            
+                console.log(data)
+    
+                const processedVotings = (data.debates ?? []).map((vote) => {
+                    const totalVotes = vote.leftCount + vote.rightCount;
+                    const leftPercent = totalVotes > 0 ? (vote.leftCount / totalVotes) * 100 : 0;
+                    const rightPercent = totalVotes > 0 ? (vote.rightCount / totalVotes) * 100 : 0;
+    
+                    return {
+                        ...vote,
+                        leftPercent,
+                        rightPercent
+                    };
+                });
 
-                return {
-                    ...vote,
-                    leftPercent,
-                    rightPercent
-                };
-            });
+                if (cursorId === null && processedVotings.length === 0) {
+                    setIsEmpty(true);
+                } else {
+                    setIsEmpty(false);
+                }
+    
+                setVotings((prev) => [...prev, ...processedVotings]);
+                setNextCursorId(data.nextCursorId || null)
+            }else{
+                const data : VotingScrapResponse = await getMypageVotingScraps(cursorId, 10);
+            
+                console.log(data)
+    
+                const processedVotings = (data.scraps ?? []).map((vote) => {
+                    const totalVotes = vote.leftCount + vote.rightCount;
+                    const leftPercent = totalVotes > 0 ? (vote.leftCount / totalVotes) * 100 : 0;
+                    const rightPercent = totalVotes > 0 ? (vote.rightCount / totalVotes) * 100 : 0;
+    
+                    return {
+                        ...vote,
+                        leftPercent,
+                        rightPercent
+                    };
+                });
 
-            if (cursorId === null && processedVotings.length === 0) {
-                setIsEmpty(true);
-            } else {
-                setIsEmpty(false);
+                if (cursorId === null && processedVotings.length === 0) {
+                    setIsEmpty(true);
+                } else {
+                    setIsEmpty(false);
+                }
+    
+                setVotings((prev) => [...prev, ...processedVotings]);
+                setNextCursorId(data.nextCursorId || null)
             }
-
-            setVotings((prev) => [...prev, ...processedVotings]);
-            setNextCursorId(data.nextCursorId || null)
         }catch(error){
             console.error("마이페이지 투표 조회 실패 : ", error);
         }finally{
@@ -59,6 +94,11 @@ const VotingList = ({type} : Props) => {
             fetchVotings(nextCursorId);
         }
     }, [nextCursorId, loading]);
+
+    const onClickVotingCard = (debateId : number) => {
+        console.log(`clicked ${debateId}`)
+        navigation.navigate('OpinionListScreen', { debateId });
+    }
     
     return (
         <FlatList
@@ -74,7 +114,7 @@ const VotingList = ({type} : Props) => {
                 rightPercent={item.rightPercent}
                 isScraped={item.isScraped}
                 onScrapToggle={() => console.log(`Scrap toggled for vote ${item.debateId}`)}
-                onCardPress={() => console.log(`Vote card pressed: ${item.debateId}`)}
+                onCardPress={() => onClickVotingCard(parseInt(item.debateId))}
             />
             )}
             contentContainerStyle={styles.listContent}

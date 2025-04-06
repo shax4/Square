@@ -13,4 +13,14 @@ export type StackParamList = {
     PersonalitySurveyPage: undefined;
     LandingScreen: undefined;
     SignupScreen: undefined;
+    BoardDetail: { boardId: number; refresh?: boolean };
+    OpinionListScreen: {
+        debateId: number;
+        showVoteResultModal?: boolean;
+        showSummaryFirst?: boolean;
+    };
+    OpinionDetailScreen: {
+        debateId: number;
+        opinionId: number;
+    };
 };

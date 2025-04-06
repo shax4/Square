@@ -10,6 +10,11 @@ export interface Voting {
 }
 
 export interface VotingResponse {
-    votings: Voting[];
+    debates: Voting[];
+    nextCursorId: number | null; // 다음 페이지가 없을 수도 있어서 null 허용
+}
+
+export interface VotingScrapResponse {
+    scraps: Voting[];
     nextCursorId: number | null; // 다음 페이지가 없을 수도 있어서 null 허용
 }
