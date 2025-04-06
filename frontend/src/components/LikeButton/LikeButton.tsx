@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
 import { View, Text, TouchableOpacity, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { styles } from "./LikeButton.styles";
@@ -27,18 +27,24 @@ const LikeButton = ({
   const [likeCount, setLikeCount] = useState<number>(initialCount);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Zustand 스토어 (조건부)
-  const { toggleLike, isLoading, hasError, clearError } = useLikeStore();
-
   // API 모드인지 확인 (targetId와 apiToggleFunction이 모두 제공된 경우)
   const isApiMode = !!(targetId && apiToggleFunction);
 
-  // disabled 상태 계산
-  const isDisabled =
-    disabled || (isApiMode && targetId ? isLoading(targetId) : false);
+  // Zustand 스토어 (최적화된 방식으로 상태 접근)
+  const toggleLike = useLikeStore((state) => state.toggleLike);
+  const isLoading = useLikeStore((state) =>
+    isApiMode && targetId ? state.isLoading(targetId) : false
+  );
+  const hasError = useLikeStore((state) =>
+    isApiMode && targetId ? state.hasError(targetId) : false
+  );
+  const clearError = useLikeStore((state) => state.clearError);
 
-  // 에러 상태 계산 추가
-  const isErrored = isApiMode && targetId ? hasError(targetId) : false;
+  // disabled 상태 계산
+  const isDisabled = disabled || isLoading;
+
+  // 에러 상태 계산
+  const isErrored = hasError;
 
   // 핸들러 통합 (useCallback으로 래핑하여 불필요한 재생성 방지)
   const handleLike = useCallback(async () => {
@@ -211,4 +217,30 @@ const LikeButton = ({
   );
 };
 
-export default LikeButton;
+/**
+ * Props 비교 함수 - 중요 props만 비교하여 불필요한 리렌더링 방지
+ * @param prevProps 이전 props
+ * @param nextProps 새 props
+ * @returns 동일하면 true, 다르면 false
+ */
+const arePropsEqual = (
+  prevProps: LikeButtonProps,
+  nextProps: LikeButtonProps
+): boolean => {
+  // 핵심 props만 비교 (함수형 props 제외)
+  return (
+    prevProps.targetId === nextProps.targetId &&
+    prevProps.targetType === nextProps.targetType &&
+    prevProps.initialLiked === nextProps.initialLiked &&
+    prevProps.initialCount === nextProps.initialCount &&
+    prevProps.disabled === nextProps.disabled &&
+    prevProps.size === nextProps.size &&
+    prevProps.isVertical === nextProps.isVertical &&
+    prevProps.errorDisplayMode === nextProps.errorDisplayMode
+    // 주의: 함수형 props(onLikeChange, onPress, onError, apiToggleFunction)는
+    // 참조 동일성만 비교하면 매번 다르게 인식될 수 있으므로 비교에서 제외
+  );
+};
+
+// memo로 컴포넌트 래핑하여 내보내기
+export default memo(LikeButton, arePropsEqual);
