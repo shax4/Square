@@ -25,6 +25,10 @@ import { ModalTestScreen } from '../../../pages';
 import { BoardAPI } from "../../../pages/BoardScreen/Api/boardApi";
 import { mockPosts } from "../../../pages/BoardScreen/mocks/boardData";
 import { BoardStackParamList } from "../../../shared/page-stack/BoardPageStack";
+
+
+import OpinionListScreen from '../../../pages/OpinionListScreen/OpinionListScreen';
+
 // 스택 네비게이터
 const Stack = createNativeStackNavigator();
 
@@ -165,6 +169,14 @@ export default function HeaderBar() {
                     ),
                 };
                 }}
+            />
+            <Stack.Screen
+                name="OpinionListScreen"
+                component={OpinionListScreen}
+                options={({ route }) => ({
+                    title: `Number ${route.params.debateId}`,
+                    headerBackButtonDisplayMode: 'minimal',
+                })}
             />
         </Stack.Navigator>
     );

@@ -14,4 +14,9 @@ export type StackParamList = {
     LandingScreen: undefined;
     SignupScreen: undefined;
     BoardDetail: { boardId: number; refresh?: boolean };
+    OpinionListScreen: {
+        debateId: number;
+        showVoteResultModal?: boolean;
+        showSummaryFirst?: boolean;
+    };
 };
