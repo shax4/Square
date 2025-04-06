@@ -1,4 +1,4 @@
-package org.shax3.square.domain.user.model;
+package org.shax3.square.common.model;
 
 public interface DisplayableEnum {
     default String getKoreanName() {

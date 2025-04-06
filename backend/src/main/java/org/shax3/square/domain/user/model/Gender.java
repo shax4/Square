@@ -1,5 +1,7 @@
 package org.shax3.square.domain.user.model;
 
+import org.shax3.square.common.model.DisplayableEnum;
+
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum Gender implements DisplayableEnum {
