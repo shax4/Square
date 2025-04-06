@@ -8,7 +8,7 @@ import React, { useEffect, useLayoutEffect, useState, useRef } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { styles } from './Components/OpinionDetailScreen.styles'
 import CommentInput from "../../components/CommentInput/CommentInput";
-import { getOpinionDetail, createComment, likesComment } from "./api/CommentApi";
+import { getOpinionDetail, createComment } from "./api/CommentApi";
 import { deleteOpinion } from "../OpinionListScreen/api/OpinionApi";
 import { OpinionsResponse } from "./Components/OpinionsResponse.types";
 import { Comment } from "./Components/Comment.types";
@@ -19,8 +19,7 @@ type OpinionDetailRouteProp = RouteProp<StackParamList, 'OpinionDetailScreen'>;
 export default function OpinionDetailScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
     const route = useRoute<OpinionDetailRouteProp>();
-    const { opinionId } = route.params;
-    const isFocused = useIsFocused();
+    const { debateId, opinionId } = route.params;
 
     // 스크롤 관리
     const scrollRef = useRef<ScrollView>(null);
@@ -123,6 +122,7 @@ export default function OpinionDetailScreen() {
                             <TouchableOpacity
                                 onPress={() =>
                                     navigation.navigate('OpinionEditScreen', {
+                                        debateId,
                                         opinionId,
                                         content: opinionDetail.content!,
                                     })
@@ -159,7 +159,14 @@ export default function OpinionDetailScreen() {
                     text: '삭제',
                     onPress: () => {
                         deleteOpinion(opinionId);
-                        navigation.goBack();
+                        setTimeout(() => {
+
+                            navigation.pop(2);
+                            navigation.navigate('OpinionListScreen', {
+                                debateId,
+                                showSummaryFirst: false,
+                            });
+                        }, 10);
                     },
                     style: 'destructive',
                 },
@@ -214,7 +221,7 @@ export default function OpinionDetailScreen() {
                     initialCount={opinionDetail!.likeCount}
                     initialLiked={opinionDetail!.isLiked}
                     isVertical={false}
-                    onPress={ () => {likesOpinion(opinionId)}}
+                    onPress={() => { likesOpinion(opinionId) }}
                 />
 
                 <View style={styles.CommentCountButton}>
@@ -254,7 +261,7 @@ export default function OpinionDetailScreen() {
                                     initialCount={comment.likeCount}
                                     initialLiked={comment.isLiked}
                                     size="small"
-                                    //onPress={() => { likesComment(comment.commentId) }}
+                                //onPress={() => { likesComment(comment.commentId) }}
                                 />
                             </View>
                         </View>

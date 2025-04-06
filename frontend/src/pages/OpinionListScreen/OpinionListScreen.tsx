@@ -40,7 +40,7 @@ export default function OpinionListScreen() {
     const isFocused = useIsFocused();
 
     const route = useRoute<OpinionListScreenRouteProp>();
-    const { debateId, showVoteResultModal = false } = route.params;
+    const { debateId, showVoteResultModal = false, showSummaryFirst = true } = route.params;
 
     const { debates, updateDebate } = useDebateStore();
     const debate = debates.find((d) => d.debateId === debateId);
@@ -87,7 +87,11 @@ export default function OpinionListScreen() {
 
     // 햔재 탭의 의견
     const currentOpinions = opinionStateMap[sort].opinions;
-    
+
+    useEffect(() => {
+        setIsSummary(showSummaryFirst);
+    }, [showSummaryFirst]);
+
     // 화면 새로 도달 시 새로고침
     useFocusEffect(
         useCallback(() => {
@@ -109,7 +113,7 @@ export default function OpinionListScreen() {
             fetchAllSorts();
 
         }, [debateId, loggedIn])
-    ); 
+    );
 
     // 처음 로드 시 각 정렬 방식에 맞춰 의견들 가져오기
     const fetchAllSorts = useCallback(async () => {
@@ -323,7 +327,7 @@ export default function OpinionListScreen() {
                         <SummaryBoxList data={summaries} />
                     ) : (
                         <OpinionBoxList
-                            data={currentOpinions}
+                            opinions={currentOpinions}
                             debateId={debateId}
                             onEndReached={() => fetchOpinionsBySort(sort)}
                         />
