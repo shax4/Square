@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { styles } from "./LikeButton.styles";
 import { LikeButtonProps } from "./LikeButton.types";
 import { useLikeStore } from "../../shared/stores/LikeStore";
+import { toggleLikeAPI } from "../../shared/services/likeService";
 
 const LikeButton = ({
   // UI 기본값
@@ -14,7 +15,7 @@ const LikeButton = ({
   targetId,
   initialCount = 0,
   initialLiked = false,
-  apiToggleFunction,
+  apiToggleFunction = toggleLikeAPI,
   onLikeChange,
   onPress,
   onError,
@@ -78,71 +79,47 @@ const LikeButton = ({
             });
           }
         }
-      } catch (error: any) {
-        console.error("좋아요 처리 중 오류:", error);
+      } catch (error) {
+        console.error(
+          `좋아요 처리 중 오류 발생: ${targetType} ${targetId}`,
+          error
+        );
 
-        // 에러 유형에 따른 메시지 설정
-        if (error.response) {
-          // HTTP 에러 응답이 있는 경우
-          switch (error.response.status) {
-            case 401:
-              setErrorMessage("로그인 필요");
-              break;
-            case 403:
-              setErrorMessage("권한 없음");
-              break;
-            case 429:
-              setErrorMessage("잠시 후 재시도");
-              break;
-            default:
-              setErrorMessage(`오류 ${error.response.status}`);
-          }
-
-          // 상세 모드인 경우 Alert으로 추가 정보 표시
-          if (errorDisplayMode === "detailed") {
-            Alert.alert(
-              "좋아요 오류",
-              error.response.data?.message ||
-                `오류가 발생했습니다 (${error.response.status})`,
-              [{ text: "확인", style: "cancel" }]
-            );
-          }
-        } else if (error.request) {
-          // 요청은 보냈지만 응답이 없는 경우 (네트워크 문제)
-          setErrorMessage("네트워크 오류");
-
-          if (errorDisplayMode === "detailed") {
-            Alert.alert(
-              "네트워크 오류",
-              "서버에 연결할 수 없습니다. 인터넷 연결을 확인하세요.",
-              [{ text: "확인", style: "cancel" }]
-            );
-          }
-        } else {
-          // 요청 설정 중 에러
-          setErrorMessage("요청 오류");
-
-          if (errorDisplayMode === "detailed") {
-            Alert.alert(
-              "요청 오류",
-              "요청을 처리하는 중 오류가 발생했습니다.",
-              [{ text: "확인", style: "cancel" }]
-            );
+        // onError 함수가 문자열을 반환할 경우 errorMsg를 업데이트, 문자열이 아니면 기본 메시지 사용
+        let errorMsg = "좋아요 처리 중 오류가 발생했습니다.";
+        if (onError) {
+          try {
+            const result = onError(error);
+            if (result) {
+              errorMsg = result;
+            }
+          } catch (e) {
+            console.error("Error in onError callback:", e);
           }
         }
+        setErrorMessage(errorMsg);
 
-        // 부모에게 에러 알림 (선택적)
-        if (onError) {
-          onError(error);
+        // 디버깅을 위한 추가 정보 로그
+        console.debug("API 요청 정보:", { targetId, targetType });
+        if (error && typeof error === "object" && "response" in error) {
+          console.debug("서버 응답:", (error as any).response?.data);
         }
       }
-    } else if (onPress) {
-      // 외부 콜백 모드
-      onPress(liked);
     } else {
-      // 기본 모드 (내부 상태만 변경)
-      setLiked(!liked);
-      setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
+      // 로컬 모드 처리 (서버 없이 UI만 업데이트)
+      const newLiked = !liked;
+      const newCount = newLiked ? likeCount + 1 : likeCount - 1;
+
+      setLiked(newLiked);
+      setLikeCount(Math.max(0, newCount)); // 음수 방지
+
+      if (onLikeChange) {
+        onLikeChange({ isLiked: newLiked, likeCount: Math.max(0, newCount) });
+      }
+
+      if (onPress) {
+        onPress(newLiked);
+      }
     }
   }, [
     isDisabled,
@@ -152,68 +129,77 @@ const LikeButton = ({
     toggleLike,
     apiToggleFunction,
     liked,
+    likeCount,
     onLikeChange,
     onPress,
     onError,
-    errorDisplayMode,
   ]);
 
-  // 에러 상태 클릭 핸들러 (useCallback으로 래핑)
-  const handleErrorClick = useCallback(() => {
-    if (isErrored && targetId) {
-      // 에러 상태 초기화
-      clearError(targetId);
-      setErrorMessage(null);
-
-      // 즉시 재시도하지 않고 버튼을 준비 상태로만 변경
-      // 사용자가 직접 다시 클릭하도록 함
-    }
-  }, [isErrored, targetId, clearError]);
-
-  // initialLiked와 initialCount가 변경될 때만 해당 상태 업데이트
+  // 초기값이 변경되면 내부 상태 업데이트
   useEffect(() => {
     setLiked(initialLiked);
     setLikeCount(initialCount);
   }, [initialLiked, initialCount]);
 
-  // targetId나 targetType이 변경될 때 에러 상태 초기화
-  useEffect(() => {
-    if (isApiMode && targetId) {
-      clearError(targetId);
-      setErrorMessage(null);
-    }
-  }, [targetId, targetType, isApiMode, clearError]);
+  // 아이콘 크기 계산
+  const iconSize = size === "large" ? 24 : 18;
 
-  // UI 렌더링
-  const iconSize = size === "large" ? 32 : 24;
-  const textSize = size === "large" ? 14 : 12;
+  // 좋아요 아이콘 (채워진/빈)
+  const LikeIcon = liked ? (
+    <Ionicons name="heart" size={iconSize} color="#FF4757" />
+  ) : (
+    <Ionicons name="heart-outline" size={iconSize} color="#555" />
+  );
+
+  // 에러 렌더링
+  const renderError = () => {
+    if (!errorMessage) return null;
+
+    if (errorDisplayMode === "detailed") {
+      // 상세 에러 표시 (주로 상세 화면에서 사용)
+      return (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{errorMessage}</Text>
+        </View>
+      );
+    } else {
+      // 간단한 에러 표시 (주로 목록에서 사용)
+      return (
+        <TouchableOpacity
+          style={styles.simpleErrorIcon}
+          onPress={() => Alert.alert("알림", errorMessage)}
+        >
+          <Ionicons name="alert-circle" size={16} color="#FF4757" />
+        </TouchableOpacity>
+      );
+    }
+  };
+
+  // 수직/수평 레이아웃 스타일 선택
+  const containerStyle = isVertical
+    ? styles.verticalContainer
+    : styles.horizontalContainer;
 
   return (
-    <TouchableOpacity
-      onPress={isErrored ? handleErrorClick : handleLike}
-      style={[
-        isVertical ? styles.container : styles.containerHorizontal,
-        isDisabled && { opacity: 0.4 },
-        isErrored && styles.errorContainer,
-      ]}
-      activeOpacity={0.7}
-      disabled={isDisabled && !isErrored}
-    >
-      <Ionicons
-        name={isErrored ? "alert-circle" : liked ? "heart" : "heart-outline"}
-        size={iconSize}
-        color={isErrored ? "red" : liked ? "red" : "gray"}
-      />
-      <Text
-        style={[
-          styles.likeCount,
-          { fontSize: textSize },
-          isErrored && styles.errorText,
-        ]}
+    <View style={[containerStyle, isErrored && styles.errorContainer]}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleLike}
+        disabled={isDisabled}
+        activeOpacity={0.7}
       >
-        {isErrored ? errorMessage || "재시도" : likeCount}
-      </Text>
-    </TouchableOpacity>
+        {isLoading ? (
+          <Ionicons name="sync" size={iconSize} color="#555" />
+        ) : (
+          LikeIcon
+        )}
+      </TouchableOpacity>
+
+      <View style={styles.countContainer}>
+        <Text style={styles.countText}>{likeCount}</Text>
+        {errorMessage && renderError()}
+      </View>
+    </View>
   );
 };
 

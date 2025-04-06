@@ -36,6 +36,7 @@ export interface LikeRequest {
 // 좋아요 토글 응답 데이터 타입
 export interface LikeResponse {
   targetId: number; // 좋아요 대상 ID
+  targetType?: string; // 좋아요 대상 타입
   isLiked: boolean; // 좋아요 상태
   likeCount: number; // 좋아요 수
 }

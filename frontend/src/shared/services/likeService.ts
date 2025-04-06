@@ -6,6 +6,7 @@
 import { apiGet, apiPost } from "../api/apiClient";
 import { API_PATHS } from "../constants/apiConfig";
 import { ApiResponse, LikeRequest, LikeResponse } from "../types/apiTypes";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 /**
  * 좋아요 서비스 - 좋아요 관련 API 요청 함수 모음
@@ -77,23 +78,11 @@ export const LikeService = {
     targetType: string
   ): Promise<LikeResponse> => {
     try {
-      // 쿼리 파라미터 구성 (URL에 추가될 부분)
-      const params = { targetId, targetType };
-
-      // API 호출
-      const response = await apiGet<LikeResponse>(API_PATHS.LIKES.STATUS, {
-        params,
-      });
-
-      // 응답 데이터 반환
-      if (response.data) {
-        return response.data;
-      }
-
-      // 데이터가 없는 경우 기본값 반환
-      console.warn("좋아요 상태 응답에 데이터가 없습니다:", response);
+      // GET 요청이 없으므로 초기 상태를 가정하여 기본값 반환
+      // 실제 상태는 사용자가 좋아요를 누를 때 업데이트됨
       return {
         targetId,
+        targetType,
         isLiked: false,
         likeCount: 0,
       };
@@ -102,6 +91,7 @@ export const LikeService = {
       // 에러 발생 시도 기본값 반환 (사용자 경험 유지)
       return {
         targetId,
+        targetType,
         isLiked: false,
         likeCount: 0,
       };
@@ -126,22 +116,16 @@ export const LikeService = {
     targets: { targetId: number; targetType: string }[]
   ): Promise<LikeResponse[]> => {
     try {
-      // API 호출
-      const response = await apiPost<LikeResponse[]>(
-        `${API_PATHS.LIKES.STATUS}/bulk`,
-        { targets }
+      // 병렬로 여러 개의 개별 요청 보내기
+      const promises = targets.map((target) =>
+        LikeService.getLikeStatus(target.targetId, target.targetType)
       );
 
-      // 응답 데이터 반환
-      if (response.data) {
-        return response.data;
-      }
-
-      // 데이터가 없는 경우 빈 배열 반환
-      console.warn("대량 좋아요 상태 응답에 데이터가 없습니다:", response);
-      return [];
+      // 모든 요청 완료 대기
+      const results = await Promise.all(promises);
+      return results;
     } catch (error) {
-      console.error("대량 좋아요 상태 확인 중 오류 발생:", error);
+      console.error("좋아요 상태 확인 중 오류 발생:", error);
       // 에러 발생 시 빈 배열 반환
       return [];
     }
@@ -158,27 +142,52 @@ export type LikeChangeCallback = (state: {
 }) => void;
 
 /**
- * LikeButton 컴포넌트에서 사용할 API 함수
- * BoardAPI.toggleLike 대신 이 함수를 사용하도록 LikeButton을 수정합니다.
- *
- * @param targetId 좋아요 대상 ID
- * @param targetType 좋아요 대상 타입
- * @returns 서버 응답을 Promise로 반환
+ * 좋아요 토글 API 함수
+ * 백엔드 응답에 데이터가 없으므로 클라이언트에서 토글 결과를 추론
  */
 export const toggleLikeAPI = async (
   targetId: number,
   targetType: string
 ): Promise<{ data: { isLiked: boolean; likeCount: number } }> => {
   try {
-    // LikeService 사용
-    const result = await LikeService.toggleLike(targetId, targetType);
+    // 요청 데이터 구성
+    const requestData: LikeRequest = {
+      targetId,
+      targetType,
+    };
 
-    // LikeButton 컴포넌트의 기존 API 구조에 맞게 데이터 변환
+    // API 호출 (응답 본문 없음)
+    await apiPost<void>(API_PATHS.LIKES.TOGGLE, requestData);
+
+    // 클라이언트 상태 관리를 위한 키 생성
+    const stateKey = `like_${targetType}_${targetId}`;
+
+    // 상태 가져오기
+    let currentState = { isLiked: false, likeCount: 0 };
+    try {
+      const savedState = await AsyncStorage.getItem(stateKey);
+      if (savedState) {
+        currentState = JSON.parse(savedState);
+      }
+    } catch (e) {
+      console.error("상태 로드 오류:", e);
+    }
+
+    // 새 상태 계산 (토글)
+    const newIsLiked = !currentState.isLiked;
+    const newLikeCount = newIsLiked
+      ? currentState.likeCount + 1
+      : Math.max(0, currentState.likeCount - 1);
+
+    // 새 상태 저장
+    const newState = { isLiked: newIsLiked, likeCount: newLikeCount };
+    await AsyncStorage.setItem(stateKey, JSON.stringify(newState));
+
+    console.log(`좋아요 토글 (${targetType} ${targetId}): `, newState);
+
+    // 새 상태 반환 (LikeButton 컴포넌트가 기대하는 형식)
     return {
-      data: {
-        isLiked: result.isLiked,
-        likeCount: result.likeCount,
-      },
+      data: newState,
     };
   } catch (error) {
     console.error(`${targetType} ${targetId} 좋아요 토글 실패:`, error);

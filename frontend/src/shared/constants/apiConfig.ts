@@ -45,8 +45,8 @@ export const API_PATHS = {
 
   // 좋아요 관련 API 경로
   LIKES: {
-    TOGGLE: "/api/likes/toggle",
-    STATUS: "/api/likes/status",
+    TOGGLE: "/api/likes",
+    STATUS: "/api/likes",
   },
 
   // 사용자 관련 API 경로
