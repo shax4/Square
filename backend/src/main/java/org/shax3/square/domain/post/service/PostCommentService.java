@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.shax3.square.domain.notification.event.PostCommentCreatedEvent;
+import org.shax3.square.domain.notification.event.PostReplyCreatedEvent;
 import org.shax3.square.domain.post.dto.request.CreatePostCommentRequest;
 import org.shax3.square.domain.post.dto.request.UpdatePostCommetRequest;
 import org.shax3.square.domain.post.dto.response.PostCommentResponse;
@@ -14,6 +16,7 @@ import org.shax3.square.domain.s3.service.S3Service;
 import org.shax3.square.domain.user.model.User;
 import org.shax3.square.exception.CustomException;
 import org.shax3.square.exception.ExceptionCode;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +29,7 @@ public class PostCommentService {
 	private final PostCommentRepository postCommentRepository;
 	private final PostService postService;
 	private final S3Service s3Service;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Transactional
 	public PostCommentResponse createPostComment(CreatePostCommentRequest request, User user) {
@@ -44,6 +48,29 @@ public class PostCommentService {
 
 		PostComment comment = request.to(post, parentComment, user);
 		postCommentRepository.save(comment);
+
+		// 대댓글 알림
+		if (parentComment != null) {
+			User parentAuthor = parentComment.getUser();
+			if (!parentAuthor.getId().equals(user.getId())) {
+				eventPublisher.publishEvent(new PostReplyCreatedEvent(
+					parentAuthor,
+					comment.getContent(),
+					post.getId()
+				));
+			}
+		}
+
+		// 게시글 작성자 알림
+		User postAuthor = post.getUser();
+
+		if (!postAuthor.getId().equals(user.getId())) {
+			eventPublisher.publishEvent(new PostCommentCreatedEvent(
+				postAuthor,
+				comment.getContent(),
+				post.getId()
+			));
+		}
 
 		String profileUrl = s3Service.generatePresignedGetUrl(user.getS3Key());
 
