@@ -3,6 +3,7 @@ package org.shax3.square.domain.user.service;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.TokenUtil;
+import org.shax3.square.domain.auth.dto.UserLoginDto;
 import org.shax3.square.domain.auth.dto.UserTokenDto;
 import org.shax3.square.domain.auth.repository.RefreshTokenRepository;
 import org.shax3.square.domain.s3.service.S3Service;
@@ -42,17 +43,8 @@ public class UserService {
     private final S3Service s3Service;
 
     @Transactional
-    public UserSignUpDto signUp(SignUpRequest signUpRequest, String signUpToken) {
-
-        if (!tokenUtil.isTokenValid(signUpToken)) {
-            throw new CustomException(SIGN_UP_TOKEN_INVALID);
-        }
-
-        String[] signUpInfo = tokenUtil.getSubject(signUpToken).split(":");
-        String email = signUpInfo[0];
-        SocialType socialType = SocialType.valueOf(signUpInfo[1]);
-
-        Optional<User> foundUser = userRepository.findByEmail(email);
+    public UserLoginDto signUp(SignUpRequest signUpRequest) {
+        Optional<User> foundUser = userRepository.findByEmail(signUpRequest.email());
         if (foundUser.isPresent()) {
             throw new CustomException(DUPLICATE_EMAIL);
         }
@@ -66,13 +58,13 @@ public class UserService {
         }
 
         AgeRange ageRange = calculateAgeRange(signUpRequest.yearOfBirth());
-        User signUpUser = signUpRequest.to(email, socialType, ageRange, s3Key);
+        User signUpUser = signUpRequest.to(ageRange, s3Key);
         userRepository.save(signUpUser);
 
         UserTokenDto userTokens = tokenUtil.createLoginToken(signUpUser.getId());
         refreshTokenRepository.save(userTokens.refreshToken());
 
-        return UserSignUpDto.createSignUpDto(userTokens, signUpUser);
+        return UserLoginDto.createMemberLoginDto(userTokens, signUpUser);
     }
 
     private AgeRange calculateAgeRange(int yearOfBirth) {

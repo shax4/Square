@@ -85,3 +85,6 @@ springdoc:
     disable-swagger-default-url: true
     persist-authorization: true
 
+firebase:
+  config:
+    path: firebase-service-key.json
