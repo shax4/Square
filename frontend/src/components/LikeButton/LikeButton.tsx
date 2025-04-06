@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { styles } from "./LikeButton.styles";
@@ -37,8 +37,8 @@ const LikeButton = ({
   // 에러 상태 계산 추가
   const isErrored = isApiMode && targetId ? hasError(targetId) : false;
 
-  // 핸들러 통합
-  const handleLike = async () => {
+  // 핸들러 통합 (useCallback으로 래핑하여 불필요한 재생성 방지)
+  const handleLike = useCallback(async () => {
     if (isDisabled) {
       console.log("Button is disabled, ignoring click");
       return;
@@ -77,20 +77,37 @@ const LikeButton = ({
       setLiked(!liked);
       setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
     }
-  };
+  }, [
+    isDisabled,
+    isApiMode,
+    targetId,
+    targetType,
+    toggleLike,
+    apiToggleFunction,
+    liked,
+    onLikeChange,
+    onPress,
+  ]);
 
-  // 에러 상태 클릭 핸들러
-  const handleErrorClick = () => {
+  // 에러 상태 클릭 핸들러 (useCallback으로 래핑)
+  const handleErrorClick = useCallback(() => {
     if (isErrored && targetId) {
       clearError(targetId);
     }
-  };
+  }, [isErrored, targetId, clearError]);
 
-  // props 변경 시 상태 업데이트
+  // initialLiked와 initialCount가 변경될 때만 해당 상태 업데이트
   useEffect(() => {
     setLiked(initialLiked);
     setLikeCount(initialCount);
   }, [initialLiked, initialCount]);
+
+  // targetId나 targetType이 변경될 때 에러 상태 초기화
+  useEffect(() => {
+    if (isApiMode && targetId) {
+      clearError(targetId);
+    }
+  }, [targetId, targetType, isApiMode, clearError]);
 
   // UI 렌더링
   const iconSize = size === "large" ? 32 : 24;

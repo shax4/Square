@@ -1,5 +1,6 @@
 // 개발용 mock api 사용
 import { MockBoardAPI } from "../mocks/boardApi";
+import { TargetType } from "../../../components/LikeButton/LikeButton.types";
 
 export const BoardAPI = MockBoardAPI;
 
@@ -147,12 +148,7 @@ export const BoardAPI = MockBoardAPI;
 //   // 댓글/대댓글/게시글 좋아요 토글 함수
 //   toggleLike: async (
 //     targetId: number,
-//     targetType:
-//       | "POST"
-//       | "POST_COMMENT"
-//       | "PROPOSAL"
-//       | "OPINION"
-//       | "OPINION_COMMENT"
+//     targetType: TargetType
 //   ): Promise<{ data: LikeResponse }> => {
 //     try {
 //       const response = await axios.post(`/api/likes`, {

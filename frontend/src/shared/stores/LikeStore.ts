@@ -1,14 +1,23 @@
 import { create } from "zustand";
 import { TargetType } from "../../components/LikeButton/LikeButton.types";
 
+/**
+ * 좋아요 상태 관리 스토어 인터페이스
+ */
 interface LikeState {
-  // 로딩 중인 아이템 ID 저장
+  /** 로딩 중인 아이템 ID 모음 */
   loadingItems: Set<number>;
 
-  // 에러 상태 추가
+  /** 에러 상태의 아이템 ID 모음 */
   errorItems: Set<number>;
 
-  // 좋아요 토글 함수
+  /**
+   * 좋아요 토글 함수
+   * @param targetId 좋아요 대상 ID
+   * @param targetType 좋아요 대상 타입
+   * @param apiToggleFunction API 호출 함수
+   * @returns API 응답
+   */
   toggleLike: (
     targetId: number,
     targetType: TargetType,
@@ -18,11 +27,24 @@ interface LikeState {
     ) => Promise<any>
   ) => Promise<any>;
 
-  // 로딩 상태 확인 함수
+  /**
+   * 현재 로딩 중인지 확인하는 함수
+   * @param itemId 확인할 아이템 ID
+   * @returns 로딩 중 여부
+   */
   isLoading: (itemId: number) => boolean;
 
-  // 에러 상태 확인 함수 추가
+  /**
+   * 현재 에러 상태인지 확인하는 함수
+   * @param targetId 확인할 아이템 ID
+   * @returns 에러 상태 여부
+   */
   hasError: (targetId: number) => boolean;
+
+  /**
+   * 에러 상태를 초기화하는 함수
+   * @param targetId 초기화할 아이템 ID
+   */
   clearError: (targetId: number) => void;
 }
 
