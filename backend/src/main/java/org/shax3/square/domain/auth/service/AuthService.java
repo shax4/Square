@@ -1,7 +1,9 @@
 package org.shax3.square.domain.auth.service;
 
+import com.google.firebase.auth.FirebaseToken;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.TokenUtil;
+import org.shax3.square.domain.auth.dto.request.FirebaseLoginRequest;
 import org.shax3.square.domain.auth.model.RefreshToken;
 import org.shax3.square.domain.auth.dto.UserLoginDto;
 import org.shax3.square.domain.auth.dto.UserTokenDto;
@@ -114,4 +116,27 @@ public class AuthService {
     public void logout(String refreshToken) {
         refreshTokenRepository.deleteByToken(refreshToken);
     }
+
+
+    public UserLoginDto firebaseLogin(FirebaseToken token, FirebaseLoginRequest request) {
+        String email = token.getEmail();
+
+        Optional<User> user = userRepository.findByEmail(email);
+
+        if (user.isPresent()) {
+            User loginUser = user.get();
+            checkSocialType(loginUser.getSocialType(), request.socialType());
+
+            Long userId = loginUser.getId();
+            UserTokenDto userTokens = tokenUtil.createLoginToken(userId);
+            refreshTokenRepository.deleteByUserId(userId);
+            refreshTokenRepository.save(userTokens.refreshToken());
+
+            return UserLoginDto.createMemberLoginDto(userTokens, loginUser);
+        }
+
+        // 비회원 처리
+        return UserLoginDto.createNotMemberLoginDto(email);
+    }
+
 }
