@@ -18,9 +18,6 @@ export enum TargetTypeEnum {
 
   /** 논쟁 의견 댓글 */
   OPINION_COMMENT = "OPINION_COMMENT",
-
-  /** 논쟁 주제 */
-  DEBATE = "DEBATE", // API 명세 검토 후 추가된 타입
 }
 
 /**
@@ -34,6 +31,12 @@ export type TargetType = keyof typeof TargetTypeEnum;
  * @description 백엔드 API 응답 형식과 일치해야 함
  */
 export interface LikeResponse {
+  /** 좋아요 대상 ID */
+  targetId: number;
+
+  /** 좋아요 대상 타입 */
+  targetType: TargetType;
+
   /** 현재 좋아요 상태 (true: 좋아요 상태, false: 좋아요 취소 상태) */
   isLiked: boolean;
 

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import LikeButton from "../LikeButton";
 import { useLikeButton } from "../../../shared/hooks/useLikeButton";
+import { TargetType } from "../LikeButton.types";
 
 /**
  * 게시글 상세 화면 컴포넌트 예시
@@ -12,6 +13,9 @@ import { useLikeButton } from "../../../shared/hooks/useLikeButton";
 const BoardDetailExample = ({ initialPost }: { initialPost: any }) => {
   // 게시글 상세 정보 상태 관리
   const [post, setPost] = useState(initialPost);
+
+  // 대상 타입 (게시글)
+  const targetType: TargetType = "POST";
 
   // 좋아요 상태 변경 시 실행될 콜백 함수
   const handleLikeChange = ({
@@ -37,7 +41,7 @@ const BoardDetailExample = ({ initialPost }: { initialPost: any }) => {
   // useLikeButton 훅으로 공통 props 생성 (콜백 포함)
   const likeProps = useLikeButton(
     post.postId,
-    "POST",
+    targetType,
     post.isLiked,
     post.likeCount,
     handleLikeChange // 상세 화면에서는 상태 업데이트를 위해 콜백 제공

@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import LikeButton from "../LikeButton";
 import { useLikeButton } from "../../../shared/hooks/useLikeButton";
+import { TargetType } from "../LikeButton.types";
 
 /**
  * 게시글 목록 아이템 컴포넌트 예시
@@ -10,10 +11,13 @@ import { useLikeButton } from "../../../shared/hooks/useLikeButton";
  * LikeButton 사용 패턴의 일관성을 위한 참고용 코드입니다.
  */
 const BoardItemExample = ({ post }: { post: any }) => {
+  // 대상 타입 (게시글)
+  const targetType: TargetType = "POST";
+
   // useLikeButton 훅으로 공통 props 생성
   const likeProps = useLikeButton(
     post.postId, // 게시글 ID
-    "POST", // 게시글 타입
+    targetType, // 게시글 타입
     post.isLiked, // 초기 좋아요 상태
     post.likeCount // 초기 좋아요 개수
     // 상태 변경 콜백은 목록에서는 생략 가능 (성능 이슈 방지)

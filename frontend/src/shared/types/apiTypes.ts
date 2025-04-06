@@ -3,6 +3,9 @@
  * 백엔드 API와 통신할 때 사용할 데이터 타입을 명확히 정의합니다.
  */
 
+// LikeButton 컴포넌트와 일관된 타입 정의를 위한 import
+import { TargetType } from "../../components/LikeButton/LikeButton.types";
+
 // API 기본 응답 구조
 export interface ApiResponse<T> {
   data?: T; // 실제 데이터
@@ -30,13 +33,13 @@ export interface User {
 // 좋아요 요청 전송 시 사용할 타입
 export interface LikeRequest {
   targetId: number; // 좋아요 대상 ID
-  targetType: string; // 좋아요 대상 타입 (POST, POST_COMMENT 등)
+  targetType: TargetType; // 좋아요 대상 타입 (POST, POST_COMMENT 등)
 }
 
 // 좋아요 토글 응답 데이터 타입
 export interface LikeResponse {
   targetId: number; // 좋아요 대상 ID
-  targetType?: string; // 좋아요 대상 타입
+  targetType: TargetType; // 좋아요 대상 타입
   isLiked: boolean; // 좋아요 상태
   likeCount: number; // 좋아요 수
 }
