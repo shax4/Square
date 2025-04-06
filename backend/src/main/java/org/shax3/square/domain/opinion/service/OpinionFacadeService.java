@@ -3,6 +3,7 @@ package org.shax3.square.domain.opinion.service;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.common.model.TargetType;
 import org.shax3.square.domain.like.service.LikeService;
+import org.shax3.square.domain.notification.event.DebateCommentCreatedEvent;
 import org.shax3.square.domain.opinion.dto.MyOpinionDto;
 import org.shax3.square.domain.opinion.dto.OpinionDto;
 import org.shax3.square.domain.opinion.dto.request.CreateOpinionCommentRequest;
@@ -14,6 +15,7 @@ import org.shax3.square.domain.opinion.model.Opinion;
 import org.shax3.square.domain.opinion.model.OpinionComment;
 import org.shax3.square.domain.s3.service.S3Service;
 import org.shax3.square.domain.user.model.User;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +31,7 @@ public class OpinionFacadeService {
     private final S3Service s3Service;
     private final LikeService likeService;
     private final RedisTemplate<String, Object> batchRedisTemplate;
+    private final ApplicationEventPublisher eventPublisher;
 
     /* 답글을 생성하기 위한 메서드
     - 답글에 opinionId가 필요하기 때문에
@@ -40,6 +43,17 @@ public class OpinionFacadeService {
         String profileUrl = s3Service.generatePresignedGetUrl(user.getS3Key());
 
         OpinionComment newComment = opinionCommentService.createComment(request, opinion, user);
+
+        // 답글 알림
+        User opinionAuthor = opinion.getUser();
+        if (!opinionAuthor.getId().equals(user.getId())) {
+            eventPublisher.publishEvent(new DebateCommentCreatedEvent(
+                opinionAuthor,
+                newComment.getContent(),
+                opinion.getId()
+            ));
+        }
+
         return CreateOpinionCommentResponse.of(newComment, profileUrl);
     }
 
