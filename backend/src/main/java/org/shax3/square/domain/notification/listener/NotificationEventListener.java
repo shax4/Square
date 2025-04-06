@@ -3,6 +3,7 @@ package org.shax3.square.domain.notification.listener;
 import org.shax3.square.domain.notification.event.DebateCommentCreatedEvent;
 import org.shax3.square.domain.notification.event.NoticePublishedEvent;
 import org.shax3.square.domain.notification.event.PostCommentCreatedEvent;
+import org.shax3.square.domain.notification.event.PostReplyCreatedEvent;
 import org.shax3.square.domain.notification.event.TodayDebateStartedEvent;
 import org.shax3.square.domain.notification.model.NotificationType;
 import org.shax3.square.domain.notification.service.NotificationService;
@@ -21,8 +22,19 @@ public class NotificationEventListener {
 	public void handlePostComment(PostCommentCreatedEvent event) {
 		notificationService.createNotification(
 			event.receiver(),
-			"새로운 댓글 알림",
+			"내 게시물에 댓글이 달렸어요",
 			event.commentContent(),
+			NotificationType.POST_COMMENT,
+			event.postId()
+		);
+	}
+
+	@EventListener
+	public void handlePostReply(PostReplyCreatedEvent event) {
+		notificationService.createNotification(
+			event.receiver(),
+			"내 댓글에 답글이 달렸어요",
+			event.replyContent(),
 			NotificationType.POST_COMMENT,
 			event.postId()
 		);
@@ -32,7 +44,7 @@ public class NotificationEventListener {
 	public void handleDebateComment(DebateCommentCreatedEvent event) {
 		notificationService.createNotification(
 			event.receiver(),
-			"새로운 답글 알림",
+			"내 의견에 답글이 달렸어요",
 			event.commentContent(),
 			NotificationType.DEBATE_COMMENT,
 			event.opinionId()
