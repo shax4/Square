@@ -68,12 +68,17 @@ public class AuthService {
     }
 
     @Transactional
-    public String reissueAccessToken(String refreshToken, String authHeader) {
+    public UserTokenDto reissueTokens(String refreshToken, String authHeader) {
         String accessToken = authHeader.split(" ")[1];
 
         if (tokenUtil.isTokenValid(accessToken)) {
-            return accessToken;
+            Long userId = Long.parseLong(tokenUtil.getSubject(accessToken));
+            RefreshToken existingRefreshToken = refreshTokenRepository.findByUserId(userId)
+                    .orElseThrow(() -> new CustomException(INVALID_REFRESH_TOKEN));
+
+            return new UserTokenDto(accessToken, existingRefreshToken);
         }
+
 
         Long userId = tokenUtil.isAccessTokenExpired(accessToken);
         if (userId != null) {
@@ -85,7 +90,7 @@ public class AuthService {
             UserTokenDto newTokens = tokenUtil.createLoginToken(userId);
             foundRefreshToken.reissueRefreshToken(newTokens.refreshToken());
 
-            return newTokens.accessToken();
+            return newTokens;
         }
 
         throw new CustomException(FAILED_TO_VALIDATE_TOKEN);

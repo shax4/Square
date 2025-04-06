@@ -39,6 +39,9 @@ public class Opinion extends BaseTimeEntity {
     @Column(name = "is_left", nullable = false)
     private boolean left;
 
+    @Column(name = "comment_count", nullable = false)
+    private int commentCount;
+
     @Builder
     public Opinion(User user, Debate debate, boolean left, String content) {
         this.debate = debate;
@@ -47,6 +50,7 @@ public class Opinion extends BaseTimeEntity {
         this.likeCount = 0;
         this.left = left;
         this.valid = true;
+        this.commentCount = 0;
     }
 
     public void updateContent(String content){
@@ -55,6 +59,18 @@ public class Opinion extends BaseTimeEntity {
 
     public void softDelete() {
         this.valid = false;
+    }
+
+    public void increaseLikeCount(int countDiff) {
+        this.likeCount += countDiff;
+    }
+
+    public void increaseCommentCount() {
+        this.commentCount++;
+    }
+
+    public void decreaseCommentCount() {
+        this.commentCount = Math.max(0, this.commentCount - 1); // 음수 방지
     }
 }
 

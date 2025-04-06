@@ -1,6 +1,11 @@
 package org.shax3.square.domain.proposal.service;
 
 import lombok.RequiredArgsConstructor;
+
+import org.shax3.square.common.model.TargetType;
+import org.shax3.square.domain.like.service.LikeService;
+import org.shax3.square.domain.post.model.Post;
+import org.shax3.square.domain.proposal.dto.ProposalDto;
 import org.shax3.square.domain.proposal.dto.request.CreateProposalRequest;
 import org.shax3.square.domain.proposal.dto.response.CreateProposalsResponse;
 import org.shax3.square.domain.proposal.dto.response.ProposalsResponse;
@@ -8,10 +13,12 @@ import org.shax3.square.domain.proposal.model.Proposal;
 import org.shax3.square.domain.proposal.repository.ProposalRepository;
 import org.shax3.square.domain.user.model.User;
 import org.shax3.square.exception.CustomException;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.shax3.square.exception.ExceptionCode.*;
 
@@ -29,14 +36,7 @@ public class ProposalService {
         return CreateProposalsResponse.of(proposal.getId());
     }
 
-    @Transactional(readOnly = true)
-    public ProposalsResponse getProposals(String sort, Long nextCursorId, Integer nextCursorLikes, int limit) {
-
-        List<Proposal> proposals = findProposalsBySort(sort, nextCursorId, nextCursorLikes, limit);
-        return ProposalsResponse.of(proposals, sort);
-    }
-
-    private List<Proposal> findProposalsBySort(String sort, Long nextCursorId, Integer nextCursorLikes, int limit) {
+    public List<Proposal> findProposalsBySort(String sort, Long nextCursorId, Integer nextCursorLikes, int limit) {
         if ("likes".equals(sort)) {
             return proposalRepository.findProposalsByLikes(nextCursorId, nextCursorLikes, limit);
         }
@@ -45,13 +45,27 @@ public class ProposalService {
 
     @Transactional
     public void deleteProposal(Long id) {
-        Proposal proposal = proposalRepository.findById(id)
-                .orElseThrow(() -> new CustomException(PROPOSAL_NOT_FOUND));
-
+        Proposal proposal = getProposal(id);
         if (!proposal.isValid()) {
             throw new CustomException(ALREADY_DELETED);
         }
         proposal.softDelete();
+    }
+
+    public Proposal getProposal(Long proposalId) {
+        return proposalRepository.findById(proposalId)
+            .orElseThrow(() -> new CustomException(PROPOSAL_NOT_FOUND));
+    }
+
+    public void validateExists(Long proposalId) {
+        if (!proposalRepository.existsById(proposalId)) {
+            throw new CustomException(PROPOSAL_NOT_FOUND);
+        }
+    }
+
+    public void increaseLikeCount(Long targetId, int countDiff) {
+        Proposal proposal = getProposal(targetId);
+        proposal.increaseLikeCount(countDiff);
     }
 }
 

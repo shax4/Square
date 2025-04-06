@@ -17,7 +17,7 @@ public record OpinionDetailsResponse(
         boolean isLiked,
         List<CommentResponse> comments
 ) {
-    public static OpinionDetailsResponse of(Opinion opinion, List<CommentResponse> comments, String presignedUrl, boolean isLiked) {
+    public static OpinionDetailsResponse of(Opinion opinion, List<CommentResponse> comments, String presignedUrl, boolean isLiked, int likeCount) {
         return new OpinionDetailsResponse(
                 opinion.getId(),
                 opinion.getUser().getNickname(),
@@ -25,7 +25,7 @@ public record OpinionDetailsResponse(
                 opinion.getUser().getType().name(),
                 opinion.getCreatedAt(),
                 opinion.getContent(),
-                opinion.getLikeCount(),
+                likeCount,
                 comments.size(),
                 isLiked,
                 comments

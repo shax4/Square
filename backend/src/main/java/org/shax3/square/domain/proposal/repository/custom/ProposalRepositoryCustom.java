@@ -1,4 +1,4 @@
-package org.shax3.square.domain.proposal.repository;
+package org.shax3.square.domain.proposal.repository.custom;
 
 import org.shax3.square.domain.proposal.model.Proposal;
 import java.util.List;

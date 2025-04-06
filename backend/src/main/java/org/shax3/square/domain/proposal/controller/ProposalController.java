@@ -8,6 +8,7 @@ import org.shax3.square.domain.auth.annotation.AuthUser;
 import org.shax3.square.domain.proposal.dto.request.CreateProposalRequest;
 import org.shax3.square.domain.proposal.dto.response.CreateProposalsResponse;
 import org.shax3.square.domain.proposal.dto.response.ProposalsResponse;
+import org.shax3.square.domain.proposal.service.ProposalFacadeService;
 import org.shax3.square.domain.proposal.service.ProposalService;
 import org.shax3.square.domain.user.model.User;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ProposalController {
     private final ProposalService proposalService;
+    private final ProposalFacadeService proposalFacadeService;
 
     @Operation(
             summary = "논쟁 주제 제안",
@@ -40,9 +42,10 @@ public class ProposalController {
             @RequestParam(defaultValue = "latest") String sort,
             @RequestParam(required = false) Long nextCursorId,
             @RequestParam(required = false) Integer nextCursorLikes,
-            @RequestParam(defaultValue = "5") int limit
+            @RequestParam(defaultValue = "5") int limit,
+            @AuthUser User user
     ) {
-        ProposalsResponse response = proposalService.getProposals(sort, nextCursorId, nextCursorLikes, limit);
+        ProposalsResponse response = proposalFacadeService.getProposals(user, sort, nextCursorId, nextCursorLikes, limit);
         return ResponseEntity.ok(response);
     }
 

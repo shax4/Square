@@ -2,7 +2,7 @@ package org.shax3.square.domain.user.model;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public enum Religion {
+public enum Religion implements DisplayableEnum {
     NONE("없음"),
     CHRISTIAN("기독교"),
     BUDDHISM("불교"),
@@ -14,7 +14,7 @@ public enum Religion {
     Religion(String koreanName) {
         this.koreanName = koreanName;
     }
-
+    @Override
     @JsonValue
     public String getKoreanName() {
         return koreanName;

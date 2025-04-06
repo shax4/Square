@@ -13,15 +13,7 @@ public record ProposalsResponse(
         Long nextCursorId,
         Integer nextCursorLikes
 ) {
-    public static ProposalsResponse of(List<Proposal> proposals, String sort) {
-        Long newNextCursorId = proposals.isEmpty() ? null : proposals.get(proposals.size() - 1).getId();
-        Integer newNextCursorLikes = (proposals.isEmpty() || !"likes".equals(sort))
-                ? null
-                : proposals.get(proposals.size() - 1).getLikeCount();
-
-        List<ProposalDto> proposalDtos = proposals.stream()
-                .map(ProposalDto::from)
-                .toList();
+    public static ProposalsResponse of(Long newNextCursorId, Integer newNextCursorLikes, List<ProposalDto> proposalDtos) {
 
         return new ProposalsResponse(proposalDtos, newNextCursorId, newNextCursorLikes);
     }

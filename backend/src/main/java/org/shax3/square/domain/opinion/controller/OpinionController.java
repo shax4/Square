@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.annotation.AuthUser;
+import org.shax3.square.domain.debate.model.Debate;
+import org.shax3.square.domain.debate.service.DebateService;
 import org.shax3.square.domain.opinion.dto.request.CreateOpinionRequest;
 import org.shax3.square.domain.opinion.dto.request.UpdateOpinionRequest;
 import org.shax3.square.domain.opinion.dto.response.MyOpinionResponse;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class OpinionController {
     private final OpinionService opinionService;
     private final OpinionFacadeService opinionFacadeService;
+    private final DebateService debateService;
 
     @Operation(
             summary = "의견 작성",
@@ -29,7 +32,8 @@ public class OpinionController {
     )
     @PostMapping
     public ResponseEntity<Void> create(@AuthUser User user, @Valid @RequestBody CreateOpinionRequest request) {
-        opinionService.createOpinion(user, request);
+        Debate debate = debateService.findDebateById(request.debateId());
+        opinionService.createOpinion(user, request, debate);
         return ResponseEntity.ok().build();
     }
 
@@ -50,7 +54,7 @@ public class OpinionController {
     @Operation(summary = "의견 수정", description = "사용자가 작성한 의견 내용을 수정하는 API입니다.")
     @PutMapping("/{opinionId}")
     public ResponseEntity<Void> update(@AuthUser User user, @PathVariable Long opinionId, @Valid @RequestBody UpdateOpinionRequest request) {
-        opinionService.updateOpinion(request,user,opinionId);
+        opinionService.updateOpinion(request, user, opinionId);
 
         return ResponseEntity.ok().build();
     }
@@ -58,18 +62,18 @@ public class OpinionController {
     @Operation(summary = "의견 삭제", description = "사용자가 작성한 의견을 삭제하는 API입니다.")
     @DeleteMapping("/{opinionId}")
     public ResponseEntity<Void> delete(@AuthUser User user, @PathVariable Long opinionId) {
-        opinionService.deleteOpinion(user,opinionId);
+        opinionService.deleteOpinion(user, opinionId);
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "내 의견 목록 조회",description = "사용자가 자신의 의견 목록을 조회하는 API입니다." )
+    @Operation(summary = "내 의견 목록 조회", description = "사용자가 자신의 의견 목록을 조회하는 API입니다.")
     @GetMapping("/my")
     public ResponseEntity<MyOpinionResponse> readMyOpinions(@AuthUser User user,
                                                             @RequestParam(required = false) Long nextCursorId,
                                                             @RequestParam(defaultValue = "5") int limit
-                                                     ) {
+    ) {
 
-        MyOpinionResponse response = opinionService.getMyOpinions(user,nextCursorId,limit);
+        MyOpinionResponse response = opinionFacadeService.getMyOpinions(user, nextCursorId, limit);
         return ResponseEntity.ok(response);
     }
 

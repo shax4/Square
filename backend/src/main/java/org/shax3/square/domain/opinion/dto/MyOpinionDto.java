@@ -10,7 +10,7 @@ public record MyOpinionDto(
         boolean isLiked
 ) {
 
-    public static MyOpinionDto from(Opinion opinion,boolean isLiked) {
+    public static MyOpinionDto from(Opinion opinion,boolean isLiked, int likeCount) {
         if (opinion == null) {
             return null;
         }
@@ -18,7 +18,7 @@ public record MyOpinionDto(
                 opinion.getId(),
                 opinion.getDebate().getTopic(),
                 opinion.getContent(),
-                opinion.getLikeCount(),
+                likeCount,
                 isLiked
         );
     }
