@@ -13,13 +13,13 @@ import { deleteOpinion } from "../OpinionListScreen/api/OpinionApi";
 import { OpinionsResponse } from "./Components/OpinionsResponse.types";
 import { Comment } from "./Components/Comment.types";
 import { useAuthStore } from "../../shared/stores";
+import { likesOpinion } from "./api/OpinionApi";
 type OpinionDetailRouteProp = RouteProp<StackParamList, 'OpinionDetailScreen'>;
 
 export default function OpinionDetailScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
     const route = useRoute<OpinionDetailRouteProp>();
-    const { opinionId } = route.params;
-    const isFocused = useIsFocused();
+    const { debateId, opinionId } = route.params;
 
     // 스크롤 관리
     const scrollRef = useRef<ScrollView>(null);
@@ -122,6 +122,7 @@ export default function OpinionDetailScreen() {
                             <TouchableOpacity
                                 onPress={() =>
                                     navigation.navigate('OpinionEditScreen', {
+                                        debateId,
                                         opinionId,
                                         content: opinionDetail.content!,
                                     })
@@ -158,7 +159,14 @@ export default function OpinionDetailScreen() {
                     text: '삭제',
                     onPress: () => {
                         deleteOpinion(opinionId);
-                        navigation.goBack();
+                        setTimeout(() => {
+
+                            navigation.pop(2);
+                            navigation.navigate('OpinionListScreen', {
+                                debateId,
+                                showSummaryFirst: false,
+                            });
+                        }, 10);
                     },
                     style: 'destructive',
                 },
@@ -209,7 +217,12 @@ export default function OpinionDetailScreen() {
 
             {/* 좋아요 및 댓글 수 */}
             <View style={styles.LikeAndCommentCountView}>
-                <LikeButton initialCount={opinionDetail!.likeCount} initialLiked={opinionDetail!.isLiked} isVertical={false} />
+                <LikeButton
+                    initialCount={opinionDetail!.likeCount}
+                    initialLiked={opinionDetail!.isLiked}
+                    isVertical={false}
+                    onPress={() => { likesOpinion(opinionId) }}
+                />
 
                 <View style={styles.CommentCountButton}>
                     <Icons.comment />
@@ -248,6 +261,7 @@ export default function OpinionDetailScreen() {
                                     initialCount={comment.likeCount}
                                     initialLiked={comment.isLiked}
                                     size="small"
+                                //onPress={() => { likesComment(comment.commentId) }}
                                 />
                             </View>
                         </View>

@@ -13,10 +13,11 @@ import { getOpinions, createOpinion } from './api/OpinionApi';
 import { Opinion } from './Components/Opinion';
 import { getSummaries } from './api/SummariesApi';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import BookmarkButton from '../../components/BookmarkButton/BookmarkButton';
+import ScrapButton from '../../components/ScrapButton/ScrapButton';
 import { Icons } from '../../../assets/icons/Icons';
 import { useDebateStore } from '../../shared/stores/debates';
-import { SortType } from './OpinionSortType';
+import { SortType } from './Components/OpinionSortType';
+import { useAuthStore } from '../../shared/stores';
 
 type OpinionListScreenRouteProp = RouteProp<StackParamList, 'OpinionListScreen'>;
 
@@ -34,10 +35,12 @@ interface PagingCursor {
 export default function OpinionListScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
 
+    const { loggedIn } = useAuthStore();
+
     const isFocused = useIsFocused();
 
     const route = useRoute<OpinionListScreenRouteProp>();
-    const { debateId, showVoteResultModal = false } = route.params;
+    const { debateId, showVoteResultModal = false, showSummaryFirst = true } = route.params;
 
     const { debates, updateDebate } = useDebateStore();
     const debate = debates.find((d) => d.debateId === debateId);
@@ -85,25 +88,32 @@ export default function OpinionListScreen() {
     // 햔재 탭의 의견
     const currentOpinions = opinionStateMap[sort].opinions;
 
-    // 화면 새로 도달 시 새로고침
     useEffect(() => {
-        if (isFocused) {
-            console.log('called!!');
-        }
-        // 페이지 진입 시 항상 초기화 후 다시 불러옴
-        setOpinionStateMap({
-            latest: { opinions: [], hasMore: true },
-            likes: { opinions: [], hasMore: true },
-            comments: { opinions: [], hasMore: true },
-        });
-        setCursor(emptyCursor);
-        setSummaries([]);
+        setIsSummary(showSummaryFirst);
+    }, [showSummaryFirst]);
 
-        fetchAllSorts();
-        initAiSummaries();
-    }, [isFocused, debateId]);
+    // 화면 새로 도달 시 새로고침
+    useFocusEffect(
+        useCallback(() => {
 
+            // AI 요약 초기화
+            setSummaries([]);
+            initAiSummaries();
 
+            if (!loggedIn) return;
+
+            // 의견 목록 초기화 및 다시 불러오기
+            setOpinionStateMap({
+                latest: { opinions: [], hasMore: true },
+                likes: { opinions: [], hasMore: true },
+                comments: { opinions: [], hasMore: true },
+            });
+            setCursor(emptyCursor);
+
+            fetchAllSorts();
+
+        }, [debateId, loggedIn])
+    );
 
     // 처음 로드 시 각 정렬 방식에 맞춰 의견들 가져오기
     const fetchAllSorts = useCallback(async () => {
@@ -112,11 +122,10 @@ export default function OpinionListScreen() {
         }
     }, [debateId, cursor]); // 필요한 의존성 추가
 
-
     // 정렬 방식에 맞춰 의견 목록 조회 요청
     const fetchOpinionsBySort = async (sortType: SortType, force = false) => {
         const current = opinionStateMap[sortType];
-        if (!current.hasMore || loading) return;
+        if (!current.hasMore || loading || !loggedIn) return;
 
         setLoading(true);
 
@@ -185,7 +194,7 @@ export default function OpinionListScreen() {
             }
 
         } catch (e) {
-            console.error(`의견 불러오기 실패 (${sortType}):`, e);
+            console.debug(`의견 불러오기 실패 (${sortType}):`, e);
         } finally {
             setLoading(false);
         }
@@ -226,7 +235,7 @@ export default function OpinionListScreen() {
                     <TouchableOpacity onPress={() => console.log('공유')}>
                         <Icons.share />
                     </TouchableOpacity>
-                    <BookmarkButton
+                    <ScrapButton
                         isScraped={debate.isScraped}
                         onPressScrap={() => handleScrap()}
                     />
@@ -318,7 +327,7 @@ export default function OpinionListScreen() {
                         <SummaryBoxList data={summaries} />
                     ) : (
                         <OpinionBoxList
-                            data={currentOpinions}
+                            opinions={currentOpinions}
                             debateId={debateId}
                             onEndReached={() => fetchOpinionsBySort(sort)}
                         />

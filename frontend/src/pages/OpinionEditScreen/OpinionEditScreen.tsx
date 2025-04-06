@@ -13,13 +13,21 @@ type Props = {
 export default function OpinionEditScreen({ route }: Props) {
 
     // 수정할 의견 id, 초기 컨텐츠를 받아옴
-    const { opinionId, content: initialContent } = route.params;
+    const { debateId, opinionId, content: initialContent } = route.params;
     const [showWarning, setShowWarning] = useState(false);
 
     const submitRef = useRef<() => void>();
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
 
     const [content, setContent] = useState(initialContent);
+
+    const returnOpinionListPage = () => {
+        navigation.pop(2); // 현재 화면에서 2단계 뒤로
+        navigation.navigate('OpinionDetailScreen', {
+            debateId,
+            opinionId,
+        });
+    }
 
     // 수정 요청 함수
     const handleSubmit = () => {
@@ -46,7 +54,7 @@ export default function OpinionEditScreen({ route }: Props) {
                     onPress: async () => {
                         try {
                             await updateOpinion(opinionId, content);
-                            navigation.goBack();
+                            returnOpinionListPage()
                         } catch (error) {
                             Alert.alert(
                                 "문제 발생",
@@ -54,7 +62,7 @@ export default function OpinionEditScreen({ route }: Props) {
                                 [
                                     {
                                         text: "확인",
-                                        onPress: () => navigation.goBack(),
+                                        onPress: () => returnOpinionListPage(),
                                     },
                                 ]
                             );

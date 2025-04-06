@@ -25,7 +25,7 @@ export const getDebateVoteResult = async (debateId: number): Promise<DebateResul
         const response = await axiosInstance.get(`/api/debates/${debateId}/result`);
         return response.data;
     } catch (error) {
-        console.error("논쟁 통계 조회 실패:", error);
+        console.debug("논쟁 통계 조회 실패:", error);
         throw error;
     }
 }

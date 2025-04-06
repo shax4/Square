@@ -15,11 +15,16 @@ export type StackParamList = {
     OpinionListScreen: {
         debateId: number;
         showVoteResultModal?: boolean;
+        showSummaryFirst?: boolean;
     };
-    OpinionDetailScreen: { opinionId: number };
+    OpinionDetailScreen: {
+        debateId: number;
+        opinionId: number;
+    };
     ProposalListScreen: undefined;
     ProposalCreateScreen: undefined;
     OpinionEditScreen: {
+        debateId: number;
         opinionId: number;
         content: string;
     };

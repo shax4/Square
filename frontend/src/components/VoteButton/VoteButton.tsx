@@ -25,11 +25,14 @@ const rightOptionEmoji = "🙅";
 const VoteButton = ({ debateId, showVoteResultModal, }: VoteButtonProps): JSX.Element => {
     // zustand
     const { debates, updateDebate } = useDebateStore();
+
+    // 사용자 로그긴에 따른 통계 조회 처리
+    const { user, setUser, loggedIn, logOut } = useAuth();
+
     const debate = useDebateStore((state) =>
         state.debates.find((d) => d.debateId === debateId)
     );
     if (!debate) return <Text>Wrong debateId</Text>;
-    const { user, setUser, loggedIn, logOut } = useAuth();
 
     // 투표 및 투표 확인 모달 관련
     const [voteConfirmModalVisible, setVoteConfirmModalVisible] = useState(false);
@@ -54,21 +57,22 @@ const VoteButton = ({ debateId, showVoteResultModal, }: VoteButtonProps): JSX.El
         }
     }, [showVoteResultModal]);
 
+    // 로그인 되었을 때만 통계 조회 로드
     useEffect(() => {
         const fetchDebateResult = async () => {
             try {
-                setIsDebateResultLoaded(false);
-                const result = await getDebateVoteResult(debateId);
-                setDebateResultData(result);
-                setIsDebateResultLoaded(true);
+                if (loggedIn) {
+                    setIsDebateResultLoaded(false);
+                    const result = await getDebateVoteResult(debateId);
+                    setDebateResultData(result);
+                    setIsDebateResultLoaded(true);
+                }
             } catch (error) {
                 console.debug("투표 결과 사전 로드 실패:", error);
             }
         };
         fetchDebateResult();
-    }, [debateId]);
-
-
+    }, [debateId, loggedIn]);
 
     // 투표 버튼 클릭 시
     const handleVote = (voteLeft: boolean) => {

@@ -12,3 +12,19 @@ export const getOpinionDetail = async (
         throw error;
     }
 };
+
+export const likesOpinion = async (
+    targetId: number,
+) => {
+    try {
+        const targetType = 'OPINION';
+        const response = await axiosInstance.post('/api/likes', {
+            targetType: targetType,
+            targetId: targetId
+        });
+        return response.data;
+    } catch (error) {
+        console.error("의견 좋아요 실패:", error);
+        throw error;
+    }
+}

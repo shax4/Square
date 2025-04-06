@@ -13,10 +13,11 @@ import { StackParamList } from "../../../../shared/page-stack/DebatePageStack";
 
 
 interface Props {
+    debateId: number;
     opinion: Opinion;
 }
 
-const OpinionBox = ({ opinion }: Props) => {
+const OpinionBox = ({ debateId, opinion }: Props) => {
     const {
         opinionId,
         content,
@@ -32,7 +33,7 @@ const OpinionBox = ({ opinion }: Props) => {
 
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
     const routeOpinionDetailScreen = () => {
-        navigation.navigate('OpinionDetailScreen', { opinionId });
+        navigation.navigate('OpinionDetailScreen', { debateId, opinionId });
     }
 
     return (

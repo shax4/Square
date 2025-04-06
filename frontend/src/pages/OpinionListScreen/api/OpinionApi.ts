@@ -1,6 +1,6 @@
 import { axiosInstance } from "../../../shared";
 import { OpinionsResponse } from "./OpinionsResponse.types";
-import { SortType } from "../OpinionSortType";
+import { SortType } from "../Components/OpinionSortType";
 
 export interface GetOpinionsParams {
     sort?: SortType;
