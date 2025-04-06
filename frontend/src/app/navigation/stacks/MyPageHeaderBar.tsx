@@ -26,9 +26,9 @@ import { BoardAPI } from "../../../pages/BoardScreen/Api/boardApi";
 import { mockPosts } from "../../../pages/BoardScreen/mocks/boardData";
 import { BoardStackParamList } from "../../../shared/page-stack/BoardPageStack";
 
-
 import OpinionListScreen from '../../../pages/OpinionListScreen/OpinionListScreen';
-
+import OpinionDetailScreen
+ from '../../../pages/OpinionDetailScreen/OpinionDetailScreen';
 // 스택 네비게이터
 const Stack = createNativeStackNavigator();
 
@@ -177,6 +177,16 @@ export default function HeaderBar() {
                     title: `Number ${route.params.debateId}`,
                     headerBackButtonDisplayMode: 'minimal',
                 })}
+            />
+            <Stack.Screen
+                name="OpinionDetailScreen"
+                component={OpinionDetailScreen}
+                options={() => {
+                    return {
+                        title: '의견 상세',
+                        headerBackButtonDisplayMode: 'minimal',
+                    };
+                }}
             />
         </Stack.Navigator>
     );

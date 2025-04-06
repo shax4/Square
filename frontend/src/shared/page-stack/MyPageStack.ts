@@ -19,4 +19,8 @@ export type StackParamList = {
         showVoteResultModal?: boolean;
         showSummaryFirst?: boolean;
     };
+    OpinionDetailScreen: {
+        debateId: number;
+        opinionId: number;
+    };
 };
