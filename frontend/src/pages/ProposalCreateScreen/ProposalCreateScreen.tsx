@@ -6,6 +6,8 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { StackParamList } from "../../shared/page-stack/DebatePageStack";
 import { VoteCreateButtonView } from "../../components/VoteButton/VoteCreateButton";
+import { ProposalResponse } from "./Type/ProposalTypes";
+import { postProposal } from "./Api/proposalAPI";
 
 export default function ProposalCreateScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
@@ -14,7 +16,18 @@ export default function ProposalCreateScreen() {
     const confirmCreateProposal = () => {
         // 저장 로직
         console.log(debateTopic);
+        createProposal(debateTopic);
         navigation.goBack();
+    }
+
+    const createProposal = async (topic : string) => {
+        try{
+            const data : ProposalResponse = await postProposal(topic);
+
+            console.log("신청 완료된 주제 ID : ", data.proposalId);
+        }catch(error){
+            console.error("주제 청원 신청 실패 : ", error);
+        }
     }
 
     return (
