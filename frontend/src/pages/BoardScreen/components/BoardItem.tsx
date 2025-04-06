@@ -4,8 +4,8 @@ import ProfileImage from "../../../components/ProfileImage";
 import LikeButton from "../../../components/LikeButton";
 import { getTimeAgo } from "../../../shared/utils/timeAge/timeAge";
 import { Icons } from "../../../../assets/icons/Icons";
-import { BoardAPI } from "../Api/boardApi";
 import PersonalityTag from "../../../components/PersonalityTag/PersonalityTag";
+import { useLikeButton } from "../../../shared/hooks/useLikeButton";
 
 // 게시글 아이템 타입 정의
 interface BoardItemProps {
@@ -40,6 +40,17 @@ export default function BoardItem({ item, onPress }: BoardItemProps) {
       ? `${item.content.substring(0, 100)}...`
       : item.content;
 
+  const likeProps = useLikeButton(
+    item.postId,
+    "POST",
+    isLiked,
+    likeCount,
+    (newState) => {
+      setLikeCount(newState.likeCount);
+      setIsLiked(newState.isLiked);
+    }
+  );
+
   return (
     <TouchableOpacity
       style={styles.container}
@@ -72,19 +83,7 @@ export default function BoardItem({ item, onPress }: BoardItemProps) {
       {/* 하단 정보 영역 (좋아요 수, 댓글 수) */}
       <View style={styles.footer}>
         <View style={styles.interactionContainer}>
-          <LikeButton
-            targetId={item.postId}
-            targetType="POST"
-            initialCount={likeCount}
-            initialLiked={isLiked}
-            apiToggleFunction={BoardAPI.toggleLike}
-            onLikeChange={(newState) => {
-              setLikeCount(newState.likeCount);
-              setIsLiked(newState.isLiked);
-            }}
-            size="small"
-            isVertical={false}
-          />
+          <LikeButton {...likeProps} size="small" isVertical={false} />
           <View style={styles.commentCountContainer}>
             <Icons.commentNew />
             <Text style={styles.commentCountText}>{item.commentCount}</Text>

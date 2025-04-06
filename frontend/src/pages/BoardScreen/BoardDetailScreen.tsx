@@ -22,6 +22,7 @@ import { getTimeAgo } from "../../shared/utils/timeAge/timeAge";
 import LikeButton from "../../components/LikeButton";
 import { Icons } from "../../../assets/icons/Icons";
 import PersonalityTag from "../../components/PersonalityTag/PersonalityTag";
+import { useLikeButton } from "../../shared/hooks/useLikeButton";
 
 // 네비게이션 프롭 타입 정의
 type Props = StackScreenProps<BoardStackParamList, "BoardDetail">;
@@ -109,6 +110,14 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
     );
   }
 
+  const likeProps = useLikeButton(
+    post?.postId || 0,
+    "POST",
+    post?.isLiked || false,
+    post?.likeCount || 0,
+    handlePostLikeChange
+  );
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -143,16 +152,7 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
         <View style={styles.commentsSection}>
           <View style={styles.commentsSectionHeader}>
             <View style={styles.interactionContainer}>
-              <LikeButton
-                targetId={post?.postId}
-                targetType="POST"
-                initialCount={post?.likeCount || 0}
-                initialLiked={post?.isLiked || false}
-                apiToggleFunction={BoardAPI.toggleLike}
-                onLikeChange={handlePostLikeChange}
-                size="small"
-                isVertical={false}
-              />
+              <LikeButton {...likeProps} size="small" isVertical={false} />
               <View style={styles.commentCountContainer}>
                 <Icons.commentNew />
                 <Text style={styles.commentCountText}>

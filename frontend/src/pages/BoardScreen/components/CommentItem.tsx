@@ -16,6 +16,7 @@ import { Comment, Reply } from "../board.types";
 import { Icons } from "../../../../assets/icons/Icons";
 import { useAuth } from "../../../shared/hooks/useAuth";
 import { getTimeAgo } from "../../../shared/utils/timeAge/timeAge";
+import { useLikeButton } from "../../../shared/hooks/useLikeButton";
 
 interface CommentItemProps {
   postId: number; // 게시글 ID
@@ -251,6 +252,26 @@ export default function CommentItem({
     ]);
   };
 
+  // 댓글용 좋아요 버튼 props 생성
+  const commentLikeProps = useLikeButton(
+    comment.commentId,
+    "POST_COMMENT",
+    comment.isLiked || false,
+    comment.likeCount || 0,
+    (newState) => handleLikeChange(comment.commentId, newState, true)
+  );
+
+  // 대댓글 렌더링 시에는 함수화하여 중복 제거
+  const getReplyLikeProps = (reply: Reply) => {
+    return useLikeButton(
+      reply.commentId,
+      "POST_COMMENT",
+      reply.isLiked || false,
+      reply.likeCount || 0,
+      (newState) => handleLikeChange(reply.commentId, newState)
+    );
+  };
+
   // 좋아요 상태 변경 핸들러
   const handleLikeChange = (
     commentId: number,
@@ -329,14 +350,7 @@ export default function CommentItem({
                 {/* 좋아요 버튼 - 내용 안에 배치 */}
                 <View style={styles.replyLikeContainer}>
                   <LikeButton
-                    targetId={comment.commentId}
-                    targetType="POST_COMMENT"
-                    initialCount={comment.likeCount || 0}
-                    initialLiked={comment.isLiked || false}
-                    apiToggleFunction={BoardAPI.toggleLike}
-                    onLikeChange={(newState) =>
-                      handleLikeChange(comment.commentId, newState, true)
-                    }
+                    {...commentLikeProps}
                     size="small"
                     isVertical={false}
                   />
@@ -451,14 +465,7 @@ export default function CommentItem({
                   <Text style={styles.contentText}>{reply.content}</Text>
                   <View style={styles.replyLikeContainer}>
                     <LikeButton
-                      targetId={reply.commentId}
-                      targetType="POST_COMMENT"
-                      initialCount={reply.likeCount || 0}
-                      initialLiked={reply.isLiked || false}
-                      apiToggleFunction={BoardAPI.toggleLike}
-                      onLikeChange={(newState) =>
-                        handleLikeChange(reply.commentId, newState)
-                      }
+                      {...getReplyLikeProps(reply)}
                       size="small"
                       isVertical={false}
                     />
