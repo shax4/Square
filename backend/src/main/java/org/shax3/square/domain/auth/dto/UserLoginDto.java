@@ -9,6 +9,7 @@ import org.shax3.square.domain.user.model.State;
 
 @Builder
 public record UserLoginDto(
+        Long userId,
         String accessToken,
         RefreshToken refreshToken,
         String email,
@@ -20,6 +21,7 @@ public record UserLoginDto(
 ) {
     public static UserLoginDto createMemberLoginDto(UserTokenDto userTokenDto, User user) {
         return UserLoginDto.builder()
+                .userId(user.getId())
                 .accessToken(userTokenDto.accessToken())
                 .refreshToken(userTokenDto.refreshToken())
                 .email(null)
@@ -33,6 +35,7 @@ public record UserLoginDto(
 
     public static UserLoginDto createNotMemberLoginDto(String email) {
         return UserLoginDto.builder()
+                .userId(null)
                 .accessToken(null)
                 .refreshToken(null)
                 .email(email)
