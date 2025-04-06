@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { styles } from "./LikeButton.styles";
 import { LikeButtonProps } from "./LikeButton.types";
@@ -17,12 +17,15 @@ const LikeButton = ({
   apiToggleFunction,
   onLikeChange,
   onPress,
+  onError,
+  errorDisplayMode = "simple",
   disabled = false,
   targetType,
 }: LikeButtonProps) => {
   // 상태 관리
   const [liked, setLiked] = useState<boolean>(initialLiked);
   const [likeCount, setLikeCount] = useState<number>(initialCount);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Zustand 스토어 (조건부)
   const { toggleLike, isLoading, hasError, clearError } = useLikeStore();
@@ -43,6 +46,9 @@ const LikeButton = ({
       console.log("Button is disabled, ignoring click");
       return;
     }
+
+    // 이전 에러 메시지 초기화
+    setErrorMessage(null);
 
     if (isApiMode && targetId && targetType) {
       // API 모드 처리
@@ -66,8 +72,63 @@ const LikeButton = ({
             });
           }
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("좋아요 처리 중 오류:", error);
+
+        // 에러 유형에 따른 메시지 설정
+        if (error.response) {
+          // HTTP 에러 응답이 있는 경우
+          switch (error.response.status) {
+            case 401:
+              setErrorMessage("로그인 필요");
+              break;
+            case 403:
+              setErrorMessage("권한 없음");
+              break;
+            case 429:
+              setErrorMessage("잠시 후 재시도");
+              break;
+            default:
+              setErrorMessage(`오류 ${error.response.status}`);
+          }
+
+          // 상세 모드인 경우 Alert으로 추가 정보 표시
+          if (errorDisplayMode === "detailed") {
+            Alert.alert(
+              "좋아요 오류",
+              error.response.data?.message ||
+                `오류가 발생했습니다 (${error.response.status})`,
+              [{ text: "확인", style: "cancel" }]
+            );
+          }
+        } else if (error.request) {
+          // 요청은 보냈지만 응답이 없는 경우 (네트워크 문제)
+          setErrorMessage("네트워크 오류");
+
+          if (errorDisplayMode === "detailed") {
+            Alert.alert(
+              "네트워크 오류",
+              "서버에 연결할 수 없습니다. 인터넷 연결을 확인하세요.",
+              [{ text: "확인", style: "cancel" }]
+            );
+          }
+        } else {
+          // 요청 설정 중 에러
+          setErrorMessage("요청 오류");
+
+          if (errorDisplayMode === "detailed") {
+            Alert.alert(
+              "요청 오류",
+              "요청을 처리하는 중 오류가 발생했습니다.",
+              [{ text: "확인", style: "cancel" }]
+            );
+          }
+        }
+
+        // 부모에게 에러 알림 (선택적)
+        if (onError) {
+          onError(error);
+        }
       }
     } else if (onPress) {
       // 외부 콜백 모드
@@ -87,12 +148,19 @@ const LikeButton = ({
     liked,
     onLikeChange,
     onPress,
+    onError,
+    errorDisplayMode,
   ]);
 
   // 에러 상태 클릭 핸들러 (useCallback으로 래핑)
   const handleErrorClick = useCallback(() => {
     if (isErrored && targetId) {
+      // 에러 상태 초기화
       clearError(targetId);
+      setErrorMessage(null);
+
+      // 즉시 재시도하지 않고 버튼을 준비 상태로만 변경
+      // 사용자가 직접 다시 클릭하도록 함
     }
   }, [isErrored, targetId, clearError]);
 
@@ -106,6 +174,7 @@ const LikeButton = ({
   useEffect(() => {
     if (isApiMode && targetId) {
       clearError(targetId);
+      setErrorMessage(null);
     }
   }, [targetId, targetType, isApiMode, clearError]);
 
@@ -136,7 +205,7 @@ const LikeButton = ({
           isErrored && styles.errorText,
         ]}
       >
-        {isErrored ? "재시도" : likeCount}
+        {isErrored ? errorMessage || "재시도" : likeCount}
       </Text>
     </TouchableOpacity>
   );

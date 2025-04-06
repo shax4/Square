@@ -23,10 +23,14 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "red",
     borderRadius: 4,
-    padding: 2,
+    padding: 4,
+    minWidth: 65,
   },
   errorText: {
     color: "red",
     fontSize: 10,
+    marginTop: 2,
+    textAlign: "center",
+    maxWidth: 80,
   },
 });
