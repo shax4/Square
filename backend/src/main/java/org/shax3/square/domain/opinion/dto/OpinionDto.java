@@ -17,11 +17,11 @@ public record OpinionDto(
         String userType,
         boolean isLiked
 ) {
-    public static OpinionDto of(Opinion opinion, boolean isLiked, int commentCount, User user, String profileUrl) {
+    public static OpinionDto of(Opinion opinion, boolean isLiked, int commentCount, User user, String profileUrl, int likeCount) {
         return new OpinionDto(
                 opinion.getId(),
                 opinion.getContent(),
-                opinion.getLikeCount(),
+                likeCount,
                 commentCount,
                 opinion.isLeft(),
                 opinion.getCreatedAt(),

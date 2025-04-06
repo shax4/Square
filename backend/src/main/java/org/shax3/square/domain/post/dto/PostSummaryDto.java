@@ -16,7 +16,7 @@ public record PostSummaryDto(
 	int commentCount,
 	boolean isLiked
 ) {
-	public static PostSummaryDto from(Post post, String profileUrl, boolean isLiked, int commentCount) {
+	public static PostSummaryDto from(Post post, String profileUrl, boolean isLiked, int commentCount, int likeCount) {
 		return new PostSummaryDto(
 			post.getId(),
 			post.getUser().getNickname(),
@@ -25,7 +25,7 @@ public record PostSummaryDto(
 			post.getCreatedAt(),
 			post.getTitle(),
 			post.getContent(),
-			post.getLikeCount(),
+			likeCount,
 			commentCount,
 			isLiked
 		);

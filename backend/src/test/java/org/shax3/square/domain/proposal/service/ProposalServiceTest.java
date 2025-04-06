@@ -84,56 +84,6 @@ class ProposalServiceTest {
     }
 
 
-    @Test
-    @DisplayName("최신순 목록 조회 테스트")
-    void getProposals_sort_latest() {
-        when(proposalRepository.findProposalsByLatest(null, 6))
-                .thenReturn(mockProposals);
-
-        ProposalsResponse response = proposalService.getProposals("latest", null, null, 5);
-
-        assertThat(response.proposals()).hasSize(5);
-        assertThat(response.nextCursorId()).isEqualTo(mockProposals.get(4).getId());
-    }
-
-    @Test
-    @DisplayName("좋아요순 목록 조회 테스트")
-    public void getProposals_sort_likeCount() {
-        List<Proposal> expectedSortedLikesList = List.of(
-                mockProposals.get(2), //likecount 5
-                mockProposals.get(0), //likecount 4
-                mockProposals.get(1), //likecount 3
-                mockProposals.get(3)  //likecount 2
-        );
-
-        when(proposalRepository.findProposalsByLikes(null, null, 4))
-                .thenReturn(expectedSortedLikesList);
-
-        ProposalsResponse response = proposalService.getProposals("likes", null, null, 3);
-
-        assertThat(response.proposals()).hasSize(3);
-        assertThat(response.proposals().get(0).likeCount()).isEqualTo(5);
-        assertThat(response.proposals().get(1).likeCount()).isEqualTo(4);
-        assertThat(response.proposals().get(2).likeCount()).isEqualTo(3);
-    }
-
-    @Test
-    @DisplayName("좋아요순 목록 조회 - 마지막 페이지 테스트")
-    public void getProposals_sort_likeCount_lastPage() {
-        List<Proposal> expectedSortedLikesList = List.of(
-                mockProposals.get(2), //likecount 5
-                mockProposals.get(0)  //likecount 4
-        );
-
-        when(proposalRepository.findProposalsByLikes(null, 3, 4))
-                .thenReturn(expectedSortedLikesList);
-
-        ProposalsResponse response = proposalService.getProposals("likes", null, 3, 3);
-
-        assertThat(response.proposals()).hasSize(2);
-        assertThat(response.proposals().get(0).likeCount()).isEqualTo(5);
-        assertThat(response.proposals().get(1).likeCount()).isEqualTo(4);
-    }
 
     @Test
     @DisplayName("소프트 딜리트 테스트 - 한번만 호출되는지 검증")

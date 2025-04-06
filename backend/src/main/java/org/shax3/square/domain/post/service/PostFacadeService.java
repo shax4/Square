@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.shax3.square.common.model.TargetType;
-import org.shax3.square.common.util.CursorUtil;
 import org.shax3.square.domain.like.service.LikeService;
 import org.shax3.square.domain.post.dto.CommentDto;
 import org.shax3.square.domain.post.dto.PopularPostDto;
@@ -17,7 +16,6 @@ import org.shax3.square.domain.post.dto.ReplyDto;
 import org.shax3.square.domain.post.dto.response.MyPostResponse;
 import org.shax3.square.domain.post.dto.response.PostDetailResponse;
 import org.shax3.square.domain.post.dto.response.PostListResponse;
-import org.shax3.square.domain.post.dto.response.RepliesResponse;
 import org.shax3.square.domain.post.model.Post;
 import org.shax3.square.domain.post.model.PostComment;
 import org.shax3.square.domain.s3.service.S3Service;
@@ -25,6 +23,7 @@ import org.shax3.square.domain.scrap.service.ScrapService;
 import org.shax3.square.domain.user.model.User;
 import org.shax3.square.exception.CustomException;
 import org.shax3.square.exception.ExceptionCode;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +39,7 @@ public class PostFacadeService {
 	private final S3Service s3Service;
 	private final PostService postService;
 	private final ScrapService scrapService;
+	private final RedisTemplate<String, Object> batchRedisTemplate;
 
 	/**
 	 * 게시글 목록 조회
@@ -149,6 +149,7 @@ public class PostFacadeService {
 
 	private List<PopularPostDto> toPopularDtos(List<Post> popularPosts) {
 		List<Long> popularPostIds = popularPosts.stream().map(Post::getId).toList();
+		Set<Object> entries = batchRedisTemplate.opsForSet().members("like:batch");
 
 		// key: postId, value: commentCount
 		Map<Long, Integer> commentCounts = commentService.getCommentCounts(popularPostIds);
@@ -156,7 +157,8 @@ public class PostFacadeService {
 		return popularPosts.stream()
 			.map(post -> PopularPostDto.from(
 				post,
-				commentCounts.getOrDefault(post.getId(), 0)
+				commentCounts.getOrDefault(post.getId(), 0),
+				post.getLikeCount() + likeService.getLikeCountInRedis(entries, post.getId(), TargetType.POST)
 			))
 			.toList();
 	}
@@ -164,6 +166,8 @@ public class PostFacadeService {
 	private List<PostSummaryDto> toPostDtos(List<Post> posts, User user) {
 		List<Long> postIds = posts.stream().map(Post::getId).toList();
 		Set<Long> likedPostIds = likeService.getLikedTargetIds(user, TargetType.POST, postIds);
+
+		Set<Object> entries = batchRedisTemplate.opsForSet().members("like:batch");
 
 		// key: postId, value: commentCount
 		Map<Long, Integer> commentCounts = commentService.getCommentCounts(postIds);
@@ -173,7 +177,8 @@ public class PostFacadeService {
 				post,
 				s3Service.generatePresignedGetUrl(post.getUser().getS3Key()),
 				likedPostIds.contains(post.getId()),
-				commentCounts.getOrDefault(post.getId(), 0)
+				commentCounts.getOrDefault(post.getId(), 0),
+				post.getLikeCount() + likeService.getLikeCountInRedis(entries, post.getId(), TargetType.POST)
 			))
 			.toList();
 	}
@@ -199,6 +204,9 @@ public class PostFacadeService {
 		boolean isLiked = likeService.isTargetLiked(user, TargetType.POST, postId);
 		boolean isScraped = scrapService.isTargetScraped(user, postId, TargetType.POST);
 
+		Set<Object> entries = batchRedisTemplate.opsForSet().members("like:batch");
+		int likeCount = post.getLikeCount() + likeService.getLikeCountInRedis(entries, postId, TargetType.POST);
+
 		// 댓글 목록 (parent만)
 		List<PostComment> comments = commentService.getParentComments(post);
 		List<Long> commentIds = extractCommentIds(comments);
@@ -222,8 +230,11 @@ public class PostFacadeService {
 					.map(reply -> ReplyDto.from(
 						reply,
 						s3Service.generatePresignedGetUrl(reply.getUser().getS3Key()),
-						likedReplyIds.contains(reply.getId())))
-					.toList()
+						likedReplyIds.contains(reply.getId()),
+						reply.getLikeCount() + likeService.getLikeCountInRedis(entries, reply.getId(), TargetType.POST_COMMENT)
+					))
+					.toList(),
+				comment.getLikeCount() + likeService.getLikeCountInRedis(entries, comment.getId(), TargetType.POST_COMMENT)
 			))
 			.toList();
 
@@ -233,7 +244,8 @@ public class PostFacadeService {
 			isLiked,
 			isScraped,
 			commentDtos,
-			commentDtos.size()
+			commentDtos.size(),
+			likeCount
 		);
 	}
 

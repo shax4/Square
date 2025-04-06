@@ -16,6 +16,7 @@ import org.shax3.square.domain.post.dto.response.RepliesResponse;
 import org.shax3.square.domain.post.model.PostComment;
 import org.shax3.square.domain.s3.service.S3Service;
 import org.shax3.square.domain.user.model.User;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ public class CommentFacadeService {
 	private final LikeService likeService;
 	private final S3Service s3Service;
 	private final PostService postService;
+	private final RedisTemplate<String, Object> batchRedisTemplate;
 
 	/**
 	 * 대댓글 더보기 조회
@@ -49,11 +51,15 @@ public class CommentFacadeService {
 		List<Long> replyIds = replies.stream().map(PostComment::getId).toList();
 		Set<Long> likedReplyIds = likeService.getLikedTargetIds(user, TargetType.POST_COMMENT, replyIds);
 
+		Set<Object> entries = batchRedisTemplate.opsForSet().members("like:batch");
+
 		List<ReplyDto> replyDtos = replies.stream()
 			.map(reply -> ReplyDto.from(
 				reply,
 				s3Service.generatePresignedGetUrl(reply.getUser().getS3Key()),
-				likedReplyIds.contains(reply.getId())))
+				likedReplyIds.contains(reply.getId()),
+				reply.getLikeCount() + likeService.getLikeCountInRedis(entries, reply.getId(), TargetType.POST_COMMENT)
+			))
 			.toList();
 
 		Long nextCursorId = hasNext && !replies.isEmpty()
@@ -74,11 +80,14 @@ public class CommentFacadeService {
 		List<Long> commentIds = comments.stream().map(PostComment::getId).toList();
 		Set<Long> likedIds = likeService.getLikedTargetIds(user, TargetType.POST_COMMENT, commentIds);
 
+		Set<Object> entries = batchRedisTemplate.opsForSet().members("like:batch");
+
 		List<MyCommentDto> dtos = comments.stream()
 			.map(comment -> MyCommentDto.from(
 				comment,
-				likedIds.contains(comment.getId()))
-			)
+				likedIds.contains(comment.getId()),
+				comment.getLikeCount() + likeService.getLikeCountInRedis(entries, comment.getId(), TargetType.POST_COMMENT)
+				))
 			.toList();
 
 		Long nextCursor = getNextCursor(comments, hasNext, PostComment::getId);

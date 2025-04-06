@@ -27,7 +27,8 @@ public record PostDetailResponse(
 		boolean isLiked,
 		boolean isScrapped,
 		List<CommentDto> comments,
-		int commentCount
+		int commentCount,
+		int likeCount
 	) {
 		return new PostDetailResponse(
 			post.getId(),
@@ -37,7 +38,7 @@ public record PostDetailResponse(
 			post.getCreatedAt(),
 			post.getTitle(),
 			post.getContent(),
-			post.getLikeCount(),
+			likeCount,
 			commentCount,
 			isLiked,
 			isScrapped,

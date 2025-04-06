@@ -15,7 +15,7 @@ public record ReplyDto(
 	int likeCount,
 	boolean isLiked
 ) {
-	public static ReplyDto from(PostComment reply, String profileUrl, boolean isLiked) {
+	public static ReplyDto from(PostComment reply, String profileUrl, boolean isLiked, int likeCount) {
 		return new ReplyDto(
 			reply.getId(),
 			reply.getParent().getId(),
@@ -24,7 +24,7 @@ public record ReplyDto(
 			reply.getUser().getType().name(),
 			reply.getCreatedAt(),
 			reply.getContent(),
-			reply.getLikeCount(),
+			likeCount,
 			isLiked
 		);
 	}

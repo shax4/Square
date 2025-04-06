@@ -9,12 +9,12 @@ public record MyCommentDto(
 	int likeCount,
 	boolean isLiked
 ) {
-	public static MyCommentDto from(PostComment comment, boolean isLiked) {
+	public static MyCommentDto from(PostComment comment, boolean isLiked, int likeCount) {
 		return new MyCommentDto(
 			comment.getId(),
 			comment.getPost().getTitle(),
 			comment.getContent(),
-			comment.getLikeCount(),
+			likeCount,
 			isLiked
 		);
 	}
