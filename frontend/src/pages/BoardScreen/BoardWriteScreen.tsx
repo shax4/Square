@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import {
   View,
   TextInput,
@@ -38,6 +38,7 @@ export default function BoardWriteScreen({ route, navigation }: Props) {
     setContent,
     loading,
     submitting,
+    submitError,
     createPost,
     updatePost,
     loadPost,
@@ -50,8 +51,21 @@ export default function BoardWriteScreen({ route, navigation }: Props) {
     }
   }, [isEditMode, postId, loadPost]);
 
+  // 성공 알림 표시 후 화면 이동 함수
+  const showSuccessAlert = useCallback(
+    (message: string, callback: () => void) => {
+      Alert.alert("완료", message, [
+        {
+          text: "확인",
+          onPress: callback,
+        },
+      ]);
+    },
+    []
+  );
+
   // 게시글 저장 (생성 또는 수정)
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     // 유효성 검사
     if (!title.trim()) {
       Alert.alert("입력 오류", "제목을 입력해주세요.");
@@ -71,56 +85,64 @@ export default function BoardWriteScreen({ route, navigation }: Props) {
         success = await updatePost(postId);
         if (success) {
           // 게시글 수정 성공
-          Alert.alert("완료", "게시글이 수정되었습니다.", [
-            {
-              text: "확인",
-              onPress: () => {
-                // 네비게이션 스택 재설정 (수정 화면 제거)
-                navigation.reset({
-                  index: 1,
-                  routes: [
-                    { name: "BoardList" },
-                    {
-                      name: "BoardDetail",
-                      params: { boardId: postId, refresh: true },
-                    },
-                  ],
-                });
-              },
-            },
-          ]);
+          showSuccessAlert("게시글이 수정되었습니다.", () => {
+            // 네비게이션 스택 재설정 (수정 화면 제거)
+            navigation.reset({
+              index: 1,
+              routes: [
+                { name: "BoardList" },
+                {
+                  name: "BoardDetail",
+                  params: { boardId: postId, refresh: true },
+                },
+              ],
+            });
+          });
         }
       } else {
         // 새 게시글 작성
         const newPostId = await createPost();
         success = newPostId !== null;
-        if (success) {
+        if (success && newPostId) {
           // 새 게시글 작성 성공
-          Alert.alert("완료", "게시글이 작성되었습니다.", [
-            {
-              text: "확인",
-              onPress: () => {
-                // 목록 화면으로 이동하면서 새로고침 플래그 전달
-                navigation.navigate("BoardList", { refresh: true });
-              },
-            },
-          ]);
+          showSuccessAlert("게시글이 작성되었습니다.", () => {
+            // 목록 화면으로 이동하면서 새로고침 플래그 전달
+            navigation.navigate("BoardList", { refresh: true });
+          });
         }
       }
 
       if (!success) {
-        Alert.alert("오류", "게시글을 저장하는 중 문제가 발생했습니다.");
+        Alert.alert(
+          "오류",
+          submitError?.message || "게시글을 저장하는 중 문제가 발생했습니다."
+        );
       }
     } catch (error) {
       console.error("게시글 저장에 실패했습니다:", error);
-      Alert.alert("오류", "게시글을 저장하는 중 문제가 발생했습니다.");
+      Alert.alert(
+        "오류",
+        error instanceof Error
+          ? error.message
+          : "게시글을 저장하는 중 문제가 발생했습니다."
+      );
     }
-  };
+  }, [
+    title,
+    content,
+    isEditMode,
+    postId,
+    updatePost,
+    createPost,
+    submitError,
+    showSuccessAlert,
+    navigation,
+  ]);
 
   // 취소 버튼에 모달 로직 연결
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     showCancelConfirmation();
-  };
+  }, [showCancelConfirmation]);
 
   return (
     <KeyboardAvoidingView

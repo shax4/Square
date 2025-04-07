@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import {
   View,
   StyleSheet,
@@ -26,6 +26,42 @@ import colors from "../../../assets/colors";
 // 네비게이션 프롭 타입 정의
 type Props = StackScreenProps<BoardStackParamList, "BoardDetail">;
 
+// API 응답의 Reply를 내부 BoardReply 타입으로 변환하는 함수
+const convertApiReplyToBoardReply = (apiReply: Reply): BoardReply => {
+  return {
+    replyId: apiReply.replyId,
+    parentId: apiReply.parentId || 0, // board.types에서는 필수 필드이므로 기본값 제공
+    nickname: apiReply.nickname,
+    profileUrl: apiReply.profileUrl,
+    userType: apiReply.userType || "", // board.types에서는 필수 필드이므로 기본값 제공
+    createdAt: apiReply.createdAt,
+    content: apiReply.content,
+    likeCount: apiReply.likeCount,
+    isLiked: apiReply.isLiked,
+  };
+};
+
+// API 응답의 Comment를 내부 BoardComment 타입으로 변환하는 함수
+const convertToComment = (apiComment: Comment): BoardComment => {
+  return {
+    commentId: apiComment.commentId,
+    nickname: apiComment.nickname,
+    profileUrl: apiComment.profileUrl,
+    userType: apiComment.userType || "", // board.types에서는 필수 필드이므로 기본값 제공
+    createdAt: apiComment.createdAt,
+    content: apiComment.content,
+    likeCount: apiComment.likeCount,
+    isLiked: apiComment.isLiked,
+    replyCount: apiComment.replyCount,
+    // replies가 있으면 변환, 없으면 빈 배열
+    replies: apiComment.replies
+      ? apiComment.replies.map((reply) => convertApiReplyToBoardReply(reply))
+      : [],
+    isMe: false, // 백엔드가 제공하지 않으므로 기본값 설정
+    updatedAt: apiComment.createdAt, // 수정 시각이 없으면 생성 시각 사용
+  };
+};
+
 export default function BoardDetailScreen({ route, navigation }: Props) {
   // 라우트 파라미터에서 게시글 ID 가져오기
   const { boardId } = route.params;
@@ -34,8 +70,13 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
   const { post, loading, error, refresh } = usePostDetail(boardId);
 
   // 댓글 관련 훅
-  const { commentText, setCommentText, submitting, createComment } =
-    useComment();
+  const {
+    commentText,
+    setCommentText,
+    submitting,
+    createComment,
+    submitError,
+  } = useComment();
 
   // 화면에 포커스가 올 때마다 데이터 갱신
   useFocusEffect(
@@ -47,30 +88,30 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
       return () => {
         // 화면을 떠날 때 정리 작업 (필요한 경우)
       };
-    }, [route.params?.refresh, refresh])
+    }, [route.params?.refresh, refresh, navigation])
   );
 
   // 댓글 작성 함수
   const handleSubmitComment = async () => {
-    if (submitting) return;
+    if (submitting || !commentText.trim()) return;
 
     const success = await createComment(boardId);
     if (success) {
       // 댓글 작성 성공 시 게시글 데이터 다시 가져오기
       refresh();
     } else {
-      Alert.alert("오류", "댓글 작성에 실패했습니다. 다시 시도해 주세요.");
+      Alert.alert(
+        "오류",
+        submitError?.message || "댓글 작성에 실패했습니다. 다시 시도해 주세요."
+      );
     }
   };
 
   // 게시글 좋아요 상태 변경 핸들러
-  const handlePostLikeChange = useCallback(
-    (newState: { isLiked: boolean; likeCount: number }) => {
-      // 상태는 자동으로 업데이트되므로 추가 처리 필요 없음
-      // refresh()를 호출하여 전체 데이터를 다시 가져올 수도 있음
-    },
-    []
-  );
+  const handlePostLikeChange = useCallback(() => {
+    // refresh 함수 호출로 데이터 새로고침
+    refresh();
+  }, [refresh]);
 
   // 로딩 중이면 로딩 인디케이터 표시
   if (loading && !post) {
@@ -86,7 +127,7 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
     return (
       <View style={styles.errorContainer}>
         <Text style={styles.errorText}>게시글을 불러오는 데 실패했습니다.</Text>
-        <Text>{error.message}</Text>
+        <Text style={styles.errorMessage}>{error.message}</Text>
         <TouchableOpacity style={styles.retryButton} onPress={refresh}>
           <Text style={styles.retryButtonText}>다시 시도</Text>
         </TouchableOpacity>
@@ -94,11 +135,26 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
     );
   }
 
+  // post가 null일 때 처리
+  if (!post) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>게시글 정보를 찾을 수 없습니다.</Text>
+        <TouchableOpacity
+          style={styles.retryButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.retryButtonText}>뒤로 가기</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   const likeProps = useLikeButton(
-    post?.postId || 0,
+    post.postId,
     "POST",
-    post?.isLiked || false,
-    post?.likeCount || 0,
+    post.isLiked,
+    post.likeCount,
     handlePostLikeChange
   );
 
@@ -111,13 +167,13 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
       <ScrollView style={styles.scrollView}>
         {/* 게시글 헤더 (작성자 정보) */}
         <View style={styles.postHeader}>
-          <ProfileImage imageUrl={post?.profileUrl} variant="medium" />
+          <ProfileImage imageUrl={post.profileUrl} variant="medium" />
           <View style={styles.authorInfo}>
             <View style={styles.nameContainer}>
-              <Text style={styles.authorName}>{post?.nickname}</Text>
+              <Text style={styles.authorName}>{post.nickname}</Text>
               <PersonalityTag
-                personality={post?.userType || ""}
-                nickname={post?.nickname || ""}
+                personality={post.userType || ""}
+                nickname={post.nickname || ""}
               />
             </View>
             <Text weight="medium" style={styles.postDate}>
@@ -148,16 +204,23 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
             </View>
           </View>
 
-          {/* 댓글 목록 - 타입 캐스팅으로 해결 */}
-          {post?.comments &&
+          {/* 댓글 목록 - 타입 변환 함수 사용 */}
+          {post.comments && post.comments.length > 0 ? (
             post.comments.map((comment) => (
               <CommentItem
                 key={comment.commentId}
-                comment={comment as unknown as BoardComment}
+                comment={convertToComment(comment)}
                 postId={boardId}
                 onCommentChange={refresh}
               />
-            ))}
+            ))
+          ) : (
+            <View style={styles.emptyCommentsContainer}>
+              <Text style={styles.emptyCommentsText}>
+                아직 댓글이 없습니다. 첫 댓글을 남겨보세요!
+              </Text>
+            </View>
+          )}
         </View>
       </ScrollView>
 
@@ -173,7 +236,8 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
         <TouchableOpacity
           style={[
             styles.commentSubmitButton,
-            submitting && styles.commentSubmitButtonDisabled,
+            (!commentText.trim() || submitting) &&
+              styles.commentSubmitButtonDisabled,
           ]}
           onPress={handleSubmitComment}
           disabled={submitting || !commentText.trim()}

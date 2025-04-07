@@ -17,7 +17,7 @@ interface BoardItemProps {
     content: string;
     nickname: string;
     profileUrl?: string;
-    userType: string;
+    userType: string | null;
     createdAt: string;
     likeCount: number;
     commentCount: number;
