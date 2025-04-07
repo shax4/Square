@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, Image } from 'react-native';
 import { styles } from './VoteButton.styles';
 import { updateVoteState } from '../../pages/DebateCardsScreen/Components/Debate.types';
 import VoteConfirmModal from '../../pages/DebateCardsScreen/Components/VoteConfirmModal';
@@ -13,14 +13,14 @@ import { getDebateVoteResult, voteDebate } from './api/VoteButtonApi';
 import { useAuth } from '../../shared/hooks';
 import { DebateResultData } from '../../pages/DebateResultModal/DebateResultData.types';
 import { emptyResultData } from './EmptyResultData';
+import Text from '../../components/Common/Text';
+
 
 type VoteButtonProps = {
     debateId: number;
     showVoteResultModal?: boolean;
 };
 
-const leftOptionEmoji = "🙆‍♂️";
-const rightOptionEmoji = "🙅";
 
 const VoteButton = ({ debateId, showVoteResultModal, }: VoteButtonProps): JSX.Element => {
     // zustand
@@ -176,6 +176,16 @@ const VoteButton = ({ debateId, showVoteResultModal, }: VoteButtonProps): JSX.El
         setDebateResultModalVisible(true);
     }
 
+    const getVoteTextStyle = (isLeftButton: boolean) => {
+        if (!voted) {
+          return isLeftButton ? styles.VoteTextBeforeLeft : styles.VoteTextBeforeRight;
+        } else if (debate.isLeft === isLeftButton) {
+          return isLeftButton ? styles.VoteTextSelectedLeft : styles.VoteTextSelectedRight;
+        } else {
+          return styles.VoteTextNotSelected;
+        }
+      };
+
     return (
         <View style={styles.Container}>
             <TouchableOpacity
@@ -191,10 +201,10 @@ const VoteButton = ({ debateId, showVoteResultModal, }: VoteButtonProps): JSX.El
                 onPress={() => handleVote(true)}
             >
                 <View style={styles.VoteContents}>
-                    <Text style={styles.VoteIcon}>{leftOptionEmoji}</Text>
-                    <Text style={styles.VoteMainText}>{debate.leftOption}</Text>
+                <Image source={require('../../../assets/images/agree.png')} style={styles.VoteEmojiImage}/>
+                    <Text style={[styles.VoteMainText, getVoteTextStyle(true)]}>{debate.leftOption}</Text>
                     {voted && (
-                        <Text style={styles.VoteSubText}>{debate.leftPercent}% ({debate.leftCount}명)</Text>
+                        <Text weight="medium" style={[styles.VoteSubText, getVoteTextStyle(true)]}>{debate.leftPercent}% ({debate.leftCount}명)</Text>
                     )}
                 </View>
             </TouchableOpacity>
@@ -212,10 +222,10 @@ const VoteButton = ({ debateId, showVoteResultModal, }: VoteButtonProps): JSX.El
                 onPress={() => handleVote(false)}
             >
                 <View style={styles.VoteContents}>
-                    <Text style={styles.VoteIcon}>{rightOptionEmoji}</Text>
-                    <Text style={styles.VoteMainText}>{debate.rightOption}</Text>
+                    <Image source={require('../../../assets/images/disagree.png')} style={styles.VoteEmojiImage}/>
+                    <Text style={[styles.VoteMainText, getVoteTextStyle(false)]}>{debate.rightOption}</Text>
                     {voted && (
-                        <Text style={styles.VoteSubText}>{debate.rightPercent}% ({debate.rightCount}명)</Text>
+                        <Text weight="medium" style={[styles.VoteSubText, getVoteTextStyle(false)]}>{debate.rightPercent}% ({debate.rightCount}명)</Text>
                     )}
                 </View>
             </TouchableOpacity>

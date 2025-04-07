@@ -24,15 +24,19 @@ export const styles = StyleSheet.create({
     CardHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        padding: 10,
+        padding: 13,
         marginLeft: 15,
+        marginRight: 10,
+        marginTop: 10,
     },
     CardHeaderText: {
         fontSize: 20,
+        color: colors.grayText,
     },
     CardHashtag: {
         marginLeft: 15,
         paddingLeft: 10,
+        marginTop: 10,
         justifyContent: 'center',
     },
     CardHashtagText: {
@@ -47,12 +51,12 @@ export const styles = StyleSheet.create({
     CardTopic: {
         flex: 4,
         justifyContent: 'center',
+        marginLeft: 15,
     },
     CardTopicText: {
-        marginLeft: 15,
-        marginRight: 15,
-        fontSize: 40,
-        fontWeight: '500',
+        marginLeft: 10,
+        marginRight: 50,
+        fontSize: 35,
     },
     CardVote: {
         flex: 3,
@@ -150,11 +154,12 @@ export const styles = StyleSheet.create({
     },
     buttonGroup: {
         flexDirection: 'row',
-        gap: 12
+        gap: 12,
+        marginTop: 15,
     },
     cancelButton: {
         width: '45%',
-        height: 70,
+        height: 50,
         backgroundColor: colors.cancelButton,
         paddingVertical: 10,
         paddingHorizontal: 20,
@@ -168,7 +173,7 @@ export const styles = StyleSheet.create({
     },
     confirmButton: {
         width: '45%',
-        height: 70,
+        height: 50,
         backgroundColor: colors.yesDark,
         paddingVertical: 10,
         paddingHorizontal: 20,
