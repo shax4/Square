@@ -38,9 +38,24 @@ export const API_PATHS = {
   },
 
   // 게시판 관련 API 경로
-  BOARD: {
-    POSTS: "/api/posts",
-    COMMENTS: "/api/comments",
+  POSTS: {
+    LIST: "/api/posts", // 게시글 목록 조회 (GET)
+    DETAIL: (postId: number) => `/api/posts/${postId}`, // 게시글 상세 조회 (GET)
+    CREATE: "/api/posts", // 게시글 생성 (POST)
+    UPDATE: (postId: number) => `/api/posts/${postId}`, // 게시글 수정 (PUT)
+    DELETE: (postId: number) => `/api/posts/${postId}`, // 게시글 삭제 (DELETE)
+    MY_POSTS: "/api/users/posts", // 내가 작성한 게시글 목록 조회
+    MY_LIKES: "/api/users/likes/posts", // 내가 좋아요한 게시글 목록 조회
+    MY_SCRAPS: "/api/users/scraps/posts", // 내가 스크랩한 게시글 목록 조회
+  },
+
+  // 댓글 관련 API 경로
+  COMMENTS: {
+    CREATE: "/api/comments", // 댓글 생성 (POST)
+    UPDATE: (commentId: number) => `/api/comments/${commentId}`, // 댓글 수정 (PUT)
+    DELETE: (commentId: number) => `/api/comments/${commentId}`, // 댓글 삭제 (DELETE)
+    REPLIES: (commentId: number) => `/api/comments/${commentId}/replies`, // 대댓글 목록 조회 (GET)
+    MY_COMMENTS: "/api/users/comments", // 내가 작성한 댓글 목록 조회
   },
 
   // 좋아요 관련 API 경로
@@ -53,5 +68,15 @@ export const API_PATHS = {
   USER: {
     PROFILE: "/api/users/profile",
     UPDATE: "/api/users/update",
+  },
+
+  // 이미지 업로드 관련 API 경로
+  IMAGE: {
+    PRESIGNED_URL: "/api/presigned-url", // 이미지 업로드용 presigned-url 조회
+  },
+
+  // 신고 관련 API 경로
+  REPORT: {
+    CREATE: "/api/reports", // 신고 생성 (POST)
   },
 };
