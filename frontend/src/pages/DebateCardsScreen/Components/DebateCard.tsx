@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -11,6 +11,7 @@ import VoteButton from '../../../components/VoteButton/VoteButton'
 import ScrapButton from '../../../components/ScrapButton/ScrapButton';
 import { useDebateStore } from '../../../shared/stores/debates';
 import { scrapDebate, scrapDebateUndo } from '../api/DebateApi';
+import Text from '../../../components/Common/Text';
 
 interface DebateCardProps {
     debateId: number;
@@ -46,7 +47,7 @@ const DebateCard = ({ debateId }: DebateCardProps): JSX.Element => {
                 <View style={styles.Card}>
                     {/* Header */}
                     <View style={styles.CardHeader}>
-                        <Text style={styles.CardHeaderText}>Number {debateId}</Text>
+                        <Text weight="medium" style={styles.CardHeaderText}>Number {debateId}</Text>
                         <ScrapButton
                             isScraped={debate.isScraped}
                             onPressScrap={() => { handlePressScrap() }}
