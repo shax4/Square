@@ -57,11 +57,10 @@ export default function OpinionListScreen() {
 
     useEffect(() => {
         setDebate(debates.find((d) => d.debateId === debateId));
-        console.log(debate?.topic);
         if (!debate) {
             (async () => {
                 try {
-                    const fetchedDebate = await fetchDebateById(debateId);
+                    const fetchedDebate = (await fetchDebateById(debateId)).debates[0];
                     updateDebate(debateId, fetchedDebate); // zustand에 저장
                     setDebate(fetchedDebate); // 로컬 상태에도 저장
                 } catch (e) {
