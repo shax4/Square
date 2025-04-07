@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  FlatList,
 } from "react-native";
 import ProfileImage from "../../../components/ProfileImage/ProfileImage";
 import PersonalityTag from "../../../components/PersonalityTag/PersonalityTag";
@@ -17,6 +18,7 @@ import { Icons } from "../../../../assets/icons/Icons";
 import { useAuth } from "../../../shared/hooks/useAuth";
 import { getTimeAgo } from "../../../shared/utils/timeAge/timeAge";
 import { useLikeButton } from "../../../shared/hooks/useLikeButton";
+import { useComment } from "../../../shared/hooks";
 
 interface CommentItemProps {
   postId: number; // 게시글 ID
@@ -59,6 +61,18 @@ export default function CommentItem({
 
   // 현재 사용자가 댓글 작성자인지 확인
   const isAuthor = user?.nickname === comment.nickname;
+
+  // useComment 훅 사용
+  const {
+    commentText,
+    setCommentText,
+    submitting,
+    createComment,
+    updateComment,
+    deleteComment,
+    loadingReplies,
+    loadReplies,
+  } = useComment();
 
   // 댓글 수정 시작 함수
   const handleEditPress = () => {

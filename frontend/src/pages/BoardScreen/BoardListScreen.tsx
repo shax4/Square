@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   FlatList,
@@ -6,48 +6,17 @@ import {
   TouchableOpacity,
   Text,
   ScrollView,
-  Alert,
   ActivityIndicator,
-  Platform,
   SafeAreaView,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useFocusEffect } from "@react-navigation/native";
-import { BoardAPI } from "../BoardScreen/Api/boardApi"; // 게시판 API 호출
+import { useCallback } from "react";
 import BoardItem from "./components/BoardItem"; // 개별 게시글 항목을 표시하는 컴포넌트
 import EmptyBoardList from "./components/EmptyBoardList"; // 게시글이 없을 때 표시하는 컴포넌트
 import { Icons } from "../../../assets/icons/Icons";
 import { BoardStackParamList } from "../../shared/page-stack/BoardPageStack";
-
-// 인기 게시글 인터페이스
-interface PopularPost {
-  postId: number;
-  title: string;
-  createdAt: string;
-  likeCount: number;
-  commentCount: number;
-}
-// 일반 게시글 인터페이스
-interface Post {
-  postId: number;
-  nickname: string;
-  profileUrl: string;
-  userType: string;
-  createdAt: string;
-  title: string;
-  content: string;
-  likeCount: number;
-  commentCount: number;
-  isLiked: boolean;
-}
-// API 응답 인터페이스
-interface PostsResponse {
-  userType: string | null;
-  popular: PopularPost[];
-  posts: Post[];
-  nextCursorId: number | null;
-  nextCursorLikes: number | null;
-}
+import { usePostList } from "../../shared/hooks"; // 커스텀 훅 사용
 
 // 네비게이션 프롭 타입 정의
 type BoardListScreenNavigationProp = StackNavigationProp<
@@ -65,84 +34,62 @@ export default function BoardListScreen({
   route,
   navigation,
 }: BoardListScreenProps) {
-  const [boards, setBoards] = useState<Post[]>([]); // 게시글 목록 데이터 상태 관리
-  const [popularPosts, setPopularPosts] = useState<PopularPost[]>([]); // 인기 게시글 목록 데이터 상태 관리
-  const [loading, setLoading] = useState(false); // 데이터 로딩 상태 관리
-  const [nextCursorId, setNextCursorId] = useState<number | null>(null);
-  const [nextCursorLikes, setNextCursorLikes] = useState<number | null>(null);
-  const [sort, setSort] = useState<"latest" | "likes">("latest"); // 정렬 방식
+  // 정렬 방식 상태 (기본값: 최신순)
+  const [sortBy, setSortBy] = useState<"latest" | "likes">("latest");
 
-  // 초기 데이터 로딩
-  useEffect(() => {
-    fetchBoards(true); // 컴포넌트 마운트 시 데이터 가져오기
-  }, []); // 빈 의존성 배열은 컴포넌트가 처음 마운트 될 때만 실행됨
+  // usePostList 훅을 사용하여 게시글 목록 관리
+  const { posts, popularPosts, loading, error, hasMore, loadMore, refresh } =
+    usePostList({ sort: sortBy, limit: 10 });
 
-  // 데이터 변경이 감지되면 데이터 다시 로드 (게시글 실시간 업데이트)
-  useEffect(() => {
-    if (route.params?.refresh) {
-      fetchBoards(true); // 새로고침 수행
-      navigation.setParams({ refresh: undefined }); // 플래그 초기화
+  // 정렬 방식 변경 시 새로고침
+  const handleSortChange = (newSort: "latest" | "likes") => {
+    if (sortBy !== newSort) {
+      setSortBy(newSort);
     }
-  }, [route.params?.refresh]); // 정렬 방식이 변경되면 데이터 다시 로드
+  };
 
-  // 화면에 포커스가 올 때마다 데이터 새로고침 (댓글 개수 실시간 업데이트)
+  // 화면에 포커스가 올 때마다 데이터 새로고침
   useFocusEffect(
     useCallback(() => {
-      fetchBoards(true); // 전체 데이터 새로고침
+      if (route.params?.refresh) {
+        refresh(); // 전체 데이터 새로고침
+        navigation.setParams({ refresh: undefined }); // 플래그 초기화
+      }
       return () => {
         // 정리 작업 (필요한 경우)
       };
-    }, [sort]) // sort가 변경되면 다시 실행
+    }, [route.params?.refresh, refresh])
   );
 
-  // 게시글 목록을 서버에서 가져오는 함수
-  const fetchBoards = async (refresh = false) => {
-    try {
-      setLoading(true); // 로딩 상태를 true로 설정
-      // 새로고침 시 커서 초기화
-      const cursor = refresh ? null : nextCursorId;
-      const response = await BoardAPI.getPosts(
-        sort,
-        cursor,
-        sort === "likes" ? nextCursorLikes : null,
-        10 // limit
-      );
-
-      const data = response.data as PostsResponse;
-
-      // 새로고침 또는 첫 로드 시 전체 데이터 설정, 그렇지 않으면 중복 제거 후 추가
-      if (refresh) {
-        setBoards(data.posts);
-        setPopularPosts(data.popular);
-      } else {
-        const uniquePosts = data.posts.filter(
-          (newPost) =>
-            !boards.some(
-              (existingPost) => existingPost.postId === newPost.postId
-            )
-        );
-        setBoards((prev) => [...prev, ...uniquePosts]);
-      }
-
-      setNextCursorId(data.nextCursorId);
-      setNextCursorLikes(data.nextCursorLikes);
-    } catch (error) {
-      console.error("게시글 목록을 불러오는 데 실패했습니다:", error);
-      Alert.alert("오류", "게시글 목록을 불러오는 데 실패했습니다.");
-    } finally {
-      setLoading(false); // 로딩 상태를 false로 설정
-    }
+  // 날짜 포맷 함수
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
   };
 
-  const handleSortChange = (newSort: "latest" | "likes") => {
-    setSort(newSort);
-  };
+  // 로딩 상태 표시
+  if (loading && posts.length === 0) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#007BFF" />
+      </View>
+    );
+  }
 
-  return loading && boards.length === 0 ? (
-    <View style={styles.loadingContainer}>
-      <ActivityIndicator size="large" color="#007BFF" />
-    </View>
-  ) : (
+  // 오류 상태 표시
+  if (error && posts.length === 0) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>오류가 발생했습니다.</Text>
+        <Text>{error.message}</Text>
+        <TouchableOpacity style={styles.retryButton} onPress={refresh}>
+          <Text style={styles.retryButtonText}>다시 시도</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         {/* 인기 게시글 (캐러셀) */}
@@ -176,13 +123,13 @@ export default function BoardListScreen({
           <TouchableOpacity
             style={[
               styles.sortButton,
-              sort === "latest" && styles.activeSortButton,
+              sortBy === "latest" && styles.activeSortButton,
             ]}
             onPress={() => handleSortChange("latest")}
           >
             <Text
               style={
-                sort === "latest" ? styles.activeSortText : styles.sortText
+                sortBy === "latest" ? styles.activeSortText : styles.sortText
               }
             >
               최신순
@@ -191,21 +138,23 @@ export default function BoardListScreen({
           <TouchableOpacity
             style={[
               styles.sortButton,
-              sort === "likes" && styles.activeSortButton,
+              sortBy === "likes" && styles.activeSortButton,
             ]}
             onPress={() => handleSortChange("likes")}
           >
             <Text
-              style={sort === "likes" ? styles.activeSortText : styles.sortText}
+              style={
+                sortBy === "likes" ? styles.activeSortText : styles.sortText
+              }
             >
-              인기순
+              좋아요순
             </Text>
           </TouchableOpacity>
         </View>
 
         {/* 게시글 목록 */}
         <FlatList
-          data={boards}
+          data={posts}
           renderItem={({ item }) => (
             <BoardItem
               item={item}
@@ -214,25 +163,24 @@ export default function BoardListScreen({
               }
             />
           )}
-          keyExtractor={(item) => item.postId.toString()}
-          onEndReached={() => {
-            if (nextCursorId || nextCursorLikes) {
-              fetchBoards();
-            }
-          }}
-          onEndReachedThreshold={0.1}
-          contentContainerStyle={[
-            styles.listContent,
-            boards.length === 0 && styles.emptyListContent,
-          ]} // 빈 상태면 세로축 중앙 정렬
-          // 빈 상태 컴포넌트 추가
-          ListEmptyComponent={
-            <EmptyBoardList
-              onPressWrite={() =>
-                navigation.navigate("BoardWrite", { postId: undefined })
-              }
-            />
+          keyExtractor={(item) => `post-${item.postId}`}
+          contentContainerStyle={styles.listContainer}
+          ListEmptyComponent={<EmptyBoardList />}
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            loading && posts.length > 0 ? (
+              <ActivityIndicator
+                style={styles.footer}
+                size="small"
+                color="#999"
+              />
+            ) : !hasMore && posts.length > 0 ? (
+              <Text style={styles.footer}>더 이상 게시글이 없습니다.</Text>
+            ) : null
           }
+          refreshing={loading}
+          onRefresh={refresh}
         />
 
         {/* 글쓰기 버튼 */}
@@ -242,52 +190,73 @@ export default function BoardListScreen({
             navigation.navigate("BoardWrite", { postId: undefined })
           }
         >
-          <Icons.write />
+          <Text style={styles.writeButtonText}>+</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 }
 
+// 스타일 정의
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#f5f5f5",
   },
   container: {
     flex: 1,
-    backgroundColor: "#fff",
   },
-  listContent: {
-    paddingBottom: 90, // 하단 네비게이션 바 높이(60) + 여백(30)
-  },
-  emptyListContent: {
-    flex: 1, // 컨텐츠가 없을 때 전체 공간 사용
+  loadingContainer: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 16,
+    color: "red",
+    marginBottom: 10,
+  },
+  retryButton: {
+    backgroundColor: "#007BFF",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  retryButtonText: {
+    color: "white",
+    fontWeight: "600",
+  },
   popularSection: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    backgroundColor: "#fff",
+    paddingVertical: 15,
+    marginBottom: 8,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 12,
+    fontSize: 16,
+    fontWeight: "600",
+    marginLeft: 15,
+    marginBottom: 10,
   },
   popularPostItem: {
-    width: 150,
-    marginRight: 12,
-    padding: 12,
+    width: 200,
+    padding: 15,
+    marginLeft: 10,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: "#eee",
-    borderRadius: 8,
   },
   popularPostTitle: {
     fontSize: 14,
-    fontWeight: "bold",
-    marginBottom: 8,
+    fontWeight: "600",
+    marginBottom: 10,
   },
   popularPostStats: {
     fontSize: 12,
@@ -295,51 +264,60 @@ const styles = StyleSheet.create({
   },
   sortOptions: {
     flexDirection: "row",
-    padding: 16,
+    padding: 10,
+    backgroundColor: "#fff",
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
+    marginBottom: 8,
   },
   sortButton: {
-    marginRight: 16,
-    paddingVertical: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    marginRight: 8,
+    borderRadius: 15,
+    backgroundColor: "#f1f1f1",
   },
   activeSortButton: {
-    borderBottomWidth: 2,
-    borderBottomColor: "#007BFF",
+    backgroundColor: "#007BFF",
   },
   sortText: {
+    fontSize: 14,
+    fontWeight: "500",
     color: "#666",
   },
   activeSortText: {
-    color: "#007BFF",
-    fontWeight: "bold",
+    color: "#fff",
+    fontWeight: "500",
+  },
+  listContainer: {
+    paddingHorizontal: 15,
+    paddingTop: 5,
+    paddingBottom: 80, // writeButton을 위한 공간
   },
   writeButton: {
     position: "absolute",
+    bottom: 20,
     right: 20,
-    bottom: Platform.OS === "ios" ? 100 : 90, // 하단 네비게이션 바 위에 배치
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: "#007BFF",
-    width: 60,
-    height: 60,
-    borderRadius: 30,
     justifyContent: "center",
     alignItems: "center",
-    elevation: 5,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    zIndex: 1, // 네비게이션 바보다 위에 표시되도록 설정
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
   },
   writeButtonText: {
-    color: "white",
-    fontSize: 16,
+    fontSize: 24,
     fontWeight: "bold",
+    color: "#FFFFFF",
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#fff",
+  footer: {
+    padding: 10,
+    textAlign: "center",
+    color: "#666",
   },
 });

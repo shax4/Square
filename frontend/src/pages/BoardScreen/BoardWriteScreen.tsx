@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
@@ -10,10 +10,10 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
-import { BoardAPI } from "./Api/boardApi";
 import { StackScreenProps } from "@react-navigation/stack";
 import { useConfirmModal } from "./hooks/useConfirmModal";
 import { BoardStackParamList } from "../../shared/page-stack/BoardPageStack";
+import { usePostForm } from "../../shared/hooks";
 
 // props 타입 정의
 type Props = StackScreenProps<BoardStackParamList, "BoardWrite">;
@@ -24,36 +24,32 @@ export default function BoardWriteScreen({ route, navigation }: Props) {
   // 수정 모드인지 여부 확인
   const isEditMode = !!postId;
 
-  // 제목과 내용 상태 관리
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  // 로딩 상태 관리
-  const [loading, setLoading] = useState(false);
   // 취소 모달 커스텀 훅
-  const { showCancelConfirmation } = useConfirmModal({navigation, isEditMode, postId});
+  const { showCancelConfirmation } = useConfirmModal({
+    navigation,
+    isEditMode,
+    postId,
+  });
 
-  // 수정 모드일 때 기존 데이터 로드
+  // usePostForm 훅 사용
+  const {
+    title,
+    setTitle,
+    content,
+    setContent,
+    loading,
+    submitting,
+    createPost,
+    updatePost,
+    loadPost,
+  } = usePostForm();
+
+  // 수정 모드일 경우 게시글 정보 로드
   useEffect(() => {
-    if (isEditMode) {
-      fetchPostData();
+    if (isEditMode && postId) {
+      loadPost(postId);
     }
-  }, [postId]);
-
-  // 게시글 데이터 가져오기 (수정 모드)
-  const fetchPostData = async () => {
-    try {
-      setLoading(true);
-      const response = await BoardAPI.getPostDetail(postId!); // 수정 시 postId는 반드시 존재해야함
-      const post = response.data;
-      setTitle(post.title);
-      setContent(post.content);
-    } catch (error) {
-      console.error("게시글 정보를 불러오는 데 실패했습니다:", error);
-      Alert.alert("오류", "게시글 정보를 불러오는 데 실패했습니다.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [isEditMode, postId, loadPost]);
 
   // 게시글 저장 (생성 또는 수정)
   const handleSave = async () => {
@@ -69,54 +65,62 @@ export default function BoardWriteScreen({ route, navigation }: Props) {
     }
 
     try {
-      setLoading(true);
-      const postData = { title, content };
+      let success = false;
 
-      if (isEditMode) {
+      if (isEditMode && postId) {
         // 게시글 수정
-        await BoardAPI.updatePost(postId!, postData); // 수정 시 postId는 반드시 존재해야함
-        Alert.alert("완료", "게시글이 수정되었습니다.", [
-          {
-            text: "확인",
-            onPress: () => {
-              // 네비게이션 스택 재설정 (수정 화면 제거)
-              navigation.reset({
-                index: 1,
-                routes: [
-                  { name: "BoardList" },
-                  {
-                    name: "BoardDetail",
-                    params: { boardId: postId, refresh: true },
-                  },
-                ],
-              });
+        success = await updatePost(postId);
+        if (success) {
+          // 게시글 수정 성공
+          Alert.alert("완료", "게시글이 수정되었습니다.", [
+            {
+              text: "확인",
+              onPress: () => {
+                // 네비게이션 스택 재설정 (수정 화면 제거)
+                navigation.reset({
+                  index: 1,
+                  routes: [
+                    { name: "BoardList" },
+                    {
+                      name: "BoardDetail",
+                      params: { boardId: postId, refresh: true },
+                    },
+                  ],
+                });
+              },
             },
-          },
-        ]);
+          ]);
+        }
       } else {
         // 새 게시글 작성
-        await BoardAPI.createPost(postData);
-        Alert.alert("완료", "게시글이 작성되었습니다.", [
-          {
-            text: "확인",
-            onPress: () => {
-              // 목록 화면으로 이동하면서 새로고침 플래그 전달
-              navigation.navigate("BoardList", { refresh: true });
+        const newPostId = await createPost();
+        success = newPostId !== null;
+        if (success) {
+          // 새 게시글 작성 성공
+          Alert.alert("완료", "게시글이 작성되었습니다.", [
+            {
+              text: "확인",
+              onPress: () => {
+                // 목록 화면으로 이동하면서 새로고침 플래그 전달
+                navigation.navigate("BoardList", { refresh: true });
+              },
             },
-          },
-        ]);
+          ]);
+        }
+      }
+
+      if (!success) {
+        Alert.alert("오류", "게시글을 저장하는 중 문제가 발생했습니다.");
       }
     } catch (error) {
       console.error("게시글 저장에 실패했습니다:", error);
       Alert.alert("오류", "게시글을 저장하는 중 문제가 발생했습니다.");
-    } finally {
-      setLoading(false);
     }
   };
 
   // 취소 버튼에 모달 로직 연결
   const handleCancel = () => {
-    showCancelConfirmation()
+    showCancelConfirmation();
   };
 
   return (
@@ -157,7 +161,7 @@ export default function BoardWriteScreen({ route, navigation }: Props) {
         <TouchableOpacity
           style={[styles.button, styles.cancelButton]}
           onPress={handleCancel}
-          disabled={loading}
+          disabled={loading || submitting}
         >
           <Text style={styles.cancelButtonText}>취소</Text>
         </TouchableOpacity>
@@ -166,13 +170,13 @@ export default function BoardWriteScreen({ route, navigation }: Props) {
           style={[
             styles.button,
             styles.saveButton,
-            loading && styles.disabledButton,
+            (loading || submitting) && styles.disabledButton,
           ]}
           onPress={handleSave}
-          disabled={loading}
+          disabled={loading || submitting}
         >
           <Text style={styles.saveButtonText}>
-            {loading ? "저장 중..." : isEditMode ? "수정" : "등록"}
+            {submitting ? "저장 중..." : isEditMode ? "수정" : "등록"}
           </Text>
         </TouchableOpacity>
       </View>
