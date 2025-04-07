@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React from "react";
 import {
   View,
   StyleSheet,
@@ -11,18 +11,16 @@ import {
   Alert,
 } from "react-native";
 import { StackScreenProps } from "@react-navigation/stack";
-import { BoardAPI } from "./Api/boardApi";
 import ProfileImage from "../../components/ProfileImage/ProfileImage";
 import CommentItem from "./components/CommentItem";
-import { useFocusEffect } from "@react-navigation/native";
 import { BoardStackParamList } from "../../shared/page-stack/BoardPageStack";
-import { Post, Comment, Reply } from "./board.types";
 import { getTimeAgo } from "../../shared/utils/timeAge/timeAge";
 import LikeButton from "../../components/LikeButton";
 import { Icons } from "../../../assets/icons/Icons";
 import PersonalityTag from "../../components/PersonalityTag/PersonalityTag";
+import { usePostDetail, useComment } from "../../shared/hooks";
 import { useLikeButton } from "../../shared/hooks/useLikeButton";
-import Text from '../../components/Common/Text';
+import Text from "../../components/Common/Text";
 import colors from "../../../assets/colors";
 
 // 네비게이션 프롭 타입 정의
@@ -32,81 +30,66 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
   // 라우트 파라미터에서 게시글 ID 가져오기
   const { boardId } = route.params;
 
-  // 게시글 상세 정보를 저장하는 상태
-  const [post, setPost] = useState<Post | null>(null); // 게시글 초기값은 null
-  // 댓글 입력 내용을 저장하는 상태
-  const [commentText, setCommentText] = useState("");
-  // 로딩 상태를 관리하는 상태
-  const [loading, setLoading] = useState(true);
-  // 강제 리렌더링을 위한 카운터 상태
-  const [RenderCounter, setRenderCounter] = useState(0);
+  // 게시글 상세 정보 훅
+  const { post, loading, error, refresh } = usePostDetail(boardId);
 
-  // 컴포넌트가 마운트될 때 게시글 데이터를 가져옴
-  useEffect(() => {
-    fetchPostDetail();
-  }, [boardId]);
-
-  // 게시글 상세 정보를 가져오는 함수
-  const fetchPostDetail = useCallback(async () => {
-    try {
-      setLoading(true);
-
-      const response = await BoardAPI.getPostDetail(boardId);
-
-      // 상태 업데이트를 강제로 새 객체로 설정
-      setPost({ ...response.data });
-
-      // 강제 리렌더링을 위한 카운터 상태 추가
-      setRenderCounter((prev) => prev + 1);
-    } catch (error) {
-      console.error("게시글 상세 정보를 불러오는 데 실패했습니다:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [boardId]);
+  // 댓글 관련 훅
+  const { commentText, setCommentText, submitting, createComment } =
+    useComment();
 
   // 화면에 포커스가 올 때마다 데이터 갱신
   useFocusEffect(
     useCallback(() => {
-      fetchPostDetail();
+      if (route.params?.refresh) {
+        refresh();
+        navigation.setParams({ refresh: undefined });
+      }
       return () => {
         // 화면을 떠날 때 정리 작업 (필요한 경우)
       };
-    }, [fetchPostDetail])
+    }, [route.params?.refresh, refresh])
   );
 
   // 댓글 작성 함수
   const handleSubmitComment = async () => {
-    if (!commentText.trim()) return; // 빈 댓글은 제출하지 않음
+    if (submitting) return;
 
-    try {
-      await BoardAPI.createComment(boardId, commentText);
-      setCommentText(""); // 입력 필드 초기화
-      fetchPostDetail(); // 게시글 데이터 다시 가져와서 댓글 목록 갱신
-    } catch (error) {
-      console.error("댓글 작성에 실패했습니다:", error);
+    const success = await createComment(boardId);
+    if (success) {
+      // 댓글 작성 성공 시 게시글 데이터 다시 가져오기
+      refresh();
+    } else {
+      Alert.alert("오류", "댓글 작성에 실패했습니다. 다시 시도해 주세요.");
     }
   };
 
   // 게시글 좋아요 상태 변경 핸들러
   const handlePostLikeChange = useCallback(
     (newState: { isLiked: boolean; likeCount: number }) => {
-      if (post) {
-        setPost({
-          ...post,
-          isLiked: newState.isLiked,
-          likeCount: newState.likeCount,
-        });
-      }
+      // 상태는 자동으로 업데이트되므로 추가 처리 필요 없음
+      // refresh()를 호출하여 전체 데이터를 다시 가져올 수도 있음
     },
-    [post]
+    []
   );
 
   // 로딩 중이면 로딩 인디케이터 표시
-  if (loading) {
+  if (loading && !post) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#007BFF" />
+      </View>
+    );
+  }
+
+  // 오류 발생 시
+  if (error && !post) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>게시글을 불러오는 데 실패했습니다.</Text>
+        <Text>{error.message}</Text>
+        <TouchableOpacity style={styles.retryButton} onPress={refresh}>
+          <Text style={styles.retryButtonText}>다시 시도</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -146,7 +129,9 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
         {/* 게시글 내용 */}
         <View style={styles.postContent}>
           <Text style={styles.postTitle}>{post?.title}</Text>
-          <Text weight="medium" style={styles.postBody}>{post?.content}</Text>
+          <Text weight="medium" style={styles.postBody}>
+            {post?.content}
+          </Text>
         </View>
 
         {/* 댓글 영역 */}
@@ -163,15 +148,16 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
             </View>
           </View>
 
-          {/* 댓글 목록 */}
-          {post?.comments.map((comment) => (
-            <CommentItem
-              key={comment.commentId}
-              comment={comment}
-              postId={boardId}
-              onCommentChange={fetchPostDetail}
-            />
-          ))}
+          {/* 댓글 목록 - 타입 캐스팅으로 해결 */}
+          {post?.comments &&
+            post.comments.map((comment) => (
+              <CommentItem
+                key={comment.commentId}
+                comment={comment as unknown as BoardComment}
+                postId={boardId}
+                onCommentChange={refresh}
+              />
+            ))}
         </View>
       </ScrollView>
 
@@ -185,10 +171,16 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
           multiline
         />
         <TouchableOpacity
-          style={styles.commentSubmitButton}
+          style={[
+            styles.commentSubmitButton,
+            submitting && styles.commentSubmitButtonDisabled,
+          ]}
           onPress={handleSubmitComment}
+          disabled={submitting || !commentText.trim()}
         >
-          <Text style={styles.commentSubmitText}>등록</Text>
+          <Text style={styles.commentSubmitText}>
+            {submitting ? "등록 중..." : "등록"}
+          </Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -200,12 +192,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
+  scrollView: {
+    flex: 1,
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#fff",
   },
-  scrollView: {
+  errorContainer: {
     flex: 1,
     padding: 18,
   },
@@ -213,7 +209,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 16,
-    marginTop: 5
+    marginTop: 5,
   },
   authorInfo: {
     marginLeft: 15,
@@ -225,12 +221,16 @@ const styles = StyleSheet.create({
   },
   postDate: {
     fontSize: 12,
+    color: "#666",
     color: colors.grayText,
     marginTop: 4,
   },
   postContent: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
     marginBottom: 2,
-    marginLeft: 5
+    marginLeft: 5,
   },
   postTitle: {
     fontSize: 19,
@@ -241,13 +241,16 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   commentsSection: {
-    marginTop: 16,
+    padding: 16,
   },
   commentsSectionHeader: {
     marginBottom: 20,
     borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-    paddingBottom: 12,
+    borderBottomColor: "#eee",
+  },
+  commentsSectionTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
   },
   interactionContainer: {
     flexDirection: "row",
@@ -265,33 +268,34 @@ const styles = StyleSheet.create({
   },
   commentInputContainer: {
     flexDirection: "row",
-    padding: 10,
+    padding: 12,
     borderTopWidth: 1,
-    borderTopColor: "#e1e1e1",
+    borderTopColor: "#eee",
     backgroundColor: "#fff",
   },
   commentInput: {
     flex: 1,
-    borderWidth: 1,
-    borderColor: "#e1e1e1",
-    borderRadius: 20,
-    padding: 10,
+    minHeight: 40,
     maxHeight: 80,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: "#f9f9f9",
   },
   commentSubmitButton: {
+    marginLeft: 8,
+    paddingHorizontal: 16,
     justifyContent: "center",
-    alignItems: "center",
-    marginLeft: 10,
-    paddingHorizontal: 15,
     backgroundColor: "#007BFF",
     borderRadius: 20,
   },
-  commentSubmitText: {
-    color: "white",
-    fontWeight: "bold",
+  commentSubmitButtonDisabled: {
+    backgroundColor: "#ccc",
   },
-  nameContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+  commentSubmitText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
 });
