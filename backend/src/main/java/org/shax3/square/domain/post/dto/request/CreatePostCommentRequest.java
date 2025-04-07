@@ -15,7 +15,7 @@ public record CreatePostCommentRequest(
 
 		@NotNull
 		Long postId,
-		Long parentCommentId
+		Long parentId
 ) {
 	public PostComment to(Post post, PostComment postComment, User user) {
 		return PostComment.builder()
