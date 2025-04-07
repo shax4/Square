@@ -60,7 +60,7 @@ const PostCard = ({
         <View style={styles.userInfo}>
           <View style={styles.nameTagContainer}>
             <Text style={styles.nickname}>{nickname}</Text>
-            <PersonalityTag personality={userType} onPress={() => console.log(`${userType} clicked`)} />
+            <PersonalityTag personality={userType} nickname={nickname} />
           </View>
           <Text style={styles.timeAgo}>{getTimeAgo(createdAt)}</Text>
         </View>

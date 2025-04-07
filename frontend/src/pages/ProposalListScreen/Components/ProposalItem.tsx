@@ -13,7 +13,7 @@ interface ProposalItemProps {
 const ProposalItem = ({
     item
 }: ProposalItemProps): JSX.Element => {
-    const [isLiked, setIsLiked] = useState(false); // 좋아요 여부
+    const [isLiked, setIsLiked] = useState(item.isLiked); // 좋아요 여부
     const [likeCount, setLikeCount] = useState(item.likeCount); // 좋아요 수
 
     const handleLike = async (proposalId : number) => {

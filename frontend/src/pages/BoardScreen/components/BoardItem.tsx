@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import ProfileImage from "../../../components/ProfileImage";
 import LikeButton from "../../../components/LikeButton";
 import { getTimeAgo } from "../../../shared/utils/timeAge/timeAge";
+import { Icons } from "../../../../assets/icons/Icons";
+import PersonalityTag from "../../../components/PersonalityTag/PersonalityTag";
+import { useLikeButton } from "../../../shared/hooks/useLikeButton";
 
 // 게시글 아이템 타입 정의
 interface BoardItemProps {
@@ -27,11 +30,26 @@ interface BoardItemProps {
  * @param onPress - 게시글 클릭 시 실행될 함수
  */
 export default function BoardItem({ item, onPress }: BoardItemProps) {
+  // 로컬 상태 추가
+  const [likeCount, setLikeCount] = useState(item.likeCount);
+  const [isLiked, setIsLiked] = useState(item.isLiked);
+
   // 게시글 내용을 미리보기 형태로 자름 (최대 100자)
   const contentPreview =
     item.content.length > 100
       ? `${item.content.substring(0, 100)}...`
       : item.content;
+
+  const likeProps = useLikeButton(
+    item.postId,
+    "POST",
+    isLiked,
+    likeCount,
+    (newState) => {
+      setLikeCount(newState.likeCount);
+      setIsLiked(newState.isLiked);
+    }
+  );
 
   return (
     <TouchableOpacity
@@ -43,7 +61,13 @@ export default function BoardItem({ item, onPress }: BoardItemProps) {
       <View style={styles.header}>
         <ProfileImage imageUrl={item?.profileUrl} variant="medium" />
         <View style={styles.authorInfo}>
-          <Text style={styles.authorName}>{item.nickname}</Text>
+          <View style={styles.nameContainer}>
+            <Text style={styles.authorName}>{item.nickname}</Text>
+            <PersonalityTag
+              personality={item.userType}
+              nickname={item.nickname}
+            />
+          </View>
           <Text style={styles.date}>{getTimeAgo(item.createdAt)}</Text>
         </View>
       </View>
@@ -58,15 +82,11 @@ export default function BoardItem({ item, onPress }: BoardItemProps) {
 
       {/* 하단 정보 영역 (좋아요 수, 댓글 수) */}
       <View style={styles.footer}>
-        <View style={styles.stats}>
-          <LikeButton
-            initialCount={item.likeCount}
-            initialLiked={item.isLiked}
-            isVertical={false}
-            size="small"
-          />
-          <View style={styles.commentInfo}>
-            <Text style={styles.commentText}>댓글 {item.commentCount}개</Text>
+        <View style={styles.interactionContainer}>
+          <LikeButton {...likeProps} size="small" isVertical={false} />
+          <View style={styles.commentCountContainer}>
+            <Icons.commentNew />
+            <Text style={styles.commentCountText}>{item.commentCount}</Text>
           </View>
         </View>
       </View>
@@ -100,6 +120,7 @@ const styles = StyleSheet.create({
   authorName: {
     fontSize: 14,
     fontWeight: "bold",
+    marginRight: 4,
   },
   date: {
     fontSize: 12,
@@ -128,14 +149,24 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  commentInfo: {
+  interactionContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  commentCountContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginLeft: 16,
   },
-  commentText: {
+  commentCountText: {
+    fontWeight: "bold",
     fontSize: 12,
-    color: "#666",
+    color: "gray",
     marginLeft: 4,
+    paddingTop: 2, // 텍스트를 아이콘과 정렬
+  },
+  nameContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
 });

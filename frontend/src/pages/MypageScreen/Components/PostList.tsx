@@ -4,6 +4,11 @@ import PostCard from "./PostCard"
 import { getMypagePosts } from "../Api/postAPI";
 import { Post, PostResponse } from "../Type/mypagePost";
 
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
+
+import {StackParamList} from '../../../shared/page-stack/MyPageStack'
+
 interface Props {
     type : "작성글" | "스크랩" | "좋아요";
 }
@@ -15,6 +20,8 @@ const API_URLS = {
   };
 
 const PostList = ({type} : Props) => {
+    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
+
     const [posts, setPosts] = useState<Post[]>([]);
     const [nextCursorId, setNextCursorId] = useState<number | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
@@ -54,6 +61,10 @@ const PostList = ({type} : Props) => {
         }
       }, [nextCursorId, loading]);
 
+    const onClickPost = (postId : number) => {
+        navigation.navigate("BoardDetail", { boardId: postId})
+    }
+
     return (
         <FlatList
             data={posts}
@@ -71,7 +82,7 @@ const PostList = ({type} : Props) => {
                 isLiked={item.isLiked}
                 onLikePress={() => console.log(`Like pressed for post ${item.postId}`)}
                 onCommentPress={() => console.log(`Comment pressed for post ${item.postId}`)}
-                onCardPress={() => console.log(`Card pressed for post ${item.postId}`)}
+                onCardPress={() => onClickPost(item.postId)}
             />
             )}
             contentContainerStyle={styles.listContent}

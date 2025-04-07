@@ -7,6 +7,7 @@ import {
   findReplyById,
 } from "./boardData";
 import { LikeResponse } from "../board.types";
+import { TargetType } from "../../../components/LikeButton/LikeButton.types";
 
 // 댓글 좋아요 상태 저장용 맵
 const mockLikeStore = new Map<number, boolean>();
@@ -554,40 +555,5 @@ export const MockBoardAPI = {
         setTimeout(() => reject({ message: "댓글을 찾을 수 없습니다." }), 300);
       }
     });
-  },
-  // 좋아요 토글 함수
-  toggleCommentLike: async (
-    commentId: number
-  ): Promise<{ data: LikeResponse }> => {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-
-    // 현재 좋아요 상태 가져오기 (없으면 false로 초기화)
-    const currentLiked = mockLikeStore.get(commentId) || false;
-
-    // 현재 좋아요 수 가져오기 (없으면 초기값 사용)
-    let currentCount = mockLikeCountStore.get(commentId);
-    if (currentCount === undefined) {
-      // 댓글 데이터에서 초기 좋아요 수 찾기
-      const foundReply = findReplyById(commentId);
-      currentCount = foundReply?.likeCount || 0;
-      mockLikeCountStore.set(commentId, currentCount);
-    }
-
-    // 상태 토글
-    const newLiked = !currentLiked;
-    mockLikeStore.set(commentId, newLiked);
-
-    // 좋아요 수 업데이트 (토글에 따라 +1 또는 -1)
-    const newCount = newLiked
-      ? currentCount + 1
-      : Math.max(0, currentCount - 1);
-    mockLikeCountStore.set(commentId, newCount);
-
-    return {
-      data: {
-        isLiked: newLiked,
-        likeCount: newCount,
-      },
-    };
   },
 }; // End of MockBoardAPI object
