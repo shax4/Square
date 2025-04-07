@@ -22,6 +22,8 @@ import org.shax3.square.domain.user.model.Type;
 import org.shax3.square.domain.user.model.User;
 import org.shax3.square.exception.CustomException;
 import org.shax3.square.exception.ExceptionCode;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SetOperations;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
@@ -45,6 +47,10 @@ class OpinionFacadeServiceTest {
     private S3Service s3Service;
     @Mock
     private LikeService likeService;
+    @Mock
+    private RedisTemplate<String, String> batchRedisTemplate;
+    @Mock
+    private SetOperations<String, String> setOperations;
 
     @InjectMocks
     private OpinionFacadeService opinionFacadeService;
@@ -132,6 +138,9 @@ class OpinionFacadeServiceTest {
         when(opinionCommentService.getOpinionComments(1L)).thenReturn(mockOpinionComments);
         when(s3Service.generatePresignedGetUrl("test-key")).thenReturn("presigned-url");
 
+        when(batchRedisTemplate.opsForSet()).thenReturn(setOperations);
+        when(setOperations.members("like:batch")).thenReturn(Set.of());
+
         // opinion에 대해 유저가 좋아요 누른 상태
         when(likeService.getLikedTargetIds(mockUser, TargetType.OPINION, List.of(1L)))
             .thenReturn(Set.of(1L));
@@ -171,6 +180,9 @@ class OpinionFacadeServiceTest {
         when(opinionCommentService.getOpinionComments(1L)).thenReturn(List.of());
         when(s3Service.generatePresignedGetUrl("test-key")).thenReturn("presigned-url");
 
+        when(batchRedisTemplate.opsForSet()).thenReturn(setOperations);
+        when(setOperations.members("like:batch")).thenReturn(Set.of());
+
         OpinionDetailsResponse response = opinionFacadeService.getOpinionDetails(mockUser, 1L);
 
         assertThat(response).isNotNull();
@@ -189,6 +201,9 @@ class OpinionFacadeServiceTest {
         when(opinionService.getMyOpinions(mockUser, nextCursorId, limit)).thenReturn(opinions);
         when(likeService.getLikedTargetIds(eq(mockUser), eq(TargetType.OPINION), anyList()))
             .thenReturn(Set.of(4L));
+
+        when(batchRedisTemplate.opsForSet()).thenReturn(setOperations);
+        when(setOperations.members("like:batch")).thenReturn(Set.of());
 
         // When
         MyOpinionResponse response = opinionFacadeService.getMyOpinions(mockUser, nextCursorId, limit);
@@ -213,6 +228,9 @@ class OpinionFacadeServiceTest {
         when(opinionService.getMyOpinions(mockUser, nextCursorId, limit)).thenReturn(opinions);
         when(likeService.getLikedTargetIds(eq(mockUser), eq(TargetType.OPINION), anyList())).thenReturn(Set.of());
 
+        when(batchRedisTemplate.opsForSet()).thenReturn(setOperations);
+        when(setOperations.members("like:batch")).thenReturn(Set.of());
+
         MyOpinionResponse response = opinionFacadeService.getMyOpinions(mockUser, nextCursorId, limit);
 
         assertThat(response.opinions()).hasSize(2);
@@ -230,6 +248,9 @@ class OpinionFacadeServiceTest {
 
         when(opinionService.getMyOpinions(mockUser, nextCursorId, limit)).thenReturn(List.of());
 
+        when(batchRedisTemplate.opsForSet()).thenReturn(setOperations);
+        when(setOperations.members("like:batch")).thenReturn(Set.of());
+
         MyOpinionResponse response = opinionFacadeService.getMyOpinions(mockUser, nextCursorId, limit);
 
         assertThat(response.opinions()).isEmpty();
@@ -243,6 +264,9 @@ class OpinionFacadeServiceTest {
         int limit = 3;
 
         when(opinionService.getMyOpinions(mockUser, nextCursorId, limit)).thenReturn(List.of());
+
+        when(batchRedisTemplate.opsForSet()).thenReturn(setOperations);
+        when(setOperations.members("like:batch")).thenReturn(Set.of());
 
         MyOpinionResponse response = opinionFacadeService.getMyOpinions(mockUser, nextCursorId, limit);
 
@@ -259,6 +283,9 @@ class OpinionFacadeServiceTest {
 
         when(opinionService.getMyOpinions(mockUser, nextCursorId, limit)).thenReturn(opinions);
         when(likeService.getLikedTargetIds(eq(mockUser), eq(TargetType.OPINION), anyList())).thenReturn(Set.of(3L));
+
+        when(batchRedisTemplate.opsForSet()).thenReturn(setOperations);
+        when(setOperations.members("like:batch")).thenReturn(Set.of());
 
         MyOpinionResponse response = opinionFacadeService.getMyOpinions(mockUser, nextCursorId, limit);
 

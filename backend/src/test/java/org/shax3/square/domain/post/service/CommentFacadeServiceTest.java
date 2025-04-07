@@ -22,19 +22,31 @@ import org.shax3.square.domain.post.model.PostComment;
 import org.shax3.square.domain.s3.service.S3Service;
 import org.shax3.square.domain.user.model.Type;
 import org.shax3.square.domain.user.model.User;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SetOperations;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class CommentFacadeServiceTest {
 
 	@Mock
-	private PostCommentService commentService;
+	private
+	PostCommentService commentService;
 
-	@Mock private LikeService likeService;
+	@Mock
+	private LikeService likeService;
 
-	@Mock private S3Service s3Service;
+	@Mock
+	private S3Service s3Service;
 
-	@Mock private PostService postService;
+	@Mock
+	private PostService postService;
+
+	@Mock
+	private RedisTemplate<String, String> batchRedisTemplate;
+
+	@Mock
+	private SetOperations<String, String> setOperations;
 
 	@InjectMocks
 	private CommentFacadeService commentFacadeService;
@@ -77,6 +89,9 @@ class CommentFacadeServiceTest {
 		when(s3Service.generatePresignedGetUrl(anyString()))
 			.thenReturn("https://s3.com/profile.jpg");
 
+		when(batchRedisTemplate.opsForSet()).thenReturn(setOperations);
+		when(setOperations.members("like:batch")).thenReturn(Set.of());
+
 		// when
 		RepliesResponse result = commentFacadeService.getReplies(user, 3L, null, 5);
 
@@ -96,6 +111,9 @@ class CommentFacadeServiceTest {
 		when(commentService.getMyComments(user, null, 5)).thenReturn(comments);
 		when(likeService.getLikedTargetIds(eq(user), eq(TargetType.POST_COMMENT), anyList()))
 			.thenReturn(Set.of(9L));
+
+		when(batchRedisTemplate.opsForSet()).thenReturn(setOperations);
+		when(setOperations.members("like:batch")).thenReturn(Set.of());
 
 		// when
 		MyCommentListResponse result = commentFacadeService.getMyComments(user, null, 5);
