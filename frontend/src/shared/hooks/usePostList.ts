@@ -8,15 +8,17 @@ import { PostService } from "../services";
 import { Post, PopularPost, GetPostsParams } from "../types/postTypes";
 
 // 훅의 반환 타입 정의
-interface UsePostListReturn {
+export interface UsePostListReturn {
   posts: Post[]; // 게시글 목록
   popularPosts: PopularPost[]; // 인기 게시글 목록
   loading: boolean; // 로딩 상태
   error: Error | null; // 에러 상태
   hasMore: boolean; // 더 불러올 게시글이 있는지 여부
-  loadMore: () => void; // 추가 게시글 로드 함수
-  refresh: () => void; // 목록 새로고침 함수
+  loadMore: () => Promise<void>; // 추가 게시글 로드 함수
+  refresh: () => Promise<void>; // 목록 새로고침 함수
   userType: string | null; // 사용자 유형 (필터링 정보)
+  refreshing: boolean; // 새로고침 중인지 상태 (ui)
+  changeSort: (sort: "latest" | "likes") => void; // 정렬 방식 변경 함수
 }
 
 /**
@@ -45,6 +47,9 @@ export const usePostList = (
   const [sortBy, setSortBy] = useState<"latest" | "likes">(
     initialParams.sort || "latest"
   );
+
+  // 새로고침 상태 추가
+  const [refreshing, setRefreshing] = useState(false);
 
   /**
    * 게시글 목록을 불러오는 함수
@@ -119,19 +124,23 @@ export const usePostList = (
 
       // 응답 데이터 처리
       if (response && response.data) {
+        const {
+          posts: newPosts,
+          nextCursorId,
+          nextCursorLikes,
+        } = response.data;
+
         // 기존 목록에 새 게시글 추가
-        setPosts((prevPosts) => [...prevPosts, ...response.data.posts]);
+        setPosts((prevPosts) => [...prevPosts, ...newPosts]);
 
         // 다음 페이지 커서 업데이트
-        if (response.data.nextCursorId !== undefined) {
-          setNextCursorId(response.data.nextCursorId);
+        if (nextCursorId !== undefined) {
+          setNextCursorId(nextCursorId);
         }
-        setNextCursorLikes(response.data.nextCursorLikes || null);
+        setNextCursorLikes(nextCursorLikes || null);
 
         // 더 불러올 데이터가 있는지 확인
-        setHasMore(
-          !!response.data.nextCursorId || !!response.data.nextCursorLikes
-        );
+        setHasMore(!!nextCursorId || !!nextCursorLikes);
       }
     } catch (err) {
       setError(
@@ -155,12 +164,18 @@ export const usePostList = (
   /**
    * 목록 새로고침 함수
    */
-  const refresh = useCallback(() => {
+  const refresh = useCallback(async () => {
     setPosts([]);
     setNextCursorId(undefined);
     setNextCursorLikes(null);
     setHasMore(true);
-    loadPosts();
+    setRefreshing(true);
+
+    try {
+      await loadPosts();
+    } finally {
+      setRefreshing(false);
+    }
   }, [loadPosts]);
 
   // 정렬 방식이 변경되면 목록 초기화 후 다시 로드
@@ -196,6 +211,8 @@ export const usePostList = (
     loadMore,
     refresh,
     userType,
+    refreshing,
+    changeSort,
   };
 };
 

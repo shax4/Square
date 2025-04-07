@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   FlatList,
@@ -8,15 +8,16 @@ import {
   ScrollView,
   ActivityIndicator,
   SafeAreaView,
+  RefreshControl,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useFocusEffect } from "@react-navigation/native";
-import { useCallback } from "react";
-import BoardItem from "./components/BoardItem"; // 개별 게시글 항목을 표시하는 컴포넌트
-import EmptyBoardList from "./components/EmptyBoardList"; // 게시글이 없을 때 표시하는 컴포넌트
-import { Icons } from "../../../assets/icons/Icons";
 import { BoardStackParamList } from "../../shared/page-stack/BoardPageStack";
-import { usePostList } from "../../shared/hooks"; // 커스텀 훅 사용
+import BoardItem from "./components/BoardItem";
+import EmptyBoardList from "./components/EmptyBoardList";
+import PopularPostCard from "./components/PopularPostCard";
+import { usePostList } from "../../shared/hooks";
+import { Icons } from "../../../assets/icons/Icons";
 
 // 네비게이션 프롭 타입 정의
 type BoardListScreenNavigationProp = StackNavigationProp<
@@ -38,13 +39,23 @@ export default function BoardListScreen({
   const [sortBy, setSortBy] = useState<"latest" | "likes">("latest");
 
   // usePostList 훅을 사용하여 게시글 목록 관리
-  const { posts, popularPosts, loading, error, hasMore, loadMore, refresh } =
-    usePostList({ sort: sortBy, limit: 10 });
+  const {
+    posts,
+    popularPosts,
+    loading,
+    error,
+    hasMore,
+    loadMore,
+    refresh,
+    refreshing,
+    changeSort,
+  } = usePostList({ sort: sortBy, limit: 10 });
 
   // 정렬 방식 변경 시 새로고침
   const handleSortChange = (newSort: "latest" | "likes") => {
     if (sortBy !== newSort) {
       setSortBy(newSort);
+      changeSort(newSort);
     }
   };
 
@@ -52,8 +63,8 @@ export default function BoardListScreen({
   useFocusEffect(
     useCallback(() => {
       if (route.params?.refresh) {
-        refresh(); // 전체 데이터 새로고침
-        navigation.setParams({ refresh: undefined }); // 플래그 초기화
+        refresh();
+        navigation.setParams({ refresh: undefined });
       }
       return () => {
         // 정리 작업 (필요한 경우)
@@ -157,14 +168,17 @@ export default function BoardListScreen({
           data={posts}
           renderItem={({ item }) => (
             <BoardItem
-              item={item}
+              item={{ ...item, userType: item.userType || "" }}
               onPress={() =>
                 navigation.navigate("BoardDetail", { boardId: item.postId })
               }
             />
           )}
           keyExtractor={(item) => `post-${item.postId}`}
-          contentContainerStyle={styles.listContainer}
+          contentContainerStyle={{
+            ...styles.listContainer,
+            ...styles.listContent,
+          }}
           ListEmptyComponent={<EmptyBoardList />}
           onEndReached={loadMore}
           onEndReachedThreshold={0.5}
@@ -179,8 +193,14 @@ export default function BoardListScreen({
               <Text style={styles.footer}>더 이상 게시글이 없습니다.</Text>
             ) : null
           }
-          refreshing={loading}
-          onRefresh={refresh}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={refresh} />
+          }
+          ListHeaderComponent={() => (
+            <View style={styles.postsHeader}>
+              <Text style={styles.sectionTitle}>게시글 목록</Text>
+            </View>
+          )}
         />
 
         {/* 글쓰기 버튼 */}
@@ -319,5 +339,12 @@ const styles = StyleSheet.create({
     padding: 10,
     textAlign: "center",
     color: "#666",
+  },
+  postsHeader: {
+    paddingTop: 16,
+    paddingBottom: 8,
+  },
+  listContent: {
+    paddingBottom: 20,
   },
 });
