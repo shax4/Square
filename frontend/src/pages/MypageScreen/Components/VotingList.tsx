@@ -9,6 +9,7 @@ import { getDebateById } from "../../DebateCardsScreen/api/DebateApi";
 
 import { StackParamList } from '../../../shared/page-stack/MyPageStack'
 import { useDebateStore } from "../../../shared/stores/debates";
+import { useFocusEffect } from '@react-navigation/native';
 
 interface Props {
     type: string;
@@ -31,7 +32,6 @@ const VotingList = ({ type }: Props) => {
             if (type === 'my-votes') {
                 const data: VotingResponse = await getMypageVotings(cursorId, 10);
                 addDebatesToZustand(data.debates);
-
                 const processedVotings = (data.debates ?? []).map((vote) => {
                     const totalVotes = vote.leftCount + vote.rightCount;
                     const leftPercent = totalVotes > 0 ? (vote.leftCount / totalVotes) * 100 : 0;
@@ -85,11 +85,14 @@ const VotingList = ({ type }: Props) => {
         }
     }
 
-    useEffect(() => {
-        setVotings([]);
-        setNextCursorId(null)
-        fetchVotings(null);
-    }, [type]);
+    // 강제로 갱신
+    useFocusEffect(
+        useCallback(() => {
+            setVotings([]);
+            setNextCursorId(null);
+            fetchVotings(null);
+        }, [type])
+    );
 
     const addDebatesToZustand = async (data: Voting[]) => {
         for (const debate of data) {

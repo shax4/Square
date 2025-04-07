@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState, useCallback } from 'react';
+import React, { useEffect, useLayoutEffect, useState, useCallback, useRef } from 'react';
 import { View, Text, KeyboardAvoidingView, Platform, SafeAreaView, TouchableOpacity } from 'react-native';
 import { styles } from './Components/OpinionListScreen.styles'
 import { RouteProp, useNavigation, useRoute, useFocusEffect, useIsFocused } from '@react-navigation/native';
@@ -18,8 +18,6 @@ import { Icons } from '../../../assets/icons/Icons';
 import { useDebateStore } from '../../shared/stores/debates';
 import { SortType } from './Components/OpinionSortType';
 import { useAuthStore } from '../../shared/stores';
-import { getDebateById } from '../DebateCardsScreen/api/DebateApi';
-import { Debate } from '../DebateCardsScreen/Components';
 
 type OpinionListScreenRouteProp = RouteProp<StackParamList, 'OpinionListScreen'>;
 
@@ -52,25 +50,21 @@ export default function OpinionListScreen() {
     const { debateId, showVoteResultModal = false, showSummaryFirst = true } = route.params;
 
     const { debates, updateDebate } = useDebateStore();
-
-    const debate = useDebateStore((state) =>
-        state.debates.find((d) => d.debateId === debateId)
-    );
-
-    useEffect(() => {
-        if (!debate) {
-            (async () => {
-                try {
-                    const fetched = (await getDebateById(debateId)).debates[0];
-                    updateDebate(debateId, fetched);
-                } catch (e) {
-                    console.debug("debate 불러오기 실패", e);
-                }
-            })();
-        }
-    }, [debateId, debate]);
-    
+    const debate = debates.find((d) => d.debateId === debateId);
     if (!debate) return <Text>Wrong debateId</Text>;
+
+    // 로딩을 통한 데이터 초기화 중 렌더링 방지 
+    const [loading, setLoading] = useState(false);
+
+    // 스크랩 버튼 관리
+    const [scrap, setScrap] = useState(false);
+    useEffect(() => {
+        if (debate) {
+            setScrap(debate.isScraped);
+        } else {
+            setScrap(false);
+        }
+    }, [debate]);
 
     const [isSummary, setIsSummary] = useState(true);
     const [commentText, setCommentText] = useState('');
@@ -99,10 +93,6 @@ export default function OpinionListScreen() {
         },
     });
 
-    // 로딩을 통한 데이터 초기화 중 렌더링 방지 
-    const [loading, setLoading] = useState(false);
-    // 스크랩 버튼 관리
-    const [scrap, setScrap] = useState(debate.isScraped);
 
     // 햔재 탭의 의견
     const currentOpinions = opinionStateMap[sort].opinions;
@@ -248,6 +238,8 @@ export default function OpinionListScreen() {
 
     // 상단바 기능 버튼 추가
     useLayoutEffect(() => {
+        if (!debate) return;
+
         navigation.setOptions({
             headerRight: () => (
                 <View style={styles.headerRightItems}>
@@ -256,22 +248,23 @@ export default function OpinionListScreen() {
                     </TouchableOpacity>
                     <ScrapButton
                         isScraped={debate.isScraped}
-                        onPressScrap={() => handleScrap()}
+                        onPressScrap={handleScrap}
                     />
                 </View>
             ),
         });
-    }, [debate.isScraped]);
+    }, [debate?.isScraped]);
+
 
     // 투표한 사람만 입력 가능하도록 검사 후 의견 등록
     const handleOpinionPosting = async () => {
-        if (debate.isLeft == null) {
+        if (debate!.isLeft == null) {
             console.debug("투표해야 의견 입력 가능");
             return;
         }
 
         try {
-            await createOpinion(debateId, debate.isLeft, commentText);
+            await createOpinion(debateId, debate!.isLeft, commentText);
             setCommentText('');
 
             // 의견 상태 맵 초기화 먼저 수행
@@ -291,6 +284,15 @@ export default function OpinionListScreen() {
         }
     };
 
+    if (!debate) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <View style={styles.container}>
+                    <Text>불러오는 중...</Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -299,7 +301,7 @@ export default function OpinionListScreen() {
         >
             <SafeAreaView style={styles.container}>
                 <View style={styles.topicView}>
-                    <Text style={styles.topicViewText}>{debate.topic}</Text>
+                    <Text style={styles.topicViewText}>{debate!.topic}</Text>
                 </View>
 
                 {/* 의견 목록 */}
@@ -336,8 +338,8 @@ export default function OpinionListScreen() {
                 )}
 
                 <View style={styles.optionView}>
-                    <Text style={styles.optionTextLeft}>{debate.leftOption}</Text>
-                    <Text style={styles.optionTextRight}>{debate.rightOption}</Text>
+                    <Text style={styles.optionTextLeft}>{debate!.leftOption}</Text>
+                    <Text style={styles.optionTextRight}>{debate!.rightOption}</Text>
                 </View>
 
                 <View style={styles.opinionView}>
@@ -369,7 +371,7 @@ export default function OpinionListScreen() {
 
                     {isSummary && (
                         <View style={styles.TotalVoteCountView}>
-                            <Text>지금까지 {debate.totalVoteCount}명 참여중</Text>
+                            <Text>지금까지 {debate!.totalVoteCount}명 참여중</Text>
                         </View>
                     )}
                 </View>
