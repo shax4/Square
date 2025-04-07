@@ -18,8 +18,19 @@ import { Icons } from '../../../assets/icons/Icons';
 import { useDebateStore } from '../../shared/stores/debates';
 import { SortType } from './Components/OpinionSortType';
 import { useAuthStore } from '../../shared/stores';
+import { getDebateById } from '../DebateCardsScreen/api/DebateApi';
+import { Debate } from '../DebateCardsScreen/Components';
 
 type OpinionListScreenRouteProp = RouteProp<StackParamList, 'OpinionListScreen'>;
+
+const emptyCursor = {
+    nextLeftCursorId: null,
+    nextLeftCursorLikes: null,
+    nextLeftCursorComments: null,
+    nextRightCursorId: null,
+    nextRightCursorLikes: null,
+    nextRightCursorComments: null,
+}
 
 interface PagingCursor {
     // 왼쪽 의견 커서
@@ -37,18 +48,38 @@ export default function OpinionListScreen() {
 
     const { loggedIn } = useAuthStore();
 
-    const isFocused = useIsFocused();
-
     const route = useRoute<OpinionListScreenRouteProp>();
     const { debateId, showVoteResultModal = false, showSummaryFirst = true } = route.params;
 
     const { debates, updateDebate } = useDebateStore();
-    const debate = debates.find((d) => d.debateId === debateId);
+
+    const [debate, setDebate] = useState(debates.find((d) => d.debateId === debateId));
+
+    useEffect(() => {
+        setDebate(debates.find((d) => d.debateId === debateId));
+        console.log(debate?.topic);
+        if (!debate) {
+            (async () => {
+                try {
+                    const fetchedDebate = await fetchDebateById(debateId);
+                    updateDebate(debateId, fetchedDebate); // zustand에 저장
+                    setDebate(fetchedDebate); // 로컬 상태에도 저장
+                } catch (e) {
+                    console.debug("debate 불러오기 실패", e);
+                }
+            })();
+        }
+    }, [debateId, debate]);
+
     if (!debate) return <Text>Wrong debateId</Text>;
 
     const [isSummary, setIsSummary] = useState(true);
     const [commentText, setCommentText] = useState('');
     const [summaries, setSummaries] = useState<Summary[]>([]);
+
+    // 페이징 커서 관리
+    const [cursor, setCursor] = useState<PagingCursor>(emptyCursor);
+    const limit = 5;
 
     const [sort, setSort] = useState<SortType>(SortType.Latest);
     const [opinionStateMap, setOpinionStateMap] = useState<Record<SortType, {
@@ -68,17 +99,6 @@ export default function OpinionListScreen() {
             hasMore: true
         },
     });
-    const emptyCursor = {
-        nextLeftCursorId: null,
-        nextLeftCursorLikes: null,
-        nextLeftCursorComments: null,
-        nextRightCursorId: null,
-        nextRightCursorLikes: null,
-        nextRightCursorComments: null,
-    }
-    // 페이징 커서 관리
-    const [cursor, setCursor] = useState<PagingCursor>(emptyCursor);
-    const limit = 5;
 
     // 로딩을 통한 데이터 초기화 중 렌더링 방지 
     const [loading, setLoading] = useState(false);
@@ -272,6 +292,10 @@ export default function OpinionListScreen() {
         }
     };
 
+    const fetchDebateById = async (debateId: number) => {
+        const response = await getDebateById(debateId);
+        return response;
+    }
 
     return (
         <KeyboardAvoidingView
