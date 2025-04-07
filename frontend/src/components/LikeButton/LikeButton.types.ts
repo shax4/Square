@@ -18,9 +18,6 @@ export enum TargetTypeEnum {
 
   /** 논쟁 의견 댓글 */
   OPINION_COMMENT = "OPINION_COMMENT",
-
-  /** 논쟁 주제 */
-  DEBATE = "DEBATE", // API 명세 검토 후 추가된 타입
 }
 
 /**
@@ -34,6 +31,12 @@ export type TargetType = keyof typeof TargetTypeEnum;
  * @description 백엔드 API 응답 형식과 일치해야 함
  */
 export interface LikeResponse {
+  /** 좋아요 대상 ID */
+  targetId: number;
+
+  /** 좋아요 대상 타입 */
+  targetType: TargetType;
+
   /** 현재 좋아요 상태 (true: 좋아요 상태, false: 좋아요 취소 상태) */
   isLiked: boolean;
 
@@ -74,14 +77,17 @@ export interface LikeButtonProps {
   /** 좋아요 상태 변경 시 호출되는 콜백 함수 */
   onLikeChange?: (newState: { isLiked: boolean; likeCount: number }) => void;
 
-  /** 좋아요 버튼 클릭 시 호출되는 콜백 함수 (하위 호환성 유지) */
+  /**
+   * 좋아요 버튼 클릭 시 호출되는 콜백 함수 (하위 호환성 유지)
+   * @deprecated onLikeChange를 대신 사용하세요. 다음 메이저 버전에서 제거될 예정입니다.
+   */
   onPress?: (isLiked: boolean) => void;
 
   /** 비활성화 여부 - 기본값: false */
   disabled?: boolean;
 
   /** 에러 발생 시 호출되는 콜백 함수 */
-  onError?: (error: any) => void;
+  onError?: (error: unknown) => string | undefined;
 
   /** 에러 메시지 표시 스타일 (간단/상세) - 기본값: 'simple' */
   errorDisplayMode?: "simple" | "detailed";

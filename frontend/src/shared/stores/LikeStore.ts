@@ -6,10 +6,10 @@ import { TargetType } from "../../components/LikeButton/LikeButton.types";
  */
 interface LikeState {
   /** 로딩 중인 아이템 ID 모음 */
-  loadingItems: Set<number>;
+  loadingIds: Record<number, boolean>;
 
   /** 에러 상태의 아이템 ID 모음 */
-  errorItems: Set<number>;
+  errorIds: Record<number, boolean>;
 
   /**
    * 좋아요 토글 함수
@@ -21,10 +21,7 @@ interface LikeState {
   toggleLike: (
     targetId: number,
     targetType: TargetType,
-    apiToggleFunction: (
-      targetId: number,
-      targetType: TargetType
-    ) => Promise<any>
+    apiFunction: (targetId: number, targetType: TargetType) => Promise<any>
   ) => Promise<any>;
 
   /**
@@ -32,7 +29,7 @@ interface LikeState {
    * @param itemId 확인할 아이템 ID
    * @returns 로딩 중 여부
    */
-  isLoading: (itemId: number) => boolean;
+  isLoading: (targetId: number) => boolean;
 
   /**
    * 현재 에러 상태인지 확인하는 함수
@@ -52,80 +49,49 @@ interface LikeState {
 const loadingItemsRef = new Set<number>();
 
 export const useLikeStore = create<LikeState>()((set, get) => ({
-  loadingItems: new Set<number>(),
-  errorItems: new Set<number>(),
+  loadingIds: {},
+  errorIds: {},
 
-  toggleLike: async (
-    targetId: number,
-    targetType: TargetType,
-    apiToggleFunction: (
-      targetId: number,
-      targetType: TargetType
-    ) => Promise<any>
-  ) => {
-    // 중복 요청 방지
-    if (loadingItemsRef.has(targetId)) {
-      console.log(`이미 처리 중인 요청: ${targetId}`);
-      return;
+  toggleLike: async (targetId, targetType, apiFunction) => {
+    if (get().loadingIds[targetId]) {
+      console.log(`이미 ${targetId}에 대한 요청이 진행 중입니다.`);
+      return null;
     }
-
-    // 로딩 상태 설정
-    loadingItemsRef.add(targetId);
-    set((state) => {
-      const newSet = new Set(state.loadingItems);
-      newSet.add(targetId);
-      return { loadingItems: newSet };
-    });
 
     try {
-      // API 호출
-      const response = await apiToggleFunction(targetId, targetType);
+      set((state) => ({
+        loadingIds: { ...state.loadingIds, [targetId]: true },
+        errorIds: { ...state.errorIds, [targetId]: false },
+      }));
 
-      // 오류 상태 초기화
-      set((state) => {
-        const newErrors = new Set(state.errorItems);
-        newErrors.delete(targetId);
-        return { errorItems: newErrors };
-      });
+      console.log(`좋아요 토글 요청: ${targetType} ${targetId}`);
+      const response = await apiFunction(targetId, targetType);
 
+      set((state) => ({
+        loadingIds: { ...state.loadingIds, [targetId]: false },
+      }));
+
+      console.log(`좋아요 토글 응답:`, response);
       return response;
     } catch (error) {
-      console.error("좋아요 처리 중 오류:", error);
+      console.error(`좋아요 토글 에러: ${targetType} ${targetId}`, error);
 
-      // 오류 상태 설정
-      set((state) => {
-        const newErrors = new Set(state.errorItems);
-        newErrors.add(targetId);
-        return { errorItems: newErrors };
-      });
+      set((state) => ({
+        loadingIds: { ...state.loadingIds, [targetId]: false },
+        errorIds: { ...state.errorIds, [targetId]: true },
+      }));
 
       throw error;
-    } finally {
-      // 로딩 상태 초기화
-      loadingItemsRef.delete(targetId);
-      set((state) => {
-        const newSet = new Set(state.loadingItems);
-        newSet.delete(targetId);
-        return { loadingItems: newSet };
-      });
     }
   },
 
-  isLoading: (targetId) => {
-    return get().loadingItems.has(targetId) || loadingItemsRef.has(targetId);
-  },
+  isLoading: (targetId) => !!get().loadingIds[targetId],
 
-  // 에러 상태 확인 함수
-  hasError: (targetId) => {
-    return get().errorItems.has(targetId);
-  },
+  hasError: (targetId) => !!get().errorIds[targetId],
 
-  // 에러 상태 초기화 함수
   clearError: (targetId) => {
-    set((state) => {
-      const newErrors = new Set(state.errorItems);
-      newErrors.delete(targetId);
-      return { errorItems: newErrors };
-    });
+    set((state) => ({
+      errorIds: { ...state.errorIds, [targetId]: false },
+    }));
   },
 }));

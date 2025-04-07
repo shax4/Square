@@ -1,5 +1,5 @@
 import type React from "react"
-import { View, Text, StyleSheet, SafeAreaView } from "react-native"
+import { View, StyleSheet, SafeAreaView } from "react-native"
 import PersonalityInfoButton from "./Components/PersonalityInfoButton"
 import PersonalityGraph from "./Components/PersonalityGraph"
 import { Button } from "../../components"
@@ -14,6 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import {StackParamList} from '../../shared/page-stack/MyPageStack'
 
 import { getMyPersonalityResult, getOthersPersonalityResult } from "./Api/PersonalityResultAPI"
+import Text from '../../components/Common/Text';
 
 // Axios 연결 필요
 // 임시 데이터로 태스트

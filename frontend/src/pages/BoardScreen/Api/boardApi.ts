@@ -1,13 +1,12 @@
 // 개발용 mock api 사용
 import { MockBoardAPI } from "../mocks/boardApi";
-import { TargetType } from "../../../components/LikeButton/LikeButton.types";
 
 export const BoardAPI = MockBoardAPI;
 
 // 실제 API 코드
 // import axios from "../../../shared/api/axiosInstance";
 // import { AxiosResponse } from "axios";
-// import { LikeResponse, Post, Reply } from "../board.types";
+// import { Post, Reply } from "../board.types";
 
 // // API 응답 타입 정의
 // // 대댓글 목록 조회 응답 타입 정의
@@ -144,20 +143,4 @@ export const BoardAPI = MockBoardAPI;
 //     axios.delete(`/api/scraps`, {
 //       data: { targetId: postId, targetType: "POST" },
 //     }),
-
-//   // 댓글/대댓글/게시글 좋아요 토글 함수
-//   toggleLike: async (
-//     targetId: number,
-//     targetType: TargetType
-//   ): Promise<{ data: LikeResponse }> => {
-//     try {
-//       const response = await axios.post(`/api/likes`, {
-//         targetType,
-//         targetId,
-//       });
-//       return response;
-//     } catch (error) {
-//       throw new Error("Failed to toggle like");
-//     }
-//   },
 // };

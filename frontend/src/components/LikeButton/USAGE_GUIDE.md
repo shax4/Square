@@ -151,10 +151,47 @@ const customProps = {
 />
 ```
 
+## API 서비스 레이어
+
+LikeButton은 백엔드 API와 통합되어 있으며, 아래 서비스 레이어를 사용합니다:
+
+```tsx
+// src/shared/services/likeService.ts
+import { LikeService, toggleLikeAPI } from "../../shared/services/likeService";
+
+// 기본 사용법: toggleLikeAPI 함수 사용 (useLikeButton 훅이 사용)
+const result = await toggleLikeAPI(postId, "POST");
+console.log(result.data.isLiked, result.data.likeCount);
+
+// 고급 사용법: LikeService 객체의 직접 사용
+// 백엔드 API 호출
+await LikeService.callToggleLikeApi(commentId, "POST_COMMENT");
+
+// 로컬 상태 관리
+const state = await LikeService.manageLocalLikeState(commentId, "POST_COMMENT");
+
+// 상태 조회
+const status = await LikeService.getLikeStatus(postId, "POST");
+
+// 대량 상태 조회
+const bulkStatus = await LikeService.getBulkLikeStatus([
+  { targetId: post1.id, targetType: "POST" },
+  { targetId: post2.id, targetType: "POST" },
+]);
+
+// 테스트용: 상태 초기화
+await LikeService.clearLikeStatus(); // 모든 좋아요 상태 초기화
+await LikeService.clearLikeStatus(postId, "POST"); // 특정 대상만 초기화
+```
+
 ## 주의사항
 
-1. **API 모드 전환**: 개발 환경에서는 Mock API가 사용되지만, 프로덕션 환경에서는 실제 API가 사용됩니다. 이 전환은 `BoardAPI.ts`에서 자동으로 처리됩니다.
+1. **데이터 일관성**: 현재 구현에서는 백엔드 API 호출 후 로컬 상태(AsyncStorage)에서 좋아요 상태를 관리합니다. 백엔드 API는 응답 데이터를 반환하지 않으므로, 클라이언트가 상태를 계산합니다.
 
 2. **성능 최적화**: 목록에서 많은 좋아요 버튼이 렌더링될 때는 `React.memo`와 `arePropsEqual` 함수가 성능 최적화에 도움이 됩니다. `LikeButton` 컴포넌트는 이미 이러한 최적화가 적용되어 있습니다.
 
 3. **함수형 props**: `onLikeChange`, `onPress`, `onError` 등의 콜백 함수는 매 렌더링마다 새로 생성되므로, `React.memo`의 비교에서 제외되어 있습니다. 성능에 민감한 경우 `useCallback`으로 함수를 메모이제이션하세요.
+
+4. **다중 기기 동기화**: 현재 구현에서는 다른 기기의 좋아요 상태가 자동으로 동기화되지 않습니다. 사용자가 다른 기기에서 좋아요를 누르면, 현재 기기에서 새로고침 전까지는 반영되지 않을 수 있습니다.
+
+5. **AsyncStorage 사용**: 로컬 상태를 저장하기 위해 AsyncStorage를 사용합니다. React Native 환경에서 필요한 패키지이므로, 개발 환경 설정 시 `@react-native-async-storage/async-storage` 패키지가 필요합니다.
