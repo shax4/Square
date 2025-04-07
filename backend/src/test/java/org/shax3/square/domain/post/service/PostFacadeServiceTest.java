@@ -27,6 +27,8 @@ import org.shax3.square.domain.s3.service.S3Service;
 import org.shax3.square.domain.scrap.service.ScrapService;
 import org.shax3.square.domain.user.model.Type;
 import org.shax3.square.domain.user.model.User;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SetOperations;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,6 +51,12 @@ class PostFacadeServiceTest {
 
 	@Mock
 	private ScrapService scrapService;
+
+	@Mock
+	private RedisTemplate<String, String> batchRedisTemplate;
+
+	@Mock
+	private SetOperations<String, String> setOperations;
 
 	@InjectMocks
 	private PostFacadeService postFacadeService;
@@ -95,6 +103,9 @@ class PostFacadeServiceTest {
 		when(likeService.getLikedTargetIds(eq(user), eq(TargetType.POST), anyList())).thenReturn(Set.of(102L));
 		when(s3Service.generatePresignedGetUrl("user/profile.jpg")).thenReturn("https://s3.com/user/profile.jpg");
 
+		when(batchRedisTemplate.opsForSet()).thenReturn(setOperations);
+		when(setOperations.members("like:batch")).thenReturn(Set.of());
+
 		// when
 		PostListResponse response = postFacadeService.getPostList(user, "latest", null, null, 3);
 
@@ -126,6 +137,9 @@ class PostFacadeServiceTest {
 		when(likeService.getLikedTargetIds(eq(user), eq(TargetType.POST), anyList())).thenReturn(Set.of(101L, 103L));
 		when(s3Service.generatePresignedGetUrl("user/profile.jpg")).thenReturn("https://s3.com/user/profile.jpg");
 
+		when(batchRedisTemplate.opsForSet()).thenReturn(setOperations);
+		when(setOperations.members("like:batch")).thenReturn(Set.of());
+
 		// when
 		PostListResponse response = postFacadeService.getPostList(user, "likes", null, null, 3);
 
@@ -155,7 +169,8 @@ class PostFacadeServiceTest {
 		));
 		when(likeService.getLikedTargetIds(eq(user), eq(TargetType.POST), anyList())).thenReturn(Set.of(101L));
 		when(s3Service.generatePresignedGetUrl("user/profile.jpg")).thenReturn("https://s3.com/user/profile.jpg");
-
+		when(batchRedisTemplate.opsForSet()).thenReturn(setOperations);
+		when(setOperations.members("like:batch")).thenReturn(Set.of());
 		// when
 		MyPostResponse response = postFacadeService.getMyPostList(user, null, 3);
 
@@ -184,6 +199,8 @@ class PostFacadeServiceTest {
 		));
 		when(likeService.getLikedTargetIds(eq(user), eq(TargetType.POST), anyList())).thenReturn(Set.of(103L));
 		when(s3Service.generatePresignedGetUrl("user/profile.jpg")).thenReturn("https://s3.com/user/profile.jpg");
+		when(batchRedisTemplate.opsForSet()).thenReturn(setOperations);
+		when(setOperations.members("like:batch")).thenReturn(Set.of());
 
 		// when
 		MyPostResponse response = postFacadeService.getMyLikedPostList(user, null, 3);
@@ -213,6 +230,8 @@ class PostFacadeServiceTest {
 		));
 		when(likeService.getLikedTargetIds(eq(user), eq(TargetType.POST), anyList())).thenReturn(Set.of(102L, 103L));
 		when(s3Service.generatePresignedGetUrl("user/profile.jpg")).thenReturn("https://s3.com/user/profile.jpg");
+		when(batchRedisTemplate.opsForSet()).thenReturn(setOperations);
+		when(setOperations.members("like:batch")).thenReturn(Set.of());
 
 		// when
 		MyPostResponse response = postFacadeService.getMyScrapPostList(user, null, 3);
@@ -266,6 +285,8 @@ class PostFacadeServiceTest {
 		when(likeService.getLikedTargetIds(user, TargetType.POST_COMMENT, List.of(301L, 302L))).thenReturn(Set.of(302L));
 		when(s3Service.generatePresignedGetUrl("user/profile.jpg")).thenReturn("https://s3.com/user/profile.jpg");
 
+		when(batchRedisTemplate.opsForSet()).thenReturn(setOperations);
+		when(setOperations.members("like:batch")).thenReturn(Set.of());
 		// when
 		PostDetailResponse response = postFacadeService.getPostDetail(user, postId);
 
