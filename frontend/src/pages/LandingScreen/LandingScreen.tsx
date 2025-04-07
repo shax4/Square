@@ -3,9 +3,14 @@ import { Ionicons } from "@expo/vector-icons";
 import { onGoogleButtonPress, requestFirebaseLogin } from "./API/googleAPI";
 import { v4 as uuidv4 } from 'uuid';
 import { useState } from "react";
+import { userDetails } from "../../shared/types/user";
+import { loginTemp } from "./API/tempLoginAPI";
+import { useAuthStore } from "../../shared/stores";
+import { FirebaseLoginResponse } from "./type/googleLoginType";
 
 const LandingScreen = ({ navigation }: any) => {
-  const [loginResponse, setLoginResponse] = useState<any>(null); // 로그인 응답 저장용
+  const [loginResponse, setLoginResponse] = useState<FirebaseLoginResponse>(); // 로그인 응답 저장용
+  const {setUser} = useAuthStore.getState();
 
   const handleGoogleLogin = async () => {
     console.log("Google 계정으로 시작하기");
@@ -19,25 +24,41 @@ const LandingScreen = ({ navigation }: any) => {
         return;
       }
 
-      const response = await requestFirebaseLogin(idToken, null, deviceId, "android", "GOOGLE");
+      const response : FirebaseLoginResponse = await requestFirebaseLogin(idToken, null, deviceId, "android", "GOOGLE");
       setLoginResponse(response); // 화면에 출력하기 위해 저장
 
-      if (response?.isMember) {
-        navigation.reset({
-         index: 0,
-          routes: [{ name: "Main" }],
-        });
-      } else {
-        navigation.navigate("SignUp", {
-          email: response.email,
-          socialType: response.socialType,
-        });
+      if (response.isMember) { // 구글 로그인 완료, 서비스 멤버인 경우. 바로 메인 화면으로
+        const userDetails : userDetails = {
+          nickname : response.nickname,
+          userType: response.userType,
+          state: "ACTIVE",
+          isMember : response.isMember,
+          accessToken : response.accessToken,
+          refreshToken : response.refreshToken,
+        }
+        setUser(userDetails)
+      } else { // 구글 로그인 완료, 회원가입 화면으로.
+        // navigation.navigate("SignUp", {
+        //   email: response.email,
+        //   socialType: response.socialType,
+        // });
       }
     } catch (error) {
       console.error("handleGoogleLogin 에러 발생:", error);
       Alert.alert("오류", "Google 로그인 중 문제가 발생했습니다.");
     }
   };
+
+  const handleTempLogin = async () => {
+        try {
+            const result: userDetails = await loginTemp();
+
+            console.log(result)
+            setUser(result);
+        } catch (error) {
+            console.error("임시 로그인 실패 :", error);
+        }
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -64,6 +85,10 @@ const LandingScreen = ({ navigation }: any) => {
           <TouchableOpacity style={[styles.loginButton, styles.appleButton]} onPress={() => console.log("애플 로그인")}>
             <Ionicons name="logo-apple" size={20} color="#FFFFFF" />
             <Text style={styles.appleButtonText}>Apple 계정으로 시작하기</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={[styles.loginButton, styles.appleButton]} onPress={handleTempLogin}>
+            <Text style={styles.appleButtonText}>임시 로그인</Text>
           </TouchableOpacity>
         </View>
 

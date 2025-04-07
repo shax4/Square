@@ -8,6 +8,11 @@ import MainHeaderBar from "./stacks/MainHeaderBar";
 import MyPageHeaderBar from "./stacks/MyPageHeaderBar";
 
 import {hideTabBarScreens} from "./NavigationData"
+import { useAuthStore } from "../../shared/stores";
+
+import LandingScreen from "../../pages/LandingScreen/LandingScreen";
+import { useEffect, useState } from "react";
+import { useAuth } from "../../shared/hooks";
 
 // 하단에 표시되는 탭 이름.
 const boardName = "게시판";
@@ -87,9 +92,20 @@ function BottomTabs() {
 }
 
 export default function AppNavigator() {
+    const {user} = useAuth()
+
+    const [isUserLoggedIn, setIsUserLoggedIn] = useState<boolean>(false);
+
+    useEffect(() => {
+        if(user?.accessToken)
+            setIsUserLoggedIn(true);
+        else
+            setIsUserLoggedIn(false);
+    }, [user])
+
     return (
         <NavigationContainer>
-            <BottomTabs />
+            {isUserLoggedIn ? <BottomTabs /> : <LandingScreen />}
         </NavigationContainer>
     );
 }
