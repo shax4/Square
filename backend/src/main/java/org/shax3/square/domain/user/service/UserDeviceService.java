@@ -8,6 +8,7 @@ import org.shax3.square.domain.user.repository.UserRepository;
 import org.shax3.square.exception.CustomException;
 import org.shax3.square.exception.ExceptionCode;
 import org.springframework.stereotype.Service;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -22,12 +23,16 @@ public class UserDeviceService {
 
         userDeviceRepository.findByDeviceId(deviceId)
                 .ifPresentOrElse(
-                        existingDevice -> existingDevice.updateFcmToken(fcmToken),
+                        existingDevice -> {
+                            existingDevice.updateFcmToken(fcmToken);
+                            existingDevice.updateLastLogin(LocalDateTime.now());
+                        },
                         () -> userDeviceRepository.save(UserDevice.builder()
                                 .user(user)
                                 .deviceId(deviceId)
                                 .deviceType(deviceType)
                                 .fcmToken(fcmToken)
+                                .lastLogin(LocalDateTime.now())
                                 .build())
                 );
     }
