@@ -3,10 +3,8 @@ import { View, ActivityIndicator, FlatList, Dimensions, RefreshControl, Touchabl
 import DebateCard from './DebateCard';
 import { styles } from './DebateCard.styles';
 import { getAllDebates } from '../api/DebateApi';
-import { computeDebateListFields } from './Debate.types';
 import { useDebateStore } from '../../../shared/stores/debates';
 import { useAuthStore } from '../../../shared/stores/auth';
-import { Button } from '../../../components';
 
 const { width, height } = Dimensions.get('window');
 
@@ -33,16 +31,13 @@ export default function DebateCardList() {
             const nextId = response.nextCursorId;
 
             if (newData.length > 0) {
-                // 통계 정보 계산해 넣기
-                const computedDebates = computeDebateListFields(newData);
-
                 // 리프레시 시에는 목록을 초기화하고 새 데이터만 표시
                 if (refresh) {
                     clearDebates();
-                    addDebates(computedDebates);
+                    addDebates(newData);
                     setHasMore(true);
                 } else {
-                    addDebates(computedDebates);
+                    addDebates(newData);
                 }
 
                 // 더이상 줄 데이터가 없다 알리면 페이징 막기 
