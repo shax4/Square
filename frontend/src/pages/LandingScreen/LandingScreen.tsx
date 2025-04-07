@@ -7,42 +7,55 @@ import { userDetails } from "../../shared/types/user";
 import { loginTemp } from "./API/tempLoginAPI";
 import { useAuthStore } from "../../shared/stores";
 import { FirebaseLoginResponse } from "./type/googleLoginType";
+import SignUpScreen from "../SignupScreen/SignupScreen";
+import {styles} from "./style/LandingScreen.style"
+import { useAuth } from "../../shared/hooks";
 
 const LandingScreen = ({ navigation }: any) => {
   const [loginResponse, setLoginResponse] = useState<FirebaseLoginResponse>(); // 로그인 응답 저장용
-  const {setUser} = useAuthStore.getState();
+  const [signUpFlag, setSignUpFlag] = useState<boolean>(false);
+
+  const {setUser} = useAuth();
 
   const handleGoogleLogin = async () => {
     console.log("Google 계정으로 시작하기");
 
     try {
-      const idToken = await onGoogleButtonPress();
-      const deviceId = uuidv4();
+      // const idToken = await onGoogleButtonPress();
+      // const deviceId = uuidv4();
 
-      if (!idToken) {
-        Alert.alert("로그인 실패", "Google 로그인에 실패했습니다.");
-        return;
+      // if (!idToken) {
+      //   Alert.alert("로그인 실패", "Google 로그인에 실패했습니다.");
+      //   return;
+      // }
+
+      // const response : FirebaseLoginResponse = await requestFirebaseLogin(idToken, null, deviceId, "android", "GOOGLE");
+      // setLoginResponse(response); // 화면에 출력하기 위해 저장
+
+      // const userDetails : userDetails = {
+      //   nickname : response.nickname,
+      //   userType: response.userType,
+      //   state: "ACTIVE",
+      //   isMember : response.isMember,
+      //   accessToken : response.accessToken,
+      //   refreshToken : response.refreshToken,
+      // }
+
+      const userDetails : userDetails = {
+        nickname : null,
+        userType: null,
+        state: "ACTIVE",
+        isMember : false,
+        accessToken : null,
+        refreshToken : null,
       }
 
-      const response : FirebaseLoginResponse = await requestFirebaseLogin(idToken, null, deviceId, "android", "GOOGLE");
-      setLoginResponse(response); // 화면에 출력하기 위해 저장
+      setUser(userDetails)
 
-      if (response.isMember) { // 구글 로그인 완료, 서비스 멤버인 경우. 바로 메인 화면으로
-        const userDetails : userDetails = {
-          nickname : response.nickname,
-          userType: response.userType,
-          state: "ACTIVE",
-          isMember : response.isMember,
-          accessToken : response.accessToken,
-          refreshToken : response.refreshToken,
-        }
-        setUser(userDetails)
-      } else { // 구글 로그인 완료, 회원가입 화면으로.
-        // navigation.navigate("SignUp", {
-        //   email: response.email,
-        //   socialType: response.socialType,
-        // });
+      if (!userDetails.isMember) { // 구글 로그인 완료, 서비스 멤버가 아니므로 회원가입 화면으로 이동.
+        setSignUpFlag(true);
       }
+
     } catch (error) {
       console.error("handleGoogleLogin 에러 발생:", error);
       Alert.alert("오류", "Google 로그인 중 문제가 발생했습니다.");
@@ -58,6 +71,12 @@ const LandingScreen = ({ navigation }: any) => {
         } catch (error) {
             console.error("임시 로그인 실패 :", error);
         }
+  }
+
+  if (signUpFlag) {
+    return (
+      <SignUpScreen/>
+    );
   }
 
   return (
@@ -103,101 +122,5 @@ const LandingScreen = ({ navigation }: any) => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F8F8F8",
-  },
-  content: {
-    flexGrow: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-  },
-  logoContainer: {
-    alignItems: "center",
-    marginBottom: 60,
-  },
-  logo: {
-    width: 250,
-    height: 250,
-    marginBottom: 20,
-  },
-  serviceName: {
-    fontSize: 24,
-    fontWeight: "700",
-    marginBottom: 8,
-    color: "black",
-  },
-  serviceDescription: {
-    fontSize: 16,
-    color: "#666666",
-    textAlign: "center",
-  },
-  loginButtonsContainer: {
-    width: "100%",
-  },
-  loginButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 14,
-    borderRadius: 8,
-    marginBottom: 12,
-  },
-  kakaoButton: {
-    backgroundColor: "#FEE500",
-  },
-  kakaoButtonText: {
-    color: "#000000",
-    fontSize: 16,
-    fontWeight: "600",
-    marginLeft: 8,
-  },
-  googleButton: {
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#DDDDDD",
-  },
-  googleIcon: {
-    width: 20,
-    height: 20,
-    marginRight: 8,
-  },
-  googleButtonText: {
-    color: "#000000",
-    fontSize: 16,
-    fontWeight: "600",
-    marginLeft: 8,
-  },
-  appleButton: {
-    backgroundColor: "#000000",
-  },
-  appleButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "600",
-    marginLeft: 8,
-  },
-  debugContainer: {
-    marginTop: 30,
-    padding: 16,
-    backgroundColor: "#EEE",
-    borderRadius: 8,
-    width: "100%",
-  },
-  debugTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 8,
-    color: "#333",
-  },
-  debugText: {
-    fontSize: 14,
-    color: "#555",
-  },
-});
 
 export default LandingScreen;

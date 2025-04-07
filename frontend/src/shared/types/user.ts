@@ -1,11 +1,11 @@
 // 임시 로그인 시 반환되는 유저 정보.
 export interface userDetails{
-    nickname: string;
+    nickname: string | null;
     userType: string | null;
     state: string;
     isMember : boolean;
-    accessToken : string;
-    refreshToken : string;
+    accessToken : string | null;
+    refreshToken : string | null;
 }
 
 export interface UserInfo{
