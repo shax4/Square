@@ -117,7 +117,7 @@ public class AuthService {
         refreshTokenRepository.deleteByToken(refreshToken);
     }
 
-
+    @Transactional
     public UserLoginDto firebaseLogin(FirebaseToken token, FirebaseLoginRequest request) {
         String email = token.getEmail();
 
