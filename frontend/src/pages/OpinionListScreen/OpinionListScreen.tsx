@@ -53,23 +53,23 @@ export default function OpinionListScreen() {
 
     const { debates, updateDebate } = useDebateStore();
 
-    const [debate, setDebate] = useState(debates.find((d) => d.debateId === debateId));
+    const debate = useDebateStore((state) =>
+        state.debates.find((d) => d.debateId === debateId)
+    );
 
     useEffect(() => {
-        setDebate(debates.find((d) => d.debateId === debateId));
         if (!debate) {
             (async () => {
                 try {
-                    const fetchedDebate = (await fetchDebateById(debateId)).debates[0];
-                    updateDebate(debateId, fetchedDebate); // zustand에 저장
-                    setDebate(fetchedDebate); // 로컬 상태에도 저장
+                    const fetched = (await getDebateById(debateId)).debates[0];
+                    updateDebate(debateId, fetched);
                 } catch (e) {
                     console.debug("debate 불러오기 실패", e);
                 }
             })();
         }
     }, [debateId, debate]);
-
+    
     if (!debate) return <Text>Wrong debateId</Text>;
 
     const [isSummary, setIsSummary] = useState(true);
@@ -290,11 +290,6 @@ export default function OpinionListScreen() {
             console.debug("OpinionListScreen.handleOpinionPosting 실패:", e);
         }
     };
-
-    const fetchDebateById = async (debateId: number) => {
-        const response = await getDebateById(debateId);
-        return response;
-    }
 
     return (
         <KeyboardAvoidingView
