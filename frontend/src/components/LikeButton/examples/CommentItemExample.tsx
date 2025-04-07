@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import LikeButton from "../LikeButton";
 import { useLikeButton } from "../../../shared/hooks/useLikeButton";
+import { TargetType } from "../LikeButton.types";
 
 /**
  * 댓글 아이템 컴포넌트 예시
@@ -16,6 +17,9 @@ const CommentItemExample = ({
   comment: any;
   onCommentUpdate?: (commentId: number, updates: any) => void;
 }) => {
+  // 대상 타입 (댓글)
+  const targetType: TargetType = "POST_COMMENT";
+
   // 좋아요 상태 변경 콜백
   const handleLikeChange = ({
     isLiked,
@@ -33,7 +37,7 @@ const CommentItemExample = ({
   // useLikeButton 훅으로 공통 props 생성
   const likeProps = useLikeButton(
     comment.commentId, // 댓글 ID
-    "POST_COMMENT", // 댓글 타입
+    targetType, // 댓글 타입
     comment.isLiked, // 초기 좋아요 상태
     comment.likeCount, // 초기 좋아요 개수
     handleLikeChange // 상태 변경 콜백

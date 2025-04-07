@@ -33,4 +33,29 @@ export const styles = StyleSheet.create({
     textAlign: "center",
     maxWidth: 80,
   },
+  verticalContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  horizontalContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginLeft: 8,
+  },
+  button: {
+    padding: 4,
+  },
+  countContainer: {
+    marginTop: 4,
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  countText: {
+    fontSize: 12,
+    color: "#555",
+    fontWeight: "bold",
+  },
+  simpleErrorIcon: {
+    marginLeft: 4,
+  },
 });
