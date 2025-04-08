@@ -48,7 +48,6 @@ export default function ProposalListScreen() {
     // 1. 화면 포커스될 때 무조건 실행
     useFocusEffect(
         useCallback(() => {
-            console.log("refresh (focus)");
             setRenderedProposals([]);
             setNextCursorId(null);
             setNextCursorLikes(null);
@@ -58,7 +57,6 @@ export default function ProposalListScreen() {
 
     // 2. 정렬 옵션 바뀔 때도 실행
     useEffect(() => {
-        console.log("refresh (sortOption changed)");
         setRenderedProposals([]);
         setNextCursorId(null);
         setNextCursorLikes(null);
