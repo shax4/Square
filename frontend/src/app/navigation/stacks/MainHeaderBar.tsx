@@ -110,12 +110,12 @@ export default function HeaderBar() {
                 component={ProposalEditScreen}
                 options={() => {
                     return {
-                        title: '청원 등록하기',
+                        headerTitle: () => <Text style={styles.headerTitle}>청원 등록하기</Text>,
                         headerBackButtonDisplayMode: 'minimal',
                     };
                 }}
             />
-            
+
             {/* 성향 타입 그래프 페이지 */}
             <Stack.Screen
                 name="PersonalityResultScreen"
@@ -140,7 +140,7 @@ export default function HeaderBar() {
 
 
 function DebateCardsScreenHeaderRightIcons() {
-    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
+    const navigation = useNavigation<NativeStackNavigationProp<DebateStackParamList>>();
     return (
         <View style={styles.headerRightItems}>
             <TouchableOpacity onPress={() => { navigation.navigate('ProposalListScreen') }}>
@@ -159,5 +159,5 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: "700",
         color: "#333",
-      },
+    },
 });
