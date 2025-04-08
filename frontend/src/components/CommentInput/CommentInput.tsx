@@ -1,5 +1,5 @@
-import React from "react";
-import { KeyboardAvoidingView, Platform, TouchableOpacity, TextInput, View, Keyboard } from "react-native";
+import React, { useState } from "react";
+import { KeyboardAvoidingView, Platform, TouchableOpacity, TextInput, View, Keyboard, Text } from "react-native";
 
 import { styles } from "./Components/CommentInput.styles";
 import ProfileImage from "../ProfileImage";
@@ -12,6 +12,8 @@ interface CommentInputProps {
     placeholder?: string;
     disabled?: boolean;
     profileImageUrl?: string;
+    contentMinSize?: number;
+    contentMaxSize?: number;
 }
 
 const CommentInput = ({
@@ -21,39 +23,66 @@ const CommentInput = ({
     placeholder = "댓글을 입력하세요...",
     disabled = false,
     profileImageUrl,
+    contentMinSize = 1,
+    contentMaxSize = 100,
 }: CommentInputProps): JSX.Element => {
+
+    const [WarnVisible, setWarnVisible] = useState(false);
+
+    const showWarning = () => {
+        setWarnVisible(true);
+        setTimeout(() => {
+            setWarnVisible(false);
+        }, 2000); // 2초 후에 사라짐
+    };
+
+    const handleSubmit = () => {
+        const valueLength = value.trim().length;
+        if (valueLength >= contentMinSize && valueLength <= contentMaxSize) {
+            onSubmit();
+            Keyboard.dismiss();
+        } else {
+            showWarning();
+        }
+    }
+
     return (
         <KeyboardAvoidingView
-            style={styles.CommentCreateView}
             behavior={Platform.OS === "ios" ? "padding" : "height"}
-            keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
         >
-            <View style={styles.CommentProfileImage}>
-                <ProfileImage variant="small" imageUrl={profileImageUrl} />
+            {WarnVisible && (
+                <View style={styles.ErrorInfoView}>
+                    <Text style={styles.ErrorINfoText}>
+                        최소 {contentMinSize}자 이상, 최대 {contentMaxSize}자 이하 이어야 합니다.
+                    </Text>
+                </View>
+            )}
+            <View style={styles.CommentCreateView}>
+                <View style={styles.CommentProfileImage}>
+                    <ProfileImage variant="small" imageUrl={profileImageUrl} />
+                </View>
+
+                <TextInput
+                    style={styles.commentInput}
+                    placeholder={placeholder}
+                    value={value}
+                    onChangeText={onChangeText}
+                    editable={!disabled}
+                    multiline
+                />
+
+                <TouchableOpacity
+                    style={styles.CommentSendButton}
+                    onPress={() => { handleSubmit() }}
+                    disabled={disabled}
+                >
+                    <Icons.send />
+                </TouchableOpacity>
             </View>
 
-            <TextInput
-                style={styles.commentInput}
-                placeholder={placeholder}
-                value={value}
-                onChangeText={onChangeText}
-                editable={!disabled}
-                multiline
-            />
-
-            <TouchableOpacity
-                style={styles.CommentSendButton}
-                onPress={() => {
-                    if (value.trim() !== "") {
-                        onSubmit();
-                        Keyboard.dismiss();
-                    }
-                }}
-                disabled={disabled}
-            >
-                <Icons.send />
-            </TouchableOpacity>
         </KeyboardAvoidingView>
+
     );
 };
 
