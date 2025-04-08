@@ -1,6 +1,8 @@
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native"
+import { StyleSheet, View, TouchableOpacity, Image } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import colors from "../../../../assets/colors"
+import Text from '../../../components/Common/Text';
+
 
 type VotingCardProps = {
   topic: string
@@ -29,6 +31,20 @@ const VotingCard = ({
   onScrapToggle,
   onCardPress,
 }: VotingCardProps) => {
+
+  const getOptionTextStyle = (isLeftOption: boolean) => {
+    if (isLeftOption && isLeft) return styles.selectedLeftText;
+    if (!isLeftOption && !isLeft) return styles.selectedRightText;
+    return styles.unselectedText;
+  };
+  
+  const getEmoji = (isLeftOption: boolean) => {
+    return isLeftOption
+      ? require('../../../../assets/images/agree.png')
+      : require('../../../../assets/images/disagree.png');
+  };
+  
+
   return (
     <TouchableOpacity style={styles.container} onPress={onCardPress} activeOpacity={0.8}>
       <View style={styles.header}>
@@ -51,18 +67,16 @@ const VotingCard = ({
       <View style={styles.optionsContainer}>
         <View style={[styles.option, styles.leftOption, isLeft && styles.selectedLeftOption]}>
           <View style={styles.optionIconContainer}>
-            <Text style={styles.emoji}>🙆🏻‍♂️</Text>
+            <Image source={getEmoji(true)} style={styles.emoji} />
           </View>
-          <Text style={styles.percentText}>{leftPercent}%</Text>
-          <Text style={styles.countText}>{leftCount}명</Text>
+          <Text style={[styles.percentText, getOptionTextStyle(true)]}>{leftPercent}% {leftCount}명</Text>
         </View>
 
         <View style={[styles.option, styles.rightOption, !isLeft && styles.selectedRightOption]}>
           <View style={styles.optionIconContainer}>
-            <Text style={styles.emoji}>🙅🏻</Text>
+            <Image source={getEmoji(false)} style={styles.emoji} />
           </View>
-          <Text style={styles.percentText}>{rightPercent}%</Text>
-          <Text style={styles.countText}>{rightCount}명</Text>
+          <Text style={[styles.percentText, getOptionTextStyle(false)]}>{rightPercent}% {rightCount}명</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -73,8 +87,8 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.white,
     borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    padding: 20,
+    marginBottom: 25,
     shadowColor: colors.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -88,8 +102,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   topic: {
-    fontSize: 22,
-    fontWeight: "bold",
+    fontSize: 20,
     flex: 1,
     marginRight: 8,
     color: colors.black,
@@ -135,15 +148,28 @@ const styles = StyleSheet.create({
   },
   emoji: {
     fontSize: 24,
+    height: 24,
+    resizeMode: 'contain',
   },
   percentText: {
     fontSize: 16,
     fontWeight: "700",
     color: colors.black,
-    marginRight: 4,
+    marginRight: 7,
   },
   countText: {
     fontSize: 14,
+    color: colors.black,
+  },
+  selectedLeftText: {
+    color: colors.white,
+    fontWeight: "700",
+  },
+  selectedRightText: {
+    color: colors.white,
+    fontWeight: "700",
+  },
+  unselectedText: {
     color: colors.black,
   },
 })

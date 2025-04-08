@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { StyleSheet, Text, View, ScrollView, SafeAreaView } from "react-native"
+import { StyleSheet, View, ScrollView, SafeAreaView } from "react-native"
 import {ProfileImage, PersonalityTag} from "../../components"
 import SectionToggle from "./Components/SectionToggle"
 import TabBar from "./Components/TabBar"
@@ -17,6 +17,8 @@ import { getProfileInfos } from "./Api/userAPI"
 
 import { useAuth } from "../../shared/hooks"
 import { UserInfo } from "../../shared/types/user"
+import Text from '../../components/Common/Text';
+
 
 const MypageScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
@@ -156,7 +158,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   tabContainer: {
-
   },
   sectionToggleContainer: {
     paddingHorizontal: 16,

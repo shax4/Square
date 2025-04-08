@@ -77,7 +77,8 @@ const SurveyContent = () => {
 
         // Handle success
         console.log("Survey submitted successfully:", result)
-        Alert.alert("제출 완료", JSON.stringify(result, null, 2), [{ text: "확인" }]);
+        //Alert.alert("제출이 완료", JSON.stringify(result, null, 2), [{ text: "확인" }]);
+        Alert.alert("제출이 완료", "성향 정보가 반영되었습니다.", [{ text: "확인" }]);
   
         navigation.replace('PersonalityResultScreen', { isAfterSurvey : true, givenNickname : result.nickname, typeResult : result})
       } catch (error) {

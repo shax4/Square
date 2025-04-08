@@ -13,6 +13,7 @@ import PersonalityResultScreen from '../../../pages/PersonalityResultScreen/Pers
 import { StackParamList } from '../../../shared/page-stack/DebatePageStack';
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
+import PersonalitySurveyPage from '../../../pages/PersonalitySurveyPage/PersonalitySurveyPage';
 const Stack = createNativeStackNavigator<StackParamList>();
 
 // 테스트용 예시 사용자 정보(전역 상태관리로 받아오도록 수정 필요)
@@ -51,7 +52,7 @@ export default function HeaderBar() {
                 name="OpinionListScreen"
                 component={OpinionListScreen}
                 options={({ route }) => ({
-                    title: `Number ${route.params.debateId}`,
+                    title: `논쟁 ${route.params.debateId}`,
                     headerBackButtonDisplayMode: 'minimal',
                 })}
             />
@@ -111,6 +112,15 @@ export default function HeaderBar() {
                 options={{
                     title: '성향 테스트 확인',
                     headerBackButtonDisplayMode: 'minimal',
+                }}
+            />
+            {/* 성향 테스트 */}
+            <Stack.Screen
+                name="PersonalitySurveyPage"
+                component={PersonalitySurveyPage}
+                options={{
+                    title: "설문 조사",
+                    headerBackButtonDisplayMode: "minimal",
                 }}
             />
         </Stack.Navigator>
