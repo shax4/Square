@@ -41,7 +41,6 @@ export const styles = StyleSheet.create({
   horizontalContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginLeft: 8,
   },
   button: {
     padding: 4,

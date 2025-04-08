@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
 import ProfileImage from "../../../components/ProfileImage";
 import LikeButton from "../../../components/LikeButton";
 import { getTimeAgo } from "../../../shared/utils/timeAge/timeAge";
 import { Icons } from "../../../../assets/icons/Icons";
 import PersonalityTag from "../../../components/PersonalityTag/PersonalityTag";
 import { useLikeButton } from "../../../shared/hooks/useLikeButton";
+import Text from '../../../components/Common/Text';
+import colors from "../../../../assets/colors";
 
 // 게시글 아이템 타입 정의
 interface BoardItemProps {
@@ -68,14 +70,14 @@ export default function BoardItem({ item, onPress }: BoardItemProps) {
               nickname={item.nickname}
             />
           </View>
-          <Text style={styles.date}>{getTimeAgo(item.createdAt)}</Text>
+          <Text weight="medium" style={styles.date}>{getTimeAgo(item.createdAt)}</Text>
         </View>
       </View>
 
       {/* 게시글 내용 영역 */}
       <View style={styles.content}>
         <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.preview} numberOfLines={2}>
+        <Text weight="medium" style={styles.preview} numberOfLines={2}>
           {contentPreview}
         </Text>
       </View>
@@ -83,10 +85,10 @@ export default function BoardItem({ item, onPress }: BoardItemProps) {
       {/* 하단 정보 영역 (좋아요 수, 댓글 수) */}
       <View style={styles.footer}>
         <View style={styles.interactionContainer}>
-          <LikeButton {...likeProps} size="small" isVertical={false} />
+          <LikeButton {...likeProps} size="large" isVertical={false} />
           <View style={styles.commentCountContainer}>
             <Icons.commentNew />
-            <Text style={styles.commentCountText}>{item.commentCount}</Text>
+            <Text weight="medium" style={styles.commentCountText}>{item.commentCount}</Text>
           </View>
         </View>
       </View>
@@ -100,7 +102,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 8,
     padding: 16,
-    marginBottom: 12,
+    marginBottom: 14,
     marginHorizontal: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
@@ -112,6 +114,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 12,
+    marginLeft: 1
   },
   authorInfo: {
     marginLeft: 10,
@@ -120,30 +123,32 @@ const styles = StyleSheet.create({
   authorName: {
     fontSize: 14,
     fontWeight: "bold",
-    marginRight: 4,
+    marginRight: 5,
   },
   date: {
     fontSize: 12,
-    color: "#666",
+    color: colors.grayText,
   },
   content: {
-    marginBottom: 12,
+    marginBottom: 5,
+    marginLeft: 4
+
   },
   title: {
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 17,
     marginBottom: 8,
   },
   preview: {
     fontSize: 14,
     color: "#444",
-    lineHeight: 20,
+    lineHeight: 18,
   },
   footer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 8,
+    marginTop: 4,
+    
   },
   stats: {
     flexDirection: "row",
