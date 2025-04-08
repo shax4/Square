@@ -24,11 +24,11 @@ export const PostService = {
    * 최신순 또는 좋아요순으로 게시글 목록을 조회합니다.
    *
    * @param params 목록 조회 매개변수 (정렬 방식, 커서 ID, 제한 수)
-   * @returns 게시글 목록 데이터를 포함한 Promise 객체
+   * @returns 실제 게시글 목록 데이터(PostListResponse) 또는 에러 시 undefined를 포함하는 Promise 객체
    */
   getPosts: async (
     params: GetPostsParams = {}
-  ): Promise<ApiResponse<PostListResponse>> => {
+  ): Promise<PostListResponse | undefined> => {
     // 기본값 설정
     const queryParams = {
       sort: params.sort || "latest", // 기본값은 최신순
@@ -40,13 +40,14 @@ export const PostService = {
     };
 
     try {
-      // API 호출
+      // apiGet은 PostListResponse | undefined 를 반환 (ApiResponse 래퍼 없음)
       return await apiGet<PostListResponse>(API_PATHS.POSTS.LIST, {
         params: queryParams,
       });
     } catch (error) {
       console.error("게시글 목록 조회 API 호출 중 오류 발생:", error);
-      throw error;
+      // 에러 발생 시 undefined 반환하여 usePostList에서 처리하도록 함
+      return undefined;
     }
   },
 
@@ -55,19 +56,20 @@ export const PostService = {
    * 특정 게시글의 상세 정보와 댓글 목록을 함께 조회합니다.
    *
    * @param postId 조회할 게시글 ID
-   * @returns 게시글 상세 정보를 포함한 Promise 객체
+   * @returns 게시글 상세 정보를 포함한 Promise 객체 (실제로는 PostDetailResponse | undefined)
    */
   getPostDetail: async (
     postId: number
-  ): Promise<ApiResponse<PostDetailResponse>> => {
+  ): Promise<PostDetailResponse | undefined> => {
     try {
+      // apiGet은 데이터 본문 또는 undefined 반환
       return await apiGet<PostDetailResponse>(API_PATHS.POSTS.DETAIL(postId));
     } catch (error) {
       console.error(
         `게시글 ID ${postId} 상세 조회 API 호출 중 오류 발생:`,
         error
       );
-      throw error;
+      return undefined; // 에러 시 undefined 반환
     }
   },
 

@@ -37,7 +37,8 @@ export interface PostImage {
 // 게시글 목록 조회 응답 타입
 export interface PostListResponse {
   userType: string | null;
-  popular: PopularPost[];
+  popular?: PopularPost[]; // 기존 필드명 (하위 호환성)
+  popularPosts?: PopularPost[]; // 새 필드명 (API 응답과 일치)
   posts: Post[];
   nextCursorId?: number;
   nextCursorLikes?: number | null;

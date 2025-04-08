@@ -4,15 +4,23 @@
  */
 
 // 게시판 관련 서비스
-export { default as PostService } from "./postService";
+import { PostService } from "./postService";
 
 // 댓글 관련 서비스
-export { default as CommentService } from "./commentService";
+import { CommentService } from "./commentService";
 
 // 이미지 업로드 관련 서비스
-export { default as ImageService } from "./imageService";
+import { ImageService } from "./imageService";
 
 // 좋아요 관련 서비스
-export { LikeService, toggleLikeAPI } from "./likeService";
+import { LikeService, toggleLikeAPI } from "./likeService";
 
 // 추가 서비스들은 여기에 추가
+
+export {
+  PostService,
+  CommentService,
+  ImageService,
+  LikeService,
+  toggleLikeAPI,
+};

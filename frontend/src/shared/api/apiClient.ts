@@ -25,8 +25,12 @@ const apiClient = axios.create({
 // 요청 인터셉터 (기존 코드와 일치)
 apiClient.interceptors.request.use(
   (config) => {
-    const { user } = useAuthStore.getState();
-    const accessToken = user?.accessToken;
+    // useAuthStore를 Hook이 아닌 getState()로 직접 접근
+    // Hook을 React 컴포넌트 외부에서 호출할 수 없으므로 이렇게 수정
+    const accessToken = useAuthStore.getState().user?.accessToken;
+
+    // 토큰 로깅 추가 (개발 시 확인용)
+    console.log("🔑 인증 토큰:", accessToken ? "토큰 있음" : "토큰 없음");
 
     // 개발 로그 (디버깅용)
     console.log(`📤 API 요청: ${config.method?.toUpperCase()} ${config.url}`);
@@ -55,14 +59,19 @@ apiClient.interceptors.response.use(
       }]: ${response.config.method?.toUpperCase()} ${response.config.url}`
     );
 
+    // 응답 데이터 로깅 추가
+    console.log("📄 응답 데이터:", JSON.stringify(response.data));
+
     return response;
   },
   async (error: AxiosError<ApiError>) => {
     const originalRequest = error.config as AxiosRequestConfig & {
       _retry?: boolean;
     };
-    const { user, updateAccessToken, logOut } = useAuthStore.getState();
-    const accessToken = user?.accessToken;
+
+    // useAuthStore를 Hook이 아닌 getState()로 직접 접근
+    const authStore = useAuthStore.getState();
+    const accessToken = authStore.user?.accessToken;
 
     // 에러 로깅
     console.error("API 응답 에러:", error.response?.data);
@@ -96,7 +105,7 @@ apiClient.interceptors.response.use(
 
         // 새 토큰 추출 및 저장
         const newAccessToken = authHeader.split(" ")[1];
-        updateAccessToken(newAccessToken);
+        authStore.updateAccessToken(newAccessToken);
 
         // 원래 요청 재시도
         if (originalRequest.headers) {
@@ -111,7 +120,7 @@ apiClient.interceptors.response.use(
           console.error("네트워크 오류 또는 알 수 없는 오류 발생");
         }
         // 재발급 실패 시 로그아웃
-        logOut();
+        authStore.logOut();
       }
     }
 
