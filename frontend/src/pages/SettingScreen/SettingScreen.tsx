@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import { View, ScrollView, Text, StyleSheet } from "react-native";
 import { useAuth } from "../../shared/hooks";
 import SettingToggleItem from "./components/SettingToggleItem";
+import { useAdminMode } from "../../shared/hooks/useAdminMode";
 
 const SettingScreen = () => {
     const { user } = useAuth();
     const isAdmin = user?.state === "ADMIN";
-
+    const { isAdminMode, setAdminMode } = useAdminMode();
     const [settings, setSettings] = useState({
         newTopic: true,
         popularOpinion: true,
@@ -15,7 +16,6 @@ const SettingScreen = () => {
         sound: true,
         alert: true,
         hidePreference: false,
-        adminMode: false,
     });
 
     const toggleSetting = (key: keyof typeof settings) => (val: boolean) => {
@@ -36,7 +36,11 @@ const SettingScreen = () => {
                 <>
                     <View style={styles.sectionDivider} />
                     <Text style={styles.sectionTitle}>관리자 모드</Text>
-                    <SettingToggleItem label="관리자 모드 전환" value={settings.adminMode} onValueChange={toggleSetting("adminMode")} />
+                    <SettingToggleItem
+                        label="관리자 모드 전환"
+                        value={isAdminMode}
+                        onValueChange={setAdminMode}
+                    />
                 </>
             )}
         </ScrollView>
