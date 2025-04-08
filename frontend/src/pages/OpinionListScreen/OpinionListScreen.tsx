@@ -382,6 +382,8 @@ export default function OpinionListScreen() {
                         onSubmit={handleOpinionPosting}
                         value={commentText}
                         placeholder='의견을 입력하세요...'
+                        contentMinSize={10}
+                        contentMaxSize={150}
                     />
                 )}
             </SafeAreaView>

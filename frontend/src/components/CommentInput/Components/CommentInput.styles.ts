@@ -5,6 +5,9 @@ const {height:SCREEN_HEIGHT, width:SCREEN_WIDTH} = Dimensions.get("window")
 
 export const styles = StyleSheet.create({
 
+    TotalView: {
+
+    },
     CommentCreateView: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -33,4 +36,10 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+    ErrorInfoView: {
+        alignItems: 'center',
+    },
+    ErrorINfoText: {
+        color: colors.warnRed,
+    }
 })
