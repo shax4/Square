@@ -1,14 +1,12 @@
 import type React from "react"
-import { View} from "react-native"
-import {GenderChartProps} from './GenderChart.types'
-import {styles} from './GenderChart.styles'
+import { View } from "react-native"
+import { GenderChartProps } from './GenderChart.types'
+import { styles } from './GenderChart.styles'
 import Text from '../../../../components/Common/Text';
 
 const GenderChart: React.FC<GenderChartProps> = ({ data }) => {
-  // Calculate total value for percentage calculation
   const totalValue = data.reduce((sum, item) => sum + item.value, 0)
 
-  // Get color based on label
   const getColorByLabel = (label: string): string => {
     switch (label) {
       case "남성":
@@ -22,12 +20,21 @@ const GenderChart: React.FC<GenderChartProps> = ({ data }) => {
     }
   }
 
+  if (totalValue === 0) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.labelText}>투표자가 없습니다.</Text>
+      </View>
+    )
+  }
+
   return (
     <View style={styles.container}>
       {/* Labels above the chart */}
       <View style={styles.labelsContainer}>
         {data.map((item, index) => {
-          // Calculate the position for each label based on the percentage
+          if (item.value === 0) return null
+
           const previousValues = data.slice(0, index).reduce((sum, prevItem) => sum + prevItem.value, 0)
           const startPercentage = (previousValues / totalValue) * 100
           const widthPercentage = (item.value / totalValue) * 100
@@ -52,6 +59,7 @@ const GenderChart: React.FC<GenderChartProps> = ({ data }) => {
       <View style={styles.barContainer}>
         {data.map((item, index) => {
           const widthPercentage = (item.value / totalValue) * 100
+
           return (
             <View
               key={`section-${index}`}
@@ -63,7 +71,11 @@ const GenderChart: React.FC<GenderChartProps> = ({ data }) => {
                 },
               ]}
             >
-              <Text style={styles.percentageText}>{`${item.value}%`}</Text>
+              {item.value > 0 && (
+                <Text style={styles.percentageText}>
+                  {`${((item.value / totalValue) * 100).toFixed(1)}%`}
+                </Text>
+              )}
             </View>
           )
         })}
@@ -73,4 +85,3 @@ const GenderChart: React.FC<GenderChartProps> = ({ data }) => {
 }
 
 export default GenderChart
-
