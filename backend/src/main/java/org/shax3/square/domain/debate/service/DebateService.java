@@ -1,19 +1,26 @@
 package org.shax3.square.domain.debate.service;
 
 import lombok.RequiredArgsConstructor;
+
+import org.shax3.square.domain.debate.AiSummaryClient;
 import org.shax3.square.domain.debate.dto.DebateVotedResultResponse;
 import org.shax3.square.domain.debate.dto.SummaryDto;
 import org.shax3.square.domain.debate.dto.VoteResultDto;
+import org.shax3.square.domain.debate.dto.request.DebateCreateRequest;
 import org.shax3.square.domain.debate.dto.response.DebateDetailResponse;
 import org.shax3.square.domain.debate.dto.response.SummaryResponse;
 import org.shax3.square.domain.debate.dto.response.VoteResponse;
 import org.shax3.square.domain.debate.model.Debate;
+import org.shax3.square.domain.debate.model.Summary;
 import org.shax3.square.domain.debate.model.Vote;
 import org.shax3.square.domain.debate.repository.DebateRepository;
 import org.shax3.square.domain.opinion.dto.OpinionDto;
 import org.shax3.square.domain.opinion.service.OpinionFacadeService;
+import org.shax3.square.domain.proposal.service.ProposalService;
+import org.shax3.square.domain.user.model.State;
 import org.shax3.square.domain.user.model.User;
 import org.shax3.square.exception.CustomException;
+import org.shax3.square.exception.ExceptionCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +40,8 @@ public class DebateService {
     private final VoteService voteService;
     private final SummaryService summaryService;
     private final OpinionFacadeService opinionFacadeService;
+    private final ProposalService proposalService;
+    private final AiSummaryClient aiSummaryClient;
 
     public Debate findDebateById(Long debateId) {
         return debateRepository.findById(debateId)
@@ -147,4 +156,28 @@ public class DebateService {
 
         return merged;
     }
+
+    /**
+     * 오늘의 논쟁 생성
+     * @param request
+     * @param user
+     */
+    @Transactional
+    public void createDebateFromProposal(DebateCreateRequest request, User user) {
+
+        if (user.getState() != State.ADMIN) {
+            throw new CustomException(ExceptionCode.USER_NOT_AUTHORIZED);
+        }
+
+        Debate debate = request.to();
+        debateRepository.save(debate);
+
+        aiSummaryClient.generateAndSaveSummaries(debate);
+
+        proposalService.deleteProposal(request.proposalId());
+    }
+
+
+
+
 }

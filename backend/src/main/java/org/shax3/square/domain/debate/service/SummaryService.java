@@ -17,4 +17,8 @@ public class SummaryService {
         List<Summary> summaries = summaryRepository.findByDebateId(debateId);
         return SummaryDto.of(summaries);
     }
+
+    public void save(Summary summary) {
+        summaryRepository.save(summary);
+    }
 }
