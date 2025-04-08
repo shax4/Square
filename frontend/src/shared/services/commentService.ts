@@ -138,6 +138,41 @@ export const CommentService = {
       throw error;
     }
   },
+
+  /**
+   * 특정 댓글에 대한 답글 목록 조회 (더보기 기능)
+   * GET /comments/{commentId} API 호출 (Swagger 기준)
+   * @param commentId 상위 댓글 ID
+   * @param nextCursorId 다음 페이지 커서 ID (마지막으로 조회된 답글 ID)
+   * @param limit 페이지당 답글 수 (기본값: 9)
+   * @returns 답글 목록 데이터 또는 undefined
+   */
+  getCommentReplies: async ({
+    commentId,
+    nextCursorId,
+    limit = 9, // 요구사항에 맞춰 기본값 9로 설정
+  }: GetRepliesParams): Promise<RepliesResponse | undefined> => {
+    // API 경로 설정 (API_PATHS 사용 권장하나, 여기서는 직접 구성)
+    const path = `/api/comments/${commentId}`;
+
+    // 쿼리 파라미터 구성
+    const queryParams: { limit: number; nextCursorId?: number } = { limit };
+    if (nextCursorId) {
+      queryParams.nextCursorId = nextCursorId;
+    }
+
+    try {
+      // apiGet 호출 (반환 타입: RepliesResponse | undefined)
+      const result = await apiGet<RepliesResponse>(path, {
+        params: queryParams,
+      });
+      console.log(`댓글 ${commentId} 답글 조회 API 응답:`, result); // 응답 로깅
+      return result;
+    } catch (error) {
+      console.error(`댓글 ID ${commentId} 답글 목록 조회 API 오류:`, error);
+      return undefined;
+    }
+  },
 };
 
 // 편의성을 위한 기본 내보내기

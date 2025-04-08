@@ -93,7 +93,7 @@ export interface UpdatePostRequest {
 // 댓글 생성 요청 타입
 export interface CreateCommentRequest {
   postId: number;
-  parentCommentId?: number; // 대댓글인 경우에만 필요
+  parentId?: number; // 대댓글인 경우 부모 댓글 ID (백엔드 필드명 변경됨)
   content: string;
 }
 
