@@ -4,14 +4,16 @@ import colors from "../../../../assets/colors";
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.white,
+        backgroundColor: colors.background,
     },
     topicView: {
         maxHeight: 100,
         minHeight: 60,
         alignItems: 'flex-start',
-        margin: 12,
         flexWrap: 'wrap',
+        marginLeft: 20,
+        marginTop: 20,
+        marginBottom: 20
     },
     topicViewText: {
         margin: 10,
@@ -24,24 +26,24 @@ export const styles = StyleSheet.create({
         marginLeft: 20,
         marginRight: 20,
         marginBottom: 10,
+        gap: 130,
     },
     optionTextLeft: {
-        width: '30%',
         height: 40,
         lineHeight: 40,
-        backgroundColor: colors.yesLight,
         fontSize: 15,
         borderRadius: 15,
         textAlign: 'center',
+        color: colors.yesDark
+        
     },
     optionTextRight: {
-        width: '30%',
         height: 40,
         lineHeight: 40,
-        backgroundColor: colors.noLight,
         fontSize: 15,
         borderRadius: 15,
         textAlign: 'center',
+        color: colors.noDark
     },
     opinionView: {
         flex: 1,
@@ -53,6 +55,38 @@ export const styles = StyleSheet.create({
         bottom: 10,
         backgroundColor: 'rgba(0, 0, 0, 0)',
     },
+    
+    optionBox: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#F4F4F4',
+        borderRadius: 50,
+        paddingVertical: 5,
+        paddingHorizontal: 14,
+        flex: 1, 
+
+    },
+
+    optionBoxLeft: {
+        backgroundColor: colors.white, 
+    },
+    
+    optionBoxRight: {
+        backgroundColor: '#e4e4e4', 
+    },
+    
+    optionImage: {
+        width: 20,
+        height: 20,
+        marginRight: 10,
+        marginLeft: 13
+    },
+    
+    optionText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+      
     bottomContainer: {
         width: '100%',
     },
@@ -81,15 +115,15 @@ export const styles = StyleSheet.create({
         backgroundColor: '#eeeeee',
         borderRadius: 15,
         marginHorizontal: 20,
-        padding: 4,
-        marginBottom: 10,
+        padding: 3,
+        marginBottom: 20,
         alignItems: 'center',
     },
     tabButton: {
         flex: 1,
         textAlign: 'center',
-        paddingVertical: 10,
-        borderRadius: 12,
+        paddingVertical: 8,
+        borderRadius: 14,
         color: '#888',
         fontWeight: '500',
     },

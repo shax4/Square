@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import { View, TouchableOpacity, Image } from "react-native";
 import { Opinion } from "./Opinion.types";
 import { getTimeAgo } from "../../../../shared/utils/timeAge/timeAge";
 import { ProfileImage, PersonalityTag } from "../../../../components";
@@ -9,6 +9,7 @@ import { AntDesign, Feather } from '@expo/vector-icons'; // 하트/댓글 아이
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { StackParamList } from "../../../../shared/page-stack/DebatePageStack";
+import Text from '../../../../components/Common/Text';
 
 
 
@@ -64,7 +65,7 @@ const OpinionBox = ({ debateId, opinion }: Props) => {
                 </View>
 
                 {/* 본문 */}
-                <Text style={styles.contentText}>{content}</Text>
+                <Text weight="medium" style={styles.contentText}>{content}</Text>
 
                 {/* 하단: 하트, 댓글, 시간 */}
                 <View style={styles.bottomRow}>
@@ -73,12 +74,12 @@ const OpinionBox = ({ debateId, opinion }: Props) => {
                         size={16}
                         color={isLiked ? "red" : "gray"}
                     />
-                    <Text style={styles.countText}>{likeCount}</Text>
+                    <Text weight="medium" style={styles.countText}>{likeCount}</Text>
 
                     <Feather name="message-circle" size={16} color="gray" style={{ marginLeft: 12 }} />
-                    <Text style={styles.countText}>{commentCount}</Text>
+                    <Text weight="medium" style={styles.countText}>{commentCount}</Text>
 
-                    <Text style={styles.timeText}>{getTimeAgo(createdAt)}</Text>
+                    <Text weight="medium" style={styles.timeText}>{getTimeAgo(createdAt)}</Text>
                 </View>
             </View>
         </TouchableOpacity>

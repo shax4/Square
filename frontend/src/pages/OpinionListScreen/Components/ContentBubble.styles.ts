@@ -19,22 +19,23 @@ export const styles = StyleSheet.create({
         borderRadius: 15,
     },
     leftBubble: {
-        backgroundColor: colors.yesLight,
+        backgroundColor: '#CCE0FF',
         borderTopLeftRadius: 0,
     },
     rightBubble: {
-        backgroundColor: colors.noLight,
+        backgroundColor: '#FEECEC',
         borderTopRightRadius: 0,
     },
     topRow: {
         flexDirection: "row",
         alignItems: "center",
-        marginBottom: 6,
+        marginBottom: 8,
     },
     nickname: {
         fontWeight: "bold",
         fontSize: 14,
-        marginRight: 4,
+        marginRight: 6,
+        marginLeft: 4
     },
     contentText: {
         fontSize: 15,

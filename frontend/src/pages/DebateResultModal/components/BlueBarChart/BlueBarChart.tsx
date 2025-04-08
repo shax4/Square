@@ -1,6 +1,6 @@
 import { BarChart } from "react-native-gifted-charts";
 import { BarChartComponentProps } from "./BlueBarChart.types";
-import { Text } from "react-native";
+import Text from '../../../../components/Common/Text';
 
 const BlueBarChart = (data: BarChartComponentProps) => {
 

@@ -1,9 +1,10 @@
-import { TouchableOpacity, Text } from "react-native";
+import { TouchableOpacity} from "react-native";
 import { PersonalityTagProps } from "./PersonalityTag.types";
 import { styles } from "./PersonalityTag.styles";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { StackParamList } from "../../shared/page-stack/MyPageStack";
+import Text from '../../components/Common/Text';
 
 
 const PersonalityTag = ({ personality, nickname }: PersonalityTagProps) => {

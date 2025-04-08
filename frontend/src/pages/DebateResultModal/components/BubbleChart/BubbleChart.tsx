@@ -2,9 +2,10 @@
 
 import type React from "react"
 import { useEffect, useState } from "react"
-import { View, Text, StyleSheet, Dimensions, ScrollView } from "react-native"
+import { View, StyleSheet, Dimensions, ScrollView } from "react-native"
 import {styles} from "./BubbleChart.styles";
 import {BubbleChartProps, Bubble} from "./BubbleChart.types";
+import Text from '../../../../components/Common/Text';
 
 const colors = ["#00AEFF", "#6541F2", "#F553DA", "#CB59FF", "#FFA500", "#FF4500", "#32CD32", "#8A2BE2"]
 

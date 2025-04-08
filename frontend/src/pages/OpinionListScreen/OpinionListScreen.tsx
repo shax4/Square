@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useState, useCallback, useRef } from 'react';
-import { View, Text, KeyboardAvoidingView, Platform, SafeAreaView, TouchableOpacity } from 'react-native';
+import { View, KeyboardAvoidingView, Platform, SafeAreaView, TouchableOpacity, Image } from 'react-native';
 import { styles } from './Components/OpinionListScreen.styles'
 import { RouteProp, useNavigation, useRoute, useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { StackParamList } from '../../shared/page-stack/DebatePageStack';
@@ -18,6 +18,7 @@ import { Icons } from '../../../assets/icons/Icons';
 import { useDebateStore } from '../../shared/stores/debates';
 import { SortType } from './Components/OpinionSortType';
 import { useAuthStore } from '../../shared/stores';
+import Text from '../../components/Common/Text';
 
 type OpinionListScreenRouteProp = RouteProp<StackParamList, 'OpinionListScreen'>;
 
@@ -338,9 +339,27 @@ export default function OpinionListScreen() {
                 )}
 
                 <View style={styles.optionView}>
-                    <Text style={styles.optionTextLeft}>{debate!.leftOption}</Text>
-                    <Text style={styles.optionTextRight}>{debate!.rightOption}</Text>
+                    <View style={[styles.optionBox, styles.optionBoxLeft]}>
+                        <Image
+                        source={require('../../../assets/images/agree.png')}
+                        style={styles.optionImage}
+                        />
+                        <Text style={[styles.optionText, styles.optionTextLeft]}>
+                        {debate!.leftOption}
+                        </Text>
+                    </View>
+
+                    <View style={[styles.optionBox, styles.optionBoxRight]}>
+                        <Image
+                        source={require('../../../assets/images/disagree.png')}
+                        style={styles.optionImage}
+                        />
+                        <Text style={[styles.optionText, styles.optionTextRight]}>
+                        {debate!.rightOption}
+                        </Text>
+                    </View>
                 </View>
+
 
                 <View style={styles.opinionView}>
                     {isSummary ? (

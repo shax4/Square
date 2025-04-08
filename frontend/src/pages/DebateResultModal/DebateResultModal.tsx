@@ -1,10 +1,11 @@
 import type React from "react"
 import { useState } from "react"
-import { View, Text, Modal, TouchableOpacity, ScrollView, SafeAreaView, Dimensions } from "react-native"
+import { View, Modal, TouchableOpacity, ScrollView, SafeAreaView, Dimensions } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import { GenderChart, BlueBarChart, BubbleChart } from "./components"
 import { styles } from './DebateResultModal.styles'
 import { DebateResultModalProps } from './DebateResultModal.types'
+import Text from '../../components/Common/Text';
 
 const DebateResultModal: React.FC<DebateResultModalProps> = ({ visible, onClose, onPressMoreOpinion, data, leftOption, rightOption }) => {
 
