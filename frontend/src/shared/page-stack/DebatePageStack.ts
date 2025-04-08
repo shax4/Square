@@ -28,6 +28,6 @@ export type StackParamList = {
         opinionId: number;
         content: string;
     };
-
     PersonalityResultScreen: { nickname: string };
+    PersonalitySurveyPage: undefined;
 };

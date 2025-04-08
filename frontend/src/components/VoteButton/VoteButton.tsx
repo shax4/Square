@@ -178,13 +178,13 @@ const VoteButton = ({ debateId, showVoteResultModal, }: VoteButtonProps): JSX.El
 
     const getVoteTextStyle = (isLeftButton: boolean) => {
         if (!voted) {
-          return isLeftButton ? styles.VoteTextBeforeLeft : styles.VoteTextBeforeRight;
+            return isLeftButton ? styles.VoteTextBeforeLeft : styles.VoteTextBeforeRight;
         } else if (debate.isLeft === isLeftButton) {
-          return isLeftButton ? styles.VoteTextSelectedLeft : styles.VoteTextSelectedRight;
+            return isLeftButton ? styles.VoteTextSelectedLeft : styles.VoteTextSelectedRight;
         } else {
-          return styles.VoteTextNotSelected;
+            return styles.VoteTextNotSelected;
         }
-      };
+    };
 
     return (
         <View style={styles.Container}>
@@ -201,7 +201,7 @@ const VoteButton = ({ debateId, showVoteResultModal, }: VoteButtonProps): JSX.El
                 onPress={() => handleVote(true)}
             >
                 <View style={styles.VoteContents}>
-                <Image source={require('../../../assets/images/agree.png')} style={styles.VoteEmojiImage}/>
+                    <Image source={require('../../../assets/images/agree.png')} style={styles.VoteEmojiImage} />
                     <Text style={[styles.VoteMainText, getVoteTextStyle(true)]}>{debate.leftOption}</Text>
                     {voted && (
                         <Text weight="medium" style={[styles.VoteSubText, getVoteTextStyle(true)]}>{debate.leftPercent}% ({debate.leftCount}명)</Text>
@@ -222,7 +222,7 @@ const VoteButton = ({ debateId, showVoteResultModal, }: VoteButtonProps): JSX.El
                 onPress={() => handleVote(false)}
             >
                 <View style={styles.VoteContents}>
-                    <Image source={require('../../../assets/images/disagree.png')} style={styles.VoteEmojiImage}/>
+                    <Image source={require('../../../assets/images/disagree.png')} style={styles.VoteEmojiImage} />
                     <Text style={[styles.VoteMainText, getVoteTextStyle(false)]}>{debate.rightOption}</Text>
                     {voted && (
                         <Text weight="medium" style={[styles.VoteSubText, getVoteTextStyle(false)]}>{debate.rightPercent}% ({debate.rightCount}명)</Text>
