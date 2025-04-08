@@ -1,5 +1,6 @@
 import type React from "react"
-import { View, Text, StyleSheet } from "react-native"
+import { View, StyleSheet } from "react-native"
+import Text from '../../../components/Common/Text';
 
 interface PersonalityGraphProps {
   title: string
@@ -74,7 +75,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontWeight: 'bold',
     color: "#37383C",
     marginBottom: 0,
     textAlign: "center",
@@ -85,12 +85,11 @@ const styles = StyleSheet.create({
   labelsContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 4,
+    marginBottom: 6,
   },
   label: {
-    fontSize: 16,
+    fontSize: 15,
     color: "#7E7E7E",
-    fontWeight: 'bold'
   },
   barContainer: {
     flexDirection: "row",

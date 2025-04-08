@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { TextInput, View, Text, StyleSheet } from "react-native";
+import { TextInput, View, StyleSheet } from "react-native";
 import { TextFieldProps, TextFieldVariant } from "./TextField.types";
 import { styles } from "./TextField.styles";
+import Text from '../../components/Common/Text';
 
 const TextField = ({
   label,
