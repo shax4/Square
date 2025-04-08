@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { StyleSheet, FlatList, ActivityIndicator, View, Text } from "react-native";
+import { StyleSheet, FlatList, ActivityIndicator, View} from "react-native";
 import PostCard from "./PostCard"
 import { getMypagePosts } from "../Api/postAPI";
 import { Post, PostResponse } from "../Type/mypagePost";
@@ -8,6 +8,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 
 import {StackParamList} from '../../../shared/page-stack/MyPageStack'
+import Text from '../../../components/Common/Text';
 
 interface Props {
     type : "작성글" | "스크랩" | "좋아요";

@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import colors from "../../../assets/colors";
 
 export const styles = StyleSheet.create({
   container: {
@@ -46,14 +47,13 @@ export const styles = StyleSheet.create({
     padding: 4,
   },
   countContainer: {
-    marginTop: 4,
+    marginTop: 1,
     alignItems: "center",
     flexDirection: "row",
   },
   countText: {
-    fontSize: 12,
-    color: "#555",
-    fontWeight: "bold",
+    fontSize: 14,
+    color: colors.grayText,
   },
   simpleErrorIcon: {
     marginLeft: 4,
