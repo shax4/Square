@@ -1,7 +1,6 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity, SafeAreaView, Alert, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { onGoogleButtonPress, requestFirebaseLogin } from "./API/googleAPI";
-import { v4 as uuidv4 } from 'uuid';
 import { useState } from "react";
 import { userDetails } from "../../shared/types/user";
 import { loginTemp } from "./API/tempLoginAPI";
@@ -21,34 +20,35 @@ const LandingScreen = ({ navigation }: any) => {
     console.log("Google 계정으로 시작하기");
 
     try {
-      // const idToken = await onGoogleButtonPress();
-      // const deviceId = uuidv4();
+      const idToken = await onGoogleButtonPress();
 
-      // if (!idToken) {
-      //   Alert.alert("로그인 실패", "Google 로그인에 실패했습니다.");
-      //   return;
-      // }
+      if (!idToken) {
+        Alert.alert("로그인 실패", "Google 로그인에 실패했습니다.");
+        return;
+      }
 
-      // const response : FirebaseLoginResponse = await requestFirebaseLogin(idToken, null, deviceId, "android", "GOOGLE");
-      // setLoginResponse(response); // 화면에 출력하기 위해 저장
-
-      // const userDetails : userDetails = {
-      //   nickname : response.nickname,
-      //   userType: response.userType,
-      //   state: "ACTIVE",
-      //   isMember : response.isMember,
-      //   accessToken : response.accessToken,
-      //   refreshToken : response.refreshToken,
-      // }
+      const response : FirebaseLoginResponse = await requestFirebaseLogin(idToken, null, "null", "android", "GOOGLE");
+      setLoginResponse(response); // 화면에 출력하기 위해 저장
 
       const userDetails : userDetails = {
-        nickname : null,
-        userType: null,
+        nickname : response.nickname,
+        userType: response.userType,
+        email: response.email,
+        socialType: response.socialType,
         state: "ACTIVE",
-        isMember : false,
-        accessToken : null,
-        refreshToken : null,
+        isMember : response.isMember,
+        accessToken : response.accessToken,
+        refreshToken : response.refreshToken,
       }
+
+      // const userDetails : userDetails = {
+      //   nickname : null,
+      //   userType: null,
+      //   state: "ACTIVE",
+      //   isMember : false,
+      //   accessToken : null,
+      //   refreshToken : null,
+      // }
 
       setUser(userDetails)
 
