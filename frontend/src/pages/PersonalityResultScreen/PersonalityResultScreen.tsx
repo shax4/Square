@@ -15,7 +15,7 @@ import { StackParamList } from '../../shared/page-stack/MyPageStack'
 
 import { getMyPersonalityResult, getOthersPersonalityResult } from "./Api/PersonalityResultAPI"
 import Text from '../../components/Common/Text';
-import UserTypeInfoModal from "./Components/UserTypeInfoMOdal"
+import UserTypeInfoModal from "./Components/UserTypeInfoModal"
 
 // Axios 연결 필요
 // 임시 데이터로 태스트
