@@ -29,6 +29,7 @@ import { BoardStackParamList } from "../../../shared/page-stack/BoardPageStack";
 
 import OpinionListScreen from "../../../pages/OpinionListScreen/OpinionListScreen";
 import OpinionDetailScreen from "../../../pages/OpinionDetailScreen/OpinionDetailScreen";
+import SettingScreen from "../../../pages/SettingScreen/SettingScreen";
 // 스택 네비게이터
 const Stack = createNativeStackNavigator();
 
@@ -52,7 +53,7 @@ export default function HeaderBar() {
               <TouchableOpacity
                 onPress={() => {
                   console.log("환경 설정으로 이동");
-                  navigation.navigate("PersonalitySurveyPage");
+                  navigation.navigate("SettingScreen");
                 }}
               >
                 <Icons.settings />
@@ -198,6 +199,17 @@ export default function HeaderBar() {
           };
         }}
       />
+      <Stack.Screen
+        name="SettingScreen"
+        component={SettingScreen}
+        options={() => {
+          return {
+            title: "환경설정",
+            headerBackButtonDisplayMode: "minimal",
+          };
+        }}
+      />
+      
     </Stack.Navigator>
   );
 }
