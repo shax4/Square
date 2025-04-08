@@ -30,7 +30,7 @@ public class PostCommentService {
 	@Transactional
 	public PostCommentResponse createPostComment(CreatePostCommentRequest request, User user) {
 		Post post = postService.getPost(request.postId());
-		Long parentCommentId = request.parentCommentId();
+		Long parentCommentId = request.parentId();
 
 		// 부모 댓글 존재 여부 확인
 		PostComment parentComment = null;
