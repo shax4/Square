@@ -10,11 +10,11 @@ import OpinionDetailScreen from '../../../pages/OpinionDetailScreen/OpinionDetai
 import OpinionEditScreen from '../../../pages/OpinionEditScreen/OpinionEditScreen';
 import PersonalityResultScreen from '../../../pages/PersonalityResultScreen/PersonalityResultScreen';
 
-import { StackParamList } from '../../../shared/page-stack/DebatePageStack';
+import { DebateStackParamList } from '../../../shared/page-stack/DebatePageStack';
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import PersonalitySurveyPage from '../../../pages/PersonalitySurveyPage/PersonalitySurveyPage';
-const Stack = createNativeStackNavigator<StackParamList>();
+const Stack = createNativeStackNavigator<DebateStackParamList>();
 
 // 테스트용 예시 사용자 정보(전역 상태관리로 받아오도록 수정 필요)
 const currentUser = {
@@ -42,9 +42,6 @@ export default function HeaderBar() {
                 options={{
                     title: '오늘의 주제',
                     headerBackButtonDisplayMode: 'minimal',
-                    //headerRight: () => DebateCardsScreenHeaderRightIcons() // 일반 함수 형태: Hook 사용 불가
-                    headerRight: () => <DebateCardsScreenHeaderRightIcons /> // React 컴포넌트 JSX 형태: Hook 사용 가능
-
                 }}
             />
             {/* 토론 카드 상세(의견 목록) */}
@@ -127,21 +124,3 @@ export default function HeaderBar() {
     );
 }
 
-
-function DebateCardsScreenHeaderRightIcons() {
-    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
-    return (
-        <View style={styles.headerRightItems}>
-            <TouchableOpacity onPress={() => { navigation.navigate('ProposalListScreen') }}>
-                <Icons.add />
-            </TouchableOpacity>
-        </View>
-    )
-}
-
-const styles = StyleSheet.create({
-    headerRightItems: {
-        flexDirection: 'row',
-        gap: 12,
-    },
-});

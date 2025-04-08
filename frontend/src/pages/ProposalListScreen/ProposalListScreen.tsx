@@ -4,7 +4,7 @@ import colors from "../../../assets/colors";
 import { Button } from "../../components";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { StackParamList } from "../../shared/page-stack/DebatePageStack";
+import { DebateStackParamList } from "../../shared/page-stack/DebatePageStack";
 import { Proposal } from "./Components/ProposalProps";
 import ProposalItem from './Components/ProposalItem'
 import { getAllProposals } from "./Api/proposalListAPI";
@@ -20,7 +20,7 @@ export default function ProposalListScreen() {
     const [isEmpty, setIsEmpty] = useState<boolean>(false);
     const [renderedProposals, setRenderedProposals] = useState<Proposal[]>([]);
 
-    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
+    const navigation = useNavigation<NativeStackNavigationProp<DebateStackParamList>>();
 
     const fetchProposals = async (cursorId: number | null, cursorLikes: number | null) => {
         if (loading) return;

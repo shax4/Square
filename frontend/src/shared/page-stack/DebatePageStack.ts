@@ -10,7 +10,7 @@
 
 import { Debate } from "../../pages/DebateCardsScreen/Components";
 
-export type StackParamList = {
+export type DebateStackParamList = {
     DebateCardsScreen: undefined;
     OpinionListScreen: {
         debateId: number;

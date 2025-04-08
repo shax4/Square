@@ -4,13 +4,13 @@ import colors from "../../../assets/colors";
 import { Button } from "../../components";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { StackParamList } from "../../shared/page-stack/DebatePageStack";
+import { DebateStackParamList } from "../../shared/page-stack/DebatePageStack";
 import { VoteCreateButtonView } from "../../components/VoteButton/VoteCreateButton";
 import { ProposalResponse } from "./Type/ProposalTypes";
 import { postProposal } from "./Api/proposalAPI";
 
 export default function ProposalCreateScreen() {
-    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
+    const navigation = useNavigation<NativeStackNavigationProp<DebateStackParamList>>();
     const [debateTopic, setDebateTopic] = useState('');
 
     const confirmCreateProposal = () => {

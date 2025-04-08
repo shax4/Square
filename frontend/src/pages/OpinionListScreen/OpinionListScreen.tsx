@@ -2,7 +2,7 @@ import React, { useEffect, useLayoutEffect, useState, useCallback, useRef } from
 import { View, KeyboardAvoidingView, Platform, SafeAreaView, TouchableOpacity, Image } from 'react-native';
 import { styles } from './Components/OpinionListScreen.styles'
 import { RouteProp, useNavigation, useRoute, useFocusEffect, useIsFocused } from '@react-navigation/native';
-import { StackParamList } from '../../shared/page-stack/DebatePageStack';
+import { DebateStackParamList } from '../../shared/page-stack/DebatePageStack';
 import VoteButton from '../../components/VoteButton/VoteButton';
 import ToggleSwitch from './Components/ToggleSwitch';
 import SummaryBoxList from './Components/Summary/SummaryBoxList'
@@ -20,7 +20,7 @@ import { SortType } from './Components/OpinionSortType';
 import { useAuthStore } from '../../shared/stores';
 import Text from '../../components/Common/Text';
 
-type OpinionListScreenRouteProp = RouteProp<StackParamList, 'OpinionListScreen'>;
+type OpinionListScreenRouteProp = RouteProp<DebateStackParamList, 'OpinionListScreen'>;
 
 const emptyCursor = {
     nextLeftCursorId: null,
@@ -43,7 +43,7 @@ interface PagingCursor {
 }
 
 export default function OpinionListScreen() {
-    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
+    const navigation = useNavigation<NativeStackNavigationProp<DebateStackParamList>>();
 
     const { loggedIn } = useAuthStore();
 
