@@ -1,10 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, ScrollView } from "react-native"
+import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, ScrollView, Alert } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import {ProfileImage, Button, Checkbox} from "../../components"
 import { ButtonVariant } from "../../components/Button/Button.types"
+import { deleteAccount } from "./api/deleteAccountAPI"
 
 const DeleteAccountScreen = ({ navigation, route }: any) => {
   // Get profile image URL from route params or use default
@@ -14,8 +15,14 @@ const DeleteAccountScreen = ({ navigation, route }: any) => {
   const [isAgreed, setIsAgreed] = useState(false)
 
   // Handle account deletion
-  const handleDeleteAccount = () => {
+  const handleDeleteAccount = async () => {
     console.log("회원 탈퇴 버튼 클릭")
+
+    try{
+      const response = await deleteAccount();
+    }catch(error){
+      Alert.alert("탈퇴 실패", "탈퇴에 실패했습니다.");
+    }
     // Here you would implement the actual account deletion logic
     // After successful deletion, navigate to login or welcome screen
     // navigation.navigate('Welcome');
