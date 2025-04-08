@@ -58,22 +58,22 @@ const GenderChart: React.FC<GenderChartProps> = ({ data }) => {
       {/* Horizontal bar chart */}
       <View style={styles.barContainer}>
         {data.map((item, index) => {
-          const widthPercentage = (item.value / totalValue) * 100
-
+          const percentage = (item.value / totalValue) * 100
+          
           return (
             <View
               key={`section-${index}`}
               style={[
                 styles.barSection,
                 {
-                  width: `${widthPercentage}%`,
+                  width: `${percentage}%`,
                   backgroundColor: getColorByLabel(item.label),
                 },
               ]}
             >
               {item.value > 0 && (
                 <Text style={styles.percentageText}>
-                  {`${((item.value / totalValue) * 100).toFixed(1)}%`}
+                  {`${((item.value / totalValue) * 100)}%`}
                 </Text>
               )}
             </View>
