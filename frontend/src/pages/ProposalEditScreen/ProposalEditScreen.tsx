@@ -20,21 +20,6 @@ export default function ProposalEditScreen() {
     const confirmCreateDebate = () => {
         // 저장 로직
         createDebateAPi(debateTopic);
-
-        // 저장되었습니다 모달 클릭해 돌아가도록
-        Alert.alert(
-            "등록 완료",
-            "청원이 정상적으로 등록되었습니다.",
-            [
-                {
-                    text: "확인",
-                    onPress: () => {
-                        navigation.pop(2);
-                        navigation.navigate("ProposalListScreen")
-                    },
-                }
-            ]
-        );
     }
 
     const createDebateAPi = async (topic: string) => {
@@ -46,6 +31,20 @@ export default function ProposalEditScreen() {
                 rightOption: rightOption,
             };
             const response = await createDebate(debateData);
+            // 저장되었습니다 모달 클릭해 돌아가도록
+            Alert.alert(
+                "등록 완료",
+                "청원이 정상적으로 등록되었습니다.",
+                [
+                    {
+                        text: "확인",
+                        onPress: () => {
+                            navigation.pop(2);
+                            navigation.navigate("ProposalListScreen")
+                        },
+                    }
+                ]
+            );
         } catch (error) {
             Alert.alert(
                 "등록 실패",

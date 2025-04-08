@@ -16,28 +16,24 @@ export default function ProposalCreateScreen() {
     const confirmCreateProposal = () => {
         // 저장 로직
         createProposal(debateTopic);
-
-        // 저장되었습니다 모달 클릭해 돌아가도록
-        Alert.alert(
-            "작성 완료",
-            "청원이 정상적으로 등록되었습니다.",
-            [
-                {
-                    text: "확인",
-                    onPress: () => {
-                        navigation.pop(2);
-                        navigation.navigate("ProposalListScreen")
-                    },
-                }
-            ]
-        );
     }
 
     const createProposal = async (topic: string) => {
         try {
             const data: ProposalResponse = await postProposal(topic);
-
-            console.log("신청 완료된 주제 ID : ", data.proposalId);
+            Alert.alert(
+                "작성 완료",
+                "청원이 정상적으로 등록되었습니다.",
+                [
+                    {
+                        text: "확인",
+                        onPress: () => {
+                            navigation.pop(2);
+                            navigation.navigate("ProposalListScreen")
+                        },
+                    }
+                ]
+            );
         } catch (error) {
             console.debug("주제 청원 신청 실패 : ", error);
             Alert.alert(
