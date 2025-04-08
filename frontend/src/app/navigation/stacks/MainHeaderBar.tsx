@@ -52,7 +52,7 @@ export default function HeaderBar() {
                 name="OpinionListScreen"
                 component={OpinionListScreen}
                 options={({ route }) => ({
-                    title: `Number ${route.params.debateId}`,
+                    title: `논쟁 ${route.params.debateId}`,
                     headerBackButtonDisplayMode: 'minimal',
                 })}
             />

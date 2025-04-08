@@ -47,7 +47,7 @@ const DebateCard = ({ debateId }: DebateCardProps): JSX.Element => {
                 <View style={styles.Card}>
                     {/* Header */}
                     <View style={styles.CardHeader}>
-                        <Text weight="medium" style={styles.CardHeaderText}>Number {debateId}</Text>
+                        <Text weight="medium" style={styles.CardHeaderText}>논쟁 {debateId}</Text>
                         <ScrapButton
                             isScraped={debate.isScraped}
                             onPressScrap={() => { handlePressScrap() }}
