@@ -1,5 +1,5 @@
 import axiosInstance from "./axiosInstance";
-import {useAuthStore} from "../stores/auth"
+import { useAuthStore } from "../stores/auth";
 
 // export const setupAuthInterceptor = () => {
 //     axiosInstance.interceptors.request.use(

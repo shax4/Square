@@ -11,6 +11,7 @@ import {
   CreateCommentRequest,
   UpdateCommentRequest,
   GetRepliesParams,
+  RepliesResponse,
 } from "../types/postTypes";
 
 // 훅의 반환 타입 정의
@@ -29,7 +30,10 @@ interface UseCommentReturn {
   // 대댓글 로드 관련
   loadingReplies: boolean; // 대댓글 로딩 상태
   replyError: Error | null; // 대댓글 에러 상태
-  loadReplies: (commentId: number, nextCursorId?: number) => Promise<Reply[]>; // 대댓글 로드 함수
+  loadReplies: (
+    commentId: number,
+    nextCursorId?: number
+  ) => Promise<RepliesResponse | undefined>; // 대댓글 로드 함수
 }
 
 /**
@@ -66,12 +70,10 @@ export const useComment = (): UseCommentReturn => {
         const commentData: CreateCommentRequest = {
           postId,
           content: commentText.trim(),
+          ...(parentCommentId && { parentId: parentCommentId }),
         };
 
-        // 대댓글인 경우 부모 댓글 ID 추가
-        if (parentCommentId) {
-          commentData.parentCommentId = parentCommentId;
-        }
+        console.log("📄 댓글/답글 생성 API 요청 본문:", commentData); // 요청 본문 로깅 추가
 
         // API 호출
         await CommentService.createComment(commentData);
@@ -85,7 +87,7 @@ export const useComment = (): UseCommentReturn => {
             ? err
             : new Error("댓글 작성 중 오류가 발생했습니다.")
         );
-        console.error("댓글 작성 오류:", err);
+        console.error("댓글/답글 작성 오류:", err);
         return false;
       } finally {
         setSubmitting(false);
@@ -147,49 +149,52 @@ export const useComment = (): UseCommentReturn => {
   );
 
   /**
-   * 대댓글 목록 로드 함수
-   * 특정 댓글에 달린 대댓글 목록을 불러옵니다.
-   *
+   * 대댓글 목록 로드 함수 (더보기 기능)
    * @param commentId 댓글 ID
-   * @param nextCursorId 다음 페이지 커서 ID (무한 스크롤)
-   * @returns 대댓글 목록
+   * @param nextCursorId 다음 페이지 커서 ID
+   * @returns RepliesResponse 객체 또는 undefined
    */
   const loadReplies = useCallback(
-    async (commentId: number, nextCursorId?: number): Promise<Reply[]> => {
+    async (
+      commentId: number,
+      nextCursorId?: number
+    ): Promise<RepliesResponse | undefined> => {
+      console.log(
+        `대댓글 로드 요청: commentId=${commentId}, nextCursorId=${nextCursorId}`
+      );
       setLoadingReplies(true);
       setReplyError(null);
 
       try {
-        // 요청 파라미터 구성
-        const params: GetRepliesParams = {
-          commentId,
-          limit: 9, // 한 번에 9개씩 로드
-        };
-
-        // 커서가 있으면 추가
+        // 요청 파라미터 구성 (limit은 Service에서 기본값 9로 설정됨)
+        const params: GetRepliesParams = { commentId };
         if (nextCursorId) {
           params.nextCursorId = nextCursorId;
         }
 
         // API 호출
-        const response = await CommentService.getReplies(params);
+        const response = await CommentService.getCommentReplies(params);
 
-        // 응답 데이터 처리
-        if (response && response.data && response.data.replies) {
-          return response.data.replies;
+        // API 응답 처리
+        if (response) {
+          console.log("대댓글 로드 성공:", response);
+          return response; // RepliesResponse 객체 반환
+        } else {
+          console.log("대댓글 로드 실패 또는 데이터 없음 (undefined 반환)");
+          return undefined; // API 실패 또는 데이터 없을 시 undefined 반환
         }
-
-        return [];
       } catch (err) {
+        // CommentService에서 처리하지 못한 예외
+        console.error(`댓글 ID ${commentId}의 대댓글 로드 중 예외 발생:`, err);
         setReplyError(
           err instanceof Error
             ? err
             : new Error("대댓글을 불러오는 중 오류가 발생했습니다.")
         );
-        console.error(`댓글 ID ${commentId}의 대댓글 로드 오류:`, err);
-        return [];
+        return undefined; // 에러 시 undefined 반환
       } finally {
         setLoadingReplies(false);
+        console.log(`대댓글 로드 종료: commentId=${commentId}`);
       }
     },
     []
