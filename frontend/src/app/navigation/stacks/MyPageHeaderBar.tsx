@@ -26,6 +26,7 @@ import { ModalTestScreen } from "../../../pages";
 import { BoardAPI } from "../../../pages/BoardScreen/Api/boardApi";
 import { mockPosts } from "../../../pages/BoardScreen/mocks/boardData";
 import { BoardStackParamList } from "../../../shared/page-stack/BoardPageStack";
+import Text from '../../../components/Common/Text';
 
 import OpinionListScreen from "../../../pages/OpinionListScreen/OpinionListScreen";
 import OpinionDetailScreen from "../../../pages/OpinionDetailScreen/OpinionDetailScreen";
@@ -46,7 +47,7 @@ export default function HeaderBar() {
         name="MypageScreen"
         component={MypageScreen}
         options={({ navigation }) => ({
-          title: "마이 페이지",
+          headerTitle: () => <Text style={styles.headerTitle}>마이 페이지</Text>,
           headerBackButtonDisplayMode: "minimal",
           headerRight: () => (
             <View style={styles.headerRightItems}>
@@ -70,7 +71,7 @@ export default function HeaderBar() {
         name="NevTestPage2"
         component={NevTestPage2}
         options={{
-          title: "환경 설정",
+          headerTitle: () => <Text style={styles.headerTitle}>환경 설정</Text>,
           headerBackButtonDisplayMode: "minimal",
         }}
       />
@@ -78,7 +79,7 @@ export default function HeaderBar() {
         name="PersonalitySurveyPage"
         component={PersonalitySurveyPage}
         options={{
-          title: "설문 조사",
+          headerTitle: () => <Text style={styles.headerTitle}>설문 조사</Text>,
           headerBackButtonDisplayMode: "minimal",
         }}
       />
@@ -86,7 +87,7 @@ export default function HeaderBar() {
         name="PersonalityResultScreen"
         component={PersonalityResultScreen}
         options={{
-          title: "성향 테스트 확인",
+          headerTitle: () => <Text style={styles.headerTitle}>성향 테스트 확인</Text>,
           headerBackButtonDisplayMode: "minimal",
         }}
       />
@@ -94,7 +95,7 @@ export default function HeaderBar() {
         name="ProfileUpdateScreen"
         component={ProfileUpdateScreen}
         options={{
-          title: "프로필 수정",
+          headerTitle: () => <Text style={styles.headerTitle}>프로필 수정</Text>,
           headerBackButtonDisplayMode: "minimal",
         }}
       />
@@ -102,7 +103,7 @@ export default function HeaderBar() {
         name="DeleteAccountScreen"
         component={DeleteAccountScreen}
         options={{
-          title: "탈퇴하기",
+          headerTitle: () => <Text style={styles.headerTitle}>탈퇴하기</Text>,
           headerBackButtonDisplayMode: "minimal",
         }}
       />
@@ -110,7 +111,7 @@ export default function HeaderBar() {
         name="UseAuthTestScreen"
         component={UseAuthTestScreen}
         options={{
-          title: "임시 로그인",
+          headerTitle: () => <Text style={styles.headerTitle}>임시 로그인</Text>,
           headerBackButtonDisplayMode: "minimal",
         }}
       />
@@ -118,7 +119,7 @@ export default function HeaderBar() {
         name="SignupTestScreen"
         component={SignupTestScreen}
         options={{
-          title: "SignupTestScreen",
+          headerTitle: () => <Text style={styles.headerTitle}>SignupTestScreen</Text>,
           headerBackButtonDisplayMode: "minimal",
         }}
       />
@@ -126,7 +127,7 @@ export default function HeaderBar() {
         name="ModalTestScreen"
         component={ModalTestScreen}
         options={{
-          title: "ModalTestScreen",
+          headerTitle: () => <Text style={styles.headerTitle}>ModalTestScreen</Text>,
           headerBackButtonDisplayMode: "minimal",
         }}
       />
@@ -134,7 +135,7 @@ export default function HeaderBar() {
         name="MypageFeatureTestScreen"
         component={MypageFeatureTestScreen}
         options={{
-          title: "MypageFeatureTestScreen",
+          headerTitle: () => <Text style={styles.headerTitle}>MypageFeatureTestScreen</Text>,
           headerBackButtonDisplayMode: "minimal",
         }}
       />
@@ -142,7 +143,7 @@ export default function HeaderBar() {
         name="LandingScreen"
         component={LandingScreen}
         options={{
-          title: "LandingScreen",
+          headerTitle: () => <Text style={styles.headerTitle}>LandingScreen</Text>,
           headerBackButtonDisplayMode: "minimal",
         }}
       />
@@ -150,7 +151,7 @@ export default function HeaderBar() {
         name="SignupScreen"
         component={SignUpScreen}
         options={{
-          title: "SignupScreen",
+          headerTitle: () => <Text style={styles.headerTitle}>SignupScreen</Text>,
           headerBackButtonDisplayMode: "minimal",
         }}
       />
@@ -158,7 +159,7 @@ export default function HeaderBar() {
         name="LikeButtonApiTestExample"
         component={LikeButtonApiTestExample}
         options={{
-          title: "좋아요 api 테스트",
+          headerTitle: () => <Text style={styles.headerTitle}>좋아요 api 테스트</Text>,
           headerBackButtonDisplayMode: "minimal",
         }}
       />
@@ -292,5 +293,10 @@ const styles = StyleSheet.create({
   headerRightItems: {
     flexDirection: "row",
     gap: 12,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#333",
   },
 });

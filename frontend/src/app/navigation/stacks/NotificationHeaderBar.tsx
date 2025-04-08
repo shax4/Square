@@ -1,6 +1,7 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View,  TouchableOpacity, StyleSheet } from "react-native";
+import Text from '../../../components/Common/Text';
 
 import NevTestPage1 from '../../../pages/StackSampleScreen/NevTestPage1';
 import NotificationScreen from '../../../pages/NotificationScreen/NotificationScreen'
@@ -17,13 +18,13 @@ export default function HeaderBar() {
                 name="NotificationScreen"
                 component={NotificationScreen}
                 options={{
-                    title: '알림',
+                    headerTitle: () => <Text style={styles.headerTitle}>알림</Text>,
                     headerBackButtonDisplayMode: 'minimal',
                     headerRight: () => {
                         return (
                             <View style={styles.headerRightItems}>
                                 <TouchableOpacity onPress={() => console.log("주제 청원으로 이동 메서드")}>
-                                    <Text>전체 삭제</Text>
+                                    <Text weight="medium" >전체 삭제</Text>
                                 </TouchableOpacity>
                             </View>
 
@@ -40,5 +41,11 @@ const styles = StyleSheet.create({
   headerRightItems: {
     flexDirection: "row",
     gap: 12,
+    
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#333",
   },
 });

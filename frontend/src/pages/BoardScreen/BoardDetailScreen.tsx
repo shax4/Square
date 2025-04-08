@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
-  Text,
   StyleSheet,
   ScrollView,
   TextInput,
@@ -23,6 +22,8 @@ import LikeButton from "../../components/LikeButton";
 import { Icons } from "../../../assets/icons/Icons";
 import PersonalityTag from "../../components/PersonalityTag/PersonalityTag";
 import { useLikeButton } from "../../shared/hooks/useLikeButton";
+import Text from '../../components/Common/Text';
+import colors from "../../../assets/colors";
 
 // 네비게이션 프롭 타입 정의
 type Props = StackScreenProps<BoardStackParamList, "BoardDetail">;
@@ -136,7 +137,7 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
                 nickname={post?.nickname || ""}
               />
             </View>
-            <Text style={styles.postDate}>
+            <Text weight="medium" style={styles.postDate}>
               {post?.createdAt ? getTimeAgo(post.createdAt) : ""}
             </Text>
           </View>
@@ -145,17 +146,17 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
         {/* 게시글 내용 */}
         <View style={styles.postContent}>
           <Text style={styles.postTitle}>{post?.title}</Text>
-          <Text style={styles.postBody}>{post?.content}</Text>
+          <Text weight="medium" style={styles.postBody}>{post?.content}</Text>
         </View>
 
         {/* 댓글 영역 */}
         <View style={styles.commentsSection}>
           <View style={styles.commentsSectionHeader}>
             <View style={styles.interactionContainer}>
-              <LikeButton {...likeProps} size="small" isVertical={false} />
+              <LikeButton {...likeProps} size="large" isVertical={false} />
               <View style={styles.commentCountContainer}>
                 <Icons.commentNew />
-                <Text style={styles.commentCountText}>
+                <Text weight="medium" style={styles.commentCountText}>
                   {post?.commentCount || 0}
                 </Text>
               </View>
@@ -206,43 +207,44 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    padding: 16,
+    padding: 18,
   },
   postHeader: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 16,
+    marginTop: 5
   },
   authorInfo: {
-    marginLeft: 10,
+    marginLeft: 15,
   },
   authorName: {
     fontSize: 16,
     fontWeight: "bold",
-    marginRight: 4,
+    marginRight: 6,
   },
   postDate: {
     fontSize: 12,
-    color: "#666",
-    marginTop: 2,
+    color: colors.grayText,
+    marginTop: 4,
   },
   postContent: {
-    marginBottom: 24,
+    marginBottom: 2,
+    marginLeft: 5
   },
   postTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
+    fontSize: 19,
     marginBottom: 8,
   },
   postBody: {
-    fontSize: 16,
+    fontSize: 15,
     lineHeight: 24,
   },
   commentsSection: {
     marginTop: 16,
   },
   commentsSectionHeader: {
-    marginBottom: 16,
+    marginBottom: 20,
     borderBottomWidth: 1,
     borderBottomColor: "#f0f0f0",
     paddingBottom: 12,
@@ -257,11 +259,9 @@ const styles = StyleSheet.create({
     marginLeft: 16,
   },
   commentCountText: {
-    fontWeight: "bold",
-    fontSize: 12,
+    fontSize: 14,
     color: "gray",
     marginLeft: 4,
-    paddingTop: 2, // 텍스트를 아이콘과 정렬
   },
   commentInputContainer: {
     flexDirection: "row",

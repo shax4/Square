@@ -41,7 +41,7 @@ export default function HeaderBar() {
                 name="DebateCardsScreen"
                 component={DebateCardsScreen}
                 options={{
-                    title: '오늘의 주제',
+                    headerTitle: () => <Text style={styles.headerTitle}>오늘의 주제</Text>,
                     headerBackButtonDisplayMode: 'minimal',
                 }}
             />
@@ -50,7 +50,8 @@ export default function HeaderBar() {
                 name="OpinionListScreen"
                 component={OpinionListScreen}
                 options={({ route }) => ({
-                    title: `논쟁 ${route.params.debateId}`,
+                    headerTitle: () => <Text style={styles.headerTitle}>논쟁 {route.params.debateId}</Text>,
+
                     headerBackButtonDisplayMode: 'minimal',
                 })}
             />
@@ -60,7 +61,7 @@ export default function HeaderBar() {
                 component={OpinionDetailScreen}
                 options={() => {
                     return {
-                        title: '의견 상세',
+                        headerTitle: () => <Text style={styles.headerTitle}>의견 상세</Text>,
                         headerBackButtonDisplayMode: 'minimal',
                     };
                 }}
@@ -74,7 +75,7 @@ export default function HeaderBar() {
                     const isAuthor = currentUser.nickname === opinion.nickname;
 
                     return {
-                        title: '의견 수정',
+                        headerTitle: () => <Text style={styles.headerTitle}>의견 수정</Text>,
                         headerBackButtonDisplayMode: 'minimal',
                         // headerRight: () => <EditOpinionHeaderRightIcon />,
                     };
@@ -87,7 +88,7 @@ export default function HeaderBar() {
                 component={ProposalListScreen}
                 options={() => {
                     return {
-                        title: '새로운 주제 신청 리스트',
+                        headerTitle: () => <Text style={styles.headerTitle}>새로운 주제 신청 리스트</Text>,
                         headerBackButtonDisplayMode: 'minimal',
                     };
                 }}
@@ -98,7 +99,7 @@ export default function HeaderBar() {
                 component={ProposalCreateScreen}
                 options={() => {
                     return {
-                        title: '새로운 주제 작성하기',
+                        headerTitle: () => <Text style={styles.headerTitle}>새로운 주제 작성하기</Text>,
                         headerBackButtonDisplayMode: 'minimal',
                     };
                 }}
@@ -120,7 +121,7 @@ export default function HeaderBar() {
                 name="PersonalityResultScreen"
                 component={PersonalityResultScreen}
                 options={{
-                    title: '성향 테스트 확인',
+                    headerTitle: () => <Text style={styles.headerTitle}>성향 테스트 확인</Text>,
                     headerBackButtonDisplayMode: 'minimal',
                 }}
             />
@@ -129,7 +130,7 @@ export default function HeaderBar() {
                 name="PersonalitySurveyPage"
                 component={PersonalitySurveyPage}
                 options={{
-                    title: "설문 조사",
+                    headerTitle: () => <Text style={styles.headerTitle}>설문 조사</Text>,
                     headerBackButtonDisplayMode: "minimal",
                 }}
             />
@@ -137,3 +138,26 @@ export default function HeaderBar() {
     );
 }
 
+
+function DebateCardsScreenHeaderRightIcons() {
+    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
+    return (
+        <View style={styles.headerRightItems}>
+            <TouchableOpacity onPress={() => { navigation.navigate('ProposalListScreen') }}>
+                <Icons.add />
+            </TouchableOpacity>
+        </View>
+    )
+}
+
+const styles = StyleSheet.create({
+    headerRightItems: {
+        flexDirection: 'row',
+        gap: 12,
+    },
+    headerTitle: {
+        fontSize: 20,
+        fontWeight: "700",
+        color: "#333",
+      },
+});
