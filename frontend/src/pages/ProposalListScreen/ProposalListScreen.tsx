@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { Text, View, StyleSheet, FlatList, TouchableOpacity, ListRenderItem, ActivityIndicator } from "react-native";
 import colors from "../../../assets/colors";
 import { Button } from "../../components";
@@ -9,7 +9,7 @@ import { Proposal } from "./Components/ProposalProps";
 import ProposalItem from './Components/ProposalItem'
 import { getAllProposals } from "./Api/proposalListAPI";
 import { ProposalResponse } from "./Type/proposalListType";
-
+import { useAdminMode } from "../../shared/hooks/useAdminMode";
 const PAGE_SIZE = 15;
 
 export default function ProposalListScreen() {
@@ -19,8 +19,14 @@ export default function ProposalListScreen() {
     const [loading, setLoading] = useState<boolean>(false);
     const [isEmpty, setIsEmpty] = useState<boolean>(false);
     const [renderedProposals, setRenderedProposals] = useState<Proposal[]>([]);
-
+    const { isAdminMode } = useAdminMode();
     const navigation = useNavigation<NativeStackNavigationProp<DebateStackParamList>>();
+
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            title: isAdminMode ? "새로운 논쟁 주제 관리" : "새로운 논쟁 주제 리스트"
+        });
+    }, [isAdminMode]);
 
     const fetchProposals = async (cursorId: number | null, cursorLikes: number | null) => {
         if (loading) return;

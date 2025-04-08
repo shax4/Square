@@ -20,11 +20,6 @@ export default function DebateCardsScreen() {
                     <TouchableOpacity onPress={() => { navigation.navigate('ProposalListScreen') }}>
                         <Icons.add />
                     </TouchableOpacity>
-                    {isAdminMode && (
-                        <TouchableOpacity>
-                            <Icons.settings />
-                        </TouchableOpacity >
-                    )}
                 </View>
             ),
         });
