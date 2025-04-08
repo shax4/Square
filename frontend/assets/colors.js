@@ -1,5 +1,5 @@
 const colors = {
-    black: "#000000",
+    black: "#171719",
     white: "#FFFFFF",
     yesLight: "#EAF2FE",
     yesDark: "#0066FF",
@@ -15,7 +15,7 @@ const colors = {
     cancelButton: '#ccc',
     hashtag: '#e1e1e1',
     proposalBox: '#F7F7F8',
-    grayText: 'gray',
+    grayText: '#888888',
 }
 
 export default colors;

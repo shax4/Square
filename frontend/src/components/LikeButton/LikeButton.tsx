@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback, memo } from "react";
-import { View, Text, TouchableOpacity, Alert } from "react-native";
+import { View, TouchableOpacity, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { styles } from "./LikeButton.styles";
 import { LikeButtonProps } from "./LikeButton.types";
 import { useLikeStore } from "../../shared/stores/LikeStore";
 import { toggleLikeAPI } from "../../shared/services/likeService";
+import Text from '../../components/Common/Text';
 
 const LikeButton = ({
   // UI 기본값
@@ -148,7 +149,7 @@ const LikeButton = ({
   const LikeIcon = liked ? (
     <Ionicons name="heart" size={iconSize} color="#FF4757" />
   ) : (
-    <Ionicons name="heart-outline" size={iconSize} color="#555" />
+    <Ionicons name="heart-outline" size={iconSize} color="#888888" />
   );
 
   // 에러 렌더링
@@ -196,7 +197,7 @@ const LikeButton = ({
       </TouchableOpacity>
 
       <View style={styles.countContainer}>
-        <Text style={styles.countText}>{likeCount}</Text>
+        <Text weight="medium" style={styles.countText}>{likeCount}</Text>
         {errorMessage && renderError()}
       </View>
     </View>

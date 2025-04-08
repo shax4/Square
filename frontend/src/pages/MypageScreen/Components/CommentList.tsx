@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
-import { StyleSheet, FlatList, ActivityIndicator, View, Text } from "react-native";
+import { StyleSheet, FlatList, ActivityIndicator, View } from "react-native";
 import CommentCard from "./CommentCard"
 import { CommentResponse, Comment } from "../Type/mypageComment";
 import { getMypageComments } from "../Api/commentAPI";
+import Text from '../../../components/Common/Text';
+
 
 const CommentList = () => {
     const [comments, setComments] = useState<Comment[]>([]);

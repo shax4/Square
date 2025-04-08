@@ -1,4 +1,5 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import { StyleSheet, TouchableOpacity, View } from "react-native"
+import Text from '../../../components/Common/Text';
 
 type TabBarProps = {
   tabs: string[]
@@ -26,6 +27,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     borderBottomWidth: 1,
     borderBottomColor: "#EEEEEE",
+    marginLeft: 20,
+    marginRight: 20
   },
   tabContent: {
     alignItems: "center", // 텍스트 중앙 정렬
@@ -48,8 +51,8 @@ const styles = StyleSheet.create({
   activeIndicator: {
     position: "absolute",
     bottom: 0,
-    left: 16,
-    right: 16,
+    left: 0,
+    right: 0,
     height: 2,
     backgroundColor: "#000000",
     borderRadius: 1,

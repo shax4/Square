@@ -1,4 +1,5 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import { StyleSheet, TouchableOpacity, View } from "react-native"
+import Text from '../../../components/Common/Text';
 
 type SectionToggleProps = {
   sections: string[]
@@ -39,7 +40,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   sectionText: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "500",
     color: "#888888",
   },

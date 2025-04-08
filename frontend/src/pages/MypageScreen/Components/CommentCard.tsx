@@ -1,6 +1,8 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import {LikeButton} from '../../../components';
+import Text from '../../../components/Common/Text';
+import colors from '../../../../assets/colors';
 
 type CommentCardProps = {
   title: string;
@@ -32,8 +34,8 @@ const CommentCard = ({
         </View>
         
         <View style={styles.commentContainer}>
-          <Text style={styles.commentPrefix}>ㄴ</Text>
-          <Text style={styles.commentContent} numberOfLines={2} ellipsizeMode="tail">
+          <Text weight="medium" style={styles.commentPrefix}>ㄴ</Text>
+          <Text weight="medium" style={styles.commentContent} numberOfLines={2} ellipsizeMode="tail">
             {content}
           </Text>
         </View>
@@ -65,9 +67,12 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
     marginRight: 8,
+    marginLeft: 1
   },
   titleContainer: {
-    marginBottom: 8,
+    marginTop: 2,
+    marginBottom: 6,
+    marginRight: 20
   },
   title: {
     fontSize: 15,
@@ -77,11 +82,12 @@ const styles = StyleSheet.create({
   commentContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
+    marginRight: 20
   },
   commentPrefix: {
     fontSize: 14,
-    color: '#888888',
-    marginRight: 4,
+    color: colors.grayText,
+    marginRight: 6,
     fontWeight: '500',
   },
   commentContent: {
