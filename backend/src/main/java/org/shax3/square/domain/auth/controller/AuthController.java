@@ -200,20 +200,24 @@ public class AuthController {
         UserLoginDto userLoginDto = authService.firebaseLogin(firebaseUser, request);
 
         if (userLoginDto.isMember()) {
+
+            Cookie cookie = new Cookie("refresh-token", userLoginDto.refreshToken().getToken());
+            cookie.setHttpOnly(true);
+            cookie.setSecure(false);
+            cookie.setPath("/");
+            response.addCookie(cookie);
+
             userDeviceService.registerOrUpdateDevice(
                     userLoginDto.userId(),
                     request.fcmToken(),
                     request.deviceId(),
                     request.deviceType()
             );
+
             return ResponseEntity.ok(FirebaseLoginResponse.member(userLoginDto));
         }
 
-        Cookie cookie = new Cookie("refresh-token", userLoginDto.refreshToken().getToken());
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
-        cookie.setPath("/");
-        response.addCookie(cookie);
+
 
 
         return ResponseEntity.ok(FirebaseLoginResponse.notMember(userLoginDto.email(),userLoginDto.socialType()));
