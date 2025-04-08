@@ -1,30 +1,29 @@
-import React, { useEffect, useState } from "react";
-import { Text, View, StyleSheet, FlatList, TouchableOpacity, ListRenderItem, TextInput, Alert } from "react-native";
+import React, { useState } from "react";
+import { View, StyleSheet, TextInput, Alert } from "react-native";
 import colors from "../../../assets/colors";
 import { Button } from "../../components";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { DebateStackParamList } from "../../shared/page-stack/DebatePageStack";
-import { VoteCreateButtonView } from "../../components/VoteButton/VoteCreateButton";
-import { Proposal, ProposalResponse } from "../ProposalListScreen/Type/proposalListType";
-
-interface ProposalEditScreenProps {
-    proposal: Proposal;
-}
+import { styles as VoteButtonStyle } from '../../components/VoteButton/VoteButton.styles'
+import { createDebate } from "../ProposalCreateScreen/Api/proposalAPI";
 
 export default function ProposalEditScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<DebateStackParamList>>();
-    const [debateTopic, setDebateTopic] = useState('');
     const route = useRoute<RouteProp<DebateStackParamList, 'ProposalEditScreen'>>();
     const { proposal } = route.params;
+    const [debateTopic, setDebateTopic] = useState(proposal.topic);
 
-    const confirmCreateProposal = () => {
+    const [leftOption, setLeftOption] = useState('');
+    const [rightOption, setRightOption] = useState('');
+
+    const confirmCreateDebate = () => {
         // 저장 로직
-        editProposal(debateTopic);
+        createDebateAPi(debateTopic);
 
         // 저장되었습니다 모달 클릭해 돌아가도록
         Alert.alert(
-            "작성 완료",
+            "등록 완료",
             "청원이 정상적으로 등록되었습니다.",
             [
                 {
@@ -38,9 +37,15 @@ export default function ProposalEditScreen() {
         );
     }
 
-    const editProposal = async (topic: string) => {
+    const createDebateAPi = async (topic: string) => {
         try {
-
+            const debateData = {
+                proposalId: proposal.proposalId,
+                topic: debateTopic,
+                leftOption: leftOption,
+                rightOption: rightOption,
+            };
+            const response = await createDebate(debateData);
         } catch (error) {
             Alert.alert(
                 "등록 실패",
@@ -54,6 +59,7 @@ export default function ProposalEditScreen() {
         }
     }
 
+
     return (
         <View style={styles.Container}>
             {/* 토론 주제 입력 */}
@@ -66,14 +72,41 @@ export default function ProposalEditScreen() {
                 />
             </View>
 
+            {/* 좌 우 의견 작성 */}
             <View style={styles.VoteButtonView}>
-                <VoteCreateButtonView />
+                <View style={VoteButtonStyle.Container}>
+
+                    <View
+                        style={[
+                            VoteButtonStyle.VoteButtonBase, VoteButtonStyle.VoteNotSelectedLeft]}
+                    >
+                        <TextInput
+                            style={VoteButtonStyle.VoteContents}
+                            value={leftOption}
+                            onChangeText={setLeftOption}
+                            placeholder="왼쪽 선택지 입력..."
+                        />
+                    </View>
+
+                    <View
+                        style={[
+                            VoteButtonStyle.VoteButtonBase, VoteButtonStyle.VoteNotSelectedRight]}
+                    >
+                        <TextInput
+                            style={VoteButtonStyle.VoteContents}
+                            value={rightOption}
+                            onChangeText={setRightOption}
+                            placeholder="오른쪽 선택지 입력..."
+                        />
+
+                    </View>
+                </View>
             </View>
 
             <View style={styles.CreateButtonView}>
                 <Button
-                    label="작성하기"
-                    onPress={confirmCreateProposal}
+                    label="논쟁 등록"
+                    onPress={confirmCreateDebate}
                 />
             </View>
             <View style={styles.BottomBlankView}>
@@ -101,6 +134,9 @@ const styles = StyleSheet.create({
         margin: 20,
         fontSize: 20,
 
+    },
+    OptionTextInput: {
+        fontSize: 15,
     },
     VoteButtonView: {
         flex: 3,
