@@ -1,4 +1,10 @@
-import React, { useState, useCallback } from "react";
+import React, {
+  useState,
+  useCallback,
+  useRef,
+  useEffect,
+  useMemo,
+} from "react";
 import {
   View,
   FlatList,
@@ -16,8 +22,11 @@ import { BoardStackParamList } from "../../shared/page-stack/BoardPageStack";
 import BoardItem from "./components/BoardItem";
 import EmptyBoardList from "./components/EmptyBoardList";
 import PopularPostCard from "./components/PopularPostCard";
-import { usePostList } from "../../shared/hooks";
+import { usePostList } from "../../shared/hooks/usePostList";
+import { Post } from "../../shared/types/postTypes";
+import { PostService } from "../../shared/services/postService";
 import { Icons } from "../../../assets/icons/Icons";
+import { useAuthStore } from "../../shared/stores/auth";
 
 // 네비게이션 프롭 타입 정의
 type BoardListScreenNavigationProp = StackNavigationProp<
@@ -31,14 +40,45 @@ interface BoardListScreenProps {
   route: RouteProp<BoardStackParamList, "BoardList">;
 }
 
+/**
+ * 게시글 목록 화면 컴포넌트
+ * 게시글 목록을 표시하고 무한 스크롤, 정렬, 새로고침 기능을 제공합니다.
+ */
 export default function BoardListScreen({
   route,
   navigation,
 }: BoardListScreenProps) {
-  // 정렬 방식 상태 (기본값: 최신순)
+  // 1. 모든 useState 훅 호출
   const [sortBy, setSortBy] = useState<"latest" | "likes">("latest");
+  const [loadingStartTime, setLoadingStartTime] = useState(Date.now());
 
-  // usePostList 훅을 사용하여 게시글 목록 관리
+  // 로그인 상태 확인
+  const { loggedIn, user } = useAuthStore();
+
+  // 컴포넌트 마운트 시 로그인 상태 및 토큰 확인
+  useEffect(() => {
+    console.log("🔐 로그인 상태:", loggedIn ? "로그인됨" : "로그인되지 않음");
+    console.log("👤 사용자 정보:", user ? `닉네임: ${user.nickname}` : "없음");
+
+    if (!loggedIn || !user) {
+      console.log("⚠️ 로그인이 필요합니다.");
+    }
+  }, [loggedIn, user]);
+
+  // 2. 모든 useRef 훅 호출
+  const isInitialMount = useRef(true);
+  const flatListRef = useRef<FlatList>(null);
+
+  // 3. usePostList 파라미터를 useMemo로 메모이제이션
+  const postListParams = useMemo(
+    () => ({
+      sort: sortBy,
+      limit: 10,
+    }),
+    [sortBy]
+  ); // sortBy만 의존성으로 포함 - limit은 변경되지 않음
+
+  // 4. usePostList 커스텀 훅 호출 - 메모이제이션된 파라미터 전달
   const {
     posts,
     popularPosts,
@@ -49,61 +89,143 @@ export default function BoardListScreen({
     refresh,
     refreshing,
     changeSort,
-  } = usePostList({ sort: sortBy, limit: 10 });
+  } = usePostList(postListParams);
 
-  // 정렬 방식 변경 시 새로고침
-  const handleSortChange = (newSort: "latest" | "likes") => {
-    if (sortBy !== newSort) {
-      setSortBy(newSort);
-      changeSort(newSort);
+  // 5. 로딩 시작 시간 관리를 위한 useEffect
+  useEffect(() => {
+    if (loading) {
+      setLoadingStartTime(Date.now());
     }
-  };
+  }, [loading]);
 
-  // 화면에 포커스가 올 때마다 데이터 새로고침
+  // 6. 라우트 파라미터 변경 감지를 위한 useFocusEffect
   useFocusEffect(
     useCallback(() => {
-      if (route.params?.refresh) {
+      // 화면에 포커스가 올 때마다 실행
+      if (route.params?.refresh && !isInitialMount.current) {
         refresh();
+        // 파라미터 초기화
         navigation.setParams({ refresh: undefined });
       }
-      return () => {
-        // 정리 작업 (필요한 경우)
-      };
-    }, [route.params?.refresh, refresh])
+      // 첫 마운트 표시 해제
+      isInitialMount.current = false;
+
+      // 컴포넌트 언마운트 시 정리 작업
+      return () => {};
+    }, [route.params?.refresh, refresh, navigation])
   );
 
-  // 날짜 포맷 함수
-  const formatDate = (dateString: string) => {
+  // 7. 정렬 변경 핸들러 함수
+  const handleSortChange = useCallback(
+    (newSort: "latest" | "likes") => {
+      if (sortBy !== newSort) {
+        setSortBy(newSort);
+        changeSort(newSort);
+      }
+    },
+    [sortBy, changeSort]
+  );
+
+  // 8. 날짜 포맷팅 함수
+  const formatDate = useCallback((dateString: string) => {
     const date = new Date(dateString);
     return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
-  };
+  }, []);
 
-  // 로딩 상태 표시
-  if (loading && posts.length === 0) {
-    return (
+  // 9. 게시글 아이템 렌더링 함수
+  const renderItem = useCallback(
+    ({ item }: { item: Post }) => (
+      <BoardItem
+        item={{ ...item, userType: item.userType || "" }}
+        onPress={() =>
+          navigation.navigate("BoardDetail", { boardId: item.postId })
+        }
+      />
+    ),
+    [navigation]
+  );
+
+  // 10. 무한 스크롤 처리 함수
+  const handleEndReached = useCallback(() => {
+    if (hasMore && !loading) {
+      loadMore();
+    }
+  }, [hasMore, loading, loadMore]);
+
+  // 11. 새로고침 핸들러 - 메모이제이션
+  const handleRefresh = useCallback(() => {
+    refresh();
+  }, [refresh]);
+
+  // 12. 로딩 상태 컴포넌트 - JSX를 변수로 분리하여 조건부 렌더링 안전하게 구현
+  const LoadingComponent = useMemo(
+    () => (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#007BFF" />
+        <Text style={styles.loadingText}>게시글을 불러오는 중...</Text>
       </View>
-    );
-  }
+    ),
+    []
+  );
 
-  // 오류 상태 표시
-  if (error && posts.length === 0) {
-    return (
+  // 13. 로딩 시간 초과 컴포넌트
+  const LoadingTimeoutComponent = useMemo(
+    () => (
       <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>오류가 발생했습니다.</Text>
-        <Text>{error.message}</Text>
-        <TouchableOpacity style={styles.retryButton} onPress={refresh}>
+        <Text style={styles.errorText}>
+          게시글을 불러오는데 시간이 오래 걸립니다.
+        </Text>
+        <TouchableOpacity style={styles.retryButton} onPress={handleRefresh}>
           <Text style={styles.retryButtonText}>다시 시도</Text>
         </TouchableOpacity>
       </View>
-    );
+    ),
+    [handleRefresh]
+  );
+
+  // 14. 에러 상태 컴포넌트
+  const ErrorComponent = useMemo(
+    () => (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>오류가 발생했습니다.</Text>
+        {error && <Text>{error.message}</Text>}
+        <TouchableOpacity style={styles.retryButton} onPress={handleRefresh}>
+          <Text style={styles.retryButtonText}>다시 시도</Text>
+        </TouchableOpacity>
+      </View>
+    ),
+    [error, handleRefresh]
+  );
+
+  // 15. 조건부 렌더링 - 초기 로딩 상태
+  if (loading && Date.now() - loadingStartTime < 10000) {
+    return LoadingComponent;
   }
 
+  // 16. 조건부 렌더링 - 로딩 타임아웃
+  if (loading && posts.length === 0) {
+    return LoadingTimeoutComponent;
+  }
+
+  // 17. 조건부 렌더링 - 에러 상태
+  if (error && posts.length === 0) {
+    return ErrorComponent;
+  }
+
+  // 18. 메인 렌더링 - 게시글 목록 표시
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        {/* 인기 게시글 (캐러셀) */}
+        {/* 로그인 상태 메시지 - 로그인하지 않았을 때만 표시 */}
+        {!loggedIn && (
+          <View style={styles.loginMessage}>
+            <Text style={styles.loginMessageText}>
+              게시판을 이용하려면 로그인이 필요합니다.
+            </Text>
+          </View>
+        )}
+
+        {/* 인기 게시글 섹션 */}
         {popularPosts.length > 0 && (
           <View style={styles.popularSection}>
             <Text style={styles.sectionTitle}>인기 게시글</Text>
@@ -165,22 +287,16 @@ export default function BoardListScreen({
 
         {/* 게시글 목록 */}
         <FlatList
+          ref={flatListRef}
           data={posts}
-          renderItem={({ item }) => (
-            <BoardItem
-              item={{ ...item, userType: item.userType || "" }}
-              onPress={() =>
-                navigation.navigate("BoardDetail", { boardId: item.postId })
-              }
-            />
-          )}
+          renderItem={renderItem}
           keyExtractor={(item) => `post-${item.postId}`}
           contentContainerStyle={{
             ...styles.listContainer,
             ...styles.listContent,
           }}
           ListEmptyComponent={<EmptyBoardList />}
-          onEndReached={loadMore}
+          onEndReached={handleEndReached}
           onEndReachedThreshold={0.5}
           ListFooterComponent={
             loading && posts.length > 0 ? (
@@ -194,7 +310,7 @@ export default function BoardListScreen({
             ) : null
           }
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={refresh} />
+            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
           }
           ListHeaderComponent={() => (
             <View style={styles.postsHeader}>
@@ -210,7 +326,7 @@ export default function BoardListScreen({
             navigation.navigate("BoardWrite", { postId: undefined })
           }
         >
-          <Text style={styles.writeButtonText}>+</Text>
+          <Icons.write />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -346,5 +462,20 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingBottom: 20,
+  },
+  loadingText: {
+    marginTop: 10,
+    color: "#666",
+  },
+  loginMessage: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  loginMessageText: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
   },
 });
