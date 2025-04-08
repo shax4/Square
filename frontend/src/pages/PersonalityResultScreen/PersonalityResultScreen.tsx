@@ -193,25 +193,25 @@ const styles = StyleSheet.create({
     color: "#171719",
     textAlign: "center",
     fontWeight: 'bold',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   personalityTypeContainer: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 0,
+    marginBottom: 5,
   },
   personalityType: {
     fontSize: 40,
-    fontWeight: "bold",
   },
   graphsContainer: {
-    marginBottom: 0,
+    marginBottom: 5,
+    marginHorizontal: 10
   },
   buttonsContainer: {
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 10,
+    marginTop: 5,
   },
   buttonContainer: {
     paddingVertical: 5,
