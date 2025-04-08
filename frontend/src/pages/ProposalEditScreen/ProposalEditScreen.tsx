@@ -2,20 +2,25 @@ import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, FlatList, TouchableOpacity, ListRenderItem, TextInput, Alert } from "react-native";
 import colors from "../../../assets/colors";
 import { Button } from "../../components";
-import { useNavigation } from "@react-navigation/native";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { DebateStackParamList } from "../../shared/page-stack/DebatePageStack";
 import { VoteCreateButtonView } from "../../components/VoteButton/VoteCreateButton";
-import { ProposalResponse } from "./Type/ProposalTypes";
-import { postProposal } from "./Api/proposalAPI";
+import { Proposal, ProposalResponse } from "../ProposalListScreen/Type/proposalListType";
 
-export default function ProposalCreateScreen() {
+interface ProposalEditScreenProps {
+    proposal: Proposal;
+}
+
+export default function ProposalEditScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<DebateStackParamList>>();
     const [debateTopic, setDebateTopic] = useState('');
+    const route = useRoute<RouteProp<DebateStackParamList, 'ProposalEditScreen'>>();
+    const { proposal } = route.params;
 
     const confirmCreateProposal = () => {
         // 저장 로직
-        createProposal(debateTopic);
+        editProposal(debateTopic);
 
         // 저장되었습니다 모달 클릭해 돌아가도록
         Alert.alert(
@@ -33,16 +38,13 @@ export default function ProposalCreateScreen() {
         );
     }
 
-    const createProposal = async (topic: string) => {
+    const editProposal = async (topic: string) => {
         try {
-            const data: ProposalResponse = await postProposal(topic);
 
-            console.log("신청 완료된 주제 ID : ", data.proposalId);
         } catch (error) {
-            console.debug("주제 청원 신청 실패 : ", error);
             Alert.alert(
-                "작성 실패",
-                "청원 신청 중 문제가 발생했습니다. 잠시후 다시 실행해주세요.",
+                "등록 실패",
+                "청원 등록 중 문제가 발생했습니다. 잠시후 다시 실행해주세요.",
                 [
                     {
                         text: "확인"

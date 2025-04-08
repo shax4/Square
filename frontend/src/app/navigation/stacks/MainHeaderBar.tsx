@@ -14,6 +14,7 @@ import { DebateStackParamList } from '../../../shared/page-stack/DebatePageStack
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import PersonalitySurveyPage from '../../../pages/PersonalitySurveyPage/PersonalitySurveyPage';
+import ProposalEditScreen from '../../../pages/ProposalEditScreen/ProposalEditScreen';
 const Stack = createNativeStackNavigator<DebateStackParamList>();
 
 // 테스트용 예시 사용자 정보(전역 상태관리로 받아오도록 수정 필요)
@@ -102,6 +103,18 @@ export default function HeaderBar() {
                     };
                 }}
             />
+            {/* 관리자 청원 수정 */}
+            <Stack.Screen
+                name="ProposalEditScreen"
+                component={ProposalEditScreen}
+                options={() => {
+                    return {
+                        title: '청원 등록하기',
+                        headerBackButtonDisplayMode: 'minimal',
+                    };
+                }}
+            />
+            
             {/* 성향 타입 그래프 페이지 */}
             <Stack.Screen
                 name="PersonalityResultScreen"

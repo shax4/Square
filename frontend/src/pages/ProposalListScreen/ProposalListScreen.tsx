@@ -5,10 +5,9 @@ import { Button } from "../../components";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { DebateStackParamList } from "../../shared/page-stack/DebatePageStack";
-import { Proposal } from "./Components/ProposalProps";
 import ProposalItem from './Components/ProposalItem'
 import { getAllProposals } from "./Api/proposalListAPI";
-import { ProposalResponse } from "./Type/proposalListType";
+import { Proposal, ProposalResponse } from "./Type/proposalListType";
 import { useAdminMode } from "../../shared/hooks/useAdminMode";
 const PAGE_SIZE = 15;
 
@@ -116,10 +115,16 @@ export default function ProposalListScreen() {
                 />
             </View>
 
-            {/* 버튼 */}
+            {/* 청원 등록 버튼 혹은 청원 관리 안내 페이지 */}
             <View style={styles.ProposalButtonView}>
-                <Button label="새로운 주제 작성하기" onPress={() => navigation.navigate("ProposalCreateScreen")} />
+                {!isAdminMode && (
+                    <Button label="새로운 주제 작성하기" onPress={() => navigation.navigate("ProposalCreateScreen")} />
+                )}
+                {isAdminMode && (
+                    <Text style={styles.InfoText}>편집 후 등록할 논쟁 청원을 선택하세요.</Text>
+                )}
             </View>
+
             <View style={styles.BottomPadding} />
         </View>
     );
@@ -166,7 +171,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     BottomPadding: {
-        flex: 1,
+        flex: 0.3,
     },
     emptyContainer: {
         flex: 1,
@@ -178,4 +183,8 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: "gray",
     },
+    InfoText: {
+        color: colors.black,
+        fontSize: 15,
+    }
 });

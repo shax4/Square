@@ -9,6 +9,7 @@
  */
 
 import { Debate } from "../../pages/DebateCardsScreen/Components";
+import { Proposal } from "../../pages/ProposalListScreen/Type/proposalListType";
 
 export type DebateStackParamList = {
     DebateCardsScreen: undefined;
@@ -30,4 +31,7 @@ export type DebateStackParamList = {
     };
     PersonalityResultScreen: { nickname: string };
     PersonalitySurveyPage: undefined;
+    ProposalEditScreen : {
+        proposal: Proposal;
+    }
 };

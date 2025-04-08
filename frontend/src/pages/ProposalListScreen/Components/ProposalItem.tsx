@@ -1,11 +1,14 @@
 import React from 'react';
 import { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Proposal } from './ProposalProps';
 import colors from '../../../../assets/colors';
 import { likeProposal } from '../Api/proposalListAPI';
 import { LikeButton } from '../../../components';
 import { useAdminMode } from '../../../shared/hooks/useAdminMode';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { DebateStackParamList } from '../../../shared/page-stack/DebatePageStack';
+import { Proposal } from '../Type/proposalListType';
 interface ProposalItemProps {
     item: Proposal;
 }
@@ -13,8 +16,8 @@ interface ProposalItemProps {
 const ProposalItem = ({
     item
 }: ProposalItemProps): JSX.Element => {
-
     const { isAdminMode } = useAdminMode();
+    const navigation = useNavigation<NativeStackNavigationProp<DebateStackParamList>>();
 
     const ProposalItemContent = () => {
         return (
@@ -42,7 +45,7 @@ const ProposalItem = ({
     else {
         return (
             <TouchableOpacity style={styles.ContentText}
-
+                onPress={() => { navigation.navigate('ProposalEditScreen', { proposal: item }) }}
             >
                 <ProposalItemContent />
             </TouchableOpacity>
