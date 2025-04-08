@@ -1,4 +1,5 @@
 import { axiosInstance } from "../../../shared";
+import { Debate } from "../Components";
 import { DebatesResponse } from "./DebatesResponse.types";
 
 export const getAllDebates = async (
@@ -49,6 +50,25 @@ export const scrapDebateUndo = async (
     return response.data;
   } catch (error) {
     console.debug("스크랩 취소 실패:", targetId);
+    throw error;
+  }
+};
+
+
+export const getDebateById = async (
+  debateId: number,
+): Promise<DebatesResponse> => {
+  try {
+    const response = await axiosInstance.get("/api/debates", {
+      params: {
+        nextCursorId: debateId + 1,
+        limit: 1
+      }
+    });
+
+    return response.data;
+  } catch (error) {
+    console.debug("논쟁 주제 받아오기 실패:", error);
     throw error;
   }
 };

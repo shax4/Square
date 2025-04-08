@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useRef } from "react"
 import {
   StyleSheet,
@@ -18,7 +16,8 @@ import Button from "../../components/Button"
 import SelectField from "../../components/SelectField/SelectField"
 import ProgressBar from "../../components/ProgressBar/ProgressBar"
 import ProfileImage from "../../components/ProfileImage"
-
+import { useAuth } from "../../shared/hooks"
+import { userDetails } from "../../shared/types/user"
 // Define steps for the sign-up process
 enum SignUpStep {
   Nickname = 1,
@@ -52,7 +51,7 @@ const regionOptions = [
 ]
 const religionOptions = ["기독교", "천주교", "불교", "이슬람교", "힌두교", "무교", "기타"]
 
-const SignUpScreen = ({ navigation }: any) => {
+const SignUpScreen = () => {
   // State for form fields
   const [currentStep, setCurrentStep] = useState<SignUpStep>(SignUpStep.Nickname)
   const [nickname, setNickname] = useState("")
@@ -71,6 +70,9 @@ const SignUpScreen = ({ navigation }: any) => {
   // Validation states
   const [nicknameError, setNicknameError] = useState("")
   const [birthdateError, setBirthdateError] = useState("")
+
+  const {setUser} = useAuth();
+
 
   // Scroll ref for content
   const scrollViewRef = useRef<ScrollView>(null)
@@ -97,7 +99,7 @@ const SignUpScreen = ({ navigation }: any) => {
       // Scroll to top when changing steps
       scrollViewRef.current?.scrollTo({ y: 0, animated: true })
     } else {
-      navigation.goBack()
+      // navigation.goBack()
     }
   }
 
@@ -112,11 +114,22 @@ const SignUpScreen = ({ navigation }: any) => {
       profileImageUrl,
     })
 
+    const userDetails : userDetails = {
+      nickname : "Signup_Test",
+      userType: "ABCD",
+      state: "ACTIVE",
+      isMember : true,
+      accessToken : "1234",
+      refreshToken : "1234",
+    } // 실제 데이터로 변경.
+
+    setUser(userDetails)
+
     // Navigate to main app or show success message
     Alert.alert("회원가입 완료", "회원가입이 성공적으로 완료되었습니다.", [
       {
         text: "확인",
-        onPress: () => navigation.navigate("Profile"),
+        //onPress: () => navigation.navigate("Profile"),
       },
     ])
   }

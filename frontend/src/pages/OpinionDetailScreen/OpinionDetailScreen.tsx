@@ -8,7 +8,7 @@ import React, { useEffect, useLayoutEffect, useState, useRef } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { styles } from './Components/OpinionDetailScreen.styles'
 import CommentInput from "../../components/CommentInput/CommentInput";
-import { getOpinionDetail, createComment } from "./api/CommentApi";
+import { getOpinionDetail, createComment, likesComment } from "./api/CommentApi";
 import { deleteOpinion } from "../OpinionListScreen/api/OpinionApi";
 import { OpinionsResponse } from "./Components/OpinionsResponse.types";
 import { Comment } from "./Components/Comment.types";
@@ -46,6 +46,7 @@ export default function OpinionDetailScreen() {
         const trimmedComment = commentText.trim();
         if (!trimmedComment || trimmedComment.length < 5 || trimmedComment.length > 150) {
             // 네이티브 모달로 글자 수 보내 경고
+
             return;
         }
 
@@ -56,7 +57,7 @@ export default function OpinionDetailScreen() {
             // 새 댓글을 직접 만들어 추가
             const newComment: Comment = {
                 commentId: commentResponse.commentId,
-                nickname: user!.nickname,
+                nickname: user?.nickname ?? "사용자",
                 profileUrl: commentResponse.profileUrl,
                 userType: user!.userType,
                 createdAt: new Date().toISOString(),
@@ -261,7 +262,7 @@ export default function OpinionDetailScreen() {
                                     initialCount={comment.likeCount}
                                     initialLiked={comment.isLiked}
                                     size="small"
-                                //onPress={() => { likesComment(comment.commentId) }}
+                                    onPress={() => { likesComment(comment.commentId) }}
                                 />
                             </View>
                         </View>
@@ -277,6 +278,8 @@ export default function OpinionDetailScreen() {
                 onChangeText={onChangeText}
                 value={commentText}
                 placeholder="댓글을 입력하세요..."
+                contentMinSize={5}
+                contentMaxSize={150}
             />
         </View>
     )
