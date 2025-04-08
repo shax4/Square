@@ -16,6 +16,7 @@ const colors = {
     hashtag: '#e1e1e1',
     proposalBox: '#F7F7F8',
     grayText: '#888888',
+    background: '#F5F5F5'
 }
 
 export default colors;

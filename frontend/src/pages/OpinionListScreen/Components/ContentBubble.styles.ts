@@ -6,6 +6,7 @@ export const styles = StyleSheet.create({
         marginVertical: 6,
         flexDirection: "row",
         width: "100%",
+        marginBottom: 10
     },
     alignLeft: {
         justifyContent: "flex-start",
@@ -19,7 +20,7 @@ export const styles = StyleSheet.create({
         borderRadius: 15,
     },
     leftBubble: {
-        backgroundColor: colors.yesLight,
+        backgroundColor: '#CCE0FF',
         borderTopLeftRadius: 0,
     },
     rightBubble: {
@@ -29,20 +30,21 @@ export const styles = StyleSheet.create({
     topRow: {
         flexDirection: "row",
         alignItems: "center",
-        marginBottom: 6,
+        marginBottom: 8,
     },
     nickname: {
         fontWeight: "bold",
         fontSize: 14,
-        marginRight: 4,
+        marginRight: 6,
+        marginLeft: 4
     },
     contentText: {
         fontSize: 15,
-        marginBottom: 8,
     },
     bottomRow: {
         flexDirection: "row",
         alignItems: "center",
+        marginTop: 10
     },
     countText: {
         marginLeft: 4,

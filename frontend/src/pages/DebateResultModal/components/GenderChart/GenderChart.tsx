@@ -1,7 +1,8 @@
 import type React from "react"
-import { View, Text} from "react-native"
+import { View} from "react-native"
 import {GenderChartProps} from './GenderChart.types'
 import {styles} from './GenderChart.styles'
+import Text from '../../../../components/Common/Text';
 
 const GenderChart: React.FC<GenderChartProps> = ({ data }) => {
   // Calculate total value for percentage calculation
