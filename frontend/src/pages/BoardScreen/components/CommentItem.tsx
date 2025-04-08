@@ -1,7 +1,6 @@
 import React, { useState, useCallback, Fragment, useRef } from "react";
 import {
   View,
-  Text,
   TextInput,
   StyleSheet,
   TouchableOpacity,
@@ -17,6 +16,8 @@ import { Icons } from "../../../../assets/icons/Icons";
 import { useAuth } from "../../../shared/hooks/useAuth";
 import { getTimeAgo } from "../../../shared/utils/timeAge/timeAge";
 import { useLikeButton } from "../../../shared/hooks/useLikeButton";
+import Text from '../../../components/Common/Text';
+import colors from "../../../../assets/colors";
 
 interface CommentItemProps {
   postId: number; // 게시글 ID
@@ -334,19 +335,19 @@ export default function CommentItem({
                     onPress={handleCancelPress}
                     style={styles.button}
                   >
-                    <Text>취소</Text>
+                    <Text weight="medium">취소</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={handleSavePress}
                     style={[styles.button, styles.saveButton]}
                   >
-                    <Text style={styles.saveButtonText}>저장</Text>
+                    <Text weight="medium" style={styles.saveButtonText}>저장</Text>
                   </TouchableOpacity>
                 </View>
               </View>
             ) : (
               <View style={styles.contentRow}>
-                <Text style={styles.contentText}>{comment.content}</Text>
+                <Text weight="medium" style={styles.contentText}>{comment.content}</Text>
                 {/* 좋아요 버튼 - 내용 안에 배치 */}
                 <View style={styles.replyLikeContainer}>
                   <LikeButton
@@ -364,11 +365,11 @@ export default function CommentItem({
         <View style={styles.footerContainer}>
           {/* 2-1. 왼쪽 그룹 (시간 + 답글 달기) */}
           <View style={styles.leftFooterGroup}>
-            <Text style={styles.time}>{getTimeAgo(comment.createdAt)}</Text>
+            <Text weight="medium" style={styles.time}>{getTimeAgo(comment.createdAt)}</Text>
             {/* 답글 달기 버튼 */}
             {!isEditing && ( // 수정 중 아닐 때만 표시
               <TouchableOpacity onPress={handleReplyPress}>
-                <Text style={styles.replyButtonText}>답글 달기</Text>
+                <Text weight="medium" style={styles.replyButtonText}>답글 달기</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -377,10 +378,10 @@ export default function CommentItem({
           {isAuthor && !isEditing && (
             <View style={styles.authorButtons}>
               <TouchableOpacity onPress={handleEditPress}>
-                <Text style={styles.actionText}>수정</Text>
+                <Text weight="medium" style={styles.actionText}>수정</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={handleDeletePress}>
-                <Text style={styles.actionText}>삭제</Text>
+                <Text weight="medium" style={styles.actionText}>삭제</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -402,13 +403,13 @@ export default function CommentItem({
                 onPress={handleCancelReply}
                 style={styles.button}
               >
-                <Text>취소</Text>
+                <Text weight="medium">취소</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={handleSubmitReply}
                 style={[styles.button, styles.saveButton]}
               >
-                <Text style={styles.saveButtonText}>등록</Text>
+                <Text weight="medium" style={styles.saveButtonText}>등록</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -448,13 +449,13 @@ export default function CommentItem({
                     onPress={handleCancelEditReply}
                     style={styles.button}
                   >
-                    <Text>취소</Text>
+                    <Text weight="medium">취소</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => handleSaveReply(reply.commentId)}
                     style={[styles.button, styles.saveButton]}
                   >
-                    <Text style={styles.saveButtonText}>저장</Text>
+                    <Text weight="medium" style={styles.saveButtonText}>저장</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -462,7 +463,7 @@ export default function CommentItem({
               // 대댓글 일반 모드 UI
               <Fragment>
                 <View style={styles.replyContentRow}>
-                  <Text style={styles.contentText}>{reply.content}</Text>
+                  <Text weight="medium" style={styles.contentText}>{reply.content}</Text>
                   <View style={styles.replyLikeContainer}>
                     <LikeButton
                       {...getReplyLikeProps(reply)}
@@ -477,17 +478,17 @@ export default function CommentItem({
             {/* 푸터는 수정 중이 아닐 때만 표시 */}
             {editingReplyId !== reply.commentId && (
               <View style={styles.replyFooterContainer}>
-                <Text style={styles.time}>{getTimeAgo(reply.createdAt)}</Text>
+                <Text weight="medium" style={styles.time}>{getTimeAgo(reply.createdAt)}</Text>
 
                 {user?.nickname === reply.nickname && (
                   <View style={styles.authorButtons}>
                     <TouchableOpacity onPress={() => handleEditReply(reply)}>
-                      <Text style={styles.actionText}>수정</Text>
+                      <Text weight="medium" style={styles.actionText}>수정</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       onPress={() => handleDeleteReply(reply.commentId)}
                     >
-                      <Text style={styles.actionText}>삭제</Text>
+                      <Text weight="medium" style={styles.actionText}>삭제</Text>
                     </TouchableOpacity>
                   </View>
                 )}
@@ -506,7 +507,7 @@ export default function CommentItem({
           {replyLoading ? (
             <ActivityIndicator size="small" color="#0000ff" />
           ) : (
-            <Text style={styles.loadMoreText}>
+            <Text weight="medium" style={styles.loadMoreText}>
               답글 {comment.replyCount - loadedReplies.length}개 더보기
             </Text>
           )}
@@ -521,25 +522,25 @@ const styles = StyleSheet.create({
   container: {
     // 전체 댓글 아이템 컨테이너
     paddingVertical: 12,
-    paddingHorizontal: 16,
-    backgroundColor: "#fafafa", // 배경색 통일
-    marginBottom: 8, // 댓글 간 간격 추가
-    borderRadius: 8, // 모서리 둥글게
-    borderWidth: 1, // 테두리 추가
-    borderColor: "#eeeeee", // 테두리 색상
+    paddingHorizontal: 10,
+    // backgroundColor: "#fafafa", // 배경색 통일
+    // marginBottom: 8, // 댓글 간 간격 추가
+    // borderRadius: 8, // 모서리 둥글게
+    // borderWidth: 1, // 테두리 추가
+    // borderColor: "#eeeeee", // 테두리 색상
   },
   replyItemContainer: {
     // 대댓글 컨테이너 (독립적 컨테이너)
     paddingVertical: 12,
     paddingHorizontal: 16,
-    backgroundColor: "#fafafa", // 댓글과 같은 배경색
-    marginBottom: 8, // 간격 추가
-    borderRadius: 8, // 모서리 둥글게
-    borderWidth: 1, // 테두리 추가
-    borderColor: "#eeeeee", // 테두리 색상
-    marginLeft: 24, // 들여쓰기
-    borderLeftWidth: 3, // 왼쪽 경계선
-    borderLeftColor: "#e0e0e0", // 경계선 색상
+    // backgroundColor: "#fafafa", // 댓글과 같은 배경색
+    marginBottom: 2, // 간격 추가
+    // borderRadius: 8, // 모서리 둥글게
+    // borderWidth: 1, // 테두리 추가
+    // borderColor: "#eeeeee", // 테두리 색상
+    marginLeft: 30, // 들여쓰기
+    // borderLeftWidth: 3, // 왼쪽 경계선
+    // borderLeftColor: "#e0e0e0", // 경계선 색상
   },
   topContainer: {
     // 상단 영역: 내용 블록과 좋아요 버튼을 가로로 배치
@@ -555,18 +556,19 @@ const styles = StyleSheet.create({
   userInfoContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 4, // 사용자 정보와 댓글 내용 사이 간격
   },
   userInfoText: {
     flexDirection: "row",
     alignItems: "center",
     marginLeft: 8,
   },
-  nickname: { fontWeight: "bold", marginRight: 6 },
+  nickname: {
+     marginRight: 6
+   },
   contentText: {
     fontSize: 14,
     lineHeight: 20,
-    marginTop: 4, // 사용자 정보 바로 아래부터 시작
+    marginTop: 2, // 사용자 정보 바로 아래부터 시작
   },
   editContainer: { marginVertical: 4 },
   textInput: {
@@ -584,8 +586,8 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   saveButton: {
-    backgroundColor: "#007AFF",
-    borderRadius: 4,
+    backgroundColor: colors.yesDark,
+    borderRadius: 6,
   },
   saveButtonText: {
     color: "white",
@@ -598,7 +600,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between", // 왼쪽 그룹과 오른쪽 그룹을 양 끝으로
     alignItems: "center",
-    marginTop: 8, // 댓글 내용과 푸터 사이 간격
   },
   leftFooterGroup: {
     // 시간 + 답글 버튼 그룹
@@ -613,7 +614,6 @@ const styles = StyleSheet.create({
   replyButtonText: {
     fontSize: 12,
     color: "#555", // 약간 더 진하게
-    fontWeight: "500",
   },
   authorButtons: {
     // 수정 + 삭제 버튼 그룹
@@ -629,6 +629,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: 4,
+    marginLeft: 2
+
   },
   replyFooterContainer: {
     flexDirection: "row",
@@ -638,7 +640,7 @@ const styles = StyleSheet.create({
   loadMoreButton: {
     padding: 8,
     alignItems: "center",
-    marginVertical: 6, // 간격 추가
+    marginBottom: 6, // 간격 추가
     marginLeft: 24, // 들여쓰기 적용
   },
   loadMoreText: {
@@ -671,5 +673,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: 4,
+    marginLeft: 2
   },
 });
