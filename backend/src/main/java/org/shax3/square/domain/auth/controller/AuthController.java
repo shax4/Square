@@ -193,8 +193,7 @@ public class AuthController {
 
     @PostMapping("/firebase")
     public ResponseEntity<FirebaseLoginResponse> loginWithFirebase(
-            @RequestBody FirebaseLoginRequest request,
-            HttpServletResponse response
+            @RequestBody FirebaseLoginRequest request
     ) {
         FirebaseToken firebaseUser = firebaseService.verifyIdToken(request.idToken());
         UserLoginDto userLoginDto = authService.firebaseLogin(firebaseUser, request);
@@ -208,13 +207,6 @@ public class AuthController {
             );
             return ResponseEntity.ok(FirebaseLoginResponse.member(userLoginDto));
         }
-
-        Cookie cookie = new Cookie("refresh-token", userLoginDto.refreshToken().getToken());
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
-        cookie.setPath("/");
-        response.addCookie(cookie);
-
 
         return ResponseEntity.ok(FirebaseLoginResponse.notMember(userLoginDto.email(),userLoginDto.socialType()));
     }
