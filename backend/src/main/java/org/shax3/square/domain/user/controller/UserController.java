@@ -48,6 +48,13 @@ public class UserController {
             @Valid @RequestBody SignUpRequest signUpRequest
     ) {
         UserLoginDto userLoginDto = userService.signUp(signUpRequest);
+
+        Cookie cookie = new Cookie("refresh-token", userLoginDto.refreshToken().getToken());
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false);
+        cookie.setPath("/");
+        response.addCookie(cookie);
+
         return ResponseEntity.ok(FirebaseLoginResponse.member(userLoginDto));
     }
 
