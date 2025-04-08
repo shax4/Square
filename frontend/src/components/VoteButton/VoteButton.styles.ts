@@ -92,23 +92,23 @@ export const styles = StyleSheet.create({
     },
     VoteTextBeforeLeft: {
         color: colors.yesDark,
-      },
-      VoteTextBeforeRight: {
+    },
+    VoteTextBeforeRight: {
         color: colors.noDark,
-      },
-      VoteTextSelectedLeft: {
+    },
+    VoteTextSelectedLeft: {
         color: colors.white,
-      },
-      VoteTextSelectedRight: {
+    },
+    VoteTextSelectedRight: {
         color: colors.white,
-      },
-      VoteTextNotSelected: {
+    },
+    VoteTextNotSelected: {
         color: colors.grayText,
-      },
+    },
     VoteEmojiImage: {
         width: 24,
         height: 24,
         marginRight: 4,
-      },
+    },
 
 });

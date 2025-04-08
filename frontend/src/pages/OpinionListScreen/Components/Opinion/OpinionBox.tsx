@@ -8,7 +8,7 @@ import { styles } from '../ContentBubble.styles';
 import { AntDesign, Feather } from '@expo/vector-icons'; // 하트/댓글 아이콘용
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { StackParamList } from "../../../../shared/page-stack/DebatePageStack";
+import { DebateStackParamList } from "../../../../shared/page-stack/DebatePageStack";
 import Text from '../../../../components/Common/Text';
 
 
@@ -32,7 +32,7 @@ const OpinionBox = ({ debateId, opinion }: Props) => {
         createdAt,
     } = opinion;
 
-    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
+    const navigation = useNavigation<NativeStackNavigationProp<DebateStackParamList>>();
     const routeOpinionDetailScreen = () => {
         navigation.navigate('OpinionDetailScreen', { debateId, opinionId });
     }

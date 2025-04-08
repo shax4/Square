@@ -28,4 +28,5 @@ export type StackParamList = {
     opinionId: number;
   };
   LikeButtonApiTestExample: undefined;
+  SettingScreen: undefined;
 };

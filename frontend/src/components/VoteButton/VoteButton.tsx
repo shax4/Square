@@ -6,7 +6,7 @@ import VoteConfirmModal from '../../pages/DebateCardsScreen/Components/VoteConfi
 import { DebateResultModal } from '../../pages';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { StackParamList } from '../../shared/page-stack/DebatePageStack';
+import { DebateStackParamList } from '../../shared/page-stack/DebatePageStack';
 
 import { useDebateStore } from '../../shared/stores/debates';
 import { getDebateVoteResult, voteDebate } from './api/VoteButtonApi';
@@ -47,7 +47,7 @@ const VoteButton = ({ debateId, showVoteResultModal, }: VoteButtonProps): JSX.El
     const [debateResultModalVisible, setDebateResultModalVisible] = useState(false);
 
     // 페이지 스택 관련
-    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
+    const navigation = useNavigation<NativeStackNavigationProp<DebateStackParamList>>();
     const currentRoute = navigation.getState().routes[navigation.getState().index];
 
     // OpinionList에서 showVoteResultModal 여부를 보내 렌더링과 동시에 모달을 띄울지 여부 결정
