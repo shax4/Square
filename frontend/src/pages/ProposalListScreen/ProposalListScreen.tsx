@@ -19,7 +19,7 @@ export default function ProposalListScreen() {
     const [loading, setLoading] = useState<boolean>(false);
     const [isEmpty, setIsEmpty] = useState<boolean>(false);
     const [renderedProposals, setRenderedProposals] = useState<Proposal[]>([]);
-    
+
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
 
     const fetchProposals = async (cursorId: number | null, cursorLikes: number | null) => {
@@ -45,15 +45,25 @@ export default function ProposalListScreen() {
         }
     };
 
-    // ✅ goBack() 후 화면이 다시 포커스될 때 자동 새로고침
+    // 1. 화면 포커스될 때 무조건 실행
     useFocusEffect(
         useCallback(() => {
+            console.log("refresh (focus)");
             setRenderedProposals([]);
             setNextCursorId(null);
             setNextCursorLikes(null);
             fetchProposals(null, null);
-        }, [sortOption])
+        }, [])
     );
+
+    // 2. 정렬 옵션 바뀔 때도 실행
+    useEffect(() => {
+        console.log("refresh (sortOption changed)");
+        setRenderedProposals([]);
+        setNextCursorId(null);
+        setNextCursorLikes(null);
+        fetchProposals(null, null);
+    }, [sortOption]);
 
     const loadMore = useCallback(() => {
         if (nextCursorId && nextCursorLikes && !loading) {
