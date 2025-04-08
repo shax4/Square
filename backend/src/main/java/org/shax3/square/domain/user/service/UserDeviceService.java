@@ -9,6 +9,7 @@ import org.shax3.square.exception.CustomException;
 import org.shax3.square.exception.ExceptionCode;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -35,5 +36,15 @@ public class UserDeviceService {
                                 .lastLogin(LocalDateTime.now())
                                 .build())
                 );
+
     }
+
+    public List<String> getFcmTokensByUser(User user) {
+        return userDeviceRepository.findAllByUser(user).stream()
+                .map(UserDevice::getFcmToken)
+                .filter(token -> token != null && !token.isBlank())
+                .distinct()
+                .toList();
+    }
+
 }
