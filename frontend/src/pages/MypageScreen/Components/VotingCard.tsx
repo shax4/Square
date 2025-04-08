@@ -69,16 +69,14 @@ const VotingCard = ({
           <View style={styles.optionIconContainer}>
             <Image source={getEmoji(true)} style={styles.emoji} />
           </View>
-          <Text style={[styles.percentText, getOptionTextStyle(true)]}>{leftPercent}%</Text>
-          <Text style={[styles.countText, getOptionTextStyle(true)]}>{leftCount}명</Text>
+          <Text style={[styles.percentText, getOptionTextStyle(true)]}>{leftPercent}% {leftCount}명</Text>
         </View>
 
         <View style={[styles.option, styles.rightOption, !isLeft && styles.selectedRightOption]}>
           <View style={styles.optionIconContainer}>
             <Image source={getEmoji(false)} style={styles.emoji} />
           </View>
-          <Text style={[styles.percentText, getOptionTextStyle(false)]}>{rightPercent}%</Text>
-          <Text style={[styles.countText, getOptionTextStyle(false)]}>{rightCount}명</Text>
+          <Text style={[styles.percentText, getOptionTextStyle(false)]}>{rightPercent}% {rightCount}명</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -157,7 +155,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "700",
     color: colors.black,
-    marginRight: 4,
+    marginRight: 7,
   },
   countText: {
     fontSize: 14,
@@ -165,11 +163,11 @@ const styles = StyleSheet.create({
   },
   selectedLeftText: {
     color: colors.white,
-    fontWeight: 'bold',
+    fontWeight: "700",
   },
   selectedRightText: {
     color: colors.white,
-    fontWeight: 'bold',
+    fontWeight: "700",
   },
   unselectedText: {
     color: colors.black,
