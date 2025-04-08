@@ -134,14 +134,14 @@ apiClient.interceptors.response.use(
  * @param url API 경로
  * @param data 요청 데이터 (옵션)
  * @param config 추가 설정 (옵션)
- * @returns Promise 객체
+ * @returns Promise 객체 (성공 시 데이터 T, 실패 시 undefined)
  */
 export const apiRequest = async <T>(
   method: string,
   url: string,
   data?: any,
   config?: AxiosRequestConfig
-): Promise<ApiResponse<T>> => {
+): Promise<T | undefined> => {
   try {
     const response = await apiClient({
       method,
@@ -149,32 +149,35 @@ export const apiRequest = async <T>(
       data,
       ...config,
     });
-    return response.data;
+    return response.data as T;
   } catch (error) {
-    // 에러 로깅 후 다시 throw
     console.error(`API 요청 실패: ${method} ${url}`, error);
-    throw error;
+    return undefined;
   }
 };
 
 // 편의성을 위한 HTTP 메소드별 함수
-export const apiGet = <T>(url: string, config?: AxiosRequestConfig) =>
-  apiRequest<T>("get", url, undefined, config);
+export const apiGet = <T>(
+  url: string,
+  config?: AxiosRequestConfig
+): Promise<T | undefined> => apiRequest<T>("get", url, undefined, config);
 
 export const apiPost = <T>(
   url: string,
   data?: any,
   config?: AxiosRequestConfig
-) => apiRequest<T>("post", url, data, config);
+): Promise<T | undefined> => apiRequest<T>("post", url, data, config);
 
 export const apiPut = <T>(
   url: string,
   data?: any,
   config?: AxiosRequestConfig
-) => apiRequest<T>("put", url, data, config);
+): Promise<T | undefined> => apiRequest<T>("put", url, data, config);
 
-export const apiDelete = <T>(url: string, config?: AxiosRequestConfig) =>
-  apiRequest<T>("delete", url, undefined, config);
+export const apiDelete = <T>(
+  url: string,
+  config?: AxiosRequestConfig
+): Promise<T | undefined> => apiRequest<T>("delete", url, undefined, config);
 
 // 기존 axiosInstance 내보내기 (하위 호환성 유지)
 export default apiClient;

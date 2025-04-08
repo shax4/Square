@@ -29,24 +29,24 @@ export const PostService = {
   getPosts: async (
     params: GetPostsParams = {}
   ): Promise<PostListResponse | undefined> => {
-    // 기본값 설정
     const queryParams = {
-      sort: params.sort || "latest", // 기본값은 최신순
-      limit: params.limit || 10, // 기본값은 10개
+      sort: params.sort || "latest",
+      limit: params.limit || 10,
       ...(params.nextCursorId ? { nextCursorId: params.nextCursorId } : {}),
       ...(params.nextCursorLikes
         ? { nextCursorLikes: params.nextCursorLikes }
         : {}),
     };
-
     try {
-      // apiGet은 PostListResponse | undefined 를 반환 (ApiResponse 래퍼 없음)
-      return await apiGet<PostListResponse>(API_PATHS.POSTS.LIST, {
+      // apiClient의 apiGet에서 이미 에러를 로깅하고 undefined를 반환함
+      const result = await apiGet<PostListResponse>(API_PATHS.POSTS.LIST, {
         params: queryParams,
       });
+      return result; // 성공 시 PostListResponse, 실패 시 undefined
     } catch (error) {
-      console.error("게시글 목록 조회 API 호출 중 오류 발생:", error);
-      // 에러 발생 시 undefined 반환하여 usePostList에서 처리하도록 함
+      // 추가적인 로깅이나 처리가 필요하다면 여기에 작성
+      // console.error("PostService.getPosts에서 추가 오류 처리:", error);
+      // apiClient에서 undefined를 반환하므로 여기서도 undefined 반환
       return undefined;
     }
   },
@@ -62,14 +62,10 @@ export const PostService = {
     postId: number
   ): Promise<PostDetailResponse | undefined> => {
     try {
-      // apiGet은 데이터 본문 또는 undefined 반환
       return await apiGet<PostDetailResponse>(API_PATHS.POSTS.DETAIL(postId));
     } catch (error) {
-      console.error(
-        `게시글 ID ${postId} 상세 조회 API 호출 중 오류 발생:`,
-        error
-      );
-      return undefined; // 에러 시 undefined 반환
+      // console.error("PostService.getPostDetail에서 추가 오류 처리:", error);
+      return undefined;
     }
   },
 
@@ -78,19 +74,19 @@ export const PostService = {
    * 새로운 게시글을 작성합니다.
    *
    * @param postData 게시글 생성 데이터 (제목, 내용, 이미지 키)
-   * @returns 생성된 게시글 정보를 포함한 Promise 객체
+   * @returns 생성된 게시글 ID 정보 또는 undefined를 포함하는 Promise
    */
   createPost: async (
     postData: CreatePostRequest
-  ): Promise<ApiResponse<{ postId: number }>> => {
+  ): Promise<{ postId: number } | undefined> => {
     try {
       return await apiPost<{ postId: number }>(
         API_PATHS.POSTS.CREATE,
         postData
       );
     } catch (error) {
-      console.error("게시글 생성 API 호출 중 오류 발생:", error);
-      throw error;
+      // console.error("PostService.createPost에서 추가 오류 처리:", error);
+      return undefined;
     }
   },
 
@@ -100,17 +96,17 @@ export const PostService = {
    *
    * @param postId 수정할 게시글 ID
    * @param updateData 수정할 데이터 (제목, 내용, 이미지 키)
-   * @returns API 응답 데이터를 포함한 Promise 객체
+   * @returns 성공 시 응답 데이터(any) 또는 undefined 를 포함하는 Promise (추후 구체화 필요)
    */
   updatePost: async (
     postId: number,
     updateData: UpdatePostRequest
-  ): Promise<ApiResponse<any>> => {
+  ): Promise<any | undefined> => {
     try {
       return await apiPut<any>(API_PATHS.POSTS.UPDATE(postId), updateData);
     } catch (error) {
-      console.error(`게시글 ID ${postId} 수정 API 호출 중 오류 발생:`, error);
-      throw error;
+      // console.error("PostService.updatePost에서 추가 오류 처리:", error);
+      return undefined;
     }
   },
 
@@ -119,14 +115,14 @@ export const PostService = {
    * 특정 게시글을 삭제합니다.
    *
    * @param postId 삭제할 게시글 ID
-   * @returns API 응답 데이터를 포함한 Promise 객체
+   * @returns 성공 시 응답 데이터(any) 또는 undefined 를 포함하는 Promise (추후 구체화 필요)
    */
-  deletePost: async (postId: number): Promise<ApiResponse<any>> => {
+  deletePost: async (postId: number): Promise<any | undefined> => {
     try {
       return await apiDelete<any>(API_PATHS.POSTS.DELETE(postId));
     } catch (error) {
-      console.error(`게시글 ID ${postId} 삭제 API 호출 중 오류 발생:`, error);
-      throw error;
+      // console.error("PostService.deletePost에서 추가 오류 처리:", error);
+      return undefined;
     }
   },
 
@@ -136,28 +132,24 @@ export const PostService = {
    *
    * @param nextCursorId 다음 페이지 커서 ID (선택 사항)
    * @param limit 페이지당 게시글 수 (선택 사항)
-   * @returns 사용자 게시글 목록 데이터를 포함한 Promise 객체
+   * @returns 사용자 게시글 목록 데이터 또는 undefined 를 포함하는 Promise
    */
   getMyPosts: async (
     nextCursorId?: number,
     limit: number = 10
-  ): Promise<ApiResponse<{ posts: Post[]; nextCursorId?: number }>> => {
+  ): Promise<{ posts: Post[]; nextCursorId?: number } | undefined> => {
     const queryParams = {
       limit,
       ...(nextCursorId ? { nextCursorId } : {}),
     };
-
     try {
       return await apiGet<{ posts: Post[]; nextCursorId?: number }>(
         API_PATHS.POSTS.MY_POSTS,
         { params: queryParams }
       );
     } catch (error) {
-      console.error(
-        "내가 작성한 게시글 목록 조회 API 호출 중 오류 발생:",
-        error
-      );
-      throw error;
+      // console.error("PostService.getMyPosts에서 추가 오류 처리:", error);
+      return undefined;
     }
   },
 
@@ -167,28 +159,24 @@ export const PostService = {
    *
    * @param nextCursorId 다음 페이지 커서 ID (선택 사항)
    * @param limit 페이지당 게시글 수 (선택 사항)
-   * @returns 좋아요한 게시글 목록 데이터를 포함한 Promise 객체
+   * @returns 좋아요한 게시글 목록 데이터 또는 undefined 를 포함하는 Promise
    */
   getMyLikedPosts: async (
     nextCursorId?: number,
     limit: number = 10
-  ): Promise<ApiResponse<{ posts: Post[]; nextCursorId?: number }>> => {
+  ): Promise<{ posts: Post[]; nextCursorId?: number } | undefined> => {
     const queryParams = {
       limit,
       ...(nextCursorId ? { nextCursorId } : {}),
     };
-
     try {
       return await apiGet<{ posts: Post[]; nextCursorId?: number }>(
         API_PATHS.POSTS.MY_LIKES,
         { params: queryParams }
       );
     } catch (error) {
-      console.error(
-        "내가 좋아요한 게시글 목록 조회 API 호출 중 오류 발생:",
-        error
-      );
-      throw error;
+      // console.error("PostService.getMyLikedPosts에서 추가 오류 처리:", error);
+      return undefined;
     }
   },
 
@@ -198,28 +186,24 @@ export const PostService = {
    *
    * @param nextCursorId 다음 페이지 커서 ID (선택 사항)
    * @param limit 페이지당 게시글 수 (선택 사항)
-   * @returns 스크랩한 게시글 목록 데이터를 포함한 Promise 객체
+   * @returns 스크랩한 게시글 목록 데이터 또는 undefined 를 포함하는 Promise
    */
   getMyScrapPosts: async (
     nextCursorId?: number,
     limit: number = 10
-  ): Promise<ApiResponse<{ posts: Post[]; nextCursorId?: number }>> => {
+  ): Promise<{ posts: Post[]; nextCursorId?: number } | undefined> => {
     const queryParams = {
       limit,
       ...(nextCursorId ? { nextCursorId } : {}),
     };
-
     try {
       return await apiGet<{ posts: Post[]; nextCursorId?: number }>(
         API_PATHS.POSTS.MY_SCRAPS,
         { params: queryParams }
       );
     } catch (error) {
-      console.error(
-        "내가 스크랩한 게시글 목록 조회 API 호출 중 오류 발생:",
-        error
-      );
-      throw error;
+      // console.error("PostService.getMyScrapPosts에서 추가 오류 처리:", error);
+      return undefined;
     }
   },
 };

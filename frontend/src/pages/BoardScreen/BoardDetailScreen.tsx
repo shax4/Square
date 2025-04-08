@@ -356,7 +356,8 @@ const styles = StyleSheet.create({
   },
   commentCountText: {
     marginLeft: 4,
-    fontSize: 14,
+    fontSize: 12,
+    fontWeight: "bold",
     color: "#666",
   },
   emptyCommentsContainer: {
