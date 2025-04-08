@@ -30,15 +30,28 @@ interface BoardItemProps {
  * @param onPress - 게시글 클릭 시 실행될 함수
  */
 export default function BoardItem({ item, onPress }: BoardItemProps) {
+  console.log(`BoardItem 렌더링: ID ${item.postId}, 제목: ${item.title}`);
+
+  // 필수 데이터 검증
+  if (!item || !item.postId) {
+    console.error("유효하지 않은 게시글 데이터:", item);
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>유효하지 않은 게시글</Text>
+      </View>
+    );
+  }
+
   // 로컬 상태 추가
-  const [likeCount, setLikeCount] = useState(item.likeCount);
-  const [isLiked, setIsLiked] = useState(item.isLiked);
+  const [likeCount, setLikeCount] = useState(item.likeCount || 0);
+  const [isLiked, setIsLiked] = useState(item.isLiked || false);
 
   // 게시글 내용을 미리보기 형태로 자름 (최대 100자)
-  const contentPreview =
-    item.content.length > 100
+  const contentPreview = item.content
+    ? item.content.length > 100
       ? `${item.content.substring(0, 100)}...`
-      : item.content;
+      : item.content
+    : "";
 
   const likeProps = useLikeButton(
     item.postId,
@@ -168,5 +181,11 @@ const styles = StyleSheet.create({
   nameContainer: {
     flexDirection: "row",
     alignItems: "center",
+  },
+  errorText: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "red",
+    textAlign: "center",
   },
 });

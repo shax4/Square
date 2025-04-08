@@ -134,14 +134,18 @@ export default function BoardListScreen({
 
   // 9. 게시글 아이템 렌더링 함수
   const renderItem = useCallback(
-    ({ item }: { item: Post }) => (
-      <BoardItem
-        item={{ ...item, userType: item.userType || "" }}
-        onPress={() =>
-          navigation.navigate("BoardDetail", { boardId: item.postId })
-        }
-      />
-    ),
+    ({ item }: { item: Post }) => {
+      // 각 아이템 렌더링 시 로그 (필요하면 주석 해제하여 사용)
+      // console.log("Rendering post item:", item.postId, item.title);
+      return (
+        <BoardItem
+          item={{ ...item, userType: item.userType || "" }}
+          onPress={() =>
+            navigation.navigate("BoardDetail", { boardId: item.postId })
+          }
+        />
+      );
+    },
     [navigation]
   );
 
@@ -291,11 +295,12 @@ export default function BoardListScreen({
           data={posts}
           renderItem={renderItem}
           keyExtractor={(item) => `post-${item.postId}`}
-          contentContainerStyle={{
-            ...styles.listContainer,
-            ...styles.listContent,
-          }}
-          ListEmptyComponent={<EmptyBoardList />}
+          contentContainerStyle={
+            posts.length === 0
+              ? styles.emptyListContainer
+              : styles.listContainer
+          }
+          ListEmptyComponent={!loading ? <EmptyBoardList /> : null}
           onEndReached={handleEndReached}
           onEndReachedThreshold={0.5}
           ListFooterComponent={
@@ -312,11 +317,6 @@ export default function BoardListScreen({
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
           }
-          ListHeaderComponent={() => (
-            <View style={styles.postsHeader}>
-              <Text style={styles.sectionTitle}>게시글 목록</Text>
-            </View>
-          )}
         />
 
         {/* 글쓰기 버튼 */}
@@ -426,9 +426,12 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   listContainer: {
-    paddingHorizontal: 15,
-    paddingTop: 5,
-    paddingBottom: 80, // writeButton을 위한 공간
+    paddingBottom: 80, // 글쓰기 버튼 영역 확보
+  },
+  emptyListContainer: {
+    flex: 1, // 빈 목록일 때 화면 전체를 차지하도록 설정
+    justifyContent: "center", // 수직 중앙 정렬
+    alignItems: "center", // 수평 중앙 정렬
   },
   writeButton: {
     position: "absolute",
@@ -455,13 +458,6 @@ const styles = StyleSheet.create({
     padding: 10,
     textAlign: "center",
     color: "#666",
-  },
-  postsHeader: {
-    paddingTop: 16,
-    paddingBottom: 8,
-  },
-  listContent: {
-    paddingBottom: 20,
   },
   loadingText: {
     marginTop: 10,

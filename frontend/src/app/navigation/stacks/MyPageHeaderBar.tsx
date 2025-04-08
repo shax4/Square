@@ -23,7 +23,8 @@ import LikeButtonApiTestExample from "../../../components/LikeButton/examples/Ap
 import BoardDetailScreen from "../../../pages/BoardScreen/BoardDetailScreen";
 import { ModalTestScreen } from "../../../pages";
 
-import { BoardAPI } from "../../../pages/BoardScreen/Api/boardApi";
+// 사용 중지된 BoardAPI 대신 PostService 사용
+import { PostService } from "../../../shared/services/postService";
 import { mockPosts } from "../../../pages/BoardScreen/mocks/boardData";
 import { BoardStackParamList } from "../../../shared/page-stack/BoardPageStack";
 
@@ -233,8 +234,8 @@ function HeaderRightIcons({
         text: "삭제",
         onPress: async () => {
           try {
-            // API를 호출하여 게시글 삭제
-            await BoardAPI.deletePost(boardId);
+            // BoardAPI 대신 PostService 사용
+            await PostService.deletePost(boardId);
             Alert.alert("삭제 완료", "게시글이 삭제되었습니다.", [
               {
                 text: "확인",
