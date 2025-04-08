@@ -74,10 +74,10 @@ const OpinionBox = ({ debateId, opinion }: Props) => {
                         size={16}
                         color={isLiked ? "red" : "gray"}
                     />
-                    <Text weight="medium" style={styles.countText}>{likeCount}</Text>
+                    <Text style={styles.countText}>{likeCount}</Text>
 
                     <Feather name="message-circle" size={16} color="gray" style={{ marginLeft: 12 }} />
-                    <Text weight="medium" style={styles.countText}>{commentCount}</Text>
+                    <Text style={styles.countText}>{commentCount}</Text>
 
                     <Text weight="medium" style={styles.timeText}>{getTimeAgo(createdAt)}</Text>
                 </View>

@@ -13,7 +13,7 @@ export const styles = StyleSheet.create({
         flexWrap: 'wrap',
         marginLeft: 20,
         marginTop: 20,
-        marginBottom: 20
+        marginBottom: 15
     },
     topicViewText: {
         margin: 10,
@@ -25,13 +25,13 @@ export const styles = StyleSheet.create({
         justifyContent: 'space-between',
         marginLeft: 20,
         marginRight: 20,
-        marginBottom: 10,
-        gap: 130,
+        marginBottom: 20,
+        gap: 200,
     },
     optionTextLeft: {
         height: 40,
         lineHeight: 40,
-        fontSize: 15,
+        fontSize: 13,
         borderRadius: 15,
         textAlign: 'center',
         color: colors.yesDark
@@ -40,7 +40,7 @@ export const styles = StyleSheet.create({
     optionTextRight: {
         height: 40,
         lineHeight: 40,
-        fontSize: 15,
+        fontSize: 13,
         borderRadius: 15,
         textAlign: 'center',
         color: colors.noDark
@@ -62,7 +62,7 @@ export const styles = StyleSheet.create({
         backgroundColor: '#F4F4F4',
         borderRadius: 50,
         paddingVertical: 5,
-        paddingHorizontal: 14,
+        paddingHorizontal: 7,
         flex: 1, 
 
     },
@@ -76,10 +76,10 @@ export const styles = StyleSheet.create({
     },
     
     optionImage: {
-        width: 20,
-        height: 20,
-        marginRight: 10,
-        marginLeft: 13
+        width: 18,
+        height: 18,
+        marginRight: 8,
+        marginLeft: 10
     },
     
     optionText: {

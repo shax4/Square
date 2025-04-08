@@ -6,6 +6,7 @@ export const styles = StyleSheet.create({
         marginVertical: 6,
         flexDirection: "row",
         width: "100%",
+        marginBottom: 10
     },
     alignLeft: {
         justifyContent: "flex-start",
@@ -23,7 +24,7 @@ export const styles = StyleSheet.create({
         borderTopLeftRadius: 0,
     },
     rightBubble: {
-        backgroundColor: '#FEECEC',
+        backgroundColor: colors.noLight,
         borderTopRightRadius: 0,
     },
     topRow: {
@@ -39,11 +40,11 @@ export const styles = StyleSheet.create({
     },
     contentText: {
         fontSize: 15,
-        marginBottom: 8,
     },
     bottomRow: {
         flexDirection: "row",
         alignItems: "center",
+        marginTop: 10
     },
     countText: {
         marginLeft: 4,

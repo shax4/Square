@@ -13,10 +13,10 @@ export const Icons = {
   edit: (props: any) => <Ionicons name="pencil" size={24} {...props} />,
   delete: (props: any) => <Ionicons name="trash" size={24} {...props} />,
   bookmark: (props: any) => (
-    <Ionicons name="bookmark-outline" size={24} color="black" />
+    <Ionicons name="bookmark-outline" size={24} color="#888888" />
   ),
   bookmarkUndo: (props: any) => (
-    <Ionicons name="bookmark" size={24} {...props} />
+    <Ionicons name="bookmark" size={24} color="#FF4848" {...props} />
   ),
   report: (props: any) => (
     <MaterialCommunityIcons
