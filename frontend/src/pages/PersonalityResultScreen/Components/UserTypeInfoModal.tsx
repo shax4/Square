@@ -7,6 +7,8 @@ import {
     ScrollView,
     StyleSheet,
     Dimensions,
+    SafeAreaView,
+    Platform,
 } from 'react-native';
 import Text from '../../../components/Common/Text';
 import colors from '../../../../assets/colors';
@@ -91,16 +93,24 @@ const DATA = [
 
 const UserTypeInfoModal = ({ visible, onClose }: UserTypeInfoModalProps) => {
     return (
-        <Modal transparent visible={visible} animationType="fade">
-            <TouchableWithoutFeedback onPress={onClose}>
-                <View style={styles.overlay}>
-                    <TouchableWithoutFeedback>
+        <Modal transparent visible={visible} animationType="fade" statusBarTranslucent>
+            <SafeAreaView style={styles.safeArea}>
+                <TouchableWithoutFeedback>
+                    <View style={styles.overlay}>
                         <View style={styles.modalContainer}>
+                            {/* 모달 헤더 */}
+                            <View style={styles.header}>
+                                <Text style={styles.headerTitle}>성향 유형 정보</Text>
+                                <TouchableOpacity style={styles.headerCloseButton} onPress={onClose}>
+                                    <Text style={styles.headerCloseButtonText}>✕</Text>
+                                </TouchableOpacity>
+                            </View>
+
                             <View style={styles.scrollWrapper}>
                                 <ScrollView
                                     style={styles.scrollView}
                                     contentContainerStyle={styles.scrollContent}
-                                    showsVerticalScrollIndicator={true}
+                                    showsVerticalScrollIndicator={false}
                                 >
                                     {DATA.map((item) => (
                                         <View key={item.id} style={styles.section}>
@@ -108,120 +118,227 @@ const UserTypeInfoModal = ({ visible, onClose }: UserTypeInfoModalProps) => {
                                             <Text style={styles.description}>{item.description}</Text>
 
                                             <View style={styles.traitsContainer}>
-                                                <View style={styles.traitBox}>
-                                                    <Text style={styles.traitShort}>{item.traitA.short}</Text>
-                                                    <Text style={styles.traitName}>{item.traitA.name}</Text>
-                                                    <Text style={styles.traitDefinition}>{item.traitA.definition}</Text>
-                                                    <Text style={styles.traitExample}>{item.traitA.example}</Text>
+                                                <View style={[styles.traitBox, styles.traitBoxLeft]}>
+                                                    <View style={styles.traitHeader}>
+                                                        <Text style={styles.traitShort}>{item.traitA.short}</Text>
+                                                        <Text style={styles.traitName}>{item.traitA.name}</Text>
+                                                    </View>
+                                                    <View style={styles.traitContent}>
+                                                        <Text style={styles.traitDefinition}>{item.traitA.definition}</Text>
+                                                        <Text style={styles.traitExample}>"{item.traitA.example}"</Text>
+                                                    </View>
                                                 </View>
 
-                                                <View style={styles.traitBox}>
-                                                    <Text style={styles.traitShort}>{item.traitB.short}</Text>
-                                                    <Text style={styles.traitName}>{item.traitB.name}</Text>
-                                                    <Text style={styles.traitDefinition}>{item.traitB.definition}</Text>
-                                                    <Text style={styles.traitExample}>{item.traitB.example}</Text>
+                                                <View style={[styles.traitBox, styles.traitBoxRight]}>
+                                                    <View style={styles.traitHeader}>
+                                                        <Text style={styles.traitShort}>{item.traitB.short}</Text>
+                                                        <Text style={styles.traitName}>{item.traitB.name}</Text>
+                                                    </View>
+                                                    <View style={styles.traitContent}>
+                                                        <Text style={styles.traitDefinition}>{item.traitB.definition}</Text>
+                                                        <Text style={styles.traitExample}>"{item.traitB.example}"</Text>
+                                                    </View>
                                                 </View>
                                             </View>
                                         </View>
                                     ))}
+                                    <View style={styles.bottomPadding} />
                                 </ScrollView>
                             </View>
 
-                            {/* 항상 하단에 고정되는 닫기 버튼 */}
-                            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-                                <Text style={styles.closeButtonText}>닫기</Text>
-                            </TouchableOpacity>
+                            <View style={styles.buttonContainer}>
+                                <TouchableOpacity
+                                    style={styles.closeButton}
+                                    onPress={onClose}
+                                    activeOpacity={0.7}
+                                >
+                                    <Text style={styles.closeButtonText}>닫기</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
-                    </TouchableWithoutFeedback>
-                </View>
-            </TouchableWithoutFeedback>
+                    </View>
+                </TouchableWithoutFeedback>
+            </SafeAreaView>
         </Modal>
-
-
     );
 };
 
 export default UserTypeInfoModal;
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+    },
     overlay: {
         flex: 1,
-        backgroundColor: colors.blurbackgroundColor,
+        backgroundColor: 'rgba(0, 0, 0, 0.6)',
         justifyContent: 'center',
         alignItems: 'center',
     },
     modalContainer: {
         backgroundColor: colors.white,
-        borderRadius: 15,
+        borderRadius: 16,
         width: '90%',
-        maxHeight: '85%',
+        height: '90%', // ✅ 여기 추가
         overflow: 'hidden',
         flexDirection: 'column',
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+            },
+            android: {
+                elevation: 5,
+            },
+        }),
+    },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingVertical: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f0f0f0',
+        position: 'relative',
+    },
+    headerTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: colors.primary,
+    },
+    headerCloseButton: {
+        position: 'absolute',
+        right: 16,
+        top: 16,
+        width: 28,
+        height: 28,
+        borderRadius: 14,
+        backgroundColor: '#f0f0f0',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    headerCloseButtonText: {
+        fontSize: 16,
+        color: '#666',
     },
     scrollWrapper: {
         flex: 1,
     },
     scrollView: {
-        paddingHorizontal: 20,
+        flex: 1,
     },
     scrollContent: {
-        paddingVertical: 20,
-        paddingBottom: 40,
+        paddingHorizontal: 20,
+        paddingTop: 16,
     },
     section: {
-        marginBottom: 30,
+        marginBottom: 24,
+        backgroundColor: '#f9f9f9',
+        borderRadius: 12,
+        padding: 16,
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.1,
+                shadowRadius: 2,
+            },
+            android: {
+                elevation: 2,
+            },
+        }),
     },
     title: {
         fontSize: 20,
         fontWeight: 'bold',
-        marginBottom: 6,
+        marginBottom: 8,
         textAlign: 'center',
+        color: '#333',
     },
     description: {
         fontSize: 14,
-        color: '#444',
+        color: '#555',
         textAlign: 'center',
-        marginBottom: 12,
+        marginBottom: 16,
+        lineHeight: 20,
     },
     traitsContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        paddingHorizontal: 10, // 좌우 여백 추가
     },
     traitBox: {
         flex: 1,
-        backgroundColor: '#f6f6f6',
-        borderRadius: 8,
-        padding: 10,
-        marginHorizontal: 5, // traitBox 사이 여백
+        borderRadius: 10,
+        padding: 12,
+        backgroundColor: '#fff',
+    },
+    traitBoxLeft: {
+        marginRight: 6,
+        borderLeftWidth: 3,
+        borderLeftColor: colors.primary,
+    },
+    traitBoxRight: {
+        marginLeft: 6,
+        borderLeftWidth: 3,
+        borderLeftColor: '#5d8aa8',
+    },
+    traitHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 8,
     },
     traitShort: {
         fontSize: 16,
         fontWeight: 'bold',
-        marginBottom: 2,
+        marginRight: 6,
         color: colors.primary,
+        backgroundColor: '#f0f5ff',
+        width: 24,
+        height: 24,
+        textAlign: 'center',
+        lineHeight: 24,
+        borderRadius: 12,
     },
     traitName: {
         fontSize: 15,
         fontWeight: '600',
+        color: '#333',
+    },
+    traitContent: {
+        paddingLeft: 4,
     },
     traitDefinition: {
         fontSize: 13,
-        marginTop: 4,
+        marginBottom: 6,
+        color: '#444',
+        lineHeight: 18,
     },
     traitExample: {
         fontSize: 12,
-        marginTop: 4,
         fontStyle: 'italic',
         color: '#666',
     },
+    bottomPadding: {
+        height: 80,
+    },
+    buttonContainer: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        paddingHorizontal: 20,
+        paddingVertical: 12,
+        borderTopWidth: 1,
+        borderTopColor: '#f0f0f0',
+    },
     closeButton: {
         backgroundColor: colors.yesDark,
-        paddingVertical: 12,
-        borderRadius: 8,
+        paddingVertical: 14,
+        borderRadius: 10,
         alignItems: 'center',
-        marginHorizontal: 20,
-        marginBottom: 12,
     },
     closeButtonText: {
         color: colors.white,
