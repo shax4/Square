@@ -21,7 +21,7 @@ const BlueBarChart = (data: BarChartComponentProps) => {
             marginBottom: 2,
           }}
         >
-          {item.value}%
+          {item.value}
         </Text>
       ),
     }));
