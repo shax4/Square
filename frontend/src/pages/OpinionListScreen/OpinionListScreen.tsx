@@ -376,7 +376,7 @@ export default function OpinionListScreen() {
                     )}
                 </View>
 
-                {!isSummary && !debate.isLeft && (
+                {!isSummary && (
                     <CommentInput
                         onChangeText={setCommentText}
                         onSubmit={handleOpinionPosting}
@@ -384,17 +384,6 @@ export default function OpinionListScreen() {
                         placeholder='의견을 입력하세요...'
                         contentMinSize={10}
                         contentMaxSize={150}
-                    />
-                )}
-                {!isSummary && debate.isLeft == null && (
-                    <CommentInput
-                        onChangeText={setCommentText}
-                        onSubmit={handleOpinionPosting}
-                        value={commentText}
-                        placeholder='투표 후 입력 가능합니다...'
-                        contentMinSize={10}
-                        contentMaxSize={150}
-                        disabled = {true}
                     />
                 )}
             </SafeAreaView>
