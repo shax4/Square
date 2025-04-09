@@ -304,9 +304,8 @@ export default function OpinionDetailScreen() {
                                         activeOpacity={0.4}
                                         onLongPress={() => handleLongPressComment(comment.commentId, comment.nickname)}
                                     >
-                                        <Text style={styles.CommentText}>{comment.content}</Text>
+                                        <Text weight="medium" style={styles.CommentText}>{comment.content}</Text>
                                     </TouchableOpacity>
-                                    <Text weight="medium" style={styles.CommentText}>{comment.content}</Text>
                                 </View>
                             </View>
 
