@@ -13,7 +13,7 @@ export const styles = StyleSheet.create({
         flexWrap: 'wrap',
         marginLeft: 20,
         marginTop: 20,
-        marginBottom: 15
+        marginBottom: 5
     },
     topicViewText: {
         margin: 10,
@@ -64,7 +64,6 @@ export const styles = StyleSheet.create({
         paddingVertical: 1,
         paddingHorizontal: 6,
         flex: 1, 
-
     },
 
     optionBoxLeft: {
