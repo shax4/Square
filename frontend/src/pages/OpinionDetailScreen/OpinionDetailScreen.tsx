@@ -1,5 +1,5 @@
 import { RouteProp, useNavigation, useRoute, useIsFocused } from "@react-navigation/native";
-import { Text, TouchableOpacity, View, ScrollView, Alert } from "react-native";
+import { TouchableOpacity, View, ScrollView, Alert } from "react-native";
 import { DebateStackParamList } from "../../shared/page-stack/DebatePageStack";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { Icons } from "../../../assets/icons/Icons";
@@ -14,6 +14,8 @@ import { OpinionsResponse } from "./Components/OpinionsResponse.types";
 import { Comment } from "./Components/Comment.types";
 import { useAuthStore } from "../../shared/stores";
 import { likesOpinion } from "./api/OpinionApi";
+import Text from '../../components/Common/Text';
+
 type OpinionDetailRouteProp = RouteProp<DebateStackParamList, 'OpinionDetailScreen'>;
 
 export default function OpinionDetailScreen() {
@@ -211,7 +213,7 @@ export default function OpinionDetailScreen() {
 
             {/* 의견 컨텐츠 */}
             <View style={styles.OpinionContentView}>
-                <Text style={styles.OpinionContentText}>
+                <Text weight="medium" style={styles.OpinionContentText}>
                     {opinionDetail!.content}
                 </Text>
             </View>
@@ -226,8 +228,8 @@ export default function OpinionDetailScreen() {
                 />
 
                 <View style={styles.CommentCountButton}>
-                    <Icons.comment />
-                    <Text style={styles.CountText}>{opinionDetail!.commentCount}</Text>
+                    <Icons.commentNew />
+                    <Text weight="medium" style={styles.CountText}>{opinionDetail!.commentCount}</Text>
                 </View>
             </View>
 
@@ -252,7 +254,7 @@ export default function OpinionDetailScreen() {
                                     variant="small"
                                 />
                                 <View style={styles.CommentTextView}>
-                                    <Text style={styles.CommentText}>{comment.content}</Text>
+                                    <Text weight="medium" style={styles.CommentText}>{comment.content}</Text>
                                 </View>
                             </View>
 
