@@ -93,17 +93,13 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
 
   // 댓글 작성 함수
   const handleSubmitComment = async () => {
-    if (submitting || !commentText.trim()) return;
+    // 유효성 검사 및 API 호출은 useComment 훅에서 처리
+    const success = await createComment(boardId); // parentId 없이 호출 (최상위 댓글)
 
-    const success = await createComment(boardId);
     if (success) {
-      // 댓글 작성 성공 시 게시글 데이터 다시 가져오기
+      // 댓글 작성 성공 시 입력창 비우고, 게시글 데이터 다시 가져오기
+      // setCommentText(""); // 입력창 비우기는 useComment에서 처리됨
       refresh();
-    } else {
-      Alert.alert(
-        "오류",
-        submitError?.message || "댓글 작성에 실패했습니다. 다시 시도해 주세요."
-      );
     }
   };
 
@@ -234,13 +230,13 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
           multiline
         />
         <TouchableOpacity
+          disabled={submitting || !commentText.trim()}
           style={[
             styles.commentSubmitButton,
-            (!commentText.trim() || submitting) &&
+            (submitting || !commentText.trim()) &&
               styles.commentSubmitButtonDisabled,
           ]}
           onPress={handleSubmitComment}
-          disabled={submitting || !commentText.trim()}
         >
           <Text style={styles.commentSubmitText}>
             {submitting ? "등록 중..." : "등록"}

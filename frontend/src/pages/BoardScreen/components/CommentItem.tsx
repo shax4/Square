@@ -38,17 +38,22 @@ export default function CommentItem({
   const [editedContent, setEditedContent] = useState(comment.content); // 수정 내용 상태
 
   // comment.replies는 초기 로드된 대댓글 목록
+  const initialReplies = comment.replies || []; // API 응답의 초기 답글 목록
   const [displayedReplies, setDisplayedReplies] = useState<Reply[]>(
-    () => (comment.replies ? comment.replies.slice(0, 3) : []) // 초기 3개
+    initialReplies.slice(0, 3)
   );
-  const [nextReplyCursor, setNextReplyCursor] = useState<number | null>(() =>
-    comment.replies && comment.replies.length > 3
-      ? comment.replies[2].replyId
-      : null
-  );
+  const [nextReplyCursor, setNextReplyCursor] = useState<number | null>(() => {
+    if (initialReplies.length > 3) {
+      return initialReplies[2].replyId;
+    }
+    return null;
+  });
   const [isLoadingMore, setIsLoadingMore] = useState(false); // 더보기 로딩
   const [isReplying, setIsReplying] = useState(false); // 답글 입력창 표시 상태
   const [replyText, setReplyText] = useState(""); // 답글 내용 상태
+
+  // *** 내용 펼치기/접기 상태 추가 ***
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // 현재 사용자가 댓글 작성자인지 확인
   const isAuthor = user?.nickname === comment.nickname;
@@ -63,6 +68,18 @@ export default function CommentItem({
     deleteComment,
     loadReplies,
   } = useComment();
+
+  // --- 댓글 내용 처리 ---
+  const isLongContent = comment.content.length > 100;
+  const displayedContent =
+    isLongContent && !isExpanded
+      ? `${comment.content.substring(0, 100)}...`
+      : comment.content;
+
+  // *** 더보기/접기 토글 함수 ***
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
 
   // 댓글 수정 시작 함수
   const handleEditPress = () => {
@@ -151,8 +168,6 @@ export default function CommentItem({
         setIsReplying(false);
         // 댓글 목록 갱신 (부모 컴포넌트에 알림)
         onCommentChange();
-      } else {
-        Alert.alert("오류", "답글을 등록하는데 실패했습니다.");
       }
     } catch (error) {
       // 오류 처리
@@ -190,8 +205,11 @@ export default function CommentItem({
     }
   }, [comment.commentId, isLoadingMore, nextReplyCursor, loadReplies]);
 
-  // 더 보여줄 답글이 있는지 계산
-  const hasMoreReplies = comment.replyCount > displayedReplies.length;
+  // *** 더 보여줄 답글이 있는지 계산 수정 ***
+  const hasMoreReplies =
+    nextReplyCursor !== null ||
+    (comment.replyCount > displayedReplies.length &&
+      displayedReplies.length >= 3);
 
   // 댓글용 좋아요 버튼 props 생성
   const commentLikeProps = useLikeButton(
@@ -611,5 +629,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 4,
     marginLeft: 2,
+  },
+  // *** 비활성화 버튼 스타일 추가 ***
+  disabledButton: {
+    backgroundColor: "#aaa", // 비활성 버튼 색상
+  },
+  // *** 버튼 텍스트 스타일 추가 ***
+  buttonText: {
+    color: "#fff", // 버튼 텍스트 색상
+    fontWeight: "bold",
+    fontSize: 13,
   },
 });
