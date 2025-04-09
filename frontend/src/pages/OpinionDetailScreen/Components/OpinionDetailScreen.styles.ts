@@ -105,6 +105,35 @@ export const styles = StyleSheet.create({
         height: 0.5,
         backgroundColor: colors.grayText,
         marginHorizontal: 12,
+    },
+    modalOverlay: {
+        flex: 1,
+        justifyContent: 'flex-end',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+        backgroundColor: 'white',
+        paddingBottom: 30,
+        paddingTop: 10,
+        borderTopLeftRadius: 16,
+        borderTopRightRadius: 16,
+    },
+    modalButton: {
+        padding: 20,
+        alignItems: 'center',
+        borderBottomWidth: 1,
+        borderBottomColor: '#ddd',
+    },
+    modalButtonText: {
+        fontSize: 16,
+        color: '#333',
+    },
+    modalCancelButtonText: {
+        fontSize: 16,
+        color: 'red',
+    },
+    ModalPadding: {
+        height: 30
     }
 
 });
