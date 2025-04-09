@@ -13,7 +13,7 @@ import {
   UpdateCommentRequest,
   GetRepliesParams,
   RepliesResponse,
-  PostCommentResponse,
+  CreateCommentResponse,
 } from "../types/postTypes";
 
 /**
@@ -27,10 +27,10 @@ export const CommentService = {
    */
   createComment: async (
     requestData: CreateCommentRequest
-  ): Promise<PostCommentResponse | undefined> => {
+  ): Promise<CreateCommentResponse | undefined> => {
     try {
       const url = `/api/comments`;
-      return await apiPost<PostCommentResponse>(url, requestData);
+      return await apiPost<CreateCommentResponse>(url, requestData);
     } catch (error) {
       console.error("댓글/답글 생성 API 호출 중 오류 발생:", error);
       return undefined;
@@ -161,7 +161,11 @@ export const CommentService = {
       const result = await apiGet<RepliesResponse>(path, {
         params: queryParams,
       });
-      console.log(`댓글 ${commentId} 답글 조회 API 응답:`, result); // 응답 로깅
+      console.log(
+        `댓글 ${commentId} 답글 조회 API 응답: 성공 (답글 ${
+          result?.replies?.length || 0
+        }개)`
+      ); // 응답 로깅 간소화
       return result;
     } catch (error) {
       console.error(`댓글 ID ${commentId} 답글 목록 조회 API 오류:`, error);

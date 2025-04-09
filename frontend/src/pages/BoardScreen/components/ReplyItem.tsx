@@ -97,7 +97,8 @@ export default function ReplyItem({
           if (success) {
             // *** 로컬 상태 업데이트 호출 ***
             onReplyDelete(reply.replyId);
-            // onCommentChange(); // 필요시 호출 (서버와 실시간 동기화)
+            // 서버와 실시간 동기화 및 카운트 업데이트를 위해 호출
+            onCommentChange();
           } else {
             Alert.alert("오류", "답글 삭제에 실패했습니다.");
           }

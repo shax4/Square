@@ -1,4 +1,10 @@
-import React, { useState, useCallback, Fragment, useRef } from "react";
+import React, {
+  useState,
+  useCallback,
+  Fragment,
+  useRef,
+  useEffect,
+} from "react";
 import {
   View,
   TextInput,
@@ -7,6 +13,7 @@ import {
   Alert,
   ActivityIndicator,
   FlatList,
+  LayoutChangeEvent,
 } from "react-native";
 import ProfileImage from "../../../components/ProfileImage/ProfileImage";
 import PersonalityTag from "../../../components/PersonalityTag/PersonalityTag";
@@ -23,12 +30,14 @@ interface CommentItemProps {
   postId: number; // 게시글 ID
   comment: Comment; // 댓글 타입 (대댓글은 재귀 호출 시 prop 이름 변경 고려)
   onCommentChange: () => void; // 부모 컴포넌트에 변경사항 알림 콜백
+  onHideRepliesScrollRequest: (yPosition: number) => void; // *** Prop 타입 추가 ***
 }
 
 export default function CommentItem({
   postId,
   comment,
   onCommentChange,
+  onHideRepliesScrollRequest, // *** Prop 받기 ***
 }: CommentItemProps) {
   // *** 실제 로그인 사용자 정보 가져오기 ***
   const loggedInUser = useAuthStore((state) => state.user);
@@ -39,8 +48,7 @@ export default function CommentItem({
   // comment.replies는 초기 로드된 대댓글 목록
   const initialReplies = comment.replies || []; // API 응답의 초기 답글 목록
   const [displayedReplies, setDisplayedReplies] = useState<Reply[]>(() => {
-    const initial = comment.replies || [];
-    return initial.slice(0, 3);
+    return initialReplies.slice(0, 3);
   });
   const [nextReplyCursor, setNextReplyCursor] = useState<number | null>(() => {
     if (comment.replyCount > 3 && initialReplies.length === 3) {
@@ -55,8 +63,27 @@ export default function CommentItem({
   // *** 내용 펼치기/접기 상태 추가 ***
   const [isExpanded, setIsExpanded] = useState(false);
 
+  // *** 모든 답글 표시 여부 상태 추가 ***
+  const [isAllRepliesVisible, setIsAllRepliesVisible] = useState(
+    () => comment.replyCount <= 3
+  );
+
+  // *** 레이아웃 Y 위치 상태 추가 ***
+  const [commentLayoutY, setCommentLayoutY] = useState<number>(0);
+
+  // *** 이전 답글 개수 추적 ref 추가 ***
+  const prevReplyCountRef = useRef<number | undefined>(comment.replyCount);
+
+  // *** 새 답글 추가 시 자동으로 모든 답글 로드를 위한 플래그 ref 추가 ***
+  const shouldLoadAllRepliesRef = useRef(false);
+
+  // *** 레이아웃 이벤트 핸들러 ***
+  const handleLayout = (event: LayoutChangeEvent) => {
+    const { y } = event.nativeEvent.layout;
+    setCommentLayoutY(y);
+  };
+
   // *** isAuthor 로직 수정: 로그인 사용자와 댓글 작성자 비교 ***
-  // 백엔드 API 응답 및 BoardComment 타입 확인 필요 (authorId 또는 nickname)
   const isAuthor = loggedInUser?.nickname === comment.nickname;
 
   // useComment 훅 사용
@@ -82,6 +109,133 @@ export default function CommentItem({
     setIsExpanded(!isExpanded);
   };
 
+  // *** useEffect 로직 수정: 답글 개수 변경 시 플래그 설정 ***
+  useEffect(() => {
+    const newInitialReplies = comment.replies || [];
+    const prevReplyCount = prevReplyCountRef.current; // 이전 답글 개수 가져오기
+    const currentReplyCount = comment.replyCount; // 현재 답글 개수
+
+    const isNewReplyAdded =
+      typeof prevReplyCount === "number" && currentReplyCount > prevReplyCount;
+
+    if (isNewReplyAdded) {
+      // 새 답글이 추가되었을 때는 자동 로드 플래그만 설정
+      shouldLoadAllRepliesRef.current = true;
+      // UI 상태는 미리 변경 (사용자에게 로딩 중임을 표시)
+      setIsAllRepliesVisible(true);
+    } else if (prevReplyCount === undefined) {
+      // 초기 마운트 시 또는 이전 상태가 없을 때 (기본 로직)
+      const slicedReplies = newInitialReplies.slice(0, 3);
+      setDisplayedReplies(slicedReplies);
+      let newCursor = null;
+      if (currentReplyCount > 3 && newInitialReplies.length >= 3) {
+        newCursor = newInitialReplies[2].replyId;
+      }
+      setNextReplyCursor(newCursor);
+      setIsAllRepliesVisible(currentReplyCount <= 3);
+    } else {
+      // 답글 개수 변화 없을 때 (예: 좋아요 변경 등 다른 prop 변경)
+      // 상태를 유지 (기존 displayedReplies 유지됨)
+    }
+
+    // 현재 답글 개수를 ref에 저장하여 다음 실행 시 비교
+    prevReplyCountRef.current = currentReplyCount;
+  }, [comment.replies, comment.replyCount]); // 의존성 배열 유지
+
+  // *** 새로운 useEffect: 모든 답글 자동 로드 효과 ***
+  useEffect(() => {
+    // 플래그가 설정된 경우에만 자동 로드 실행
+    if (shouldLoadAllRepliesRef.current && comment.replyCount > 3) {
+      // 모든 답글 자동 로드 함수
+      const loadAllReplies = async () => {
+        // 플래그 초기화 (중복 실행 방지)
+        shouldLoadAllRepliesRef.current = false;
+
+        // 현재 표시된 답글의 마지막 ID가 커서가 됨
+        let cursor =
+          initialReplies.length >= 3 ? initialReplies[2].replyId : null;
+
+        if (cursor) {
+          setIsLoadingMore(true);
+          try {
+            // 재귀적으로 모든 답글 가져오기
+            const allReplies = await loadAllRepliesRecursively(
+              comment.commentId,
+              cursor
+            );
+
+            // 초기 답글과 새로 로드한 모든 답글 합치기
+            if (allReplies.length > 0) {
+              setDisplayedReplies([...initialReplies, ...allReplies]);
+            }
+
+            // 모든 답글을 로드했으므로 커서를 null로 설정
+            setNextReplyCursor(null);
+            // 모든 답글 표시 상태로 변경
+            setIsAllRepliesVisible(true);
+          } catch (error) {
+            console.error("자동 답글 로드 오류:", error);
+            // 오류 시에도 모든 답글 표시 상태 유지 (최소한 버튼은 일관성 있게)
+            setIsAllRepliesVisible(true);
+          } finally {
+            setIsLoadingMore(false);
+          }
+        } else {
+          // 커서가 없는 경우 (3개 미만의 답글)
+          // 이미 모든 답글이 표시되어 있으므로 상태만 업데이트
+          setIsAllRepliesVisible(true);
+        }
+      };
+
+      // 자동 로드 함수 실행
+      loadAllReplies();
+    }
+  }, [comment.commentId, comment.replyCount, initialReplies, loadReplies]);
+
+  // *** 재귀적으로 모든 답글을 가져오는 함수 추가 ***
+  const loadAllRepliesRecursively = useCallback(
+    async (commentId: number, cursor: number): Promise<Reply[]> => {
+      try {
+        const response = await loadReplies(commentId, cursor);
+        if (!response || !response.replies || response.replies.length === 0) {
+          return []; // 답글이 없으면 빈 배열 반환
+        }
+
+        // 응답으로 받은 답글을 Reply 타입으로 변환
+        const convertToReply = (apiReply: any): Reply => ({
+          replyId: apiReply.replyId,
+          parentId: apiReply.parentId,
+          nickname: apiReply.nickname,
+          profileUrl: apiReply.profileUrl,
+          userType: apiReply.userType || "",
+          createdAt: apiReply.createdAt,
+          content: apiReply.content,
+          likeCount: apiReply.likeCount,
+          isLiked: apiReply.isLiked,
+        });
+
+        const currentPageReplies = response.replies.map(convertToReply);
+
+        // 다음 커서가 있으면 재귀적으로 더 많은 답글 로드
+        if (response.nextCursorId) {
+          const nextPageReplies = await loadAllRepliesRecursively(
+            commentId,
+            response.nextCursorId
+          );
+          // 현재 페이지 답글과 다음 페이지 답글 합치기
+          return [...currentPageReplies, ...nextPageReplies];
+        }
+
+        // 더 이상 로드할 답글이 없으면 현재 페이지 답글만 반환
+        return currentPageReplies;
+      } catch (error) {
+        console.error("답글 재귀 로드 중 오류:", error);
+        return []; // 오류 발생 시 빈 배열 반환
+      }
+    },
+    [loadReplies]
+  );
+
   // *** 답글 로컬 상태 업데이트 함수 ***
   const handleReplyUpdate = useCallback((updatedReply: Reply) => {
     setDisplayedReplies((prevReplies) =>
@@ -89,15 +243,17 @@ export default function CommentItem({
         reply.replyId === updatedReply.replyId ? updatedReply : reply
       )
     );
-    // 필요시 onCommentChange(); // 서버와 완전 동기화 위해 호출 고려
   }, []);
 
-  const handleReplyDelete = useCallback((deletedReplyId: number) => {
-    setDisplayedReplies((prevReplies) =>
-      prevReplies.filter((reply) => reply.replyId !== deletedReplyId)
-    );
-    // 필요시 onCommentChange(); // 서버와 완전 동기화 위해 호출 고려
-  }, []);
+  const handleReplyDelete = useCallback(
+    (deletedReplyId: number) => {
+      setDisplayedReplies((prevReplies) =>
+        prevReplies.filter((reply) => reply.replyId !== deletedReplyId)
+      );
+      onCommentChange();
+    },
+    [onCommentChange]
+  );
 
   // 댓글 수정 시작 함수
   const handleEditPress = () => {
@@ -110,19 +266,15 @@ export default function CommentItem({
   };
   // 댓글 수정 저장 함수
   const handleSavePress = async () => {
-    // 유효성 검사 (빈 내용, 변경 없음)
     if (editedContent.trim() === "" || editedContent === comment.content) {
-      setIsEditing(false); // 수정 모드 종료
+      setIsEditing(false);
       return;
     }
-
     try {
-      // 훅의 updateComment 함수 사용
       const success = await updateComment(comment.commentId, editedContent);
-
       if (success) {
-        setIsEditing(false); // 수정 모드 종료
-        onCommentChange(); // 부모 컴포넌트에 변경사항 알림 콜백 (데이터 새로고침)
+        setIsEditing(false);
+        onCommentChange();
       } else {
         Alert.alert("오류", "댓글 수정에 실패했습니다.");
       }
@@ -133,20 +285,14 @@ export default function CommentItem({
   };
   // 댓글 삭제 함수
   const handleDeletePress = () => {
-    // 삭제 확인 다이얼로그 표시
     Alert.alert("댓글 삭제", "정말 이 댓글을 삭제하시겠습니까?", [
-      {
-        text: "취소",
-        style: "cancel",
-      },
+      { text: "취소", style: "cancel" },
       {
         text: "삭제",
         style: "destructive",
         onPress: async () => {
           try {
-            // 훅의 deleteComment 함수 사용
             const success = await deleteComment(comment.commentId);
-
             if (success) {
               onCommentChange();
             } else {
@@ -163,7 +309,6 @@ export default function CommentItem({
   // 대댓글 생성 시작 함수
   const handleReplyPress = () => {
     setIsReplying(true);
-    // 훅의 commentText 사용을 위해 초기화
     setCommentText("");
   };
   // 대댓글 생성 취소 함수
@@ -173,35 +318,25 @@ export default function CommentItem({
   };
   // 대댓글 생성 저장 함수
   const handleSubmitReply = async () => {
-    if (!commentText.trim()) return;
-
     try {
-      // 훅의 createComment 함수 사용
       const success = await createComment(postId, comment.commentId);
-
       if (success) {
-        // 입력창 초기화
-        setCommentText("");
-        // 답글 입력 모드 종료
         setIsReplying(false);
-        // 댓글 목록 갱신 (부모 컴포넌트에 알림)
-        onCommentChange();
+        onCommentChange(); // Triggers refresh -> useEffect
       }
     } catch (error) {
-      // 오류 처리
-      console.error("답글 작성 실패:", error);
-      Alert.alert("오류", "답글을 등록하는 중 문제가 발생했습니다.");
+      console.error("답글 작성 핸들러 오류:", error);
+      Alert.alert(
+        "오류",
+        "답글을 등록하는 중 예기치 못한 문제가 발생했습니다."
+      );
     }
   };
-  // 대댓글 더보기 함수
+  // *** handleLoadMoreReplies 함수 정의 ***
   const handleLoadMoreReplies = useCallback(async () => {
     if (isLoadingMore || nextReplyCursor === null) {
-      console.warn("더보기 로드 중이거나 다음 커서가 없습니다.");
       return;
     }
-    console.log(
-      `🚀 답글 더보기 요청: commentId=${comment.commentId}, cursor=${nextReplyCursor}`
-    );
     setIsLoadingMore(true);
     try {
       const response = await loadReplies(comment.commentId, nextReplyCursor);
@@ -221,15 +356,14 @@ export default function CommentItem({
         };
         const newReplies = response.replies.map(convertToReply);
         setDisplayedReplies((prevReplies) => [...prevReplies, ...newReplies]);
-        setNextReplyCursor(response.nextCursorId ?? null);
-        console.log(
-          `✅ 답글 ${newReplies.length}개 추가됨, 다음 커서: ${
-            response.nextCursorId ?? "없음"
-          }`
-        );
+        const nextCursor = response.nextCursorId ?? null;
+        setNextReplyCursor(nextCursor);
+        if (nextCursor === null) {
+          setIsAllRepliesVisible(true);
+        }
       } else {
         setNextReplyCursor(null);
-        console.log("더 이상 가져올 답글 없음.");
+        setIsAllRepliesVisible(true);
       }
     } catch (error) {
       console.error("❌ 답글 더보기 처리 중 오류:", error);
@@ -239,8 +373,27 @@ export default function CommentItem({
     }
   }, [comment.commentId, isLoadingMore, nextReplyCursor, loadReplies]);
 
-  // *** hasMoreReplies 로직 수정 ***
-  const hasMoreReplies = comment.replyCount > displayedReplies.length;
+  // *** handleHideReplies 함수 정의 ***
+  const handleHideReplies = useCallback(() => {
+    const currentInitialReplies = comment.replies || [];
+    setDisplayedReplies(currentInitialReplies.slice(0, 3));
+    setNextReplyCursor(() => {
+      if (comment.replyCount > 3 && currentInitialReplies.length >= 3) {
+        return currentInitialReplies[2].replyId;
+      }
+      return null;
+    });
+    setIsAllRepliesVisible(false);
+    onHideRepliesScrollRequest(commentLayoutY);
+  }, [
+    comment.replies,
+    comment.replyCount,
+    onHideRepliesScrollRequest,
+    commentLayoutY,
+  ]);
+
+  // 더보기/숨기기 버튼 표시 로직
+  const canLoadMore = comment.replyCount > displayedReplies.length;
 
   // 댓글용 좋아요 버튼 props 생성
   const commentLikeProps = useLikeButton(
@@ -495,7 +648,7 @@ export default function CommentItem({
             </Text>
           )}
         </TouchableOpacity>
-      )}
+      ) : null}
     </View>
   );
 }
