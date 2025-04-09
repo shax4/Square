@@ -59,8 +59,8 @@ apiClient.interceptors.response.use(
       }]: ${response.config.method?.toUpperCase()} ${response.config.url}`
     );
 
-    // 응답 데이터 로깅 추가
-    console.log("📄 응답 데이터:", JSON.stringify(response.data));
+    // *** JSON 데이터 로그 제거 ***
+    // console.log("📄 응답 데이터:", JSON.stringify(response.data)); // 이 라인 제거 또는 주석 처리
 
     return response;
   },
@@ -73,8 +73,8 @@ apiClient.interceptors.response.use(
     const authStore = useAuthStore.getState();
     const accessToken = authStore.user?.accessToken;
 
-    // 에러 로깅
-    console.error("API 응답 에러:", error.response?.data);
+    // 에러 로깅 개선
+    console.error("API 응답 에러:", error.response?.data || error.message);
 
     // 토큰 만료 에러 확인 (기존 코드와 일치)
     const isTokenExpired =

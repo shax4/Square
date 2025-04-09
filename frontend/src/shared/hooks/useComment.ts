@@ -4,6 +4,7 @@
  */
 
 import { useState, useCallback } from "react";
+import { Alert } from "react-native";
 import { CommentService } from "../services";
 import {
   Comment,
@@ -58,25 +59,35 @@ export const useComment = (): UseCommentReturn => {
    */
   const createComment = useCallback(
     async (postId: number, parentCommentId?: number): Promise<boolean> => {
-      if (!commentText.trim()) {
-        return false;
+      const trimmedComment = commentText.trim();
+
+      // *** 유효성 검사 및 통합 알림 ***
+      if (
+        !trimmedComment ||
+        trimmedComment.length < 5 ||
+        trimmedComment.length > 150
+      ) {
+        let message = "댓글 내용을 입력해주세요.";
+        if (
+          trimmedComment &&
+          (trimmedComment.length < 5 || trimmedComment.length > 150)
+        ) {
+          message = "댓글은 5자 이상 150자 이하로 입력해주세요.";
+        }
+        Alert.alert("알림", message);
+        return false; // 유효성 검사 실패 시 API 호출 안 함
       }
+      // Client-side 150자 초과 검사 추가
 
       setSubmitting(true);
-      setSubmitError(null);
+      setSubmitError(null); // 요청 시작 시 에러 초기화
 
       try {
-        // 댓글 요청 데이터 구성
-        const commentData: CreateCommentRequest = {
-          postId,
-          content: commentText.trim(),
-          ...(parentCommentId && { parentId: parentCommentId }),
+        const requestData: CreateCommentRequest = {
+          content: trimmedComment,
+          ...(parentCommentId !== undefined && { parentId: parentCommentId }),
         };
-
-        console.log("📄 댓글/답글 생성 API 요청 본문:", commentData); // 요청 본문 로깅 추가
-
-        // API 호출
-        await CommentService.createComment(commentData);
+        await CommentService.createComment(postId, requestData);
 
         // 성공 시 입력 필드 초기화
         setCommentText("");
@@ -88,6 +99,12 @@ export const useComment = (): UseCommentReturn => {
             : new Error("댓글 작성 중 오류가 발생했습니다.")
         );
         console.error("댓글/답글 작성 오류:", err);
+        Alert.alert(
+          "오류",
+          err instanceof Error
+            ? err.message
+            : "댓글 생성 중 오류가 발생했습니다. 다시 시도해 주세요."
+        );
         return false;
       } finally {
         setSubmitting(false);
@@ -106,14 +123,33 @@ export const useComment = (): UseCommentReturn => {
    */
   const updateComment = useCallback(
     async (commentId: number, content: string): Promise<boolean> => {
-      if (!content.trim()) {
-        return false;
+      const trimmedContent = content.trim();
+
+      // *** 유효성 검사 및 통합 알림 ***
+      if (
+        !trimmedContent ||
+        trimmedContent.length < 5 ||
+        trimmedContent.length > 150
+      ) {
+        let message = "댓글 내용을 입력해주세요.";
+        if (
+          trimmedContent &&
+          (trimmedContent.length < 5 || trimmedContent.length > 150)
+        ) {
+          message = "댓글은 5자 이상 150자 이하로 입력해주세요.";
+        }
+        Alert.alert("알림", message);
+        return false; // 유효성 검사 실패 시 API 호출 안 함
       }
+      // Client-side 150자 초과 검사 추가
+
+      setSubmitting(true);
+      setSubmitError(null); // 요청 시작 시 에러 초기화
 
       try {
         // 수정 요청 데이터 구성
         const updateData: UpdateCommentRequest = {
-          content: content.trim(),
+          content: trimmedContent,
         };
 
         // API 호출
@@ -121,7 +157,20 @@ export const useComment = (): UseCommentReturn => {
         return true;
       } catch (err) {
         console.error(`댓글 ID ${commentId} 수정 오류:`, err);
+        setSubmitError(
+          err instanceof Error
+            ? err
+            : new Error("댓글 수정 중 오류가 발생했습니다.")
+        );
+        Alert.alert(
+          "오류",
+          err instanceof Error
+            ? err.message
+            : "댓글 수정 중 오류가 발생했습니다."
+        );
         return false;
+      } finally {
+        setSubmitting(false);
       }
     },
     []
@@ -136,13 +185,29 @@ export const useComment = (): UseCommentReturn => {
    */
   const deleteComment = useCallback(
     async (commentId: number): Promise<boolean> => {
+      setSubmitting(true);
+      setSubmitError(null);
+
       try {
         // API 호출
         await CommentService.deleteComment(commentId);
         return true;
       } catch (err) {
         console.error(`댓글 ID ${commentId} 삭제 오류:`, err);
+        setSubmitError(
+          err instanceof Error
+            ? err
+            : new Error("댓글 삭제 중 오류가 발생했습니다.")
+        );
+        Alert.alert(
+          "오류",
+          err instanceof Error
+            ? err.message
+            : "댓글 삭제 중 오류가 발생했습니다."
+        );
         return false;
+      } finally {
+        setSubmitting(false);
       }
     },
     []
@@ -190,6 +255,12 @@ export const useComment = (): UseCommentReturn => {
           err instanceof Error
             ? err
             : new Error("대댓글을 불러오는 중 오류가 발생했습니다.")
+        );
+        Alert.alert(
+          "오류",
+          err instanceof Error
+            ? err.message
+            : "대댓글을 불러오는 중 오류가 발생했습니다."
         );
         return undefined; // 에러 시 undefined 반환
       } finally {

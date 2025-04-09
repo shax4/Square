@@ -39,17 +39,22 @@ export default function CommentItem({
   const [editedContent, setEditedContent] = useState(comment.content); // 수정 내용 상태
 
   // comment.replies는 초기 로드된 대댓글 목록
+  const initialReplies = comment.replies || []; // API 응답의 초기 답글 목록
   const [displayedReplies, setDisplayedReplies] = useState<Reply[]>(
-    () => (comment.replies ? comment.replies.slice(0, 3) : []) // 초기 3개
+    initialReplies.slice(0, 3)
   );
-  const [nextReplyCursor, setNextReplyCursor] = useState<number | null>(() =>
-    comment.replies && comment.replies.length > 3
-      ? comment.replies[2].replyId
-      : null
-  );
+  const [nextReplyCursor, setNextReplyCursor] = useState<number | null>(() => {
+    if (initialReplies.length > 3) {
+      return initialReplies[2].replyId;
+    }
+    return null;
+  });
   const [isLoadingMore, setIsLoadingMore] = useState(false); // 더보기 로딩
   const [isReplying, setIsReplying] = useState(false); // 답글 입력창 표시 상태
   const [replyText, setReplyText] = useState(""); // 답글 내용 상태
+
+  // *** 내용 펼치기/접기 상태 추가 ***
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // 현재 사용자가 댓글 작성자인지 확인
   const isAuthor = user?.nickname === comment.nickname;
@@ -64,6 +69,18 @@ export default function CommentItem({
     deleteComment,
     loadReplies,
   } = useComment();
+
+  // --- 댓글 내용 처리 ---
+  const isLongContent = comment.content.length > 100;
+  const displayedContent =
+    isLongContent && !isExpanded
+      ? `${comment.content.substring(0, 100)}...`
+      : comment.content;
+
+  // *** 더보기/접기 토글 함수 ***
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
 
   // 댓글 수정 시작 함수
   const handleEditPress = () => {
@@ -152,8 +169,6 @@ export default function CommentItem({
         setIsReplying(false);
         // 댓글 목록 갱신 (부모 컴포넌트에 알림)
         onCommentChange();
-      } else {
-        Alert.alert("오류", "답글을 등록하는데 실패했습니다.");
       }
     } catch (error) {
       // 오류 처리
@@ -191,8 +206,11 @@ export default function CommentItem({
     }
   }, [comment.commentId, isLoadingMore, nextReplyCursor, loadReplies]);
 
-  // 더 보여줄 답글이 있는지 계산
-  const hasMoreReplies = comment.replyCount > displayedReplies.length;
+  // *** 더 보여줄 답글이 있는지 계산 수정 ***
+  const hasMoreReplies =
+    nextReplyCursor !== null ||
+    (comment.replyCount > displayedReplies.length &&
+      displayedReplies.length >= 3);
 
   // 댓글용 좋아요 버튼 props 생성
   const commentLikeProps = useLikeButton(
@@ -221,7 +239,7 @@ export default function CommentItem({
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <ProfileImage imageUrl={comment.profileUrl} variant="medium" />
+        <ProfileImage imageUrl={comment.profileUrl} variant="small" />
         <View style={styles.authorInfo}>
           <View style={styles.nameContainer}>
             <Text style={styles.authorName}>{comment.nickname}</Text>
@@ -258,7 +276,19 @@ export default function CommentItem({
           </View>
         </View>
       ) : (
-        <Text style={styles.content}>{comment.content}</Text>
+        <View style={styles.contentContainer}>
+          <Text style={styles.content}>{displayedContent}</Text>
+          {isLongContent && (
+            <TouchableOpacity
+              onPress={toggleExpand}
+              style={styles.expandButton}
+            >
+              <Text style={styles.expandButtonText}>
+                {isExpanded ? "접기" : "더보기"}
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
       )}
       <View style={styles.footer}>
         <LikeButton {...commentLikeProps} size="small" isVertical={false} />
@@ -299,20 +329,23 @@ export default function CommentItem({
           <TouchableOpacity
             onPress={handleSubmitReply}
             disabled={submitting || !commentText.trim()}
-            style={styles.replySubmitButton}
+            style={[
+              styles.replySubmitButton,
+              (submitting || !commentText.trim()) && styles.disabledButton,
+            ]}
           >
-            <Text>등록</Text>
+            <Text style={styles.buttonText}>등록</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={handleCancelReply}
             style={styles.replyCancelButton}
           >
-            <Text>취소</Text>
+            <Text style={styles.buttonText}>취소</Text>
           </TouchableOpacity>
         </View>
       )}
 
-      {/* *** 답글 목록 렌더링 (ReplyItem 사용) *** */}
+      {/* *** 답글 목록 렌더링 *** */}
       {displayedReplies.length > 0 && (
         <View style={styles.repliesContainer}>
           {displayedReplies.map((reply) => (
@@ -326,7 +359,7 @@ export default function CommentItem({
         </View>
       )}
 
-      {/* *** 더보기 버튼 (기존 로직 유지) *** */}
+      {/* *** 더보기 버튼 조건 수정 *** */}
       {hasMoreReplies && (
         <TouchableOpacity
           style={styles.loadMoreButton}
@@ -376,12 +409,26 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: "#888",
   },
+  // *** 내용 컨테이너 스타일 추가 ***
+  contentContainer: {
+    marginLeft: 40, // 들여쓰기
+    marginBottom: 8,
+  },
   content: {
     fontSize: 14,
     lineHeight: 20,
     color: "#333",
-    marginBottom: 8,
-    marginLeft: 40, // 들여쓰기
+  },
+  // *** 더보기/접기 버튼 스타일 추가 ***
+  expandButton: {
+    alignSelf: "flex-start", // 버튼 크기를 텍스트에 맞춤
+    marginTop: 4,
+    paddingVertical: 2,
+  },
+  expandButtonText: {
+    fontSize: 12,
+    color: "#007bff",
+    fontWeight: "bold",
   },
   editingContainer: {
     marginLeft: 40, // 들여쓰기
@@ -438,13 +485,13 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     borderRadius: 4,
     marginRight: 4,
-    backgroundColor: "#eee", // 임시 스타일
+    backgroundColor: "#007bff", // 활성 버튼 색상
   },
   replyCancelButton: {
     paddingHorizontal: 10,
     paddingVertical: 7,
     borderRadius: 4,
-    backgroundColor: "#eee", // 임시 스타일
+    backgroundColor: "#ccc", // 취소 버튼 색상
   },
   repliesContainer: {
     marginTop: 10,
@@ -460,5 +507,15 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#007bff",
     fontWeight: "bold",
+  },
+  // *** 비활성화 버튼 스타일 추가 ***
+  disabledButton: {
+    backgroundColor: "#aaa", // 비활성 버튼 색상
+  },
+  // *** 버튼 텍스트 스타일 추가 ***
+  buttonText: {
+    color: "#fff", // 버튼 텍스트 색상
+    fontWeight: "bold",
+    fontSize: 13,
   },
 });

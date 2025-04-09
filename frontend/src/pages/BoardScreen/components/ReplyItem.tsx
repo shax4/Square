@@ -40,14 +40,8 @@ export default function ReplyItem({
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(reply.content);
 
-  // --- 답글 관련 상태 및 로직 (ReplyItem에서는 불필요) ---
-  // const [loadedReplies, setLoadedReplies] = useState<Reply[]>([]);
-  // const [replyLoading, setReplyLoading] = useState(false);
-  // const [nextReplyCursor, setNextReplyCursor] = useState<number | null>(null);
-  // const [isReplying, setIsReplying] = useState(false);
-  // const [replyText, setReplyText] = useState("");
-  // const [editingReplyId, setEditingReplyId] = useState<number | null>(null);
-  // const [editedReplyContent, setEditedReplyContent] = useState("");
+  // *** 내용 펼치기/접기 상태 추가 ***
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // --- 작성자 확인 ---
   const isAuthor = user?.nickname === reply.nickname;
@@ -55,7 +49,7 @@ export default function ReplyItem({
   // --- useComment 훅 (수정/삭제용) ---
   const {
     // commentText, setCommentText, // 답글 생성은 ReplyItem에서 직접 처리 안 함
-    // submitting, // 답글 생성은 ReplyItem에서 직접 처리 안 함
+    submitting, // 답글 생성은 ReplyItem에서 직접 처리 안 함
     // createComment, // 답글 생성은 ReplyItem에서 직접 처리 안 함
     updateComment,
     deleteComment,
@@ -79,9 +73,7 @@ export default function ReplyItem({
     const success = await updateComment(reply.replyId, editedContent);
     if (success) {
       setIsEditing(false);
-      onCommentChange(); // 목록 갱신
-    } else {
-      Alert.alert("오류", "답글 수정에 실패했습니다.");
+      onCommentChange();
     }
   };
 
@@ -113,6 +105,18 @@ export default function ReplyItem({
   // --- 답글 더보기 관련 핸들러 및 상태 (ReplyItem에서는 불필요) ---
   // const handleLoadMoreReplies = useCallback(async () => { ... });
   // const hasMoreReplies = false; // 답글은 더보기가 없음
+
+  // --- 답글 내용 처리 ---
+  const isLongContent = reply.content.length > 100;
+  const displayedContent =
+    isLongContent && !isExpanded
+      ? `${reply.content.substring(0, 100)}...`
+      : reply.content;
+
+  // *** 더보기/접기 토글 함수 ***
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
 
   // --- 좋아요 버튼 훅 ---
   const replyLikeProps = useLikeButton(
@@ -154,20 +158,45 @@ export default function ReplyItem({
           <View style={styles.editActions}>
             <TouchableOpacity
               onPress={handleSavePress}
-              style={styles.actionButton}
+              // *** disabled 조건 강화: 빈 값 또는 5자 미만 ***
+              disabled={
+                submitting ||
+                !editedContent.trim() ||
+                editedContent.trim().length < 5
+              }
+              style={[
+                styles.actionButton, // 기존 버튼 스타일
+                styles.saveButton, // 저장 버튼 스타일 추가
+                (submitting ||
+                  !editedContent.trim() ||
+                  editedContent.trim().length < 5) &&
+                  styles.disabledButton, // 비활성화 스타일
+              ]}
             >
-              <Text style={styles.actionText}>저장</Text>
+              <Text style={styles.buttonText}>저장</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={handleCancelPress}
-              style={styles.actionButton}
+              style={[styles.actionButton, styles.cancelButton]} // 취소 버튼 스타일 추가
             >
-              <Text style={styles.actionText}>취소</Text>
+              <Text style={styles.buttonText}>취소</Text>
             </TouchableOpacity>
           </View>
         </View>
       ) : (
-        <Text style={styles.content}>{reply.content}</Text>
+        <View style={styles.contentContainer}>
+          <Text style={styles.content}>{displayedContent}</Text>
+          {isLongContent && (
+            <TouchableOpacity
+              onPress={toggleExpand}
+              style={styles.expandButton}
+            >
+              <Text style={styles.expandButtonText}>
+                {isExpanded ? "접기" : "더보기"}
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
       )}
 
       {/* --- 푸터 (좋아요, 수정/삭제 버튼) --- */}
@@ -238,11 +267,13 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: "#888",
   },
+  contentContainer: {
+    marginBottom: 6,
+  },
   content: {
     fontSize: 14,
     lineHeight: 20,
     color: "#333",
-    marginBottom: 8,
   },
   editingContainer: {
     marginBottom: 8,
@@ -268,14 +299,42 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   actionButton: {
-    marginLeft: 12,
-    paddingVertical: 4, // 터치 영역 확보
+    marginLeft: 10,
+    paddingVertical: 6, // 패딩 조정
+    paddingHorizontal: 6, // 패딩 조정
+    borderRadius: 4, // 둥근 모서리
   },
   actionText: {
-    fontSize: 12,
+    // 기존 actionText 스타일은 유지하거나, buttonText로 통합
+    fontSize: 11,
     color: "#555",
+  },
+  expandButton: {
+    alignSelf: "flex-start",
+    marginTop: 4,
+    paddingVertical: 2,
+  },
+  expandButtonText: {
+    fontSize: 11,
+    color: "#007bff",
+    fontWeight: "bold",
   },
   // ReplyItem에서 사용하지 않는 스타일 제거 가능
   // replyInputContainer, replyInput, replySubmitButton, replyCancelButton,
   // repliesContainer, loadMoreButton, loadMoreText
+  // *** 버튼 스타일 추가 ***
+  saveButton: {
+    backgroundColor: "#007bff",
+  },
+  cancelButton: {
+    backgroundColor: "#ccc",
+  },
+  disabledButton: {
+    backgroundColor: "#aaa",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 11, // 답글 버튼 텍스트는 약간 작게
+  },
 });

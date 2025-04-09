@@ -54,11 +54,8 @@ export const usePostDetail = (postId: number): UsePostDetailReturn => {
       // *** 중요 수정: responseData 자체를 확인 ***
       if (responseData) {
         // responseData가 존재하고 유효한 경우
-        console.log(
-          `✅ 게시글 ID ${postId} 상세 데이터 수신 성공:`,
-          JSON.stringify(responseData, null, 2)
-        );
-        setPost(responseData); // post 상태 업데이트
+        console.log(`✅ 게시글 ID ${postId} 상세 데이터 수신 성공`);
+        setPost(responseData);
 
         // 댓글 목록 업데이트 (존재하고 배열일 경우)
         if (responseData.comments && Array.isArray(responseData.comments)) {
