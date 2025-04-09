@@ -286,7 +286,7 @@ export default function BoardListScreen({
                 sortBy === "likes" ? styles.activeSortText : styles.sortText
               }
             >
-              좋아요순
+              인기순
             </Text>
           </TouchableOpacity>
         </View>
@@ -339,11 +339,13 @@ export default function BoardListScreen({
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#fff",
   },
   container: {
     flex: 1,
+    backgroundColor: "#fff",
   },
+
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
@@ -408,14 +410,15 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   activeSortButton: {
-    backgroundColor: "#007BFF",
+    borderBottomWidth: 2,
+    borderBottomColor: "#007BFF",
   },
   sortText: {
     color: colors.grayText,
   },
   activeSortText: {
-    color: "#fff",
-    fontWeight: "500",
+    color: "#007BFF",
+    fontWeight: "bold",
   },
   listContainer: {
     paddingBottom: 80, // 글쓰기 버튼 영역 확보

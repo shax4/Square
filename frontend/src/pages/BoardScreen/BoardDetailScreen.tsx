@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useRef, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -86,7 +86,13 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
     submitError,
   } = useComment();
 
-  // *** 스크롤 함수 추가 ***
+  // 댓글 아이템 refs를 저장할 객체
+  const commentRefs = useRef<{ [key: number]: React.RefObject<View> }>({});
+
+  /**
+   * 특정 Y 좌표로 스크롤하는 함수
+   * @param yPosition 스크롤할 Y 좌표
+   */
   const scrollToY = useCallback((yPosition: number) => {
     if (scrollViewRef.current && typeof yPosition === "number") {
       console.log(`📜 Scrolling to Y: ${yPosition}`);
@@ -98,17 +104,75 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
     }
   }, []);
 
-  // 화면에 포커스가 올 때마다 데이터 갱신
+  /**
+   * 특정 댓글로 스크롤하는 함수
+   * @param commentId 포커싱할 댓글 ID
+   */
+  const scrollToComment = useCallback(
+    (commentId: number) => {
+      // 해당 ID의 댓글 ref가 있는지 확인
+      const commentRef = commentRefs.current[commentId];
+
+      if (commentRef && commentRef.current) {
+        // measureInWindow를 사용하여 화면 상의 정확한 Y 좌표 측정
+        commentRef.current.measureInWindow((x, y, width, height) => {
+          // 상태바, 헤더 등의 오프셋 고려 (필요시 조정)
+          const offsetY = 100;
+          const scrollPosition = y - offsetY;
+
+          console.log(
+            `댓글 ${commentId} 위치 측정: Y=${y}, 계산된 스크롤 위치=${scrollPosition}`
+          );
+          scrollToY(scrollPosition);
+        });
+      } else {
+        console.warn(`댓글 ID ${commentId}에 대한 ref를 찾을 수 없음`);
+      }
+    },
+    [scrollToY]
+  );
+
+  // 화면에 포커스가 올 때마다 데이터 갱신 및 댓글 포커싱
   useFocusEffect(
     useCallback(() => {
+      // 새로고침 로직 (기존 코드)
       if (route.params?.refresh) {
         refresh();
         navigation.setParams({ refresh: undefined });
       }
+
+      // 댓글 포커싱 로직 수정
+      const focusCommentId = route.params?.focusCommentId;
+      if (focusCommentId && post) {
+        // 포커싱할 댓글 찾기
+        const targetComment = post.comments.find(
+          (comment) => comment.commentId === focusCommentId
+        );
+
+        if (targetComment) {
+          console.log(`포커싱할 댓글 찾음: ID ${focusCommentId}`);
+
+          // 댓글 위치로 스크롤하기 위해 약간의 지연 시간을 두어 렌더링 완료 후 스크롤되도록 함
+          setTimeout(() => {
+            // 정확한 댓글 위치 측정 후 스크롤
+            scrollToComment(focusCommentId);
+
+            // 포커싱된 댓글 강조를 위한 파라미터는 유지 (CommentItem에서 타이머로 처리)
+          }, 500);
+        }
+      }
+
       return () => {
         // 화면을 떠날 때 정리 작업 (필요한 경우)
       };
-    }, [route.params?.refresh, refresh, navigation])
+    }, [
+      route.params?.refresh,
+      route.params?.focusCommentId,
+      refresh,
+      navigation,
+      post,
+      scrollToComment,
+    ])
   );
 
   // 댓글 작성 함수
@@ -219,17 +283,26 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
             </View>
           </View>
 
-          {/* 댓글 목록 - 타입 변환 함수 사용 */}
+          {/* 댓글 목록 - CommentItem에 ref 전달하는 부분 수정 */}
           {post.comments && post.comments.length > 0 ? (
-            post.comments.map((comment) => (
-              <CommentItem
-                key={comment.commentId}
-                comment={convertToComment(comment)}
-                postId={boardId}
-                onCommentChange={refresh}
-                onHideRepliesScrollRequest={scrollToY}
-              />
-            ))
+            post.comments.map((comment) => {
+              // 각 댓글마다 ref 생성하여 저장
+              if (!commentRefs.current[comment.commentId]) {
+                commentRefs.current[comment.commentId] =
+                  React.createRef<View>();
+              }
+
+              return (
+                <CommentItem
+                  key={comment.commentId}
+                  comment={convertToComment(comment)}
+                  postId={boardId}
+                  onCommentChange={refresh}
+                  onHideRepliesScrollRequest={scrollToY}
+                  commentRef={commentRefs.current[comment.commentId]} // ref 전달
+                />
+              );
+            })
           ) : (
             <View style={styles.emptyCommentsContainer}>
               <Text style={styles.emptyCommentsText}>
@@ -288,8 +361,9 @@ const styles = StyleSheet.create({
   postHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 16,
-    marginTop: 5,
+    marginBottom: 5,
+    marginTop: 20,
+    marginLeft: 15,
   },
   authorInfo: {
     marginLeft: 15,
@@ -308,8 +382,8 @@ const styles = StyleSheet.create({
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
-    marginBottom: 2,
-    marginLeft: 5,
+    // marginBottom: 2,
+    marginLeft: 10,
   },
   postTitle: {
     fontSize: 19,
@@ -334,6 +408,7 @@ const styles = StyleSheet.create({
   interactionContainer: {
     flexDirection: "row",
     alignItems: "center",
+    marginBottom: 10,
   },
   commentCountContainer: {
     flexDirection: "row",

@@ -4,6 +4,7 @@ import React, {
   Fragment,
   useRef,
   useEffect,
+  forwardRef,
 } from "react";
 import {
   View,
@@ -27,20 +28,68 @@ import Text from "../../../components/Common/Text";
 import colors from "../../../../assets/colors";
 import { useComment } from "../../../shared/hooks";
 import ReplyItem from "./ReplyItem";
+import { useRoute } from "@react-navigation/native";
+import { StackScreenProps } from "@react-navigation/stack";
+import { BoardStackParamList } from "../../../shared/page-stack/BoardPageStack";
 
 interface CommentItemProps {
   postId: number; // 게시글 ID
   comment: Comment; // 댓글 타입 (대댓글은 재귀 호출 시 prop 이름 변경 고려)
   onCommentChange: () => void; // 부모 컴포넌트에 변경사항 알림 콜백
-  onHideRepliesScrollRequest: (yPosition: number) => void; // *** Prop 타입 추가 ***
+  onHideRepliesScrollRequest?: (yPosition: number) => void; // *** Prop 타입 추가 ***
+  commentRef?: React.RefObject<View>; // 추가된 prop
 }
 
-export default function CommentItem({
+const CommentItem: React.FC<CommentItemProps> = ({
   postId,
   comment,
   onCommentChange,
   onHideRepliesScrollRequest, // *** Prop 받기 ***
-}: CommentItemProps) {
+  commentRef, // 추가된 prop
+}: CommentItemProps) => {
+  const route =
+    useRoute<StackScreenProps<BoardStackParamList, "BoardDetail">["route"]>();
+  const [showReplies, setShowReplies] = useState(false);
+  const containerRef = useRef<View>(null);
+  const [isFocused, setIsFocused] = useState(false);
+  const timerRef = useRef(null);
+
+  /**
+   * 댓글 포커싱 효과를 처리하는 useEffect
+   * - 라우트 파라미터에서 포커싱할 댓글 ID를 확인하고 매칭되면 강조 표시
+   * - 1초 후에 강조 효과 자동 제거
+   */
+  useEffect(() => {
+    // 기존 타이머가 있으면 제거 (중복 실행 방지)
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+
+    const focusCommentId = route.params?.focusCommentId;
+
+    // 현재 댓글이 포커싱 대상인 경우
+    if (focusCommentId && focusCommentId === comment.commentId) {
+      console.log(`댓글 ${comment.commentId} 포커싱 적용`);
+      setIsFocused(true);
+
+      // 1초 후 포커싱 효과 제거 (3초에서 1초로 변경)
+      timerRef.current = setTimeout(() => {
+        console.log(`댓글 ${comment.commentId} 포커싱 제거`);
+        setIsFocused(false);
+        timerRef.current = null;
+      }, 1500);
+    }
+
+    // 컴포넌트 언마운트 또는 의존성 배열 값 변경 시 타이머 정리
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [route.params?.focusCommentId, comment.commentId]);
+
   // *** 실제 로그인 사용자 정보 가져오기 ***
   const loggedInUser = useAuthStore((state) => state.user);
 
@@ -386,7 +435,7 @@ export default function CommentItem({
       return null;
     });
     setIsAllRepliesVisible(false);
-    onHideRepliesScrollRequest(commentLayoutY);
+    onHideRepliesScrollRequest?.(commentLayoutY);
   }, [
     comment.replies,
     comment.replyCount,
@@ -407,7 +456,11 @@ export default function CommentItem({
   );
 
   return (
-    <View style={styles.container} onLayout={handleLayout}>
+    <View
+      ref={commentRef}
+      style={[styles.container, isFocused && styles.focusedContainer]}
+      onLayout={handleLayout}
+    >
       <View style={styles.header}>
         <ProfileImage imageUrl={comment.profileUrl} variant="small" />
         <View style={styles.authorInfo}>
@@ -558,14 +611,26 @@ export default function CommentItem({
       ) : null}
     </View>
   );
-}
+};
 
 // --- 스타일 정의 (수정) ---
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 12,
+    paddingVertical: 8,
+    marginBottom: 8,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: "#f0f0f0",
+  },
+  focusedContainer: {
+    backgroundColor: "#fffee0", // 포커싱된 댓글 배경색 변경
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#ffd700", // 금색 테두리
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.5,
+    elevation: 2,
   },
   header: {
     flexDirection: "row",
@@ -706,3 +771,5 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
 });
+
+export default CommentItem;
