@@ -172,12 +172,9 @@ public class DebateService {
         Debate debate = request.to();
         debateRepository.save(debate);
 
-        aiSummaryClient.generateSummaries(debate.getTopic(), debate.getLeftOption(), debate.getRightOption());
+        aiSummaryClient.generateSummaries(debate);
 
         proposalService.deleteProposal(request.proposalId());
     }
-
-
-
 
 }
