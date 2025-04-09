@@ -338,6 +338,7 @@ export default function OpinionListScreen() {
                     </View>
                 )}
 
+                {/* 옵션 양쪽 내용 */}
                 <View style={styles.optionView}>
                     <View style={[styles.optionBox, styles.optionBoxLeft]}>
                         <Image
@@ -360,7 +361,7 @@ export default function OpinionListScreen() {
                     </View>
                 </View>
 
-
+                {/* 의견 리스트 */}
                 <View style={styles.opinionView}>
                     {isSummary ? (
                         <SummaryBoxList data={summaries} />
