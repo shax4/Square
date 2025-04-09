@@ -23,14 +23,12 @@ interface CommentItemProps {
   postId: number; // 게시글 ID
   comment: Comment; // 댓글 타입 (대댓글은 재귀 호출 시 prop 이름 변경 고려)
   onCommentChange: () => void; // 부모 컴포넌트에 변경사항 알림 콜백
-  isReply?: boolean; // 이 컴포넌트가 대댓글을 랜더링하는지 여부 (스타일링용)
 }
 
 export default function CommentItem({
   postId,
   comment,
   onCommentChange,
-  isReply = false,
 }: CommentItemProps) {
   const user = {
     nickname: "반짝이는하마",
@@ -40,23 +38,17 @@ export default function CommentItem({
   const [editedContent, setEditedContent] = useState(comment.content); // 수정 내용 상태
 
   // comment.replies는 초기 로드된 대댓글 목록
-  const [loadedReplies, setLoadedReplies] = useState<Reply[]>(
-    comment.replies || []
+  const [displayedReplies, setDisplayedReplies] = useState<Reply[]>(
+    () => (comment.replies ? comment.replies.slice(0, 3) : []) // 초기 3개
   );
-  const [replyLoading, setReplyLoading] = useState(false);
-  // !! 실제 API는 커서 기반 페이지네이션 필요. !!
-  // nextReplyCursor 초기화: 로드된 마지막 댓글의 ID를 저장
-  const [nextReplyCursor, setNextReplyCursor] = useState<number | null>(() => {
-    if (comment.replies && comment.replies.length > 0) {
-      return comment.replies[comment.replies.length - 1].replyId;
-    }
-    return null; // 초기 댓글 없으면 null
-  });
+  const [nextReplyCursor, setNextReplyCursor] = useState<number | null>(() =>
+    comment.replies && comment.replies.length > 3
+      ? comment.replies[2].replyId
+      : null
+  );
+  const [isLoadingMore, setIsLoadingMore] = useState(false); // 더보기 로딩
   const [isReplying, setIsReplying] = useState(false); // 답글 입력창 표시 상태
   const [replyText, setReplyText] = useState(""); // 답글 내용 상태
-
-  const [editingReplyId, setEditingReplyId] = useState<number | null>(null); // 대댓글 수정 모드 상태
-  const [editedReplyContent, setEditedReplyContent] = useState(""); // 대댓글 수정 내용 상태
 
   // 현재 사용자가 댓글 작성자인지 확인
   const isAuthor = user?.nickname === comment.nickname;
@@ -69,19 +61,8 @@ export default function CommentItem({
     createComment,
     updateComment,
     deleteComment,
-    loadingReplies,
     loadReplies,
   } = useComment();
-
-  // 타입 가드 함수 - API 응답이 Reply 타입인지 확인
-  const isReplyArray = (data: any): data is Reply[] => {
-    return (
-      Array.isArray(data) &&
-      data.length > 0 &&
-      "replyId" in data[0] &&
-      "parentId" in data[0]
-    );
-  };
 
   // 댓글 수정 시작 함수
   const handleEditPress = () => {
@@ -181,165 +162,45 @@ export default function CommentItem({
   };
   // 대댓글 더보기 함수
   const handleLoadMoreReplies = useCallback(async () => {
-    if (replyLoading || !comment.commentId) return;
-
-    setReplyLoading(true);
+    if (isLoadingMore || nextReplyCursor === null) return;
+    console.log(
+      `답글 더보기 요청: commentId=${comment.commentId}, cursor=${nextReplyCursor}`
+    );
+    setIsLoadingMore(true);
     try {
-      // API 호출
-      const apiReplies = await loadReplies(
-        comment.commentId,
-        nextReplyCursor || undefined
-      );
-
-      if (apiReplies && apiReplies.length > 0) {
-        // API 응답 타입을 내부 Reply 타입으로 변환
-        const convertedReplies: Reply[] = apiReplies.map(convertToReply);
-
-        // 변환된 데이터로 상태 업데이트
-        setLoadedReplies((prevReplies) => [
-          ...prevReplies,
-          ...convertedReplies,
-        ]);
-
-        // 다음 커서는 마지막 응답의 replyId
-        setNextReplyCursor(apiReplies[apiReplies.length - 1].replyId);
-      } else {
-        // 더 이상 불러올 대댓글이 없음
-        setNextReplyCursor(null);
-      }
-    } catch (error) {
-      console.error("대댓글 로드 실패:", error);
-      Alert.alert("오류", "대댓글을 불러오는 중 오류가 발생했습니다.");
-    } finally {
-      setReplyLoading(false);
-    }
-  }, [comment.commentId, replyLoading, nextReplyCursor, loadReplies]);
-
-  // 표시할 대댓글 수와 전체 대댓글 수 비교
-  const hasMoreReplies = comment.replyCount > loadedReplies.length;
-
-  // 대댓글 수정 시작 함수
-  const handleEditReply = (reply: Reply) => {
-    // 수정할 대댓글 ID 저장
-    setEditingReplyId(reply.replyId);
-    // 수정할 내용 초기값 설정
-    setEditedReplyContent(reply.content);
-  };
-  // 대댓글 수정 취소 함수
-  const handleCancelEditReply = () => {
-    // 수정 모드 종료
-    setEditingReplyId(null);
-    // 수정 내용 초기화
-    setEditedReplyContent("");
-  };
-  // 대댓글 수정 저장 함수
-  const handleSaveReply = async (replyId: number) => {
-    // 입력 내용이 비어있거나 변경되지 않았는지 확인
-    if (!editedReplyContent.trim()) {
-      Alert.alert("알림", "내용을 입력해주세요.");
-      return;
-    }
-
-    try {
-      // 훅의 updateComment 함수 사용
-      const success = await updateComment(replyId, editedReplyContent);
-
-      if (success) {
-        // 로컬 상태도 직접 업데이트
-        setLoadedReplies((prevReplies) =>
-          prevReplies.map((reply) =>
-            reply.replyId === replyId
-              ? { ...reply, content: editedReplyContent }
-              : reply
-          )
+      const response = await loadReplies(comment.commentId, nextReplyCursor);
+      if (response && response.replies && response.replies.length > 0) {
+        const newReplies = response.replies.map(convertToReply); // API -> 내부 타입 변환
+        setDisplayedReplies((prevReplies) => [...prevReplies, ...newReplies]);
+        setNextReplyCursor(response.nextCursorId ?? null);
+        console.log(
+          `답글 ${newReplies.length}개 추가됨, 다음 커서: ${
+            response.nextCursorId ?? "없음"
+          }`
         );
-
-        // 수정 모드 종료
-        setEditingReplyId(null);
-        // 수정 내용 초기화
-        setEditedReplyContent("");
-        // 댓글 목록 갱신 (부모 컴포넌트에 알림)
-        onCommentChange();
       } else {
-        Alert.alert("오류", "답글 수정에 실패했습니다.");
+        setNextReplyCursor(null);
+        console.log("더 이상 가져올 답글 없음.");
       }
     } catch (error) {
-      console.error("답글 수정 실패:", error);
-      Alert.alert("오류", "답글을 수정하는 중 문제가 발생했습니다.");
+      console.error("답글 더보기 처리 중 오류:", error);
+      Alert.alert("오류", "답글을 불러오는 중 오류가 발생했습니다.");
+    } finally {
+      setIsLoadingMore(false);
     }
-  };
-  // 대댓글 삭제 함수
-  const handleDeleteReply = (replyId: number) => {
-    Alert.alert("답글 삭제", "정말 이 답글을 삭제하시겠습니까?", [
-      { text: "취소", style: "cancel" },
-      {
-        text: "삭제",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            // 대댓글 삭제 API 호출 (replyId 사용)
-            const success = await deleteComment(replyId);
+  }, [comment.commentId, isLoadingMore, nextReplyCursor, loadReplies]);
 
-            if (success) {
-              // 로컬 상태 업데이트
-              setLoadedReplies((prev) =>
-                prev.filter((reply) => reply.replyId !== replyId)
-              );
-              onCommentChange();
-            } else {
-              Alert.alert("오류", "답글 삭제에 실패했습니다.");
-            }
-          } catch (error) {
-            console.error("답글 삭제 실패:", error);
-            Alert.alert("오류", "답글 삭제 중 오류가 발생했습니다.");
-          }
-        },
-      },
-    ]);
-  };
+  // 더 보여줄 답글이 있는지 계산
+  const hasMoreReplies = comment.replyCount > displayedReplies.length;
 
   // 댓글용 좋아요 버튼 props 생성
   const commentLikeProps = useLikeButton(
     comment.commentId,
     "POST_COMMENT",
-    comment.isLiked || false,
-    comment.likeCount || 0,
-    (newState) => handleLikeChange(comment.commentId, newState, true)
+    comment.isLiked,
+    comment.likeCount,
+    onCommentChange
   );
-
-  // 대댓글 렌더링 시에는 함수화하여 중복 제거
-  const getReplyLikeProps = (reply: Reply) => {
-    return useLikeButton(
-      reply.replyId,
-      "POST_COMMENT",
-      reply.isLiked,
-      reply.likeCount,
-      (newState) => handleLikeChange(reply.replyId, newState)
-    );
-  };
-
-  // 좋아요 상태 변경 핸들러
-  const handleLikeChange = (
-    id: number,
-    newState: { isLiked: boolean; likeCount: number },
-    isParentComment: boolean = false
-  ) => {
-    if (isParentComment) {
-      onCommentChange();
-    } else {
-      setLoadedReplies((prevReplies) =>
-        prevReplies.map((reply) =>
-          reply.replyId === id
-            ? {
-                ...reply,
-                isLiked: newState.isLiked,
-                likeCount: newState.likeCount,
-              }
-            : reply
-        )
-      );
-    }
-  };
 
   // 서비스에서 반환하는 Reply 타입을 내부 Reply 타입으로 변환
   const convertToReply = (apiReply: any): Reply => {
@@ -348,7 +209,7 @@ export default function CommentItem({
       parentId: apiReply.parentId,
       nickname: apiReply.nickname,
       profileUrl: apiReply.profileUrl,
-      userType: apiReply.userType,
+      userType: apiReply.userType || "",
       createdAt: apiReply.createdAt,
       content: apiReply.content,
       likeCount: apiReply.likeCount,
@@ -590,10 +451,10 @@ export default function CommentItem({
         <TouchableOpacity
           style={styles.loadMoreButton}
           onPress={handleLoadMoreReplies}
-          disabled={replyLoading}
+          disabled={isLoadingMore}
         >
-          {replyLoading ? (
-            <ActivityIndicator size="small" color="#0000ff" />
+          {isLoadingMore ? (
+            <ActivityIndicator size="small" color="#888" />
           ) : (
             <Text weight="medium" style={styles.loadMoreText}>
               답글 {comment.replyCount - loadedReplies.length}개 더보기
@@ -601,14 +462,13 @@ export default function CommentItem({
           )}
         </TouchableOpacity>
       )}
-    </>
+    </View>
   );
 }
 
 // --- 스타일 정의 (수정) ---
 const styles = StyleSheet.create({
   container: {
-    // 전체 댓글 아이템 컨테이너
     paddingVertical: 12,
     paddingHorizontal: 10,
     // backgroundColor: "#fafafa", // 배경색 통일
@@ -645,10 +505,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  userInfoText: {
+  authorInfo: {
+    marginLeft: 8,
+    flex: 1,
+  },
+  nameContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginLeft: 8,
+    marginBottom: 2,
   },
   nickname: {
     marginRight: 6,
@@ -658,13 +522,15 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     marginTop: 2, // 사용자 정보 바로 아래부터 시작
   },
-  editContainer: { marginVertical: 4 },
-  textInput: {
+  editingContainer: {
+    marginLeft: 40, // 들여쓰기
+    marginBottom: 8,
+  },
+  editInput: {
     borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
+    borderColor: "#ccc",
+    borderRadius: 4,
     padding: 8,
-    minHeight: 80,
     marginBottom: 8,
     backgroundColor: "#fff", // 입력창 배경색 유지
   },
@@ -680,24 +546,16 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: "white",
   },
-  likeButton: {
-    padding: 4,
-  },
-  footerContainer: {
-    // 하단 푸터 영역
+  editActions: {
     flexDirection: "row",
     justifyContent: "space-between", // 왼쪽 그룹과 오른쪽 그룹을 양 끝으로
     alignItems: "center",
   },
-  leftFooterGroup: {
-    // 시간 + 답글 버튼 그룹
+  footer: {
     flexDirection: "row",
     alignItems: "center",
-  },
-  time: {
-    fontSize: 12,
-    color: "#888",
-    marginRight: 16, // 시간과 답글 버튼 사이 간격
+    marginTop: 4,
+    marginLeft: 40, // 들여쓰기
   },
   replyButtonText: {
     fontSize: 12,
@@ -709,12 +567,10 @@ const styles = StyleSheet.create({
   },
   actionText: {
     fontSize: 12,
-    color: "#888",
-    marginLeft: 12, // 수정 버튼과 삭제 버튼 사이 간격
+    color: "#555",
   },
-  replyContentRow: {
+  replyInputContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: 4,
     marginLeft: 2,
@@ -741,18 +597,12 @@ const styles = StyleSheet.create({
     borderRadius: 8, // 모서리 둥글게
   },
   replyInput: {
+    flex: 1,
     borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    padding: 8,
-    minHeight: 80,
-    marginBottom: 8,
-    backgroundColor: "#fff", // 입력창 배경색 유지 (흰색)
-  },
-  replyButtonContainer: { flexDirection: "row", justifyContent: "flex-end" },
-  replyLikeContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    borderColor: "#ccc",
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
     marginRight: 8,
   },
   contentRow: {
