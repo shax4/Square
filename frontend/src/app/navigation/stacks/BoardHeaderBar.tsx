@@ -11,6 +11,7 @@ import { CustomBack } from "../components/CustomBack";
 import { Icons } from "../../../../assets/icons/Icons";
 // 사용 중지된 BoardAPI 대신 PostService 사용
 import { PostService } from "../../../shared/services/postService";
+import { TargetTypeEnum } from "../../../components/LikeButton/LikeButton.types";
 
 import BoardListScreen from "../../../pages/BoardScreen/BoardListScreen";
 import BoardDetailScreen from "../../../pages/BoardScreen/BoardDetailScreen";
@@ -114,6 +115,7 @@ export function HeaderRightIcons({
   const [post, setPost] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isAuthor, setIsAuthor] = useState(false);
+  const [isScrapped, setIsScrapped] = useState(false);
 
   // 게시글 데이터 가져오기
   useEffect(() => {
@@ -125,6 +127,8 @@ export function HeaderRightIcons({
 
         if (postData) {
           setPost(postData);
+          // 스크랩 상태 설정
+          setIsScrapped(postData.isScrapped || false);
 
           // 로그인한 사용자와 게시글 작성자 비교
           if (loggedInUser && postData.nickname === loggedInUser.nickname) {
@@ -194,9 +198,48 @@ export function HeaderRightIcons({
   };
 
   // 북마크(스크랩) 기능
-  const handleBookmark = () => {
-    // TODO: 북마크 기능 구현
-    console.log("북마크 기능");
+  const handleBookmark = async () => {
+    try {
+      if (isScrapped) {
+        // 스크랩 취소
+        const success = await PostService.cancelScrap(
+          boardId,
+          TargetTypeEnum.POST
+        );
+        if (success) {
+          setIsScrapped(false);
+          // 알림 표시
+          Alert.alert("스크랩 취소", "게시글 스크랩이 취소되었습니다.");
+          // 게시글 데이터 업데이트
+          const updatedPost = await PostService.getPostDetail(boardId);
+          if (updatedPost) {
+            setPost(updatedPost);
+          }
+        }
+      } else {
+        // 스크랩 추가
+        const result = await PostService.toggleScrap(
+          boardId,
+          TargetTypeEnum.POST
+        );
+        if (result) {
+          setIsScrapped(true);
+          // 알림 표시
+          Alert.alert(
+            "스크랩 완료",
+            "게시글이 스크랩되었습니다.\n마이페이지의 스크랩 목록에서 확인할 수 있습니다."
+          );
+          // 게시글 데이터 업데이트
+          const updatedPost = await PostService.getPostDetail(boardId);
+          if (updatedPost) {
+            setPost(updatedPost);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("스크랩 처리 중 오류 발생:", error);
+      Alert.alert("오류", "스크랩 처리 중 문제가 발생했습니다.");
+    }
   };
 
   // 신고 기능
@@ -224,7 +267,7 @@ export function HeaderRightIcons({
       ) : (
         <>
           <TouchableOpacity onPress={handleBookmark}>
-            <Icons.bookmark />
+            {isScrapped ? <Icons.bookmarkUndo /> : <Icons.bookmark />}
           </TouchableOpacity>
           <TouchableOpacity onPress={handleReport}>
             <Icons.report />

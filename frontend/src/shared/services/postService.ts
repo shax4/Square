@@ -14,6 +14,7 @@ import {
   UpdatePostRequest,
   GetPostsParams,
 } from "../types/postTypes";
+import { TargetTypeEnum } from "../../components/LikeButton/LikeButton.types";
 
 /**
  * 게시판 서비스 - 게시글 관련 API 요청 함수 모음
@@ -231,6 +232,65 @@ export const PostService = {
     } catch (error) {
       // console.error("PostService.getMyScrapPosts에서 추가 오류 처리:", error);
       return undefined;
+    }
+  },
+
+  /**
+   * 게시글 스크랩 토글 함수
+   * 게시글을 스크랩하거나 스크랩을 취소합니다.
+   *
+   * @param postId 스크랩할 게시글 ID
+   * @param targetType 스크랩 대상 타입 (기본값: 게시글)
+   * @returns 스크랩 상태 (isScrapped)
+   */
+  toggleScrap: async (
+    postId: number,
+    targetType: TargetTypeEnum = TargetTypeEnum.POST
+  ): Promise<{ isScrapped: boolean } | undefined> => {
+    try {
+      const requestData = {
+        targetId: postId,
+        targetType: targetType,
+      };
+      // 테스트용 로그 추가
+      console.log("📤 스크랩 생성 요청 데이터:", JSON.stringify(requestData));
+
+      return await apiPost<{ isScrapped: boolean }>("/api/scraps", requestData);
+    } catch (error) {
+      console.error("PostService.toggleScrap 실패:", error);
+      return undefined;
+    }
+  },
+
+  /**
+   * 게시글 스크랩 취소 함수
+   *
+   * @param postId 스크랩 취소할 게시글 ID
+   * @param targetType 스크랩 대상 타입 (기본값: 게시글)
+   * @returns 취소 성공 여부
+   */
+  cancelScrap: async (
+    postId: number,
+    targetType: TargetTypeEnum = TargetTypeEnum.POST
+  ): Promise<boolean> => {
+    try {
+      const requestParams = {
+        targetId: postId,
+        targetType: targetType,
+      };
+      // 테스트용 로그 추가
+      console.log(
+        "📤 스크랩 취소 요청 파라미터:",
+        JSON.stringify(requestParams)
+      );
+
+      await apiDelete("/api/scraps", {
+        params: requestParams,
+      });
+      return true;
+    } catch (error) {
+      console.error("PostService.cancelScrap 실패:", error);
+      return false;
     }
   },
 };
