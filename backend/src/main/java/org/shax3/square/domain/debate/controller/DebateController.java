@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.annotation.AuthUser;
 import org.shax3.square.domain.auth.annotation.Guest;
 import org.shax3.square.domain.debate.dto.DebateVotedResultResponse;
+import org.shax3.square.domain.debate.dto.request.DebateCreateRequest;
 import org.shax3.square.domain.debate.dto.request.VoteRequest;
 import org.shax3.square.domain.debate.dto.response.*;
 import org.shax3.square.domain.debate.model.Debate;
@@ -135,6 +136,15 @@ public class DebateController {
                 nextRightCursorComments,
                 limit);
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "오늘의 논쟁 생성 API ",
+        description = "청원 목록 중 하나를 선택하여 오늘의 논쟁을 생성합니다."
+    )
+    @PostMapping("/today")
+    public ResponseEntity<Void> createDebate(@RequestBody DebateCreateRequest request, @AuthUser User user) {
+        debateService.createDebateFromProposal(request, user);
+        return ResponseEntity.ok().build();
     }
 
 }

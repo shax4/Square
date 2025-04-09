@@ -27,6 +27,7 @@ public enum ExceptionCode {
 	USER_INACTIVE(2010, "비활성 회원입니다."),
 	USER_NOT_FOUND(2011, "유저를 찾을 수 없습니다."),
 	USER_TYPE_NOT_FOUND(2012, "타입이 없는 유저입니다."),
+	USER_NOT_AUTHORIZED(2013, "해당 유저는 권한이 없습니다."),
 
 	UNAUTHORIZED_ACCESS(3000, "접근할 수 없는 리소스입니다."),
 	INVALID_REFRESH_TOKEN(3001, "사용자 식별에 실패했습니다. 다시 로그인해주세요."),

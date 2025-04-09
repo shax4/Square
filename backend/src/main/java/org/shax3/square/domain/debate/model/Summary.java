@@ -7,7 +7,6 @@ import lombok.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
 @Table(name = "summary")
 
 public class Summary {
@@ -24,4 +23,10 @@ public class Summary {
     @Column(name = "is_left", nullable = false)
     private boolean left;
 
+    @Builder
+    public Summary(Debate debate, String content, boolean left) {
+        this.debate = debate;
+        this.content = content;
+        this.left = left;
+    }
 }
