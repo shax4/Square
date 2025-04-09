@@ -59,9 +59,6 @@ apiClient.interceptors.response.use(
       }]: ${response.config.method?.toUpperCase()} ${response.config.url}`
     );
 
-    // *** JSON 데이터 로그 제거 ***
-    // console.log("📄 응답 데이터:", JSON.stringify(response.data)); // 이 라인 제거 또는 주석 처리
-
     return response;
   },
   async (error: AxiosError<ApiError>) => {

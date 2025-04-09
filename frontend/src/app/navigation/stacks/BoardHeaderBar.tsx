@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { View, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import {
@@ -11,21 +11,15 @@ import { CustomBack } from "../components/CustomBack";
 import { Icons } from "../../../../assets/icons/Icons";
 // 사용 중지된 BoardAPI 대신 PostService 사용
 import { PostService } from "../../../shared/services/postService";
-import { mockPosts } from "../../../pages/BoardScreen/mocks/boardData";
 
 import BoardListScreen from "../../../pages/BoardScreen/BoardListScreen";
 import BoardDetailScreen from "../../../pages/BoardScreen/BoardDetailScreen";
 import BoardWriteScreen from "../../../pages/BoardScreen/BoardWriteScreen";
 import { BoardStackParamList } from "../../../shared/page-stack/BoardPageStack";
+import { useAuthStore } from "../../../shared/stores/auth";
 
 // 스택 네비게이터
 const Stack = createNativeStackNavigator<BoardStackParamList>();
-
-// 테스트용 예시 사용자 정보(전역 상태관리로 받아오도록 수정 필요)
-const currentUser = {
-  nickname: "반짝이는하마",
-};
-// 게시물 정보는 BoardDetailScreen에서 route.params.boardId를 통해 가져옵니다
 
 // 게시판 상단 탭
 export default function BoardHeaderBar() {
@@ -59,16 +53,10 @@ export default function BoardHeaderBar() {
         options={({ route }) => {
           const boardId = route.params.boardId;
 
-          // 현재 게시글 데이터를 가져와서 작성자 확인
-          const post = mockFetchPost(boardId);
-          const isAuthor = currentUser.nickname === post?.nickname;
-
           return {
             title: "게시판 상세",
             headerBackButtonDisplayMode: "minimal",
-            headerRight: () => (
-              <HeaderRightIcons isAuthor={isAuthor} boardId={boardId} />
-            ),
+            headerRight: () => <HeaderRightIcons boardId={boardId} />,
           };
         }}
       />
@@ -92,22 +80,52 @@ export default function BoardHeaderBar() {
   );
 }
 
-// Mock함수 (실제 API 호출로 대체 필요)
-function mockFetchPost(boardId: number) {
-  return mockPosts.find((post) => post.postId === boardId);
-}
-
-// 상단 바 우측 아이콘 컴포넌트: 현재 사용자와 글 작성자 여부 확인
-function HeaderRightIcons({
-  isAuthor,
-  boardId,
-}: {
-  isAuthor: boolean;
-  boardId: number;
-}) {
-  // 게시글 데이터를 가져오기 위한 로직
-  // const post = mockFetchPost(boardId); // 실제 API 호출로 대체 필요
+/**
+ * 상단 바 우측 아이콘 컴포넌트
+ * 게시글 작성자 여부에 따라 다른 아이콘을 표시합니다.
+ * 작성자: 수정/삭제 아이콘
+ * 비작성자: 스크랩/신고 아이콘
+ *
+ * @param boardId 게시글 ID
+ */
+function HeaderRightIcons({ boardId }: { boardId: number }) {
   const navigation = useNavigation<NavigationProp<BoardStackParamList>>();
+
+  // 로그인 사용자 정보 가져오기 (전역 상태)
+  const loggedInUser = useAuthStore((state) => state.user);
+
+  // 게시글 데이터와 로딩 상태 관리
+  const [post, setPost] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [isAuthor, setIsAuthor] = useState(false);
+
+  // 게시글 데이터 가져오기
+  useEffect(() => {
+    const fetchPostData = async () => {
+      setLoading(true);
+      try {
+        // PostService를 사용하여 서버에서 게시글 데이터 가져오기
+        const postData = await PostService.getPostDetail(boardId);
+
+        if (postData) {
+          setPost(postData);
+
+          // 로그인한 사용자와 게시글 작성자 비교
+          if (loggedInUser && postData.nickname === loggedInUser.nickname) {
+            setIsAuthor(true);
+          } else {
+            setIsAuthor(false);
+          }
+        }
+      } catch (error) {
+        console.error("게시글 데이터 가져오기 실패:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPostData();
+  }, [boardId, loggedInUser]);
 
   // 게시글 수정 기능
   const handleEdit = () => {
@@ -141,6 +159,24 @@ function HeaderRightIcons({
       },
     ]);
   };
+
+  // 북마크(스크랩) 기능
+  const handleBookmark = () => {
+    // TODO: 북마크 기능 구현
+    console.log("북마크 기능");
+  };
+
+  // 신고 기능
+  const handleReport = () => {
+    // TODO: 신고 기능 구현
+    console.log("신고 기능");
+  };
+
+  // 로딩 중에는 빈 UI 반환
+  if (loading) {
+    return <View style={styles.headerRightItems} />;
+  }
+
   return (
     <View style={styles.headerRightItems}>
       {isAuthor ? (
@@ -154,10 +190,10 @@ function HeaderRightIcons({
         </>
       ) : (
         <>
-          <TouchableOpacity onPress={() => console.log("북마크")}>
+          <TouchableOpacity onPress={handleBookmark}>
             <Icons.bookmark />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => console.log("신고")}>
+          <TouchableOpacity onPress={handleReport}>
             <Icons.report />
           </TouchableOpacity>
         </>

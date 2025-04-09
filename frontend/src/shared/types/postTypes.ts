@@ -88,6 +88,8 @@ export interface UpdatePostRequest {
   title?: string;
   content?: string;
   postImage?: string[]; // s3Key 배열
+  addedImages: string[]; // 추가된 이미지의 s3Key 배열 (필수, 빈 배열이라도 필요)
+  deletedImages: string[]; // 삭제된 이미지의 s3Key 배열 (필수, 빈 배열이라도 필요)
 }
 
 // 댓글/답글 생성 요청 타입
