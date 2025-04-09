@@ -25,6 +25,13 @@ public class UserDeviceService {
         userDeviceRepository.findByDeviceId(deviceId)
                 .ifPresentOrElse(
                         existingDevice -> {
+
+                            System.out.println("기존 디바이스 업데이트: deviceId=" + existingDevice.getDeviceId());
+                            System.out.println("기존 디바이스 업데이트: fcmtokenId=" + existingDevice.getFcmToken());
+
+                            System.out.println("새로운 FCM 토큰: " + fcmToken);
+
+
                             existingDevice.updateFcmToken(fcmToken);
                             existingDevice.updateLastLogin(LocalDateTime.now());
                         },
