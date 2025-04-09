@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
   View,
-  Text,
   TextInput,
   StyleSheet,
   TouchableOpacity,
@@ -14,6 +13,7 @@ import { BoardAPI } from "./Api/boardApi";
 import { StackScreenProps } from "@react-navigation/stack";
 import { useConfirmModal } from "./hooks/useConfirmModal";
 import { BoardStackParamList } from "../../shared/page-stack/BoardPageStack";
+import Text from '../../components/Common/Text';
 
 // props 타입 정의
 type Props = StackScreenProps<BoardStackParamList, "BoardWrite">;

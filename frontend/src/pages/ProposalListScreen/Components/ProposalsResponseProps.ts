@@ -1,4 +1,4 @@
-import { Proposal } from "./ProposalProps";
+import { Proposal } from "../Type/proposalListType";
 
 export interface ProposalResponse {
     proposals: Proposal[];

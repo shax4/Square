@@ -11,7 +11,7 @@ const colors = ["#00AEFF", "#6541F2", "#F553DA", "#CB59FF", "#FFA500", "#FF4500"
 
 const BubbleChart: React.FC<BubbleChartProps> = ({
   data,
-  width = Dimensions.get("window").width,
+  width = Dimensions.get("window").width * 0.7,
   height = 400,
   minRadius = 30,
   maxRadius = 100,

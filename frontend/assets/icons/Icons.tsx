@@ -50,7 +50,7 @@ export const Icons = {
   ),
   comment: (props: any) => <EvilIcons name="comment" size={32} color="gray" />,
   commentNew: (props: any) => (
-    <Ionicons name="chatbubble-outline" size={24} color="gray" />
+    <Ionicons name="chatbubble-outline" size={24} color="#888888" />
   ),
   leftOptionEmoji: "🙆‍♂️",
   rightOptionEmoji: "🙅",

@@ -1,5 +1,6 @@
 import React from "react"
-import { Text, StyleSheet } from "react-native"
+import { StyleSheet } from "react-native"
+import Text from '../../../components/Common/Text';
 
 interface QuestionTextProps {
   text: string
@@ -11,7 +12,7 @@ const QuestionText: React.FC<QuestionTextProps> = React.memo(({ text }) => {
 
 const styles = StyleSheet.create({
   questionText: {
-    fontSize: 24,
+    fontSize: 18,
     marginBottom: 10,
     fontWeight: 'bold',
     textAlign: 'center',

@@ -23,7 +23,8 @@ const Question: React.FC<QuestionProps> = React.memo(({ id, question, options })
 const styles = StyleSheet.create({
   questionContainer: {
     flex: 1,
-    marginVertical: 15,
+    marginTop: 15,
+    marginBottom: 30,
     paddingHorizontal: 20,
   },
   optionsContainer: {

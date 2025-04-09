@@ -16,6 +16,7 @@ import BoardListScreen from "../../../pages/BoardScreen/BoardListScreen";
 import BoardDetailScreen from "../../../pages/BoardScreen/BoardDetailScreen";
 import BoardWriteScreen from "../../../pages/BoardScreen/BoardWriteScreen";
 import { BoardStackParamList } from "../../../shared/page-stack/BoardPageStack";
+import Text from '../../../components/Common/Text';
 
 // 스택 네비게이터
 const Stack = createNativeStackNavigator<BoardStackParamList>();
@@ -47,7 +48,7 @@ export default function BoardHeaderBar() {
         name="BoardList"
         component={BoardListScreen}
         options={{
-          title: "자유 게시판",
+          headerTitle: () => <Text style={styles.headerTitle}>자유 게시판</Text>,
           headerBackButtonDisplayMode: "minimal",
         }}
       />
@@ -63,7 +64,7 @@ export default function BoardHeaderBar() {
           const isAuthor = currentUser.nickname === post?.nickname;
 
           return {
-            title: "게시판 상세",
+            headerTitle: () => <Text style={styles.headerTitle}>게시판 상세</Text>,
             headerBackButtonDisplayMode: "minimal",
             headerRight: () => (
               <HeaderRightIcons isAuthor={isAuthor} boardId={boardId} />
@@ -76,7 +77,7 @@ export default function BoardHeaderBar() {
         name="BoardWrite"
         component={BoardWriteScreen}
         options={({ route }) => ({
-          title: "게시글 작성",
+          headerTitle: () => <Text style={styles.headerTitle}>게시글 작성</Text>,
           headerBackButtonDisplayMode: "minimal",
           headerLeft: () => (
             <CustomBack
@@ -169,5 +170,10 @@ const styles = StyleSheet.create({
   headerRightItems: {
     flexDirection: "row",
     gap: 12,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#333",
   },
 });

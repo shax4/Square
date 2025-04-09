@@ -4,7 +4,6 @@ import {
   FlatList,
   StyleSheet,
   TouchableOpacity,
-  Text,
   ScrollView,
   Alert,
   ActivityIndicator,
@@ -18,6 +17,8 @@ import BoardItem from "./components/BoardItem"; // 개별 게시글 항목을 �
 import EmptyBoardList from "./components/EmptyBoardList"; // 게시글이 없을 때 표시하는 컴포넌트
 import { Icons } from "../../../assets/icons/Icons";
 import { BoardStackParamList } from "../../shared/page-stack/BoardPageStack";
+import Text from '../../components/Common/Text';
+import colors from "../../../assets/colors";
 
 // 인기 게시글 인터페이스
 interface PopularPost {
@@ -148,7 +149,7 @@ export default function BoardListScreen({
         {/* 인기 게시글 (캐러셀) */}
         {popularPosts.length > 0 && (
           <View style={styles.popularSection}>
-            <Text style={styles.sectionTitle}>인기 게시글</Text>
+            <Text style={styles.sectionTitle}>HOT</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {popularPosts.map((post) => (
                 <TouchableOpacity
@@ -267,48 +268,47 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   popularSection: {
-    padding: 16,
+    padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 12,
+    marginBottom: 14,
+    color: colors.warnRed
   },
   popularPostItem: {
-    width: 150,
+    width: 160,
     marginRight: 12,
     padding: 12,
     borderWidth: 1,
     borderColor: "#eee",
     borderRadius: 8,
+    backgroundColor: colors.background
   },
   popularPostTitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "bold",
     marginBottom: 8,
   },
   popularPostStats: {
-    fontSize: 12,
-    color: "#666",
+    fontSize: 11,
+    color: colors.grayText,
   },
   sortOptions: {
     flexDirection: "row",
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    padding: 18,
   },
   sortButton: {
-    marginRight: 16,
-    paddingVertical: 4,
+    marginRight: 18,
+    paddingVertical: 5,
   },
   activeSortButton: {
     borderBottomWidth: 2,
     borderBottomColor: "#007BFF",
   },
   sortText: {
-    color: "#666",
+    color: colors.grayText,
   },
   activeSortText: {
     color: "#007BFF",
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 20,
     bottom: Platform.OS === "ios" ? 100 : 90, // 하단 네비게이션 바 위에 배치
-    backgroundColor: "#007BFF",
+    backgroundColor: colors.yesDark,
     width: 60,
     height: 60,
     borderRadius: 30,
