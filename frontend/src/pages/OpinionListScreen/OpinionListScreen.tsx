@@ -341,21 +341,21 @@ export default function OpinionListScreen() {
                 <View style={styles.optionView}>
                     <View style={[styles.optionBox, styles.optionBoxLeft]}>
                         <Image
-                        source={require('../../../assets/images/agree.png')}
-                        style={styles.optionImage}
+                            source={require('../../../assets/images/agree.png')}
+                            style={styles.optionImage}
                         />
                         <Text style={[styles.optionText, styles.optionTextLeft]}>
-                        {debate!.leftOption}
+                            {debate!.leftOption}
                         </Text>
                     </View>
 
                     <View style={[styles.optionBox, styles.optionBoxRight]}>
                         <Image
-                        source={require('../../../assets/images/disagree.png')}
-                        style={styles.optionImage}
+                            source={require('../../../assets/images/disagree.png')}
+                            style={styles.optionImage}
                         />
                         <Text style={[styles.optionText, styles.optionTextRight]}>
-                        {debate!.rightOption}
+                            {debate!.rightOption}
                         </Text>
                     </View>
                 </View>
@@ -393,9 +393,15 @@ export default function OpinionListScreen() {
                             <Text>지금까지 {debate!.totalVoteCount}명 참여중</Text>
                         </View>
                     )}
+
+                    {(!isSummary && debate.isLeft == null) && (
+                        <View style={styles.TotalVoteCountView}>
+                            <Text>투표 후 의견 등록 가능합니다.</Text>
+                        </View>
+                    )}
                 </View>
 
-                {!isSummary && (
+                {(!isSummary && debate.isLeft != null) && (
                     <CommentInput
                         onChangeText={setCommentText}
                         onSubmit={handleOpinionPosting}
