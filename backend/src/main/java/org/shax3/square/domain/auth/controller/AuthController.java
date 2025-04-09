@@ -198,7 +198,8 @@ public class AuthController {
     ) {
         FirebaseToken firebaseUser = firebaseService.verifyIdToken(request.idToken());
         UserLoginDto userLoginDto = authService.firebaseLogin(firebaseUser, request);
-
+        System.out.println(request.idToken());
+        System.out.println(request.fcmToken());
         if (userLoginDto.isMember()) {
 
             Cookie cookie = new Cookie("refresh-token", userLoginDto.refreshToken().getToken());
