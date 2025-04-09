@@ -22,15 +22,18 @@ public class AiSummaryClient {
 	private String generatePrompt(String topic, String leftOption, String rightOption) {
 		return String.format(
 			"""
-			주제: "%s"
-
-			위 주제에 대해 누구나 동감할 수 있을만한 %s 측의 대표적인 주장 3개와 %s 측의 대표적인 주장 3개를 요약해줘.
-			- 감정적인 표현을 피하고, 객관적이고 논란이 적은 내용을 담아야 해.
-			- 너무 공격적이거나 논쟁을 유발할 수 있는 문장은 제외해줘.
-			- 요약은 주장 하냐당 70자 이내로 해줘.
-			- 각 요약은 코드에서 split 할 수 있도록 쉼표로 구분해주고, 한쪽 의견 먼저 3개 추출 한 후, 반대쪽 의견 3개를 추출해줘.
+			"%s" 주제에 대해 %s 측과 %s 측의 대표적인 주장 3개씩 총 6개를 요약해줘.
+	
+			- 각각의 주장은 70자 이내로 작성해줘.
+			- 문장은 너무 공격적이지 않고 객관적인 표현으로 구성해줘.
+			- 모든 주장은 쉼표(,)로 구분된 하나의 줄로만 출력해줘.
+			- 제목, 번호, 불필요한 설명 없이 주장 6개만 출력해줘.
+			- 먼저 %s 측 3개, 그 다음 %s 측 3개를 출력해줘.
+			
+			예시:
+			주장1, 주장2, 주장3, 주장4, 주장5, 주장6
 			""",
-			topic, leftOption, rightOption
+			topic, leftOption, rightOption, leftOption, rightOption
 		);
 	}
 }
