@@ -18,10 +18,10 @@ const BlueBarChart = (data: BarChartComponentProps) => {
             color: "#0066FF",
             fontSize: 16,
             fontWeight: "bold",
-            marginBottom: 6,
+            marginBottom: 2,
           }}
         >
-          {item.value}%
+          {item.value}
         </Text>
       ),
     }));
@@ -43,7 +43,9 @@ const BlueBarChart = (data: BarChartComponentProps) => {
       hideRules
       yAxisThickness={0}
       xAxisThickness={0}
-      height={160}
+      height={200}
+      overflowTop={50}
+      maxValue={100}
     />
   )
 }

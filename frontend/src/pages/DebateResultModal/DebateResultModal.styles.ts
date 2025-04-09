@@ -72,7 +72,7 @@ export const styles = StyleSheet.create({
     marginBottom: 12,
   },
   chartContainer: {
-    height: 200,
+    height: 300,
   },
   footer: {
     padding: 16,

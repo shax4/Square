@@ -3,15 +3,15 @@
 import type React from "react"
 import { useEffect, useState } from "react"
 import { View, StyleSheet, Dimensions, ScrollView } from "react-native"
-import {styles} from "./BubbleChart.styles";
-import {BubbleChartProps, Bubble} from "./BubbleChart.types";
+import { styles } from "./BubbleChart.styles";
+import { BubbleChartProps, Bubble } from "./BubbleChart.types";
 import Text from '../../../../components/Common/Text';
 
 const colors = ["#00AEFF", "#6541F2", "#F553DA", "#CB59FF", "#FFA500", "#FF4500", "#32CD32", "#8A2BE2"]
 
 const BubbleChart: React.FC<BubbleChartProps> = ({
   data,
-  width = Dimensions.get("window").width,
+  width = Dimensions.get("window").width * 0.7,
   height = 400,
   minRadius = 30,
   maxRadius = 100,
@@ -20,13 +20,19 @@ const BubbleChart: React.FC<BubbleChartProps> = ({
 }) => {
   const [bubbles, setBubbles] = useState<Bubble[]>([])
 
-  function formatBubbleData(data: {value: number; label: string}[]){
-    if(data.length <= 3) return data;
+  function formatBubbleData(data: { value: number; label: string }[]) {
+    // value 기준 내림차순 정렬
+    const sorted = [...data].sort((a, b) => b.value - a.value);
 
-    const topThree = data.slice(0, 3);
-    const otherTotal = data.slice(3).reduce((sum, item) => sum + item.value, 0);
+    // 3개 이하면 그대로 반환
+    if (sorted.length <= 3) return sorted;
 
-    return [...topThree, {value: otherTotal, label: "기타"}];
+    const topThree = sorted.slice(0, 3);
+    const otherTotal = sorted.slice(3).reduce((sum, item) => sum + item.value, 0);
+
+    return otherTotal > 0
+      ? [...topThree, { value: otherTotal, label: "기타" }]
+      : topThree;
   }
 
   // Calculate bubble sizes and positions with collision avoidance

@@ -1,13 +1,13 @@
 import { RouteProp, useNavigation } from "@react-navigation/native";
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { StackParamList } from "../../shared/page-stack/DebatePageStack";
+import { DebateStackParamList } from "../../shared/page-stack/DebatePageStack";
 import { useLayoutEffect, useRef, useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import colors from "../../../assets/colors";
 import { updateOpinion } from "../OpinionListScreen/api/OpinionApi";
 
 type Props = {
-    route: RouteProp<StackParamList, 'OpinionEditScreen'>;
+    route: RouteProp<DebateStackParamList, 'OpinionEditScreen'>;
 };
 
 export default function OpinionEditScreen({ route }: Props) {
@@ -17,7 +17,7 @@ export default function OpinionEditScreen({ route }: Props) {
     const [showWarning, setShowWarning] = useState(false);
 
     const submitRef = useRef<() => void>();
-    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
+    const navigation = useNavigation<NativeStackNavigationProp<DebateStackParamList>>();
 
     const [content, setContent] = useState(initialContent);
 
