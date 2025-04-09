@@ -1,4 +1,10 @@
-import React, { useState, useCallback, Fragment, useRef } from "react";
+import React, {
+  useState,
+  useCallback,
+  Fragment,
+  useRef,
+  useEffect,
+} from "react";
 import {
   View,
   TextInput,
@@ -13,7 +19,7 @@ import PersonalityTag from "../../../components/PersonalityTag/PersonalityTag";
 import LikeButton from "../../../components/LikeButton";
 import { Comment, Reply } from "../board.types";
 import { Icons } from "../../../../assets/icons/Icons";
-import { useAuth } from "../../../shared/hooks/useAuth";
+import { useAuthStore } from "../../../shared/stores/auth";
 import { getTimeAgo } from "../../../shared/utils/timeAge/timeAge";
 import { useLikeButton } from "../../../shared/hooks/useLikeButton";
 import Text from "../../../components/Common/Text";
@@ -30,21 +36,22 @@ export default function CommentItem({
   comment,
   onCommentChange,
 }: CommentItemProps) {
-  const user = {
-    nickname: "반짝이는하마",
-  }; // 현재 사용자(mock 테스트용)
-  // const { user } = useAuth(); // 현재 사용자 (api 연결 시 사용)
-  const [isEditing, setIsEditing] = useState(false); // 수정 모드 상태
-  const [editedContent, setEditedContent] = useState(comment.content); // 수정 내용 상태
+  // *** 실제 로그인 사용자 정보 가져오기 ***
+  const loggedInUser = useAuthStore((state) => state.user);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedContent, setEditedContent] = useState(comment.content);
 
   // comment.replies는 초기 로드된 대댓글 목록
   const initialReplies = comment.replies || []; // API 응답의 초기 답글 목록
-  const [displayedReplies, setDisplayedReplies] = useState<Reply[]>(
-    initialReplies.slice(0, 3)
-  );
+  const [displayedReplies, setDisplayedReplies] = useState<Reply[]>(() => {
+    const initial = comment.replies || [];
+    return initial.slice(0, 3);
+  });
   const [nextReplyCursor, setNextReplyCursor] = useState<number | null>(() => {
-    if (initialReplies.length > 3) {
-      return initialReplies[2].replyId;
+    const initial = comment.replies || [];
+    if (initial.length > 3) {
+      return initial[2].replyId;
     }
     return null;
   });
@@ -55,8 +62,9 @@ export default function CommentItem({
   // *** 내용 펼치기/접기 상태 추가 ***
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // 현재 사용자가 댓글 작성자인지 확인
-  const isAuthor = user?.nickname === comment.nickname;
+  // *** isAuthor 로직 수정: 로그인 사용자와 댓글 작성자 비교 ***
+  // 백엔드 API 응답 및 BoardComment 타입 확인 필요 (authorId 또는 nickname)
+  const isAuthor = loggedInUser?.nickname === comment.nickname;
 
   // useComment 훅 사용
   const {
@@ -80,6 +88,23 @@ export default function CommentItem({
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
+
+  // *** 답글 로컬 상태 업데이트 함수 ***
+  const handleReplyUpdate = useCallback((updatedReply: Reply) => {
+    setDisplayedReplies((prevReplies) =>
+      prevReplies.map((reply) =>
+        reply.replyId === updatedReply.replyId ? updatedReply : reply
+      )
+    );
+    // 필요시 onCommentChange(); // 서버와 완전 동기화 위해 호출 고려
+  }, []);
+
+  const handleReplyDelete = useCallback((deletedReplyId: number) => {
+    setDisplayedReplies((prevReplies) =>
+      prevReplies.filter((reply) => reply.replyId !== deletedReplyId)
+    );
+    // 필요시 onCommentChange(); // 서버와 완전 동기화 위해 호출 고려
+  }, []);
 
   // 댓글 수정 시작 함수
   const handleEditPress = () => {
@@ -234,6 +259,23 @@ export default function CommentItem({
       isLiked: apiReply.isLiked,
     };
   };
+
+  // *** useEffect 추가: comment.replies prop 변경 감지 및 로컬 상태 업데이트 ***
+  useEffect(() => {
+    console.log(
+      `🔄 Comment ${comment.commentId}의 replies prop 변경 감지, 로컬 상태 업데이트`
+    );
+    const newInitialReplies = comment.replies || [];
+    // 항상 최신 replies prop 기준으로 처음 3개 또는 그 이하를 표시
+    setDisplayedReplies(newInitialReplies.slice(0, 3));
+    // 다음 커서도 최신 replies prop 기준으로 재설정
+    setNextReplyCursor(() => {
+      if (newInitialReplies.length > 3) {
+        return newInitialReplies[2].replyId;
+      }
+      return null;
+    });
+  }, [comment.replies]); // comment.replies 배열 자체가 변경될 때 실행
 
   return (
     <>

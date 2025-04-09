@@ -83,16 +83,32 @@ export const useComment = (): UseCommentReturn => {
       setSubmitError(null); // 요청 시작 시 에러 초기화
 
       try {
+        // *** 요청 데이터 객체 생성 (postId 포함) ***
         const requestData: CreateCommentRequest = {
+          postId: postId, // postId 포함
           content: trimmedComment,
           ...(parentCommentId !== undefined && { parentId: parentCommentId }),
         };
-        await CommentService.createComment(postId, requestData);
 
-        // 성공 시 입력 필드 초기화
-        setCommentText("");
-        return true;
+        console.log("📄 댓글/답글 생성 API 요청 본문:", requestData); // 요청 데이터 확인
+
+        // *** CommentService.createComment 호출 방식 변경: 단일 객체 전달 ***
+        const response = await CommentService.createComment(requestData);
+
+        // *** 응답 확인 및 성공 처리 (CommentService가 undefined 반환 가능) ***
+        if (response) {
+          console.log("✅ 댓글/답글 생성 성공, 응답:", response);
+          setCommentText(""); // 입력창 초기화
+          return true;
+        } else {
+          // CommentService 내부에서 오류 처리 및 Alert가 발생했을 수 있음
+          // 또는 추가적인 실패 처리 필요 시 여기에 작성
+          console.warn("댓글/답글 생성 결과가 undefined입니다.");
+          // setSubmitError(new Error("댓글 생성 요청 처리 중 문제가 발생했습니다.")); // 필요시
+          return false;
+        }
       } catch (err) {
+        // useComment 레벨의 예외 처리 (네트워크 오류 등)
         setSubmitError(
           err instanceof Error
             ? err
@@ -110,7 +126,7 @@ export const useComment = (): UseCommentReturn => {
         setSubmitting(false);
       }
     },
-    [commentText]
+    [commentText] // postId는 useCallback의 인자로 직접 받으므로 의존성 배열 불필요
   );
 
   /**
