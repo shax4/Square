@@ -72,7 +72,7 @@ const VoteButton = ({ debateId, showVoteResultModal, }: VoteButtonProps): JSX.El
             }
         };
         fetchDebateResult();
-    }, [debateId, loggedIn]);
+    }, [debateId, loggedIn, voteConfirmModalVisible]);
 
     // 투표 버튼 클릭 시
     const handleVote = (voteLeft: boolean) => {
