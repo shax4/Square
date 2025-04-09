@@ -10,6 +10,7 @@ import org.shax3.square.domain.post.model.Post;
 public record PostDetailResponse(
 	Long postId,
 	List<PostImageDto> images,
+	String profileUrl,
 	String userType,
 	String nickname,
 	LocalDateTime createdAt,
@@ -24,6 +25,7 @@ public record PostDetailResponse(
 	public static PostDetailResponse from(
 		Post post,
 		List<PostImageDto> images,
+		String profileUrl,
 		boolean isLiked,
 		boolean isScrapped,
 		List<CommentDto> comments,
@@ -33,6 +35,7 @@ public record PostDetailResponse(
 		return new PostDetailResponse(
 			post.getId(),
 			images,
+			profileUrl,
 			post.getUser().getType().name(),
 			post.getUser().getNickname(),
 			post.getCreatedAt(),
