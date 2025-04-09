@@ -12,6 +12,7 @@ import Text from "../../../components/Common/Text";
 
 interface Props {
   type: "작성글" | "스크랩" | "좋아요";
+  refreshTrigger?: number;
 }
 
 const API_URLS = {
@@ -20,7 +21,7 @@ const API_URLS = {
   좋아요: "my-likes",
 };
 
-const PostList = ({ type }: Props) => {
+const PostList = ({ type, refreshTrigger = 0 }: Props) => {
   const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
 
   const [posts, setPosts] = useState<Post[]>([]);
@@ -58,7 +59,7 @@ const PostList = ({ type }: Props) => {
     setPosts([]);
     setNextCursorId(null);
     fetchPosts(null);
-  }, [type]);
+  }, [type, refreshTrigger]);
 
   const loadMore = useCallback(() => {
     if (nextCursorId && !loading) {

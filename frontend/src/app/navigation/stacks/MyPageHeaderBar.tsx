@@ -198,7 +198,9 @@ export default function HeaderBar() {
             ),
             headerBackButtonDisplayMode: "minimal",
             headerRight: () =>
-              boardId ? <HeaderRightIcons boardId={boardId} /> : null,
+              boardId ? (
+                <HeaderRightIcons boardId={boardId} navigationSource="mypage" />
+              ) : null,
           };
         }}
       />

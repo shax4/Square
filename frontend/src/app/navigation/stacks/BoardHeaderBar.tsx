@@ -94,9 +94,18 @@ export default function BoardHeaderBar() {
  * 비작성자: 스크랩/신고 아이콘
  *
  * @param boardId 게시글 ID
+ * @param navigationSource 네비게이션 출처 (board: 게시판, mypage: 마이페이지)
  */
-export function HeaderRightIcons({ boardId }: { boardId: number }) {
-  const navigation = useNavigation<NavigationProp<BoardStackParamList>>();
+export function HeaderRightIcons({
+  boardId,
+  navigationSource = "board",
+}: {
+  boardId: number;
+  navigationSource?: "board" | "mypage";
+}) {
+  // navigationSource에 따라 다른 타입의 네비게이션 객체를 사용
+  // @ts-ignore - 타입 오류 무시
+  const navigation = useNavigation();
 
   // 로그인 사용자 정보 가져오기 (전역 상태)
   const loggedInUser = useAuthStore((state) => state.user);
@@ -136,8 +145,18 @@ export function HeaderRightIcons({ boardId }: { boardId: number }) {
 
   // 게시글 수정 기능
   const handleEdit = () => {
-    // BoardWrite 화면으로 이동하면서 postId 전달
-    navigation.navigate("BoardWrite", { postId: boardId });
+    // 네비게이션 소스에 따라 다른 동작 수행
+    if (navigationSource === "board") {
+      // @ts-ignore - 타입 오류 무시
+      navigation.navigate("BoardWrite", { postId: boardId });
+    } else {
+      // 마이페이지에서는 루트 네비게이션으로 이동
+      // @ts-ignore - 타입 오류 무시
+      navigation.navigate("BoardHeaderBar", {
+        screen: "BoardWrite",
+        params: { postId: boardId },
+      });
+    }
   };
 
   // 게시글 삭제 기능
@@ -148,13 +167,20 @@ export function HeaderRightIcons({ boardId }: { boardId: number }) {
         text: "삭제",
         onPress: async () => {
           try {
-            // BoardAPI 대신 PostService 사용
             await PostService.deletePost(boardId);
             Alert.alert("삭제 완료", "게시글이 삭제되었습니다.", [
               {
                 text: "확인",
-                onPress: () =>
-                  navigation.navigate("BoardList", { refresh: true }),
+                onPress: () => {
+                  if (navigationSource === "board") {
+                    // @ts-ignore - 타입 오류 무시
+                    navigation.navigate("BoardList", { refresh: true });
+                  } else {
+                    // 마이페이지에서는 마이페이지로 돌아가며 새로고침 파라미터 전달
+                    // @ts-ignore - 타입 오류 무시
+                    navigation.navigate("MypageScreen", { refresh: true });
+                  }
+                },
               },
             ]);
           } catch (error) {

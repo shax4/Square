@@ -8,7 +8,11 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { StackParamList } from "../../../shared/page-stack/MyPageStack";
 
-const CommentList = () => {
+interface Props {
+  refreshTrigger?: number;
+}
+
+const CommentList = ({ refreshTrigger = 0 }: Props) => {
   const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
   const [comments, setComments] = useState<Comment[]>([]);
   const [nextCursorId, setNextCursorId] = useState<number | null>(null);
@@ -65,6 +69,16 @@ const CommentList = () => {
       };
     }, []) // 의존성 배열이 비어있어 포커스될 때마다 실행됨
   );
+
+  /**
+   * refreshTrigger가 변경될 때마다 댓글 목록 새로고침
+   */
+  useEffect(() => {
+    // 데이터 초기화 및 새로고침
+    setComments([]);
+    setNextCursorId(null);
+    fetchComments(null);
+  }, [refreshTrigger]);
 
   /**
    * 무한 스크롤을 위한 추가 데이터 로드 함수

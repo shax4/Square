@@ -8,7 +8,7 @@ export type StackParamList = {
     typeResult: TypeResult | null;
   };
   ProfileUpdateScreen: undefined;
-  MypageScreen: undefined;
+  MypageScreen: { refresh?: boolean } | undefined;
   DeleteAccountScreen: undefined;
   UseAuthTestScreen: undefined;
   SignupTestScreen: undefined;
@@ -17,7 +17,7 @@ export type StackParamList = {
   PersonalitySurveyPage: undefined;
   LandingScreen: undefined;
   SignupScreen: undefined;
-  BoardDetail: { boardId: number; refresh?: boolean };
+  BoardDetail: { boardId: number; refresh?: boolean; focusCommentId?: number };
   OpinionListScreen: {
     debateId: number;
     showVoteResultModal?: boolean;

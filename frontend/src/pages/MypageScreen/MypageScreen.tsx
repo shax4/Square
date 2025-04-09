@@ -1,86 +1,112 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { StyleSheet, View, ScrollView, SafeAreaView } from "react-native"
-import {ProfileImage, PersonalityTag} from "../../components"
-import SectionToggle from "./Components/SectionToggle"
-import TabBar from "./Components/TabBar"
-import MypageButton from "./Components/MypageButton"
-import MypageContent from "./Components/MypageContent"
+import { useState, useEffect } from "react";
+import { StyleSheet, View, ScrollView, SafeAreaView } from "react-native";
+import { ProfileImage, PersonalityTag } from "../../components";
+import SectionToggle from "./Components/SectionToggle";
+import TabBar from "./Components/TabBar";
+import MypageButton from "./Components/MypageButton";
+import MypageContent from "./Components/MypageContent";
 
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { RouteProp, useRoute } from "@react-navigation/native";
 
-import {StackParamList} from '../../shared/page-stack/MyPageStack'
+import { StackParamList } from "../../shared/page-stack/MyPageStack";
 
-import { getProfileInfos } from "./Api/userAPI"
+import { getProfileInfos } from "./Api/userAPI";
 
-import { useAuth } from "../../shared/hooks"
-import { UserInfo } from "../../shared/types/user"
-import Text from '../../components/Common/Text';
-
+import { useAuth } from "../../shared/hooks";
+import { UserInfo } from "../../shared/types/user";
+import Text from "../../components/Common/Text";
+import { useCallback } from "react";
 
 const MypageScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
-  const { user} = useAuth();
+  const route = useRoute<RouteProp<StackParamList, "MypageScreen">>();
+  const { user } = useAuth();
 
   const [userInfo, setUserInfo] = useState<UserInfo>();
+  const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
 
   // Main tab toggle (Posts vs Votes)
-  const [activeTab, setActiveTab] = useState("게시글")
+  const [activeTab, setActiveTab] = useState("게시글");
 
   // Sub-sections for Posts
-  const [activePostSection, setActivePostSection] = useState("작성글")
+  const [activePostSection, setActivePostSection] = useState("작성글");
 
   // Sub-sections for Votes
-  const [activeVoteSection, setActiveVoteSection] = useState("내가 한 투표")
+  const [activeVoteSection, setActiveVoteSection] = useState("내가 한 투표");
 
-  useEffect(() => {
-    const getUserInfo = async () => {
-      try{
-        const userInfo : UserInfo = await getProfileInfos();
-
-        setUserInfo(userInfo);
-      }catch(error : any){
-        console.error("getUserInfo 에러 발생 : ", error);
-      }
+  // 마이페이지 데이터 가져오기
+  const getUserInfo = useCallback(async () => {
+    try {
+      const userInfo: UserInfo = await getProfileInfos();
+      setUserInfo(userInfo);
+    } catch (error: any) {
+      console.error("getUserInfo 에러 발생 : ", error);
     }
+  }, []);
 
+  // 화면에 포커스가 올 때마다 route.params.refresh 확인
+  useFocusEffect(
+    useCallback(() => {
+      // 새로고침 파라미터가 true인 경우 데이터 새로고침
+      if (route.params?.refresh) {
+        // 파라미터 초기화
+        navigation.setParams({ refresh: undefined });
+        // 데이터 새로고침 트리거 업데이트
+        setRefreshTrigger((prev) => prev + 1);
+      }
+    }, [route.params?.refresh, navigation])
+  );
+
+  // 초기 데이터 로드 및 새로고침 시 데이터 갱신
+  useEffect(() => {
     getUserInfo();
-  },[])
+  }, [getUserInfo, refreshTrigger]);
 
   return (
     <SafeAreaView style={styles.container}>
-        {/* Profile Header */}
-        <View style={styles.profileHeader}>
-          <View style={styles.profileInfo}>
-            <ProfileImage variant="large" imageUrl={userInfo?.profileUrl}/>
-            <View style={styles.profileDetails}>
-              <PersonalityTag personality={user?.userType || "TEST"} nickname={user?.nickname || "temp_nickname"} />
-              <Text style={styles.nickname}>{user?.nickname}</Text>
-            </View>
+      {/* Profile Header */}
+      <View style={styles.profileHeader}>
+        <View style={styles.profileInfo}>
+          <ProfileImage variant="large" imageUrl={userInfo?.profileUrl} />
+          <View style={styles.profileDetails}>
+            <PersonalityTag
+              personality={user?.userType || "TEST"}
+              nickname={user?.nickname || "temp_nickname"}
+            />
+            <Text style={styles.nickname}>{user?.nickname}</Text>
           </View>
+        </View>
 
-          <View style={styles.profileActions}>
-            <MypageButton
-              title="프로필 수정"
-              onPress={() => navigation.navigate('ProfileUpdateScreen')}
-              variant="secondary"
-              style={styles.actionButton}
-            />
-            <MypageButton
-              title="내 가치관 정보"
-              onPress={() => navigation.navigate('PersonalityResultScreen', { isAfterSurvey : false, givenNickname : user?.nickname!, typeResult : null})}
-              variant="secondary"
-              style={styles.actionButton}
-            />
-            <MypageButton
-              title="기능 테스트"
-              onPress={() => navigation.navigate('MypageFeatureTestScreen')}
-              variant="secondary"
-              style={styles.actionButton}
-            />
-            {/* <MypageButton
+        <View style={styles.profileActions}>
+          <MypageButton
+            title="프로필 수정"
+            onPress={() => navigation.navigate("ProfileUpdateScreen")}
+            variant="secondary"
+            style={styles.actionButton}
+          />
+          <MypageButton
+            title="내 가치관 정보"
+            onPress={() =>
+              navigation.navigate("PersonalityResultScreen", {
+                isAfterSurvey: false,
+                givenNickname: user?.nickname!,
+                typeResult: null,
+              })
+            }
+            variant="secondary"
+            style={styles.actionButton}
+          />
+          <MypageButton
+            title="기능 테스트"
+            onPress={() => navigation.navigate("MypageFeatureTestScreen")}
+            variant="secondary"
+            style={styles.actionButton}
+          />
+          {/* <MypageButton
               title="API 테스트"
               onPress={() => navigation.navigate('SignupTestScreen')}
               variant="secondary"
@@ -92,40 +118,45 @@ const MypageScreen = () => {
               variant="secondary"
               style={styles.actionButton}
             /> */}
-          </View>
         </View>
+      </View>
 
-        {/* Main Section Toggle */}
-        <View style={styles.tabContainer}>
-            <TabBar
-                tabs={["게시글", "투표"]}
-                activeTab={activeTab}
-                onTabChange={setActiveTab}
-            />
-        </View>
+      {/* Main Section Toggle */}
+      <View style={styles.tabContainer}>
+        <TabBar
+          tabs={["게시글", "투표"]}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
+      </View>
 
-        {/* Sub-section Tabs */}
-        <View style={styles.sectionToggleContainer}>
+      {/* Sub-section Tabs */}
+      <View style={styles.sectionToggleContainer}>
         {activeTab === "게시글" ? (
           <SectionToggle
-                sections={["작성글", "댓글", "스크랩", "좋아요"]}
-                activeSection={activePostSection}
-                onSectionChange={setActivePostSection}
-            />
+            sections={["작성글", "댓글", "스크랩", "좋아요"]}
+            activeSection={activePostSection}
+            onSectionChange={setActivePostSection}
+          />
         ) : (
           <SectionToggle
-                sections={["내가 한 투표", "의견", "스크랩"]}
-                activeSection={activeVoteSection}
-                onSectionChange={setActiveVoteSection}
-            />
+            sections={["내가 한 투표", "의견", "스크랩"]}
+            activeSection={activeVoteSection}
+            onSectionChange={setActiveVoteSection}
+          />
         )}
-        </View>
+      </View>
 
-        {/* Content Area */}
-        <MypageContent activeTab={activeTab} activePostSection={activePostSection} activeVoteSection={activeVoteSection}/>
+      {/* Content Area */}
+      <MypageContent
+        activeTab={activeTab}
+        activePostSection={activePostSection}
+        activeVoteSection={activeVoteSection}
+        refreshTrigger={refreshTrigger}
+      />
     </SafeAreaView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -157,8 +188,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 4,
   },
-  tabContainer: {
-  },
+  tabContainer: {},
   sectionToggleContainer: {
     paddingHorizontal: 16,
     paddingVertical: 8,
@@ -172,7 +202,6 @@ const styles = StyleSheet.create({
     color: "#888888",
     marginTop: 40,
   },
-})
+});
 
-export default MypageScreen
-
+export default MypageScreen;
