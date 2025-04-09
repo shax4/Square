@@ -241,6 +241,7 @@ public class PostFacadeService {
 		return PostDetailResponse.from(
 			post,
 			imageDtos,
+			s3Service.generatePresignedGetUrl(post.getUser().getS3Key()),
 			isLiked,
 			isScraped,
 			commentDtos,
