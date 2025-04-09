@@ -301,7 +301,6 @@ const styles = StyleSheet.create({
   },
   postDate: {
     fontSize: 12,
-    color: "#666",
     color: colors.grayText,
     marginTop: 4,
   },
@@ -377,5 +376,42 @@ const styles = StyleSheet.create({
   commentSubmitText: {
     color: "#fff",
     fontWeight: "bold",
+  },
+  nameContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 4,
+  },
+  errorText: {
+    fontSize: 16,
+    color: "red",
+    marginBottom: 10,
+  },
+  errorMessage: {
+    fontSize: 14,
+    color: "#666",
+    textAlign: "center",
+    marginBottom: 16,
+  },
+  retryButton: {
+    backgroundColor: "#007BFF",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  retryButtonText: {
+    color: "white",
+    fontWeight: "600",
+  },
+  emptyCommentsContainer: {
+    padding: 16,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emptyCommentsText: {
+    fontSize: 14,
+    color: "#666",
+    textAlign: "center",
   },
 });

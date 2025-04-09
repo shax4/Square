@@ -440,7 +440,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 3,
     elevation: 5,
-    marginBottom: 80,
   },
   writeButtonText: {
     fontSize: 24,

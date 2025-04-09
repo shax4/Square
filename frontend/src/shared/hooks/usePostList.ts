@@ -148,7 +148,11 @@ export const usePostList = (
         // 상세한 응답 데이터 로깅 (이미 responseData 변수에 할당됨)
         console.log(
           "✅ API 응답 데이터 처리 시작:",
-          JSON.stringify(responseData, null, 2)
+          `posts: ${responseData.posts?.length || 0}개, popularPosts: ${
+            responseData.popularPosts?.length ||
+            responseData.popular?.length ||
+            0
+          }개`
         );
 
         // 사용자 유형 상태 업데이트
