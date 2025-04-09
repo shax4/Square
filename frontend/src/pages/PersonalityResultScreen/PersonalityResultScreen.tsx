@@ -159,13 +159,16 @@ const PersonalityResultScreen = () => {
           </View>
         )}
 
-        <View style={styles.buttonsContainer}>
-          <View style={styles.buttonContainer}>
-            <Button
-              label={user?.userType == null ? "성향 테스트 해보기" : "성향 테스트 다시하기"}
-              onPress={onPressUserTypeSurvey} />
+        {isMyType &&
+          <View style={styles.buttonsContainer}>
+            <View style={styles.buttonContainer}>
+              <Button
+                label={user?.userType == null ? "성향 테스트 해보기" : "성향 테스트 다시하기"}
+                onPress={onPressUserTypeSurvey} />
+            </View>
           </View>
-        </View>
+        }
+
 
       </View>
       <UserTypeInfoModal
