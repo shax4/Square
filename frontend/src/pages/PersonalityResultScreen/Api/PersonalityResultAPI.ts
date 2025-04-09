@@ -25,7 +25,7 @@ export const getOthersPersonalityResult = async (nickname: string): Promise<Type
 
 export const getUserTypeImagePresignedUrl = async (fileName: string, contentType: string, folder: string) => {
   try {
-    const response = await axiosInstance.post('/s3/presigned-put', {
+    const response = await axiosInstance.post('/api/s3/presigned-put', {
       fileName,
       contentType,
       folder,
