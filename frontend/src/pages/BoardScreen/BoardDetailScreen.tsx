@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useRef } from "react";
 import {
   View,
   Text,
@@ -10,6 +10,8 @@ import {
   Platform,
   ActivityIndicator,
   Alert,
+  UIManager,
+  findNodeHandle,
 } from "react-native";
 import { StackScreenProps } from "@react-navigation/stack";
 import ProfileImage from "../../components/ProfileImage/ProfileImage";
@@ -68,6 +70,9 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
   // 라우트 파라미터에서 게시글 ID 가져오기
   const { boardId } = route.params;
 
+  // *** ScrollView Ref 추가 ***
+  const scrollViewRef = useRef<ScrollView>(null);
+
   // 게시글 상세 정보 훅
   const { post, loading, error, refresh } = usePostDetail(boardId);
 
@@ -79,6 +84,18 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
     createComment,
     submitError,
   } = useComment();
+
+  // *** 스크롤 함수 추가 ***
+  const scrollToY = useCallback((yPosition: number) => {
+    if (scrollViewRef.current && typeof yPosition === "number") {
+      console.log(`📜 Scrolling to Y: ${yPosition}`);
+      scrollViewRef.current.scrollTo({ y: yPosition, animated: true });
+    } else {
+      console.warn(
+        `⚠️ Invalid scroll position or ScrollView ref: ${yPosition}`
+      );
+    }
+  }, []);
 
   // 화면에 포커스가 올 때마다 데이터 갱신
   useFocusEffect(
@@ -162,7 +179,8 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={100} // 키보드가 올라올 때 화면 조정
     >
-      <ScrollView style={styles.scrollView}>
+      {/* *** ScrollView에 ref 할당 *** */}
+      <ScrollView style={styles.scrollView} ref={scrollViewRef}>
         {/* 게시글 헤더 (작성자 정보) */}
         <View style={styles.postHeader}>
           <ProfileImage imageUrl={post.profileUrl} variant="medium" />
@@ -206,6 +224,7 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
                 comment={convertToComment(comment)}
                 postId={boardId}
                 onCommentChange={refresh}
+                onHideRepliesScrollRequest={scrollToY}
               />
             ))
           ) : (

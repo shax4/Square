@@ -258,7 +258,11 @@ export const useComment = (): UseCommentReturn => {
 
         // API 응답 처리
         if (response) {
-          console.log("대댓글 로드 성공:", response);
+          console.log(
+            `대댓글 로드 성공: [commentId=${commentId}] (replies: ${
+              response.replies?.length || 0
+            }개, 다음커서: ${response.nextCursorId || "없음"})`
+          );
           return response; // RepliesResponse 객체 반환
         } else {
           console.log("대댓글 로드 실패 또는 데이터 없음 (undefined 반환)");
