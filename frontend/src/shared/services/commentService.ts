@@ -11,9 +11,9 @@ import {
   Reply,
   CreateCommentRequest,
   UpdateCommentRequest,
-  CreateCommentResponse,
   GetRepliesParams,
   RepliesResponse,
+  PostCommentResponse,
 } from "../types/postTypes";
 
 /**
@@ -21,24 +21,19 @@ import {
  */
 export const CommentService = {
   /**
-   * 댓글 생성 함수
-   * 게시글에 새 댓글을 작성합니다.
-   * parentCommentId가 있으면 대댓글을 작성합니다.
-   *
-   * @param commentData 댓글 생성 데이터 (게시글 ID, 부모 댓글 ID(선택), 내용)
-   * @returns 생성된 댓글 정보를 포함한 Promise 객체
+   * 댓글 또는 답글 생성 함수
+   * @param requestData 댓글 생성 요청 데이터 { postId, content, parentId? }
+   * @returns 생성된 댓글 정보를 포함한 Promise 객체 (또는 오류 시 undefined)
    */
   createComment: async (
-    commentData: CreateCommentRequest
-  ): Promise<ApiResponse<CreateCommentResponse>> => {
+    requestData: CreateCommentRequest
+  ): Promise<PostCommentResponse | undefined> => {
     try {
-      return await apiPost<CreateCommentResponse>(
-        API_PATHS.COMMENTS.CREATE,
-        commentData
-      );
+      const url = `/api/comments`;
+      return await apiPost<PostCommentResponse>(url, requestData);
     } catch (error) {
-      console.error("댓글 생성 API 호출 중 오류 발생:", error);
-      throw error;
+      console.error("댓글/답글 생성 API 호출 중 오류 발생:", error);
+      return undefined;
     }
   },
 

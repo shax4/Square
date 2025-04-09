@@ -90,14 +90,14 @@ export interface UpdatePostRequest {
   postImage?: string[]; // s3Key 배열
 }
 
-// 댓글 생성 요청 타입
+// 댓글/답글 생성 요청 타입
 export interface CreateCommentRequest {
   postId: number;
   parentId?: number; // 대댓글인 경우 부모 댓글 ID (백엔드 필드명 변경됨)
   content: string;
 }
 
-// 댓글 생성 응답 타입
+// 댓글/답글 생성 응답 타입
 export interface CreateCommentResponse {
   commentId: number;
   profileUrl?: string;

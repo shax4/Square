@@ -24,6 +24,8 @@ interface ReplyItemProps {
   postId: number; // 게시글 ID (답글 생성 시 필요할 수 있음)
   reply: Reply; // *** Prop명 및 타입 변경: comment -> reply ***
   onCommentChange: () => void; // 부모 컴포넌트에 변경사항 알림 콜백 (댓글 목록 새로고침용)
+  onReplyUpdate: (updatedReply: Reply) => void; // 로컬 상태 업데이트용
+  onReplyDelete: (deletedReplyId: number) => void; // 로컬 상태 업데이트용
 }
 
 // *** 컴포넌트명 변경 ***
@@ -31,6 +33,8 @@ export default function ReplyItem({
   postId,
   reply, // *** Prop명 변경 ***
   onCommentChange,
+  onReplyUpdate,
+  onReplyDelete,
 }: ReplyItemProps) {
   // --- 사용자 정보 (mock 또는 실제 useAuth) ---
   // const user = { nickname: "반짝이는하마" }; // 예시 사용자
@@ -72,8 +76,11 @@ export default function ReplyItem({
     // *** updateComment 호출 시 reply.replyId 사용 ***
     const success = await updateComment(reply.replyId, editedContent);
     if (success) {
+      // *** 로컬 상태 업데이트 호출 ***
+      const updatedReplyData: Reply = { ...reply, content: editedContent };
+      onReplyUpdate(updatedReplyData);
       setIsEditing(false);
-      onCommentChange();
+      onCommentChange(); // 필요시 호출 (서버와 실시간 동기화)
     }
   };
 
@@ -88,7 +95,9 @@ export default function ReplyItem({
           // *** deleteComment 호출 시 reply.replyId 사용 ***
           const success = await deleteComment(reply.replyId);
           if (success) {
-            onCommentChange(); // 목록 갱신
+            // *** 로컬 상태 업데이트 호출 ***
+            onReplyDelete(reply.replyId);
+            // onCommentChange(); // 필요시 호출 (서버와 실시간 동기화)
           } else {
             Alert.alert("오류", "답글 삭제에 실패했습니다.");
           }
