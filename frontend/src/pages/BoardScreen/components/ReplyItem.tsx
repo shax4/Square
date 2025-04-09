@@ -201,7 +201,7 @@ export default function ReplyItem({
               style={styles.expandButton}
             >
               <Text style={styles.expandButtonText}>
-                {isExpanded ? "접기" : "더보기"}
+                {isExpanded ? "접기" : "펼치기"}
               </Text>
             </TouchableOpacity>
           )}

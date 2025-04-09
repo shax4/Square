@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useCallback,
-  Fragment,
-  useRef,
-  useEffect,
-} from "react";
+import React, { useState, useCallback, Fragment, useRef } from "react";
 import {
   View,
   TextInput,
@@ -49,9 +43,8 @@ export default function CommentItem({
     return initial.slice(0, 3);
   });
   const [nextReplyCursor, setNextReplyCursor] = useState<number | null>(() => {
-    const initial = comment.replies || [];
-    if (initial.length > 3) {
-      return initial[2].replyId;
+    if (comment.replyCount > 3 && initialReplies.length === 3) {
+      return initialReplies[2].replyId;
     }
     return null;
   });
@@ -202,19 +195,35 @@ export default function CommentItem({
   };
   // 대댓글 더보기 함수
   const handleLoadMoreReplies = useCallback(async () => {
-    if (isLoadingMore || nextReplyCursor === null) return;
+    if (isLoadingMore || nextReplyCursor === null) {
+      console.warn("더보기 로드 중이거나 다음 커서가 없습니다.");
+      return;
+    }
     console.log(
-      `답글 더보기 요청: commentId=${comment.commentId}, cursor=${nextReplyCursor}`
+      `🚀 답글 더보기 요청: commentId=${comment.commentId}, cursor=${nextReplyCursor}`
     );
     setIsLoadingMore(true);
     try {
       const response = await loadReplies(comment.commentId, nextReplyCursor);
       if (response && response.replies && response.replies.length > 0) {
-        const newReplies = response.replies.map(convertToReply); // API -> 내부 타입 변환
+        const convertToReply = (apiReply: any): Reply => {
+          return {
+            replyId: apiReply.replyId,
+            parentId: apiReply.parentId,
+            nickname: apiReply.nickname,
+            profileUrl: apiReply.profileUrl,
+            userType: apiReply.userType || "",
+            createdAt: apiReply.createdAt,
+            content: apiReply.content,
+            likeCount: apiReply.likeCount,
+            isLiked: apiReply.isLiked,
+          };
+        };
+        const newReplies = response.replies.map(convertToReply);
         setDisplayedReplies((prevReplies) => [...prevReplies, ...newReplies]);
         setNextReplyCursor(response.nextCursorId ?? null);
         console.log(
-          `답글 ${newReplies.length}개 추가됨, 다음 커서: ${
+          `✅ 답글 ${newReplies.length}개 추가됨, 다음 커서: ${
             response.nextCursorId ?? "없음"
           }`
         );
@@ -223,18 +232,15 @@ export default function CommentItem({
         console.log("더 이상 가져올 답글 없음.");
       }
     } catch (error) {
-      console.error("답글 더보기 처리 중 오류:", error);
+      console.error("❌ 답글 더보기 처리 중 오류:", error);
       Alert.alert("오류", "답글을 불러오는 중 오류가 발생했습니다.");
     } finally {
       setIsLoadingMore(false);
     }
   }, [comment.commentId, isLoadingMore, nextReplyCursor, loadReplies]);
 
-  // *** 더 보여줄 답글이 있는지 계산 수정 ***
-  const hasMoreReplies =
-    nextReplyCursor !== null ||
-    (comment.replyCount > displayedReplies.length &&
-      displayedReplies.length >= 3);
+  // *** hasMoreReplies 로직 수정 ***
+  const hasMoreReplies = comment.replyCount > displayedReplies.length;
 
   // 댓글용 좋아요 버튼 props 생성
   const commentLikeProps = useLikeButton(
@@ -244,38 +250,6 @@ export default function CommentItem({
     comment.likeCount,
     onCommentChange
   );
-
-  // 서비스에서 반환하는 Reply 타입을 내부 Reply 타입으로 변환
-  const convertToReply = (apiReply: any): Reply => {
-    return {
-      replyId: apiReply.replyId,
-      parentId: apiReply.parentId,
-      nickname: apiReply.nickname,
-      profileUrl: apiReply.profileUrl,
-      userType: apiReply.userType || "",
-      createdAt: apiReply.createdAt,
-      content: apiReply.content,
-      likeCount: apiReply.likeCount,
-      isLiked: apiReply.isLiked,
-    };
-  };
-
-  // *** useEffect 추가: comment.replies prop 변경 감지 및 로컬 상태 업데이트 ***
-  useEffect(() => {
-    console.log(
-      `🔄 Comment ${comment.commentId}의 replies prop 변경 감지, 로컬 상태 업데이트`
-    );
-    const newInitialReplies = comment.replies || [];
-    // 항상 최신 replies prop 기준으로 처음 3개 또는 그 이하를 표시
-    setDisplayedReplies(newInitialReplies.slice(0, 3));
-    // 다음 커서도 최신 replies prop 기준으로 재설정
-    setNextReplyCursor(() => {
-      if (newInitialReplies.length > 3) {
-        return newInitialReplies[2].replyId;
-      }
-      return null;
-    });
-  }, [comment.replies]); // comment.replies 배열 자체가 변경될 때 실행
 
   return (
     <>
