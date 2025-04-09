@@ -95,7 +95,7 @@ export default function BoardHeaderBar() {
  *
  * @param boardId 게시글 ID
  */
-function HeaderRightIcons({ boardId }: { boardId: number }) {
+export function HeaderRightIcons({ boardId }: { boardId: number }) {
   const navigation = useNavigation<NavigationProp<BoardStackParamList>>();
 
   // 로그인 사용자 정보 가져오기 (전역 상태)

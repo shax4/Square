@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { View, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { Icons } from "../../../../assets/icons/Icons";
@@ -27,11 +27,13 @@ import { ModalTestScreen } from "../../../pages";
 import { PostService } from "../../../shared/services/postService";
 import { mockPosts } from "../../../pages/BoardScreen/mocks/boardData";
 import { BoardStackParamList } from "../../../shared/page-stack/BoardPageStack";
-import Text from '../../../components/Common/Text';
+import Text from "../../../components/Common/Text";
 
 import OpinionListScreen from "../../../pages/OpinionListScreen/OpinionListScreen";
 import OpinionDetailScreen from "../../../pages/OpinionDetailScreen/OpinionDetailScreen";
 import SettingScreen from "../../../pages/SettingScreen/SettingScreen";
+import { useAuthStore } from "../../../shared/stores/auth";
+
 // 스택 네비게이터
 const Stack = createNativeStackNavigator();
 
@@ -48,7 +50,9 @@ export default function HeaderBar() {
         name="MypageScreen"
         component={MypageScreen}
         options={({ navigation }) => ({
-          headerTitle: () => <Text style={styles.headerTitle}>마이 페이지</Text>,
+          headerTitle: () => (
+            <Text style={styles.headerTitle}>마이 페이지</Text>
+          ),
           headerBackButtonDisplayMode: "minimal",
           headerRight: () => (
             <View style={styles.headerRightItems}>
@@ -88,7 +92,9 @@ export default function HeaderBar() {
         name="PersonalityResultScreen"
         component={PersonalityResultScreen}
         options={{
-          headerTitle: () => <Text style={styles.headerTitle}>성향 테스트 확인</Text>,
+          headerTitle: () => (
+            <Text style={styles.headerTitle}>성향 테스트 확인</Text>
+          ),
           headerBackButtonDisplayMode: "minimal",
         }}
       />
@@ -96,7 +102,9 @@ export default function HeaderBar() {
         name="ProfileUpdateScreen"
         component={ProfileUpdateScreen}
         options={{
-          headerTitle: () => <Text style={styles.headerTitle}>프로필 수정</Text>,
+          headerTitle: () => (
+            <Text style={styles.headerTitle}>프로필 수정</Text>
+          ),
           headerBackButtonDisplayMode: "minimal",
         }}
       />
@@ -112,7 +120,9 @@ export default function HeaderBar() {
         name="UseAuthTestScreen"
         component={UseAuthTestScreen}
         options={{
-          headerTitle: () => <Text style={styles.headerTitle}>임시 로그인</Text>,
+          headerTitle: () => (
+            <Text style={styles.headerTitle}>임시 로그인</Text>
+          ),
           headerBackButtonDisplayMode: "minimal",
         }}
       />
@@ -120,7 +130,9 @@ export default function HeaderBar() {
         name="SignupTestScreen"
         component={SignupTestScreen}
         options={{
-          headerTitle: () => <Text style={styles.headerTitle}>SignupTestScreen</Text>,
+          headerTitle: () => (
+            <Text style={styles.headerTitle}>SignupTestScreen</Text>
+          ),
           headerBackButtonDisplayMode: "minimal",
         }}
       />
@@ -128,7 +140,9 @@ export default function HeaderBar() {
         name="ModalTestScreen"
         component={ModalTestScreen}
         options={{
-          headerTitle: () => <Text style={styles.headerTitle}>ModalTestScreen</Text>,
+          headerTitle: () => (
+            <Text style={styles.headerTitle}>ModalTestScreen</Text>
+          ),
           headerBackButtonDisplayMode: "minimal",
         }}
       />
@@ -136,7 +150,9 @@ export default function HeaderBar() {
         name="MypageFeatureTestScreen"
         component={MypageFeatureTestScreen}
         options={{
-          headerTitle: () => <Text style={styles.headerTitle}>MypageFeatureTestScreen</Text>,
+          headerTitle: () => (
+            <Text style={styles.headerTitle}>MypageFeatureTestScreen</Text>
+          ),
           headerBackButtonDisplayMode: "minimal",
         }}
       />
@@ -144,7 +160,9 @@ export default function HeaderBar() {
         name="LandingScreen"
         component={LandingScreen}
         options={{
-          headerTitle: () => <Text style={styles.headerTitle}>LandingScreen</Text>,
+          headerTitle: () => (
+            <Text style={styles.headerTitle}>LandingScreen</Text>
+          ),
           headerBackButtonDisplayMode: "minimal",
         }}
       />
@@ -152,7 +170,9 @@ export default function HeaderBar() {
         name="SignupScreen"
         component={SignUpScreen}
         options={{
-          headerTitle: () => <Text style={styles.headerTitle}>SignupScreen</Text>,
+          headerTitle: () => (
+            <Text style={styles.headerTitle}>SignupScreen</Text>
+          ),
           headerBackButtonDisplayMode: "minimal",
         }}
       />
@@ -160,7 +180,9 @@ export default function HeaderBar() {
         name="LikeButtonApiTestExample"
         component={LikeButtonApiTestExample}
         options={{
-          headerTitle: () => <Text style={styles.headerTitle}>좋아요 api 테스트</Text>,
+          headerTitle: () => (
+            <Text style={styles.headerTitle}>좋아요 api 테스트</Text>
+          ),
           headerBackButtonDisplayMode: "minimal",
         }}
       />
@@ -168,18 +190,15 @@ export default function HeaderBar() {
         name="BoardDetail"
         component={BoardDetailScreen}
         options={({ route }) => {
-          const boardId = route.params.boardId;
-
-          // 현재 게시글 데이터를 가져와서 작성자 확인
-          const post = mockFetchPost(boardId);
-          const isAuthor = currentUser.nickname === post?.nickname;
+          const boardId = route.params?.boardId as number;
 
           return {
-            title: "게시판 상세",
-            headerBackButtonDisplayMode: "minimal",
-            headerRight: () => (
-              <HeaderRightIcons isAuthor={isAuthor} boardId={boardId} />
+            headerTitle: () => (
+              <Text style={styles.headerTitle}>게시판 상세</Text>
             ),
+            headerBackButtonDisplayMode: "minimal",
+            headerRight: () =>
+              boardId ? <HeaderRightIcons boardId={boardId} /> : null,
           };
         }}
       />
@@ -211,84 +230,12 @@ export default function HeaderBar() {
           };
         }}
       />
-      
     </Stack.Navigator>
   );
 }
 
-// Mock함수 (실제 API 호출로 대체 필요)
-function mockFetchPost(boardId: number) {
-  return mockPosts.find((post) => post.postId === boardId);
-}
-
-// 상단 바 우측 아이콘 컴포넌트: 현재 사용자와 글 작성자 여부 확인
-function HeaderRightIcons({
-  isAuthor,
-  boardId,
-}: {
-  isAuthor: boolean;
-  boardId: number;
-}) {
-  // 게시글 데이터를 가져오기 위한 로직
-  // const post = mockFetchPost(boardId); // 실제 API 호출로 대체 필요
-  const navigation = useNavigation<NavigationProp<BoardStackParamList>>();
-
-  // 게시글 수정 기능
-  const handleEdit = () => {
-    // BoardWrite 화면으로 이동하면서 postId 전달
-    navigation.navigate("BoardWrite", { postId: boardId });
-  };
-
-  // 게시글 삭제 기능
-  const handleDelete = () => {
-    Alert.alert("게시글 삭제", "정말 이 게시글을 삭제하시겠습니까?", [
-      { text: "취소", style: "cancel" },
-      {
-        text: "삭제",
-        onPress: async () => {
-          try {
-            // BoardAPI 대신 PostService 사용
-            await PostService.deletePost(boardId);
-            Alert.alert("삭제 완료", "게시글이 삭제되었습니다.", [
-              {
-                text: "확인",
-                onPress: () =>
-                  navigation.navigate("BoardList", { refresh: true }),
-              },
-            ]);
-          } catch (error) {
-            console.error("게시글 삭제 중 오류 발생:", error);
-            Alert.alert("오류", "게시글 삭제 중 문제가 발생했습니다.");
-          }
-        },
-        style: "destructive",
-      },
-    ]);
-  };
-  return (
-    <View style={styles.headerRightItems}>
-      {isAuthor ? (
-        <>
-          <TouchableOpacity onPress={handleEdit}>
-            <Icons.edit />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleDelete}>
-            <Icons.delete />
-          </TouchableOpacity>
-        </>
-      ) : (
-        <>
-          <TouchableOpacity onPress={() => console.log("북마크")}>
-            <Icons.bookmark />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => console.log("신고")}>
-            <Icons.report />
-          </TouchableOpacity>
-        </>
-      )}
-    </View>
-  );
-}
+// 상단 바 우측 아이콘 컴포넌트: 실제 API를 통해 현재 사용자와 글 작성자 여부 확인
+import { HeaderRightIcons } from "./BoardHeaderBar";
 
 const styles = StyleSheet.create({
   headerRightItems: {

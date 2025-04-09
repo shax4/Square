@@ -149,10 +149,10 @@ const CommentItem: React.FC<CommentItemProps> = ({
   } = useComment();
 
   // --- 댓글 내용 처리 ---
-  const isLongContent = comment.content.length > 100;
+  const isLongContent = comment.content.length > 110;
   const displayedContent =
     isLongContent && !isExpanded
-      ? `${comment.content.substring(0, 100)}...`
+      ? `${comment.content.substring(0, 110)}...`
       : comment.content;
 
   // *** 더보기/접기 토글 함수 ***
@@ -657,7 +657,7 @@ const styles = StyleSheet.create({
   },
   // *** 내용 컨테이너 스타일 추가 ***
   contentContainer: {
-    marginLeft: 40, // 들여쓰기
+    // marginLeft: 40, // 들여쓰기
     marginBottom: 8,
   },
   content: {
