@@ -78,11 +78,12 @@ export default function BoardWriteScreen({ route, navigation }: Props) {
     }
 
     try {
-      let success = false;
-
       if (isEditMode && postId) {
         // 게시글 수정
-        success = await updatePost(postId);
+        const success = await updatePost(postId);
+
+        // 오류가 있더라도 게시글이 수정되었을 가능성 고려
+        // 성공 시에만 Alert를 표시하고, 성공 여부와 상관없이 상세 화면으로 이동
         if (success) {
           // 게시글 수정 성공
           showSuccessAlert("게시글이 수정되었습니다.", () => {
@@ -98,25 +99,47 @@ export default function BoardWriteScreen({ route, navigation }: Props) {
               ],
             });
           });
+        } else {
+          // 수정 실패지만, 이미 수정이 완료되었을 가능성이 있으므로
+          // 오류 메시지만 표시하고 이동은 하지 않음
+          Alert.alert(
+            "알림",
+            "게시글 수정 요청 처리 중 문제가 발생했습니다. 정상적으로 수정되었는지 확인해 주세요.",
+            [
+              {
+                text: "확인",
+                onPress: () => {
+                  // 이동 없이 현재 화면 유지
+                },
+              },
+            ]
+          );
         }
       } else {
         // 새 게시글 작성
-        const newPostId = await createPost();
-        success = newPostId !== null;
-        if (success && newPostId) {
+        const success = await createPost();
+
+        if (success) {
           // 새 게시글 작성 성공
           showSuccessAlert("게시글이 작성되었습니다.", () => {
             // 목록 화면으로 이동하면서 새로고침 플래그 전달
             navigation.navigate("BoardList", { refresh: true });
           });
+        } else {
+          // API 요청 자체가 실패한 경우
+          Alert.alert(
+            "알림",
+            "게시글 작성 요청에 실패했습니다. 다시 시도해 주세요.",
+            [
+              {
+                text: "확인",
+                onPress: () => {
+                  // 이동 없이 현재 화면 유지
+                },
+              },
+            ]
+          );
         }
-      }
-
-      if (!success) {
-        Alert.alert(
-          "오류",
-          submitError?.message || "게시글을 저장하는 중 문제가 발생했습니다."
-        );
       }
     } catch (error) {
       console.error("게시글 저장에 실패했습니다:", error);

@@ -35,7 +35,7 @@ interface UsePostFormReturn {
   // 폼 제출
   submitting: boolean; // 제출 중 상태
   submitError: Error | null; // 제출 에러 상태
-  createPost: () => Promise<number | null>; // 게시글 생성 함수
+  createPost: () => Promise<boolean>; // 게시글 생성 함수
   updatePost: (postId: number) => Promise<boolean>; // 게시글 수정 함수
 
   // 게시글 로드 (수정 시)
@@ -207,18 +207,18 @@ export const usePostForm = (): UsePostFormReturn => {
   /**
    * 게시글 생성 함수
    *
-   * @returns 생성된 게시글 ID 또는 실패 시 null
+   * @returns 성공 여부(boolean)
    */
-  const createPost = useCallback(async (): Promise<number | null> => {
+  const createPost = useCallback(async (): Promise<boolean> => {
     // 필수 입력 확인
     if (!title.trim()) {
       alert("제목을 입력해주세요.");
-      return null;
+      return false;
     }
 
     if (!content.trim()) {
       alert("내용을 입력해주세요.");
-      return null;
+      return false;
     }
 
     setSubmitting(true);
@@ -240,22 +240,28 @@ export const usePostForm = (): UsePostFormReturn => {
       }
 
       // 3. API 호출
-      const response = await PostService.createPost(postData);
+      const success = await PostService.createPost(postData);
 
-      // 4. 성공 시 게시글 ID 반환
-      if (response && response.data) {
-        return response.data.postId;
+      // 4. 결과 처리
+      if (success) {
+        console.log("게시글 생성 성공");
+        return true;
       }
 
-      return null;
+      // 실패 처리
+      console.warn("게시글 생성 요청 실패");
+      setSubmitError(new Error("게시글 생성 요청에 실패했습니다."));
+      return false;
     } catch (err) {
+      console.error("게시글 생성 중 예외 발생:", err);
+
       setSubmitError(
         err instanceof Error
           ? err
           : new Error("게시글 작성 중 오류가 발생했습니다.")
       );
-      console.error("게시글 생성 오류:", err);
-      return null;
+
+      return false;
     } finally {
       setSubmitting(false);
     }
@@ -291,24 +297,37 @@ export const usePostForm = (): UsePostFormReturn => {
         const updateData: UpdatePostRequest = {
           title: title.trim(),
           content: content.trim(),
+          // API 명세에 맞게 필드명 수정
+          addedImages: [], // 현재 이미지 업로드 기능 미구현으로 빈 배열 전송
+          deletedImages: [], // 현재 이미지 삭제 기능 미구현으로 빈 배열 전송
         };
 
         // 이미지가 있으면 추가
         if (s3Keys.length > 0) {
           updateData.postImage = s3Keys;
+          // 이미지 업로드 기능이 구현되면 아래 코드 활성화
+          // updateData.addedImages = s3Keys;
         }
 
-        // 3. API 호출
-        await PostService.updatePost(postId, updateData);
+        // 3. API 호출 - 이제 boolean 값을 반환
+        const success = await PostService.updatePost(postId, updateData);
 
-        return true;
+        // 4. 결과 처리
+        if (success) {
+          console.log("게시글 수정 성공:", postId);
+          return true;
+        } else {
+          setSubmitError(new Error("게시글 수정에 실패했습니다."));
+          return false;
+        }
       } catch (err) {
+        console.error("게시글 수정 오류:", err);
+
         setSubmitError(
           err instanceof Error
             ? err
             : new Error("게시글 수정 중 오류가 발생했습니다.")
         );
-        console.error("게시글 수정 오류:", err);
         return false;
       } finally {
         setSubmitting(false);
@@ -328,18 +347,18 @@ export const usePostForm = (): UsePostFormReturn => {
 
     try {
       // API 호출
-      const response = await PostService.getPostDetail(postId);
+      const postDetail = await PostService.getPostDetail(postId);
 
       // 응답 데이터 처리
-      if (response && response.data) {
+      if (postDetail) {
         // 폼 데이터 설정
-        setTitle(response.data.title);
-        setContent(response.data.content);
+        setTitle(postDetail.title);
+        setContent(postDetail.content);
 
         // 이미지 데이터 설정
-        if (response.data.images && response.data.images.length > 0) {
+        if (postDetail.images && postDetail.images.length > 0) {
           // 이미지 데이터를 ImageFile 형식으로 변환
-          const loadedImages = response.data.images.map((img) => ({
+          const loadedImages = postDetail.images.map((img) => ({
             file: new File([], img.s3Key), // 빈 파일 객체 (s3Key만 사용)
             preview: img.imageUrl,
             uploading: false,

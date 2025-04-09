@@ -74,19 +74,32 @@ export const PostService = {
    * 새로운 게시글을 작성합니다.
    *
    * @param postData 게시글 생성 데이터 (제목, 내용, 이미지 키)
-   * @returns 생성된 게시글 ID 정보 또는 undefined를 포함하는 Promise
+   * @returns 성공 여부(boolean)를 포함하는 Promise
    */
-  createPost: async (
-    postData: CreatePostRequest
-  ): Promise<{ postId: number } | undefined> => {
+  createPost: async (postData: CreatePostRequest): Promise<boolean> => {
+    console.log(
+      "[PostService] 게시글 생성 요청: 제목 길이",
+      postData.title.length
+    );
     try {
-      return await apiPost<{ postId: number }>(
-        API_PATHS.POSTS.CREATE,
-        postData
-      );
+      const response = await apiPost<any>(API_PATHS.POSTS.CREATE, postData);
+
+      // API 호출이 성공했으면 true 반환
+      // 응답 본문이 없어도 상관없음 (API 명세에 따르면 응답 본문이 없음)
+      if (response !== undefined) {
+        console.log("[PostService] 게시글 생성 성공");
+        return true;
+      }
+
+      console.error("[PostService] 게시글 생성 응답 없음");
+      return false;
     } catch (error) {
-      // console.error("PostService.createPost에서 추가 오류 처리:", error);
-      return undefined;
+      console.error("[PostService] 게시글 생성 실패");
+      if (error && typeof error === "object" && "response" in error) {
+        // @ts-ignore
+        console.error("[PostService] 오류 상태 코드:", error.response?.status);
+      }
+      return false;
     }
   },
 
@@ -96,17 +109,31 @@ export const PostService = {
    *
    * @param postId 수정할 게시글 ID
    * @param updateData 수정할 데이터 (제목, 내용, 이미지 키)
-   * @returns 성공 시 응답 데이터(any) 또는 undefined 를 포함하는 Promise (추후 구체화 필요)
+   * @returns 성공 시 true, 실패 시 false를 포함하는 Promise
    */
   updatePost: async (
     postId: number,
     updateData: UpdatePostRequest
-  ): Promise<any | undefined> => {
+  ): Promise<boolean> => {
+    console.log("[PostService] 게시글 수정 요청: ID", postId);
     try {
-      return await apiPut<any>(API_PATHS.POSTS.UPDATE(postId), updateData);
+      const response = await apiPut<any>(
+        API_PATHS.POSTS.UPDATE(postId),
+        updateData
+      );
+
+      // 응답이 존재하면 성공
+      console.log("[PostService] 게시글 수정 성공: ID", postId);
+
+      // 응답이 있거나, 응답이 비어있더라도 요청이 성공했으므로 true 반환
+      return true;
     } catch (error) {
-      // console.error("PostService.updatePost에서 추가 오류 처리:", error);
-      return undefined;
+      console.error("[PostService] 게시글 수정 실패");
+      if (error && typeof error === "object" && "response" in error) {
+        // @ts-ignore
+        console.error("[PostService] 오류 상태 코드:", error.response?.status);
+      }
+      return false;
     }
   },
 
