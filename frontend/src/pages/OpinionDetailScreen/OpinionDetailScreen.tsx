@@ -343,12 +343,15 @@ export default function OpinionDetailScreen() {
                     <View style={styles.modalOverlay}>
                         <TouchableWithoutFeedback onPress={() => { }}>
                             <View style={styles.modalContent}>
-                                <TouchableOpacity onPress={handleEditComment} style={styles.modalButton}>
+                                {/*
+                                 <TouchableOpacity onPress={handleEditComment} style={styles.modalButton}>
                                     <Text style={styles.modalButtonText}>수정</Text>
                                 </TouchableOpacity>
+                                 */}
                                 <TouchableOpacity onPress={handleDeleteComment} style={styles.modalButton}>
                                     <Text style={styles.modalCancelButtonText}>삭제</Text>
                                 </TouchableOpacity>
+                                <View style={styles.ModalPadding} />
                             </View>
                         </TouchableWithoutFeedback>
                     </View>

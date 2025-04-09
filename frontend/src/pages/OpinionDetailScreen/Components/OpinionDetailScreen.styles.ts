@@ -111,7 +111,7 @@ export const styles = StyleSheet.create({
         borderTopRightRadius: 16,
     },
     modalButton: {
-        padding: 16,
+        padding: 20,
         alignItems: 'center',
         borderBottomWidth: 1,
         borderBottomColor: '#ddd',
@@ -124,5 +124,8 @@ export const styles = StyleSheet.create({
         fontSize: 16,
         color: 'red',
     },
+    ModalPadding: {
+        height: 30
+    }
 
 });
