@@ -21,7 +21,6 @@ import java.util.Map;
 public class NotificationService {
 
 	private final NotificationRepository notificationRepository;
-    private final NotificationRepository notificationRepository;
     private final FcmService fcmService;
     private final UserDeviceService userDeviceService;
     private final UserService userService;
