@@ -113,19 +113,18 @@ const SignUpScreen = () => {
     const birth = parseInt(birthdate.replace(/\./g, ""), 10);
     const profileData = {
       useremail,
+      usersocialType,
       nickname,
-      birthdate,
-      birth,
-      region,
-      gender,
-      religion,
-      profileImageUrl,
+      region, 
+      gender, 
+      birth, 
+      religion
     };
   
-    Alert.alert("입력 정보 확인", JSON.stringify(profileData, null, 2));
+    // Alert.alert("입력 정보 확인", JSON.stringify(profileData, null, 2));
 
     try{
-      const data : SignUpResponse = await signUp(useremail!, usersocialType!, nickname, "profile/0c643827-c958-465b-875d-918c8a22fe01.png", region, gender, birth, religion)
+      const data : SignUpResponse = await signUp(useremail!, "GOOGLE", nickname, "profile/0c643827-c958-465b-875d-918c8a22fe01.png", region, gender, birth, religion)
 
       const userDetails : userDetails = {
         nickname : nickname,
@@ -138,23 +137,23 @@ const SignUpScreen = () => {
         refreshToken : data.refreshToken,
       } // 실제 데이터로 변경.
 
-      Alert.alert("회원가입 결과", JSON.stringify(userDetails, null, 2));
+      // Alert.alert("회원가입 결과", JSON.stringify(userDetails, null, 2));
   
       setUser(userDetails)
   
       // Navigate to main app or show success message
 
-      Alert.alert("회원가입 완료", "회원가입이 성공적으로 완료되었습니다.", [
-        {
-          text: "확인",
-          // onPress: () => navigation.navigate("Profile"),
-        },
-      ]);
+      // Alert.alert("회원가입 완료", "회원가입이 성공적으로 완료되었습니다.", [
+      //   {
+      //     text: "확인",
+      //     // onPress: () => navigation.navigate("Profile"),
+      //   },
+      // ]);
     } catch (error: any) {
-      Alert.alert(
-        "회원가입 실패",
-        error?.message ?? JSON.stringify(error, null, 2)
-      );
+      const errorCode = error?.response?.data?.code;
+      const errorMessage = error?.response?.data?.message ?? error?.message ?? JSON.stringify(error, null, 2);
+    
+      Alert.alert("회원가입 실패", `(${errorCode}) ${errorMessage}`);
     }
   }
 
@@ -389,7 +388,7 @@ const SignUpScreen = () => {
 
       {/* Next/Complete Button */}
       <View style={styles.buttonContainer}>
-        {currentStep < SignUpStep.ProfilePhoto ? (
+        {currentStep < SignUpStep.Religion ? (
           <Button label="다음" onPress={handleNext} />
         ) : (
           <Button label="완료" onPress={handleComplete} />
