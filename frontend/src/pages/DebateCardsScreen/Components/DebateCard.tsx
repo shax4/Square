@@ -3,7 +3,7 @@ import { View, TouchableOpacity } from 'react-native';
 
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { StackParamList } from '../../../shared/page-stack/DebatePageStack';
+import { DebateStackParamList } from '../../../shared/page-stack/DebatePageStack';
 
 import { Debate } from './Debate.types';
 import { styles } from './DebateCard.styles';
@@ -19,7 +19,7 @@ interface DebateCardProps {
 
 const DebateCard = ({ debateId }: DebateCardProps): JSX.Element => {
 
-    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
+    const navigation = useNavigation<NativeStackNavigationProp<DebateStackParamList>>();
 
     // zustand
     const { debates, updateDebate } = useDebateStore();

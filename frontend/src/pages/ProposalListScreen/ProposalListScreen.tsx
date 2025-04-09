@@ -1,15 +1,14 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { Text, View, StyleSheet, FlatList, TouchableOpacity, ListRenderItem, ActivityIndicator } from "react-native";
 import colors from "../../../assets/colors";
 import { Button } from "../../components";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { StackParamList } from "../../shared/page-stack/DebatePageStack";
-import { Proposal } from "./Components/ProposalProps";
+import { DebateStackParamList } from "../../shared/page-stack/DebatePageStack";
 import ProposalItem from './Components/ProposalItem'
 import { getAllProposals } from "./Api/proposalListAPI";
-import { ProposalResponse } from "./Type/proposalListType";
-
+import { Proposal, ProposalResponse } from "./Type/proposalListType";
+import { useAdminMode } from "../../shared/hooks/useAdminMode";
 const PAGE_SIZE = 15;
 
 export default function ProposalListScreen() {
@@ -19,8 +18,14 @@ export default function ProposalListScreen() {
     const [loading, setLoading] = useState<boolean>(false);
     const [isEmpty, setIsEmpty] = useState<boolean>(false);
     const [renderedProposals, setRenderedProposals] = useState<Proposal[]>([]);
-    
-    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
+    const { isAdminMode } = useAdminMode();
+    const navigation = useNavigation<NativeStackNavigationProp<DebateStackParamList>>();
+
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            title: isAdminMode ? "새로운 논쟁 주제 관리" : "새로운 논쟁 주제 리스트"
+        });
+    }, [isAdminMode]);
 
     const fetchProposals = async (cursorId: number | null, cursorLikes: number | null) => {
         if (loading) return;
@@ -45,15 +50,23 @@ export default function ProposalListScreen() {
         }
     };
 
-    // ✅ goBack() 후 화면이 다시 포커스될 때 자동 새로고침
+    // 1. 화면 포커스될 때 무조건 실행
     useFocusEffect(
         useCallback(() => {
             setRenderedProposals([]);
             setNextCursorId(null);
             setNextCursorLikes(null);
             fetchProposals(null, null);
-        }, [sortOption])
+        }, [])
     );
+
+    // 2. 정렬 옵션 바뀔 때도 실행
+    useEffect(() => {
+        setRenderedProposals([]);
+        setNextCursorId(null);
+        setNextCursorLikes(null);
+        fetchProposals(null, null);
+    }, [sortOption]);
 
     const loadMore = useCallback(() => {
         if (nextCursorId && nextCursorLikes && !loading) {
@@ -102,10 +115,16 @@ export default function ProposalListScreen() {
                 />
             </View>
 
-            {/* 버튼 */}
+            {/* 청원 등록 버튼 혹은 청원 관리 안내 페이지 */}
             <View style={styles.ProposalButtonView}>
-                <Button label="새로운 주제 작성하기" onPress={() => navigation.navigate("ProposalCreateScreen")} />
+                {!isAdminMode && (
+                    <Button label="새로운 주제 작성하기" onPress={() => navigation.navigate("ProposalCreateScreen")} />
+                )}
+                {isAdminMode && (
+                    <Text style={styles.InfoText}>편집 후 등록할 논쟁 청원을 선택하세요.</Text>
+                )}
             </View>
+
             <View style={styles.BottomPadding} />
         </View>
     );
@@ -152,7 +171,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     BottomPadding: {
-        flex: 1,
+        flex: 0.3,
     },
     emptyContainer: {
         flex: 1,
@@ -164,4 +183,8 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: "gray",
     },
+    InfoText: {
+        color: colors.black,
+        fontSize: 15,
+    }
 });

@@ -1,6 +1,6 @@
 import { RouteProp, useNavigation, useRoute, useIsFocused } from "@react-navigation/native";
 import { Text, TouchableOpacity, View, ScrollView, Alert } from "react-native";
-import { StackParamList } from "../../shared/page-stack/DebatePageStack";
+import { DebateStackParamList } from "../../shared/page-stack/DebatePageStack";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { Icons } from "../../../assets/icons/Icons";
 import { LikeButton } from "../../components";
@@ -14,10 +14,10 @@ import { OpinionsResponse } from "./Components/OpinionsResponse.types";
 import { Comment } from "./Components/Comment.types";
 import { useAuthStore } from "../../shared/stores";
 import { likesOpinion } from "./api/OpinionApi";
-type OpinionDetailRouteProp = RouteProp<StackParamList, 'OpinionDetailScreen'>;
+type OpinionDetailRouteProp = RouteProp<DebateStackParamList, 'OpinionDetailScreen'>;
 
 export default function OpinionDetailScreen() {
-    const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
+    const navigation = useNavigation<NativeStackNavigationProp<DebateStackParamList>>();
     const route = useRoute<OpinionDetailRouteProp>();
     const { debateId, opinionId } = route.params;
 
