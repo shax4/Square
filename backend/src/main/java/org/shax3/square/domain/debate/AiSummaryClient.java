@@ -26,11 +26,11 @@ public class AiSummaryClient {
 		String result = chatClient.call(prompt);
 		System.out.println(result);
 
-		splitAndSaveSummaries(debate, result);
+		splitAndSaveSummaries(debate, result, leftOption, rightOption);
 	}
 
-	private void splitAndSaveSummaries(Debate debate, String result) {
-		String[] parts = result.split(":");
+	private void splitAndSaveSummaries(Debate debate, String result, String leftOption, String rightOption) {
+		String[] parts = result.split(leftOption + ":|"+ rightOption + ":");
 
 		String leftPart = parts[1].trim();
 		String rightPart = parts[2].trim();
@@ -38,7 +38,6 @@ public class AiSummaryClient {
 		List<String> leftSummaries = Arrays.stream(leftPart.split("/"))
 			.map(String::trim)
 			.filter(s -> !s.isEmpty())
-			.limit(3)
 			.toList();
 
 		List<String> rightSummaries = Arrays.stream(rightPart.split("/"))
