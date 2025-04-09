@@ -33,10 +33,11 @@ public class Debate {
     private String rightOption;
 
     @Builder
-    public Debate(String topic, String leftOption, String rightOption) {
+    public Debate(String topic, String leftOption, String rightOption, Category category) {
         this.topic = topic;
         this.leftOption = leftOption;
         this.rightOption = rightOption;
+        this.category = category;
         this.valid = true;
     }
 }
