@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Text, View, StyleSheet, FlatList, TouchableOpacity, ListRenderItem, ActivityIndicator } from "react-native";
+import { View, StyleSheet, FlatList, TouchableOpacity, ListRenderItem, ActivityIndicator } from "react-native";
 import colors from "../../../assets/colors";
 import { Button } from "../../components";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
@@ -9,6 +9,7 @@ import { Proposal } from "./Components/ProposalProps";
 import ProposalItem from './Components/ProposalItem'
 import { getAllProposals } from "./Api/proposalListAPI";
 import { ProposalResponse } from "./Type/proposalListType";
+import Text from '../../components/Common/Text';
 
 const PAGE_SIZE = 15;
 
@@ -69,7 +70,7 @@ export default function ProposalListScreen() {
                     style={[styles.SortingTypeButton, sortOption === "latest" && styles.activeButton]}
                     onPress={() => setSortOption("latest")}
                 >
-                    <Text style={[styles.SortingTypeButtonText, sortOption === "latest" && styles.activeText]}>
+                    <Text weight="medium" style={[styles.SortingTypeButtonText, sortOption === "latest" && styles.activeText]}>
                         최신순
                     </Text>
                 </TouchableOpacity>
@@ -77,7 +78,7 @@ export default function ProposalListScreen() {
                     style={[styles.SortingTypeButton, sortOption === "likes" && styles.activeButton]}
                     onPress={() => setSortOption("likes")}
                 >
-                    <Text style={[styles.SortingTypeButtonText, sortOption === "likes" && styles.activeText]}>
+                    <Text weight="medium" style={[styles.SortingTypeButtonText, sortOption === "likes" && styles.activeText]}>
                         인기순
                     </Text>
                 </TouchableOpacity>
@@ -95,7 +96,7 @@ export default function ProposalListScreen() {
                     ListEmptyComponent={
                         isEmpty ? (
                             <View style={styles.emptyContainer}>
-                                <Text style={styles.emptyText}>청원된 주제가 없습니다.</Text>
+                                <Text weight="medium" style={styles.emptyText}>청원된 주제가 없습니다.</Text>
                             </View>
                         ) : null
                     }
@@ -119,7 +120,7 @@ const styles = StyleSheet.create({
     SortingTypeButtonView: {
         flexDirection: "row",
         justifyContent: "center",
-        marginTop: 16,
+        marginTop: 20,
     },
     SortingTypeButton: {
         paddingVertical: 8,
@@ -130,14 +131,13 @@ const styles = StyleSheet.create({
     },
     SortingTypeButtonText: {
         color: colors.placeholderText,
-        fontWeight: "500",
     },
     activeButton: {
         backgroundColor: colors.disabledText,
     },
     activeText: {
         color: "white",
-        fontWeight: "bold",
+        fontWeight: "700",
     },
     ProposalListView: {
         flex: 8,
