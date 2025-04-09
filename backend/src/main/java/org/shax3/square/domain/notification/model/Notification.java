@@ -1,8 +1,5 @@
 package org.shax3.square.domain.notification.model;
 
-import static jakarta.persistence.GenerationType.*;
-import static lombok.AccessLevel.*;
-
 import org.shax3.square.common.entity.BaseTimeEntity;
 import org.shax3.square.domain.user.model.User;
 

@@ -20,6 +20,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class NotificationService {
 
+	private final NotificationRepository notificationRepository;
     private final NotificationRepository notificationRepository;
     private final FcmService fcmService;
     private final UserDeviceService userDeviceService;
