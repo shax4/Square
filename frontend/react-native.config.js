@@ -4,6 +4,9 @@ module.exports = {
       '@react-native-firebase/app': {},
       'react-native-svg': {},
       '@react-native-google-signin/google-signin': {},
+      '@react-native-firebase/messaging': {},
+      '@notifee/react-native': {},
+      'react-native-view-shot': {},
     },
 };
   

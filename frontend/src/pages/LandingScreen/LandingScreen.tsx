@@ -9,6 +9,7 @@ import { FirebaseLoginResponse } from "./type/googleLoginType";
 import SignUpScreen from "../SignupScreen/SignupScreen";
 import {styles} from "./style/LandingScreen.style"
 import { useAuth } from "../../shared/hooks";
+import { getFcmToken } from './API/getFcmtoken';
 
 const LandingScreen = ({ navigation }: any) => {
   const [loginResponse, setLoginResponse] = useState<FirebaseLoginResponse>(); // 로그인 응답 저장용
@@ -26,8 +27,9 @@ const LandingScreen = ({ navigation }: any) => {
         Alert.alert("로그인 실패", "Google 로그인에 실패했습니다.");
         return;
       }
-
-      const response : FirebaseLoginResponse = await requestFirebaseLogin(idToken, null, "null", "android", "GOOGLE");
+      const fcmToken = await getFcmToken();
+      console.log("FCM Token + handleGoogleLogin 로그:", fcmToken);
+      const response : FirebaseLoginResponse = await requestFirebaseLogin(idToken, fcmToken, "null", "android", "GOOGLE");
       setLoginResponse(response); // 화면에 출력하기 위해 저장
 
       const userDetails : userDetails = {
