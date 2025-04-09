@@ -204,8 +204,8 @@ export default function OpinionDetailScreen() {
                 },
                 {
                     text: '삭제',
-                    onPress: () => {
-                        deleteOpinion(opinionId);
+                    onPress: async () => {
+                        await deleteOpinion(opinionId);
                         setTimeout(() => {
 
                             navigation.pop(2);
