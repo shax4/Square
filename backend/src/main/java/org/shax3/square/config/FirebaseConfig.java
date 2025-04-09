@@ -31,6 +31,10 @@ public class FirebaseConfig {
             }
 
         } catch (Exception e) {
+            System.out.println("🔥 FCM 전송 실패 - code: " + e.getErrorCode() +
+                    ", message: " + e.getMessage() +
+                    ", cause: " + e.getCause());
+
             throw new CustomException(ExceptionCode.FIREBASE_INITIALIZE_ERROR);
         }
     }
