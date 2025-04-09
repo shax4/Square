@@ -13,6 +13,7 @@ import { StackScreenProps } from "@react-navigation/stack";
 import { useConfirmModal } from "./hooks/useConfirmModal";
 import { BoardStackParamList } from "../../shared/page-stack/BoardPageStack";
 import Text from "../../components/Common/Text";
+import { usePostForm } from "../../shared/hooks";
 
 // props 타입 정의
 type Props = StackScreenProps<BoardStackParamList, "BoardWrite">;

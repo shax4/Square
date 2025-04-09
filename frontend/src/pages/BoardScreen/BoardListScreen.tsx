@@ -14,42 +14,21 @@ import {
   ActivityIndicator,
   SafeAreaView,
   RefreshControl,
+  Platform,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp, useFocusEffect } from "@react-navigation/native";
 import { BoardStackParamList } from "../../shared/page-stack/BoardPageStack";
 import Text from "../../components/Common/Text";
 import colors from "../../../assets/colors";
-
-// 인기 게시글 인터페이스
-interface PopularPost {
-  postId: number;
-  title: string;
-  createdAt: string;
-  likeCount: number;
-  commentCount: number;
-}
-// 일반 게시글 인터페이스
-interface Post {
-  postId: number;
-  nickname: string;
-  profileUrl: string;
-  userType: string;
-  createdAt: string;
-  title: string;
-  content: string;
-  likeCount: number;
-  commentCount: number;
-  isLiked: boolean;
-}
-// API 응답 인터페이스
-interface PostsResponse {
-  userType: string | null;
-  popular: PopularPost[];
-  posts: Post[];
-  nextCursorId: number | null;
-  nextCursorLikes: number | null;
-}
+import BoardItem from "./components/BoardItem";
+import EmptyBoardList from "./components/EmptyBoardList";
+import PopularPostCard from "./components/PopularPostCard";
+import { usePostList } from "../../shared/hooks/usePostList";
+import { Post } from "../../shared/types/postTypes";
+import { PostService } from "../../shared/services/postService";
+import { Icons } from "../../../assets/icons/Icons";
+import { useAuthStore } from "../../shared/stores/auth";
 
 // 네비게이션 프롭 타입 정의
 type BoardListScreenNavigationProp = StackNavigationProp<
@@ -448,7 +427,6 @@ const styles = StyleSheet.create({
   },
   writeButton: {
     position: "absolute",
-    bottom: 20,
     right: 20,
     bottom: Platform.OS === "ios" ? 100 : 90, // 하단 네비게이션 바 위에 배치
     backgroundColor: colors.yesDark,

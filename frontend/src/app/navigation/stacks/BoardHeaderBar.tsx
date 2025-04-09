@@ -17,6 +17,7 @@ import BoardDetailScreen from "../../../pages/BoardScreen/BoardDetailScreen";
 import BoardWriteScreen from "../../../pages/BoardScreen/BoardWriteScreen";
 import { BoardStackParamList } from "../../../shared/page-stack/BoardPageStack";
 import Text from "../../../components/Common/Text";
+import { useAuthStore } from "../../../shared/stores/auth";
 
 // 스택 네비게이터
 const Stack = createNativeStackNavigator<BoardStackParamList>();

@@ -24,6 +24,9 @@ import { usePostDetail, useComment } from "../../shared/hooks";
 import { useLikeButton } from "../../shared/hooks/useLikeButton";
 import Text from "../../components/Common/Text";
 import colors from "../../../assets/colors";
+import { useFocusEffect } from "@react-navigation/native";
+import { Comment as BoardComment, Reply as BoardReply } from "./board.types";
+import { Comment, Reply } from "../../shared/types/postTypes";
 
 // 네비게이션 프롭 타입 정의
 type Props = StackScreenProps<BoardStackParamList, "BoardDetail">;
@@ -190,9 +193,7 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
                 nickname={post.nickname || ""}
               />
             </View>
-            <Text weight="medium" style={styles.postDate}>
-              {post?.createdAt ? getTimeAgo(post.createdAt) : ""}
-            </Text>
+            <Text style={styles.postDate}>{getTimeAgo(post.createdAt)}</Text>
           </View>
         </View>
 
