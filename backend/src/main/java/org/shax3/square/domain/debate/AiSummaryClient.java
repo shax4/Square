@@ -1,5 +1,9 @@
 package org.shax3.square.domain.debate;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.shax3.square.domain.debate.model.Debate;
 import org.shax3.square.domain.debate.service.SummaryService;
 import org.springframework.ai.openai.OpenAiChatClient;
 import org.springframework.stereotype.Component;
@@ -13,10 +17,36 @@ public class AiSummaryClient {
 	private final SummaryService summaryService;
 	private final OpenAiChatClient chatClient;
 
-	public void generateSummaries(String topic, String leftOption, String rightOption) {
+	public void generateSummaries(Debate debate) {
+		String topic = debate.getTopic();
+		String leftOption = debate.getLeftOption();
+		String rightOption = debate.getRightOption();
+
 		String prompt = generatePrompt(topic, leftOption, rightOption);
 		String result = chatClient.call(prompt);
 		System.out.println(result);
+
+		splitAndSaveSummaries(debate, result);
+	}
+
+	private void splitAndSaveSummaries(Debate debate, String result) {
+		String[] parts = result.split(":");
+
+		String leftPart = parts[1].trim();
+		String rightPart = parts[2].trim();
+
+		List<String> leftSummaries = Arrays.stream(leftPart.split("/"))
+			.map(String::trim)
+			.filter(s -> !s.isEmpty())
+			.toList();
+
+		List<String> rightSummaries = Arrays.stream(rightPart.split("/"))
+			.map(String::trim)
+			.filter(s -> !s.isEmpty())
+			.toList();
+
+		summaryService.saveAll(debate, leftSummaries, rightSummaries);
+
 	}
 
 	private String generatePrompt(String topic, String leftOption, String rightOption) {
