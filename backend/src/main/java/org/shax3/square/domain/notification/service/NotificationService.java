@@ -5,6 +5,7 @@ import org.shax3.square.domain.notification.dto.response.NotificationResponseDto
 import org.shax3.square.domain.notification.model.Notification;
 import org.shax3.square.domain.notification.model.NotificationType;
 import org.shax3.square.domain.notification.repository.NotificationRepository;
+import org.shax3.square.domain.opinion.service.OpinionService;
 import org.shax3.square.domain.user.model.User;
 import org.shax3.square.domain.user.service.UserDeviceService;
 import org.shax3.square.domain.user.service.UserService;
@@ -13,6 +14,7 @@ import org.shax3.square.exception.ExceptionCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +26,7 @@ public class NotificationService {
     private final FcmService fcmService;
     private final UserDeviceService userDeviceService;
     private final UserService userService;
+    private final OpinionService opinionService;
 
 
     public void createNotification(User receiver, String title, String message, NotificationType type, Long targetId) {
@@ -37,10 +40,19 @@ public class NotificationService {
 
         notificationRepository.save(notification);
         List<String> tokens = userDeviceService.getFcmTokensByUser(receiver);
-        Map<String, String> data = Map.of(
-                "type", type.name(),              // ex) POST_COMMENT
-                "targetId", String.valueOf(targetId)
-        );
+        Map<String, String> data = new HashMap<>();
+        data.put("type", type.name());
+        data.put("targetId", String.valueOf(targetId));
+
+
+        if (type == NotificationType.DEBATE_COMMENT) {
+            Long debateId = opinionService.findDebateIdByOpinionId(targetId);
+            if (debateId != null) {
+                data.put("debateId", String.valueOf(debateId));
+            }
+        }
+
+
 
         for (String token : tokens) {
             fcmService.sendPush(token, title, message,data);
