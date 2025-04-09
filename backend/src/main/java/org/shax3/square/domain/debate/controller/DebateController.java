@@ -142,7 +142,7 @@ public class DebateController {
         description = "청원 목록 중 하나를 선택하여 오늘의 논쟁을 생성합니다."
     )
     @PostMapping("/today")
-    public ResponseEntity<Void> createDebate(@RequestBody DebateCreateRequest request, @AuthUser User user) {
+    public ResponseEntity<Void> createDebate(@Valid @RequestBody DebateCreateRequest request, @AuthUser User user) {
         debateService.createDebateFromProposal(request, user);
         return ResponseEntity.ok().build();
     }

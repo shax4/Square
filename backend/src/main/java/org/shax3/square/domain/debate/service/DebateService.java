@@ -10,6 +10,7 @@ import org.shax3.square.domain.debate.dto.request.DebateCreateRequest;
 import org.shax3.square.domain.debate.dto.response.DebateDetailResponse;
 import org.shax3.square.domain.debate.dto.response.SummaryResponse;
 import org.shax3.square.domain.debate.dto.response.VoteResponse;
+import org.shax3.square.domain.debate.model.Category;
 import org.shax3.square.domain.debate.model.Debate;
 import org.shax3.square.domain.debate.model.Summary;
 import org.shax3.square.domain.debate.model.Vote;
@@ -42,6 +43,7 @@ public class DebateService {
     private final OpinionFacadeService opinionFacadeService;
     private final ProposalService proposalService;
     private final AiSummaryClient aiSummaryClient;
+    private final CategoryService categoryService;
 
     public Debate findDebateById(Long debateId) {
         return debateRepository.findById(debateId)
@@ -169,7 +171,9 @@ public class DebateService {
             throw new CustomException(ExceptionCode.USER_NOT_AUTHORIZED);
         }
 
-        Debate debate = request.to();
+        Category category = categoryService.getCategoryByName(request.categoryName());
+
+        Debate debate = request.to(category);
         debateRepository.save(debate);
 
         aiSummaryClient.generateSummaries(debate);
