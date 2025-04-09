@@ -1,5 +1,6 @@
 package org.shax3.square.domain.debate.dto;
 
+import org.shax3.square.common.model.DisplayableEnum;
 import org.shax3.square.domain.debate.model.Vote;
 import org.shax3.square.domain.user.model.*;
 
