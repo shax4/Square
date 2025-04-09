@@ -24,7 +24,6 @@ public class AiSummaryClient {
 
 		String prompt = generatePrompt(topic, leftOption, rightOption);
 		String result = chatClient.call(prompt);
-		System.out.println(result);
 
 		splitAndSaveSummaries(debate, result, leftOption, rightOption);
 	}
