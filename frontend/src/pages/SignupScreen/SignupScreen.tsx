@@ -28,7 +28,7 @@ enum SignUpStep {
   Region = 3,
   Gender = 4,
   Religion = 5,
-  ProfilePhoto = 6,
+  ConfirmSignIn = 6,
 }
 
 // Options for dropdowns
@@ -88,7 +88,7 @@ const SignUpScreen = () => {
     }
 
     // Move to next step
-    if (currentStep < SignUpStep.ProfilePhoto) {
+    if (currentStep < SignUpStep.ConfirmSignIn) {
       setCurrentStep(currentStep + 1)
       // Scroll to top when changing steps
       scrollViewRef.current?.scrollTo({ y: 0, animated: true })
@@ -110,16 +110,16 @@ const SignUpScreen = () => {
   const handleComplete = async () => {
     const useremail = user?.email;
     const usersocialType = user?.socialType;
-    const birth = parseInt(birthdate.replace(/\./g, ""), 10);
-    const profileData = {
-      useremail,
-      usersocialType,
-      nickname,
-      region, 
-      gender, 
-      birth, 
-      religion
-    };
+    const birth = parseInt(birthdate.slice(0, 4), 10);
+    // const profileData = {
+    //   useremail,
+    //   usersocialType,
+    //   nickname,
+    //   region, 
+    //   gender, 
+    //   birth, 
+    //   religion
+    // };
   
     // Alert.alert("입력 정보 확인", JSON.stringify(profileData, null, 2));
 
@@ -195,7 +195,7 @@ const SignUpScreen = () => {
       case SignUpStep.Religion:
         return !!religion.trim()
 
-      case SignUpStep.ProfilePhoto:
+      case SignUpStep.ConfirmSignIn:
         return true
 
       default:
@@ -348,22 +348,16 @@ const SignUpScreen = () => {
           </View>
         )
 
-      case SignUpStep.ProfilePhoto:
+      case SignUpStep.ConfirmSignIn:
         return (
           <View style={styles.stepContainer}>
-            <Text style={styles.stepTitle}>프로필 사진을 선택해 주세요</Text>
-            <View style={styles.profileImageContainer}>
-              <View style={styles.profileImageWrapper}>
-                <ProfileImage imageUrl={profileImageUrl} variant="large" />
-                <TouchableOpacity style={styles.cameraButton} onPress={handleProfileImageChange}>
-                  <View style={styles.cameraIconBackground}>
-                    <Ionicons name="camera" size={24} color={"black"} />
-                  </View>
-                </TouchableOpacity>
-              </View>
-            </View>
-            <Text style={styles.helperText}>프로필 사진을 설정하지 않는 경우, 기본 이미지로 설정됩니다.</Text>
-          </View>
+          <Text style={styles.welcomeTitle}>사각에 오신 걸 환영합니다!</Text>
+          <Text style={styles.welcomeSubtitle}>
+            즐거운 커뮤니티 이용을 위해서{"\n"}
+            성향 테스트가 필요해요!
+          </Text>
+          <Text style={styles.helperText}>약 5~10분 정도 소요돼요</Text>
+        </View>
         )
 
       default:
@@ -388,10 +382,15 @@ const SignUpScreen = () => {
 
       {/* Next/Complete Button */}
       <View style={styles.buttonContainer}>
-        {currentStep < SignUpStep.Religion ? (
+        {currentStep < SignUpStep.ConfirmSignIn ? (
           <Button label="다음" onPress={handleNext} />
         ) : (
-          <Button label="완료" onPress={handleComplete} />
+          <>
+            <Button label="테스트 하기" onPress={() => {}} />
+            <TouchableOpacity onPress={handleComplete}>
+              <Text style={styles.nextButton}>다음에</Text>
+            </TouchableOpacity>
+          </>
         )}
       </View>
 
@@ -438,6 +437,24 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
   },
+  welcomeTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  welcomeSubtitle: {
+    fontSize: 18,
+    textAlign: "center",
+    marginBottom: 10,
+    lineHeight: 26,
+  },
+  nextButton: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
+    marginTop: 20,
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -464,6 +481,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#888888",
     marginTop: 8,
+    textAlign: "center",
   },
   previousInfoContainer: {
     marginTop: 24,
