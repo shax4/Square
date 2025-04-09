@@ -38,6 +38,7 @@ public class AiSummaryClient {
 		List<String> leftSummaries = Arrays.stream(leftPart.split("/"))
 			.map(String::trim)
 			.filter(s -> !s.isEmpty())
+			.limit(3)
 			.toList();
 
 		List<String> rightSummaries = Arrays.stream(rightPart.split("/"))
