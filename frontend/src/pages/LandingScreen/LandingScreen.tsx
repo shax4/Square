@@ -79,9 +79,7 @@ const LandingScreen = ({ navigation }: any) => {
   }
 
   if (signUpFlag) {
-    return (
-      <SignUpScreen/>
-    );
+    return <SignUpScreen onCancel={() => setSignUpFlag(false)} />
   }
 
   return (
