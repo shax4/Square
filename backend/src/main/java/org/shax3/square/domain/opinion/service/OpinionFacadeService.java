@@ -87,7 +87,7 @@ public class OpinionFacadeService {
             ))
             .toList();
 
-        String profileUrl = s3Service.generatePresignedGetUrl(user.getS3Key());
+        String profileUrl = s3Service.generatePresignedGetUrl(opinion.getUser().getS3Key());
 
         return OpinionDetailsResponse.of(opinion, commentResponses, profileUrl, isLiked, likeCount);
     }
