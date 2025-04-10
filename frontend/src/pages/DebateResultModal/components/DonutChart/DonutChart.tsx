@@ -52,7 +52,9 @@ const DonutChart = ({ data }: DonutChartComponentProps) => {
                 centerLabelComponent={() => (
                     <View style={{ justifyContent: "center", alignItems: "center" }}>
                         <Text style={{ fontSize: 28, color: "white", fontWeight: "bold" }}>{data[0]?.label || ""}</Text>
-                        <Text style={{ fontSize: 22, color: "white" }}>{data[0]?.value || ""}%</Text>
+                        <Text style={{ fontSize: 22, color: "white" }}>
+                            {data[0] ? `${Math.round(data[0].value)}%` : ""}
+                        </Text>
                     </View>
                 )}
             />
