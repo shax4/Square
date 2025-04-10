@@ -12,7 +12,8 @@ export const styles = StyleSheet.create({
         marginTop: 20,
     },
     OpinionContentView: {
-        margin: 15,
+        marginRight: 15,
+        marginLeft: 20,
     },
     OpinionContentText: {
         fontSize: 17,
@@ -20,20 +21,22 @@ export const styles = StyleSheet.create({
     LikeAndCommentCountView: {
         flexDirection: 'row',
         marginHorizontal: 15,
-        marginTop: 15,
+        marginTop: 10,
     },
     CommentCountButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginHorizontal: 20,
+        marginHorizontal: 15,
     },
     CountText: {
         color: colors.grayText,
         fontSize: 14,
+        marginLeft: 4,
+        marginTop: 1
     },
     Separator: {
         height: 1,
-        backgroundColor: colors.disabledText,
+        backgroundColor: colors.grayText,
         marginHorizontal: 12,
         marginTop: 12,
     },
@@ -44,19 +47,24 @@ export const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'flex-start',
-        margin: 12,
+        marginLeft: 20,
+        marginTop: 12,
+        marginBottom: 4,
+        marginRight: 12
     },
     ProfileAndCommentView: {
         flex: 1,
+        marginTop: 7
     },
     CommentLikeView: {
         alignItems: 'flex-end',
-        marginTop: 30,
+        marginTop: 20,
         marginHorizontal: 12,
     },
     CommentTextView: {
-        marginVertical: 15,
-        marginLeft: 20,
+        marginTop: 15,
+        marginBottom: 10,
+        marginLeft: 10,
     },
     CommentText: {
         fontSize: 15,
@@ -95,8 +103,37 @@ export const styles = StyleSheet.create({
     },
     CommentSeparator: {
         height: 0.5,
-        backgroundColor: colors.black,
+        backgroundColor: colors.grayText,
         marginHorizontal: 12,
+    },
+    modalOverlay: {
+        flex: 1,
+        justifyContent: 'flex-end',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+        backgroundColor: 'white',
+        paddingBottom: 30,
+        paddingTop: 10,
+        borderTopLeftRadius: 16,
+        borderTopRightRadius: 16,
+    },
+    modalButton: {
+        padding: 20,
+        alignItems: 'center',
+        borderBottomWidth: 1,
+        borderBottomColor: '#ddd',
+    },
+    modalButtonText: {
+        fontSize: 16,
+        color: '#333',
+    },
+    modalCancelButtonText: {
+        fontSize: 16,
+        color: 'red',
+    },
+    ModalPadding: {
+        height: 30
     }
 
 });

@@ -83,8 +83,9 @@ function BottomTabs() {
                 headerShown: false,
             })}
         >
-            <Tab.Screen name={boardName} component={BoardHeaderBar} />
+            
             <Tab.Screen name={mainName} component={MainHeaderBar} />
+            <Tab.Screen name={boardName} component={BoardHeaderBar} />
             <Tab.Screen name={notificationName} component={NotificationHeaderBar} />
             <Tab.Screen name={mypageName} component={MyPageHeaderBar} />
         </Tab.Navigator>

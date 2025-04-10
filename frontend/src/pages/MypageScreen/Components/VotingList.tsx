@@ -34,9 +34,8 @@ const VotingList = ({ type }: Props) => {
                 addDebatesToZustand(data.debates);
                 const processedVotings = (data.debates ?? []).map((vote) => {
                     const totalVotes = vote.leftCount + vote.rightCount;
-                    const leftPercent = totalVotes > 0 ? (vote.leftCount / totalVotes) * 100 : 0;
-                    const rightPercent = totalVotes > 0 ? (vote.rightCount / totalVotes) * 100 : 0;
-
+                    const leftPercent = totalVotes > 0 ? Math.round((vote.leftCount / totalVotes) * 100) : 0;
+                    const rightPercent = totalVotes > 0 ? Math.round((vote.rightCount / totalVotes) * 100) : 0;
                     return {
                         ...vote,
                         leftPercent,

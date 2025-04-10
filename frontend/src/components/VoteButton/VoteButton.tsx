@@ -72,7 +72,7 @@ const VoteButton = ({ debateId, showVoteResultModal, }: VoteButtonProps): JSX.El
             }
         };
         fetchDebateResult();
-    }, [debateId, loggedIn]);
+    }, [debateId, loggedIn, voteConfirmModalVisible]);
 
     // 투표 버튼 클릭 시
     const handleVote = (voteLeft: boolean) => {
@@ -156,6 +156,7 @@ const VoteButton = ({ debateId, showVoteResultModal, }: VoteButtonProps): JSX.El
         }
         // 모달 컴포넌트가 없는 페이지에서 투표 버튼을 눌렀다면 페이지 이동
         else {
+            closeDebateResultModal();
             navigation.navigate('OpinionListScreen', {
                 debateId,
                 showVoteResultModal: false,
