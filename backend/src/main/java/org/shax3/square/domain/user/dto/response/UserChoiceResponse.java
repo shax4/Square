@@ -8,13 +8,15 @@ import java.util.List;
 public record UserChoiceResponse(
     List<String> regions,
     List<String> genders,
-    List<String> religions
+    List<String> religions,
+    String userState
 ) {
     public static UserChoiceResponse of(List<String> regions, List<String> genders, List<String> religions) {
         return UserChoiceResponse.builder()
                 .regions(regions)
                 .genders(genders)
                 .religions(religions)
+                .userState("ADMIN")
                 .build();
     }
 }
