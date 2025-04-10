@@ -73,7 +73,7 @@ const GenderChart: React.FC<GenderChartProps> = ({ data }) => {
             >
               {item.value > 0 && (
                 <Text style={styles.percentageText}>
-                  {`${((item.value / totalValue) * 100)}%`}
+                  {`${Math.round((item.value / totalValue) * 100)}%`}
                 </Text>
               )}
             </View>
