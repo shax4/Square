@@ -6,8 +6,7 @@ import { useAdminMode } from "../../shared/hooks/useAdminMode";
 
 const SettingScreen = () => {
     const { user } = useAuth();
-    const isAdmin = user?.state === "ADMIN";
-    const { isAdminMode, setAdminMode } = useAdminMode();
+    const { isAdminMode, setAdminMode, isAdminState, setAdminState } = useAdminMode();
     const [settings, setSettings] = useState({
         newTopic: true,
         popularOpinion: true,
@@ -32,7 +31,7 @@ const SettingScreen = () => {
             <SettingToggleItem label="앱 실행 중 알림" value={settings.alert} onValueChange={toggleSetting("alert")} />
             <SettingToggleItem label="내 성향 숨기기" value={settings.hidePreference} onValueChange={toggleSetting("hidePreference")} />
 
-            {isAdmin && (
+            {isAdminState && (
                 <>
                     <View style={styles.sectionDivider} />
                     <Text style={styles.sectionTitle}>관리자 모드</Text>

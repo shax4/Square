@@ -35,7 +35,7 @@ const MypageScreen = () => {
   // Sub-sections for Votes
   const [activeVoteSection, setActiveVoteSection] = useState("내가 한 투표")
 
-  const { isAdminMode, setAdminMode } = useAdminMode();
+  const { isAdminMode, setAdminMode, isAdminState, setAdminState } = useAdminMode();
 
   useEffect(() => {
     const getUserInfo = async () => {
@@ -45,7 +45,8 @@ const MypageScreen = () => {
         setUserInfo(userInfo);
 
         if( userInfo.userState == "ADMIN") {
-          setAdminMode(true);
+          setAdminState(true);
+          //setAdminMode(true);
         }
       }catch(error : any){
         console.error("getUserInfo 에러 발생 : ", error);
