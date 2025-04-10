@@ -54,7 +54,7 @@ const OpinionBox = ({ debateId, opinion }: Props) => {
                 {/* 상단: 프로필, 닉네임, userType */}
                 <View style={styles.topRow}>
                     <ProfileImage
-                        // imageUrl={profileUrl}
+                        imageUrl={profileUrl}
                         variant="small"
                     />
                     <Text style={styles.nickname}>{nickname}</Text>

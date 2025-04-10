@@ -249,7 +249,7 @@ export default function OpinionDetailScreen() {
             {/* 의견 작성자 프로필 */}
             <View style={styles.ProfileBoxView}>
                 <ProfileBox
-                    //imageUrl={opinionDetail!.profileUrl}
+                    imageUrl={opinionDetail!.profileUrl}
                     nickname={opinionDetail!.nickname}
                     userType={opinionDetail!.userType}
                     createdAt={opinionDetail!.createdAt}
