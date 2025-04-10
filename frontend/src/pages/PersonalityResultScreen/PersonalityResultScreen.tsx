@@ -149,65 +149,65 @@ const PersonalityResultScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content} ref={captureViewRef} collapsable={false}>
-      {userTypeResult ? (
-        <>
-        <Text style={styles.nicknameText}>
-          {userTypeResult.nickname}님의 성향은
-        </Text>
+        {userTypeResult ? (
+          <>
+            <Text style={styles.nicknameText}>
+              {userTypeResult.nickname}님의 성향은
+            </Text>
 
-        <View style={styles.personalityTypeContainer}>
-          <Text style={styles.personalityType}>
-            {userTypeResult.userType}
-          </Text>
-          {!isCapturing && (
-            <PersonalityInfoButton onPress={onInfoPress} />
-          )}
-        </View>
-
-        <View style={styles.graphsContainer}>
-          <PersonalityGraph
-            title="가치관"
-            leftLabel="P 현실"
-            rightLabel="이상 I"
-            value={userTypeResult.score1}
-            color={colors.values}
-          />
-          <PersonalityGraph
-            title="사회관"
-            leftLabel="N 개인"
-            rightLabel="공동체 C"
-            value={userTypeResult.score2}
-            color={colors.social}
-          />
-          <PersonalityGraph
-            title="미래관"
-            leftLabel="T 기술"
-            rightLabel="환경 S"
-            value={userTypeResult.score3}
-            color={colors.future}
-          />
-          <PersonalityGraph
-            title="성취관"
-            leftLabel="B 안정"
-            rightLabel="도전 R"
-            value={userTypeResult.score4}
-            color={colors.achievement}
-          />
-        </View>
-
-        {!isCapturing && isMyType && (
-          <View style={styles.buttonsContainer}>
-            <View style={styles.buttonContainer}>
-              <Button label="공유하기" onPress={onSharePress} />
+            <View style={styles.personalityTypeContainer}>
+              <Text style={styles.personalityType}>
+                {userTypeResult.userType}
+              </Text>
+              {!isCapturing && (
+                <PersonalityInfoButton onPress={onInfoPress} />
+              )}
             </View>
+
+            <View style={styles.graphsContainer}>
+              <PersonalityGraph
+                title="가치관"
+                leftLabel="P 현실"
+                rightLabel="이상 I"
+                value={userTypeResult.score1}
+                color={colors.values}
+              />
+              <PersonalityGraph
+                title="사회관"
+                leftLabel="N 개인"
+                rightLabel="공동체 C"
+                value={userTypeResult.score2}
+                color={colors.social}
+              />
+              <PersonalityGraph
+                title="미래관"
+                leftLabel="T 기술"
+                rightLabel="환경 S"
+                value={userTypeResult.score3}
+                color={colors.future}
+              />
+              <PersonalityGraph
+                title="성취관"
+                leftLabel="B 안정"
+                rightLabel="도전 R"
+                value={userTypeResult.score4}
+                color={colors.achievement}
+              />
+            </View>
+
+            {!isCapturing && isMyType && (
+              <View style={styles.buttonsContainer}>
+                <View style={styles.buttonContainer}>
+                  <Button label="공유하기" onPress={onSharePress} />
+                </View>
+              </View>
+            )}
+          </>
+        ) : (
+          <View style={styles.noPersonalityContainer}>
+            <Text style={styles.noPersonalityText}>성향이 없습니다</Text>
           </View>
         )}
-        </>
-      ):(
-        <View style={styles.noPersonalityContainer}>
-          <Text style={styles.noPersonalityText}>성향이 없습니다</Text>
-        </View>
-      )}
 
         {!isCapturing && (
           <View style={styles.buttonsContainer}>
@@ -293,6 +293,10 @@ const PersonalityResultScreen = () => {
         </Pressable>
       </Modal>
 
+      <UserTypeInfoModal
+        onClose={onPressCloseModal}
+        visible={modalVisible}
+      />
 
     </SafeAreaView>
   );
