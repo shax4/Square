@@ -49,7 +49,7 @@ const CommentInput = ({
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
-            keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 100}
         >
             {WarnVisible && (
                 <View style={styles.ErrorInfoView}>
