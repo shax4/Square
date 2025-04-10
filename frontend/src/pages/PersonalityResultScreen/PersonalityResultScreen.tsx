@@ -1,5 +1,5 @@
 import type React from "react";
-import { View, StyleSheet, SafeAreaView } from "react-native";
+import { View, StyleSheet, SafeAreaView, Modal, Pressable, Alert } from "react-native";
 import PersonalityInfoButton from "./Components/PersonalityInfoButton";
 import PersonalityGraph from "./Components/PersonalityGraph";
 import { Button } from "../../components";
@@ -12,6 +12,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 
 import { StackParamList } from "../../shared/page-stack/MyPageStack";
+import * as Clipboard from 'expo-clipboard';
 
 import {
   getMyPersonalityResult,
@@ -220,11 +221,80 @@ const PersonalityResultScreen = () => {
           </View>
         )}
       </View>
+      {/* 공유 링크 모달 */}
+      <Modal
+        visible={shareModalVisible}
+        transparent
+        animationType="fade"
+      >
+        <Pressable
+          onPress={() => setShareModalVisible(false)} // 오버레이 눌러도 닫힘
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0,0,0,0.5)',
+          }}
+        >
+          <Pressable
+            onPress={() => { }} // 내부 뷰 눌러도 닫히지 않게 막기
+            style={{
+              width: '85%',
+              backgroundColor: 'white',
+              borderRadius: 12,
+              padding: 24,
+              alignItems: 'center'
+            }}
+          >
+            <Text style={{ fontWeight: 'bold', fontSize: 18, marginBottom: 10 }}>
+              공유 링크가 생성되었어요!
+            </Text>
+            <Text
+              selectable
+              style={{
+                fontSize: 10,
+                marginBottom: 16,
+                textAlign: 'center',
+                marginVertical: 30,
+              }}
+              numberOfLines={3}
+            >
+              {shareImageUrl}
+            </Text>
 
-      <UserTypeInfoModal
-        onClose={onPressCloseModal}
-        visible={modalVisible}
-      />
+            <Pressable
+              onPress={() => {
+                if (shareImageUrl) {
+                  Clipboard.setStringAsync(shareImageUrl);
+                  Alert.alert(
+                    "복사 완료",
+                    "링크가 클립보드에 복사되었습니다!",
+                    [
+                      {
+                        text: "확인",
+                        onPress: () => setShareModalVisible(false),
+                      },
+                    ],
+                    { cancelable: true }
+                  );
+                }
+              }}
+              style={{
+                backgroundColor: "#0066FF",
+                paddingVertical: 12,
+                paddingHorizontal: 30,
+                borderRadius: 8,
+                marginTop: 10,
+                marginBottom: 6,
+              }}
+            >
+              <Text style={{ color: "white", fontWeight: "bold" }}>링크 복사</Text>
+            </Pressable>
+          </Pressable>
+        </Pressable>
+      </Modal>
+
+
     </SafeAreaView>
   );
 };
