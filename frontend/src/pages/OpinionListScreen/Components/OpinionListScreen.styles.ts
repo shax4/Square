@@ -35,7 +35,7 @@ export const styles = StyleSheet.create({
         borderRadius: 15,
         textAlign: 'center',
         color: colors.yesDark
-        
+
     },
     optionTextRight: {
         height: 40,
@@ -55,7 +55,7 @@ export const styles = StyleSheet.create({
         bottom: 10,
         backgroundColor: 'rgba(0, 0, 0, 0)',
     },
-    
+
     optionBox: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -63,29 +63,29 @@ export const styles = StyleSheet.create({
         borderRadius: 50,
         paddingVertical: 1,
         paddingHorizontal: 6,
-        flex: 1, 
+        flex: 1,
     },
 
     optionBoxLeft: {
-        backgroundColor: colors.white, 
+        backgroundColor: colors.white,
     },
-    
+
     optionBoxRight: {
-        backgroundColor: '#e4e4e4', 
+        backgroundColor: '#e4e4e4',
     },
-    
+
     optionImage: {
         width: 18,
         height: 18,
         marginRight: 8,
         marginLeft: 10
     },
-    
+
     optionText: {
         fontSize: 16,
         fontWeight: 'bold',
     },
-      
+
     bottomContainer: {
         width: '100%',
     },
@@ -101,7 +101,7 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: colors.white,
-        paddingVertical: 10,
+        paddingVertical: 15,
     },
     TotalVoteCountView: {
         alignItems: 'center',

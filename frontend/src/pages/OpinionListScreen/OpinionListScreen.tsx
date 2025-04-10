@@ -45,7 +45,7 @@ interface PagingCursor {
 export default function OpinionListScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<DebateStackParamList>>();
 
-    const { loggedIn } = useAuthStore();
+    const { loggedIn, user } = useAuthStore();
 
     const route = useRoute<OpinionListScreenRouteProp>();
     const { debateId, showVoteResultModal = false, showSummaryFirst = true } = route.params;
@@ -295,11 +295,7 @@ export default function OpinionListScreen() {
         );
     }
     return (
-        <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={styles.container}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
-        >
+        <View style={styles.container}>
             <SafeAreaView style={styles.container}>
                 <View style={styles.topicView}>
                     <Text style={styles.topicViewText}>{debate!.topic}</Text>
@@ -382,12 +378,16 @@ export default function OpinionListScreen() {
                 </View>
 
                 <View style={styles.bottomContainer}>
-                    <View style={isSummary ? styles.VoteButtonView : styles.VoteButtonViewSmall}>
+                    <KeyboardAvoidingView
+                        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                        style={isSummary ? styles.VoteButtonView : styles.VoteButtonViewSmall}
+                        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 100}
+                    >
                         <VoteButton
                             debateId={debateId}
                             showVoteResultModal={showVoteResultModal}
                         />
-                    </View>
+                    </KeyboardAvoidingView>
 
                     {isSummary && (
                         <View style={styles.TotalVoteCountView}>
@@ -397,12 +397,12 @@ export default function OpinionListScreen() {
 
                     {(!isSummary && debate.isLeft == null) && (
                         <View style={styles.TotalVoteCountView}>
-                            <Text>투표 후 의견 등록 가능합니다.</Text>
+                            <Text>성향 테스트 및 투표 후 의견 등록 가능합니다.</Text>
                         </View>
                     )}
                 </View>
 
-                {(!isSummary && debate.isLeft != null) && (
+                {(!isSummary && debate.isLeft != null && user?.userType != null) && (
                     <CommentInput
                         onChangeText={setCommentText}
                         onSubmit={handleOpinionPosting}
@@ -413,6 +413,7 @@ export default function OpinionListScreen() {
                     />
                 )}
             </SafeAreaView>
-        </KeyboardAvoidingView>
+        </View>
+
     );
 }
