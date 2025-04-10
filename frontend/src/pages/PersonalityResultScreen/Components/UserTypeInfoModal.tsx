@@ -95,71 +95,70 @@ const UserTypeInfoModal = ({ visible, onClose }: UserTypeInfoModalProps) => {
     return (
         <Modal transparent visible={visible} animationType="fade" statusBarTranslucent>
             <SafeAreaView style={styles.safeArea}>
-                <TouchableWithoutFeedback>
-                    <View style={styles.overlay}>
-                        <View style={styles.modalContainer}>
-                            {/* 모달 헤더 */}
-                            <View style={styles.header}>
-                                <Text style={styles.headerTitle}>성향 유형 정보</Text>
-                                <TouchableOpacity style={styles.headerCloseButton} onPress={onClose}>
-                                    <Text style={styles.headerCloseButtonText}>✕</Text>
-                                </TouchableOpacity>
-                            </View>
+                <View style={styles.overlay}>
+                    <View style={styles.modalContainer}>
+                        {/* 모달 헤더 */}
+                        <View style={styles.header}>
+                            <Text style={styles.headerTitle}>성향 유형 정보</Text>
+                            <TouchableOpacity style={styles.headerCloseButton} onPress={onClose}>
+                                <Text style={styles.headerCloseButtonText}>✕</Text>
+                            </TouchableOpacity>
+                        </View>
 
-                            <View style={styles.scrollWrapper}>
-                                <ScrollView
-                                    style={styles.scrollView}
-                                    contentContainerStyle={styles.scrollContent}
-                                    showsVerticalScrollIndicator={false}
-                                >
-                                    {DATA.map((item) => (
-                                        <View key={item.id} style={styles.section}>
-                                            <Text style={styles.title}>{item.title}</Text>
-                                            <Text style={styles.description}>{item.description}</Text>
+                        {/* ✅ 스크롤 가능한 영역 */}
+                        <ScrollView
+                            style={{ flex: 1 }}
+                            contentContainerStyle={styles.scrollContent}
+                            showsVerticalScrollIndicator={true}
+                        >
+                            {DATA.map((item) => (
+                                <View key={item.id} style={styles.section}>
+                                    <Text style={styles.title}>{item.title}</Text>
+                                    <Text style={styles.description}>{item.description}</Text>
 
-                                            <View style={styles.traitsContainer}>
-                                                <View style={[styles.traitBox, styles.traitBoxLeft]}>
-                                                    <View style={styles.traitHeader}>
-                                                        <Text style={styles.traitShort}>{item.traitA.short}</Text>
-                                                        <Text style={styles.traitName}>{item.traitA.name}</Text>
-                                                    </View>
-                                                    <View style={styles.traitContent}>
-                                                        <Text style={styles.traitDefinition}>{item.traitA.definition}</Text>
-                                                        <Text style={styles.traitExample}>"{item.traitA.example}"</Text>
-                                                    </View>
-                                                </View>
-
-                                                <View style={[styles.traitBox, styles.traitBoxRight]}>
-                                                    <View style={styles.traitHeader}>
-                                                        <Text style={styles.traitShort}>{item.traitB.short}</Text>
-                                                        <Text style={styles.traitName}>{item.traitB.name}</Text>
-                                                    </View>
-                                                    <View style={styles.traitContent}>
-                                                        <Text style={styles.traitDefinition}>{item.traitB.definition}</Text>
-                                                        <Text style={styles.traitExample}>"{item.traitB.example}"</Text>
-                                                    </View>
-                                                </View>
+                                    <View style={styles.traitsContainer}>
+                                        <View style={[styles.traitBox, styles.traitBoxLeft]}>
+                                            <View style={styles.traitHeader}>
+                                                <Text style={styles.traitShort}>{item.traitA.short}</Text>
+                                                <Text style={styles.traitName}>{item.traitA.name}</Text>
+                                            </View>
+                                            <View style={styles.traitContent}>
+                                                <Text style={styles.traitDefinition}>{item.traitA.definition}</Text>
+                                                <Text style={styles.traitExample}>"{item.traitA.example}"</Text>
                                             </View>
                                         </View>
-                                    ))}
-                                    <View style={styles.bottomPadding} />
-                                </ScrollView>
-                            </View>
 
-                            <View style={styles.buttonContainer}>
-                                <TouchableOpacity
-                                    style={styles.closeButton}
-                                    onPress={onClose}
-                                    activeOpacity={0.7}
-                                >
-                                    <Text style={styles.closeButtonText}>닫기</Text>
-                                </TouchableOpacity>
-                            </View>
+                                        <View style={[styles.traitBox, styles.traitBoxRight]}>
+                                            <View style={styles.traitHeader}>
+                                                <Text style={styles.traitShort}>{item.traitB.short}</Text>
+                                                <Text style={styles.traitName}>{item.traitB.name}</Text>
+                                            </View>
+                                            <View style={styles.traitContent}>
+                                                <Text style={styles.traitDefinition}>{item.traitB.definition}</Text>
+                                                <Text style={styles.traitExample}>"{item.traitB.example}"</Text>
+                                            </View>
+                                        </View>
+                                    </View>
+                                </View>
+                            ))}
+                            <View style={styles.bottomPadding} />
+                        </ScrollView>
+
+                        {/* 하단 닫기 버튼 */}
+                        <View style={styles.buttonContainer}>
+                            <TouchableOpacity
+                                style={styles.closeButton}
+                                onPress={onClose}
+                                activeOpacity={0.7}
+                            >
+                                <Text style={styles.closeButtonText}>닫기</Text>
+                            </TouchableOpacity>
                         </View>
                     </View>
-                </TouchableWithoutFeedback>
+                </View>
             </SafeAreaView>
         </Modal>
+
     );
 };
 
