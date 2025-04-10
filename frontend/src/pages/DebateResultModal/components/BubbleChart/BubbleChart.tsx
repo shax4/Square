@@ -204,7 +204,9 @@ const BubbleChart: React.FC<BubbleChartProps> = ({
             ]}
           />
           <View style={styles.labelContainer}>
-            <Text style={styles.valueText}>{bubble.data.value}%</Text>
+            <Text style={styles.valueText}>
+              {`${Math.round(bubble.data.value)}%`}
+            </Text>
             <Text style={styles.labelText} numberOfLines={2}>
               {bubble.data.label}
             </Text>
