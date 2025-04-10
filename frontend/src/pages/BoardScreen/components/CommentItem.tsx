@@ -23,7 +23,6 @@ import { Comment, Reply } from "../board.types";
 import { Icons } from "../../../../assets/icons/Icons";
 import { useAuthStore } from "../../../shared/stores/auth";
 import { getTimeAgo } from "../../../shared/utils/timeAge/timeAge";
-import { useLikeButton } from "../../../shared/hooks/useLikeButton";
 import Text from "../../../components/Common/Text";
 import colors from "../../../../assets/colors";
 import { useComment } from "../../../shared/hooks";
@@ -31,6 +30,7 @@ import ReplyItem from "./ReplyItem";
 import { useRoute } from "@react-navigation/native";
 import { StackScreenProps } from "@react-navigation/stack";
 import { BoardStackParamList } from "../../../shared/page-stack/BoardPageStack";
+import { TargetType } from "../../../components/LikeButton/LikeButton.types";
 
 interface CommentItemProps {
   postId: number; // 게시글 ID
@@ -52,7 +52,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
   const [showReplies, setShowReplies] = useState(false);
   const containerRef = useRef<View>(null);
   const [isFocused, setIsFocused] = useState(false);
-  const timerRef = useRef(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   /**
    * 댓글 포커싱 효과를 처리하는 useEffect
@@ -73,7 +73,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
       console.log(`댓글 ${comment.commentId} 포커싱 적용`);
       setIsFocused(true);
 
-      // 1초 후 포커싱 효과 제거 (3초에서 1초로 변경)
+      // 1.5초 후 포커싱 효과 제거
       timerRef.current = setTimeout(() => {
         console.log(`댓글 ${comment.commentId} 포커싱 제거`);
         setIsFocused(false);
@@ -446,15 +446,6 @@ const CommentItem: React.FC<CommentItemProps> = ({
   // 더보기/숨기기 버튼 표시 로직
   const canLoadMore = comment.replyCount > displayedReplies.length;
 
-  // 댓글용 좋아요 버튼 props 생성
-  const commentLikeProps = useLikeButton(
-    comment.commentId,
-    "POST_COMMENT",
-    comment.isLiked,
-    comment.likeCount,
-    onCommentChange
-  );
-
   return (
     <View
       ref={commentRef}
@@ -514,7 +505,14 @@ const CommentItem: React.FC<CommentItemProps> = ({
         </View>
       )}
       <View style={styles.footer}>
-        <LikeButton {...commentLikeProps} size="small" isVertical={false} />
+        <LikeButton
+          targetId={comment.commentId}
+          targetType="POST_COMMENT"
+          initialLiked={comment.isLiked ?? false} // 스토어 초기값 제공
+          initialCount={comment.likeCount ?? 0} // 스토어 초기값 제공
+          size="small"
+          isVertical={false}
+        />
         <TouchableOpacity
           onPress={handleReplyPress}
           style={styles.actionButton}

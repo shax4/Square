@@ -1,25 +1,36 @@
-import { StyleSheet, View, TouchableOpacity } from "react-native"
-import { Ionicons } from "@expo/vector-icons"
-import Text from '../../../components/Common/Text';
+import { StyleSheet, View, TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import Text from "../../../components/Common/Text";
 
 type OpinionCardProps = {
-  topic: string
-  content: string
-  likeCount: number
-  isLiked: boolean
-  onLikeToggle?: (isLiked: boolean) => void
-  onCardPress?: () => void
-}
+  topic: string;
+  content: string;
+  likeCount: number;
+  isLiked: boolean;
+  onLikeToggle?: (isLiked: boolean) => void;
+  onCardPress?: () => void;
+};
 
-const OpinionCard = ({ topic, content, likeCount, isLiked, onLikeToggle, onCardPress }: OpinionCardProps) => {
+const OpinionCard = ({
+  topic,
+  content,
+  likeCount,
+  isLiked,
+  onLikeToggle,
+  onCardPress,
+}: OpinionCardProps) => {
   const handleLikePress = () => {
     if (onLikeToggle) {
-      onLikeToggle(!isLiked)
+      onLikeToggle(!isLiked);
     }
-  }
+  };
 
   return (
-    <TouchableOpacity style={styles.container} onPress={onCardPress} activeOpacity={0.8}>
+    <TouchableOpacity
+      style={styles.container}
+      onPress={onCardPress}
+      activeOpacity={0.8}
+    >
       <View style={styles.contentContainer}>
         <View style={styles.topicContainer}>
           <Text style={styles.topic} numberOfLines={1} ellipsizeMode="tail">
@@ -28,8 +39,15 @@ const OpinionCard = ({ topic, content, likeCount, isLiked, onLikeToggle, onCardP
         </View>
 
         <View style={styles.contentBox}>
-          <Text weight="medium" style={styles.prefix}>ㄴ</Text>
-          <Text weight="medium" style={styles.content} numberOfLines={2} ellipsizeMode="tail">
+          <Text weight="medium" style={styles.prefix}>
+            ㄴ
+          </Text>
+          <Text
+            weight="medium"
+            style={styles.content}
+            numberOfLines={2}
+            ellipsizeMode="tail"
+          >
             {content}
           </Text>
         </View>
@@ -47,20 +65,22 @@ const OpinionCard = ({ topic, content, likeCount, isLiked, onLikeToggle, onCardP
             color={isLiked ? "#FF0000" : "#888888"}
           />
         </TouchableOpacity>
-        <Text weight="medium" style={styles.likeCount}>{likeCount.toLocaleString()}</Text>
+        <Text weight="medium" style={styles.likeCount}>
+          {likeCount.toLocaleString()}
+        </Text>
       </View>
     </TouchableOpacity>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
-    flexDirection: 'row',
-    shadowColor: '#000',
+    flexDirection: "row",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
@@ -78,41 +98,40 @@ const styles = StyleSheet.create({
   },
   topic: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#333333',
+    fontWeight: "600",
+    color: "#333333",
   },
   contentBox: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    alignItems: "flex-start",
     marginRight: 20,
   },
   prefix: {
     fontSize: 14,
-    color: '#999999',
+    color: "#999999",
     marginRight: 6,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   content: {
     fontSize: 14,
-    color: '#555555',
+    color: "#555555",
     flex: 1,
     lineHeight: 20,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   likeContainer: {
-    justifyContent: 'center',
-    alignItems: 'flex-end',
-    marginRight: 7
+    justifyContent: "center",
+    alignItems: "flex-end",
+    marginRight: 7,
   },
   likeButton: {
     marginBottom: 4,
   },
   likeCount: {
     fontSize: 14,
-    color: '#888888',
-    marginRight: 5
+    color: "#888888",
+    marginRight: 5,
   },
-})
+});
 
-export default OpinionCard
-
+export default OpinionCard;

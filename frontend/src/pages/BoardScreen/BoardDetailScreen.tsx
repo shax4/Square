@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useEffect } from "react";
+import React, { useCallback, useRef, useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -21,12 +21,13 @@ import LikeButton from "../../components/LikeButton";
 import { Icons } from "../../../assets/icons/Icons";
 import PersonalityTag from "../../components/PersonalityTag/PersonalityTag";
 import { usePostDetail, useComment } from "../../shared/hooks";
-import { useLikeButton } from "../../shared/hooks/useLikeButton";
+import { useLikeStore, LikeState } from "../../shared/stores/LikeStore";
 import Text from "../../components/Common/Text";
 import colors from "../../../assets/colors";
 import { useFocusEffect } from "@react-navigation/native";
 import { Comment as BoardComment, Reply as BoardReply } from "./board.types";
 import { Comment, Reply } from "../../shared/types/postTypes";
+import { TargetType } from "../../components/LikeButton/LikeButton.types";
 
 // 네비게이션 프롭 타입 정의
 type Props = StackScreenProps<BoardStackParamList, "BoardDetail">;
@@ -85,6 +86,65 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
     createComment,
     submitError,
   } = useComment();
+
+  // LikeStore 초기화 액션 가져오기
+  const initializeLikes = useLikeStore(
+    (state: LikeState) => state.initializeLikes
+  );
+
+  // 게시글 및 댓글 데이터 로드 시 LikeStore 상태 초기화
+  useEffect(() => {
+    if (post) {
+      console.log(
+        "[BoardDetailScreen] Initializing LikeStore for post and comments (only new items)"
+      );
+      const likeUpdates: Record<
+        string,
+        { isLiked: boolean; likeCount: number }
+      > = {};
+      // Get current store state once
+      const currentLikeStatuses = useLikeStore.getState().likeStatuses;
+
+      // 1. 게시글 좋아요 상태 추가 (if not exists)
+      const postKey = `POST_${post.postId}`;
+      if (currentLikeStatuses[postKey] === undefined) {
+        likeUpdates[postKey] = {
+          isLiked: post.isLiked ?? false,
+          likeCount: post.likeCount ?? 0,
+        };
+      }
+
+      // 2. 댓글 및 대댓글 좋아요 상태 추가 (if not exists)
+      post.comments?.forEach((comment) => {
+        const commentKey = `POST_COMMENT_${comment.commentId}`;
+        if (currentLikeStatuses[commentKey] === undefined) {
+          likeUpdates[commentKey] = {
+            isLiked: comment.isLiked ?? false,
+            likeCount: comment.likeCount ?? 0,
+          };
+        }
+
+        comment.replies?.forEach((reply) => {
+          const replyKey = `POST_COMMENT_${reply.replyId}`; // Use the same type as comment
+          if (currentLikeStatuses[replyKey] === undefined) {
+            likeUpdates[replyKey] = {
+              isLiked: reply.isLiked ?? false,
+              likeCount: reply.likeCount ?? 0,
+            };
+          }
+        });
+      });
+
+      // Only call initializeLikes if there are new statuses to add
+      if (Object.keys(likeUpdates).length > 0) {
+        console.log(
+          "[BoardDetailScreen] Initializing LikeStore for new items:",
+          likeUpdates
+        );
+        initializeLikes(likeUpdates);
+      }
+    }
+  }, [post, initializeLikes]); // post 데이터가 변경될 때 실행
 
   // 댓글 아이템 refs를 저장할 객체
   const commentRefs = useRef<{ [key: number]: React.RefObject<View> }>({});
@@ -187,12 +247,6 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
     }
   };
 
-  // 게시글 좋아요 상태 변경 핸들러
-  const handlePostLikeChange = useCallback(() => {
-    // refresh 함수 호출로 데이터 새로고침
-    refresh();
-  }, [refresh]);
-
   // 로딩 중이면 로딩 인디케이터 표시
   if (loading && !post) {
     return (
@@ -230,14 +284,6 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
     );
   }
 
-  const likeProps = useLikeButton(
-    post.postId,
-    "POST",
-    post.isLiked,
-    post.likeCount,
-    handlePostLikeChange
-  );
-
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -273,7 +319,14 @@ export default function BoardDetailScreen({ route, navigation }: Props) {
         <View style={styles.commentsSection}>
           <View style={styles.commentsSectionHeader}>
             <View style={styles.interactionContainer}>
-              <LikeButton {...likeProps} size="large" isVertical={false} />
+              <LikeButton
+                targetId={post.postId}
+                targetType="POST"
+                initialLiked={post.isLiked ?? false}
+                initialCount={post.likeCount ?? 0}
+                size="large"
+                isVertical={false}
+              />
               <View style={styles.commentCountContainer}>
                 <Icons.commentNew />
                 <Text weight="medium" style={styles.commentCountText}>

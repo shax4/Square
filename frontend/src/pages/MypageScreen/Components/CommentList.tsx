@@ -7,6 +7,7 @@ import Text from "../../../components/Common/Text";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { StackParamList } from "../../../shared/page-stack/MyPageStack";
+import { useLikeStore, LikeState } from "../../../shared/stores/LikeStore";
 
 interface Props {
   refreshTrigger?: number;
@@ -18,6 +19,10 @@ const CommentList = ({ refreshTrigger = 0 }: Props) => {
   const [nextCursorId, setNextCursorId] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [isEmpty, setIsEmpty] = useState<boolean>(false);
+
+  const initializeLikes = useLikeStore(
+    (state: LikeState) => state.initializeLikes
+  );
 
   /**
    * 마이페이지 댓글 목록을 가져오는 함수
@@ -37,13 +42,29 @@ const CommentList = ({ refreshTrigger = 0 }: Props) => {
       }
 
       // 첫 페이지인 경우 기존 댓글을 대체하고, 그렇지 않은 경우 기존 댓글에 추가
-      if (cursorId === null) {
-        setComments(data.comments);
-      } else {
-        setComments((prev) => [...prev, ...data.comments]);
-      }
-
+      const newComments =
+        cursorId === null ? data.comments : [...comments, ...data.comments];
+      setComments(newComments);
       setNextCursorId(data.nextCursorId || null);
+
+      if (data.comments && data.comments.length > 0) {
+        const likeUpdates: Record<
+          string,
+          { isLiked: boolean; likeCount: number }
+        > = {};
+        data.comments.forEach((comment: Comment) => {
+          const key = `POST_COMMENT_${comment.commentId}`;
+          likeUpdates[key] = {
+            isLiked: comment.isLiked ?? false,
+            likeCount: comment.likeCount ?? 0,
+          };
+        });
+        console.log(
+          `[Mypage/CommentList] Initializing LikeStore:`,
+          likeUpdates
+        );
+        initializeLikes(likeUpdates);
+      }
     } catch (error) {
       console.error("마이페이지 댓글 조회 실패 : ", error);
     } finally {
@@ -112,16 +133,12 @@ const CommentList = ({ refreshTrigger = 0 }: Props) => {
       keyExtractor={(item) => item.commentId.toString()}
       renderItem={({ item }) => (
         <CommentCard
+          commentId={item.commentId}
           title={item.title}
           content={item.content}
           likeCount={item.likeCount}
           isLiked={item.isLiked}
           onPress={() => handleCommentPress(item)}
-          onLikeToggle={(isLiked) =>
-            console.log(
-              `Like toggled to ${isLiked} for comment ${item.commentId}`
-            )
-          }
         />
       )}
       contentContainerStyle={styles.listContent}

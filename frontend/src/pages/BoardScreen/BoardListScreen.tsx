@@ -29,6 +29,7 @@ import { Post } from "../../shared/types/postTypes";
 import { PostService } from "../../shared/services/postService";
 import { Icons } from "../../../assets/icons/Icons";
 import { useAuthStore } from "../../shared/stores/auth";
+import { useLikeStore, LikeState } from "../../shared/stores/LikeStore";
 
 // 네비게이션 프롭 타입 정의
 type BoardListScreenNavigationProp = StackNavigationProp<
@@ -80,7 +81,7 @@ export default function BoardListScreen({
     [sortBy]
   ); // sortBy만 의존성으로 포함 - limit은 변경되지 않음
 
-  // 4. usePostList 커스텀 훅 호출 - 메모이제이션된 파라미터 전달
+  // 4. usePostList 커스텀 훅 호출
   const {
     posts,
     popularPosts,
@@ -92,6 +93,43 @@ export default function BoardListScreen({
     refreshing,
     changeSort,
   } = usePostList(postListParams);
+
+  // LikeStore 초기화 액션 가져오기
+  const initializeLikes = useLikeStore(
+    (state: LikeState) => state.initializeLikes
+  );
+
+  // posts 데이터 변경 시 LikeStore 상태 초기화/업데이트
+  useEffect(() => {
+    if (posts && posts.length > 0) {
+      const likeUpdates: Record<
+        string,
+        { isLiked: boolean; likeCount: number }
+      > = {};
+      // Get current store state once
+      const currentLikeStatuses = useLikeStore.getState().likeStatuses;
+
+      posts.forEach((post: Post) => {
+        const key = `POST_${post.postId}`;
+        // Only add to updates if the key doesn't already exist in the store
+        if (currentLikeStatuses[key] === undefined) {
+          likeUpdates[key] = {
+            isLiked: post.isLiked ?? false,
+            likeCount: post.likeCount ?? 0,
+          };
+        }
+      });
+
+      // Only call initializeLikes if there are new statuses to add
+      if (Object.keys(likeUpdates).length > 0) {
+        console.log(
+          "[BoardListScreen] Initializing LikeStore for new items:",
+          likeUpdates
+        );
+        initializeLikes(likeUpdates);
+      }
+    }
+  }, [posts, initializeLikes]); // posts 데이터가 변경될 때 실행
 
   // 5. 로딩 시작 시간 관리를 위한 useEffect
   useEffect(() => {
@@ -137,8 +175,6 @@ export default function BoardListScreen({
   // 9. 게시글 아이템 렌더링 함수
   const renderItem = useCallback(
     ({ item }: { item: Post }) => {
-      // 각 아이템 렌더링 시 로그 (필요하면 주석 해제하여 사용)
-      // console.log("Rendering post item:", item.postId, item.title);
       return (
         <BoardItem
           item={{ ...item, userType: item.userType || "" }}

@@ -1,19 +1,20 @@
-import React from 'react';
-import { StyleSheet, View, TouchableOpacity } from 'react-native';
-import {LikeButton} from '../../../components';
-import Text from '../../../components/Common/Text';
-import colors from '../../../../assets/colors';
+import React from "react";
+import { StyleSheet, View, TouchableOpacity } from "react-native";
+import { LikeButton } from "../../../components";
+import Text from "../../../components/Common/Text";
+import colors from "../../../../assets/colors";
 
 type CommentCardProps = {
+  commentId: number;
   title: string;
   content: string;
   likeCount: number;
   isLiked: boolean;
   onPress?: () => void;
-  onLikeToggle?: (isLiked: boolean) => void;
 };
 
 const CommentCard = ({
+  commentId,
   title,
   content,
   likeCount,
@@ -21,8 +22,8 @@ const CommentCard = ({
   onPress,
 }: CommentCardProps) => {
   return (
-    <TouchableOpacity 
-      style={styles.container} 
+    <TouchableOpacity
+      style={styles.container}
       onPress={onPress}
       activeOpacity={0.8}
     >
@@ -32,19 +33,30 @@ const CommentCard = ({
             {title}
           </Text>
         </View>
-        
+
         <View style={styles.commentContainer}>
-          <Text weight="medium" style={styles.commentPrefix}>ㄴ</Text>
-          <Text weight="medium" style={styles.commentContent} numberOfLines={2} ellipsizeMode="tail">
+          <Text weight="medium" style={styles.commentPrefix}>
+            ㄴ
+          </Text>
+          <Text
+            weight="medium"
+            style={styles.commentContent}
+            numberOfLines={2}
+            ellipsizeMode="tail"
+          >
             {content}
           </Text>
         </View>
       </View>
-      
+
       <View style={styles.likeContainer}>
-        <LikeButton 
-          initialCount={likeCount} 
-          initialLiked={isLiked} 
+        <LikeButton
+          targetId={commentId}
+          targetType="POST_COMMENT"
+          initialCount={likeCount}
+          initialLiked={isLiked}
+          size="small"
+          isVertical={true}
         />
       </View>
     </TouchableOpacity>
@@ -53,12 +65,12 @@ const CommentCard = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
-    flexDirection: 'row',
-    shadowColor: '#000',
+    flexDirection: "row",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
@@ -67,38 +79,38 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
     marginRight: 8,
-    marginLeft: 1
+    marginLeft: 1,
   },
   titleContainer: {
     marginTop: 2,
     marginBottom: 6,
-    marginRight: 20
+    marginRight: 20,
   },
   title: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#333333',
+    fontWeight: "600",
+    color: "#333333",
   },
   commentContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginRight: 20
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginRight: 20,
   },
   commentPrefix: {
     fontSize: 14,
     color: colors.grayText,
     marginRight: 6,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   commentContent: {
     fontSize: 14,
-    color: '#555555',
+    color: "#555555",
     flex: 1,
     lineHeight: 20,
   },
   likeContainer: {
-    justifyContent: 'center',
-    alignItems: 'flex-end',
+    justifyContent: "center",
+    alignItems: "flex-end",
   },
 });
 

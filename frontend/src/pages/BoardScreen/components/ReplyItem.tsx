@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,7 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
-  // ActivityIndicator, // 답글은 더보기 로딩 없음
+  ActivityIndicator,
   // FlatList, // 답글은 하위 목록 없음
 } from "react-native";
 import ProfileImage from "../../../components/ProfileImage/ProfileImage";
@@ -16,8 +16,8 @@ import { Reply } from "../board.types"; // *** 타입 변경: Comment -> Reply *
 import { Icons } from "../../../../assets/icons/Icons";
 import { useAuth } from "../../../shared/hooks/useAuth";
 import { getTimeAgo } from "../../../shared/utils/timeAge/timeAge";
-import { useLikeButton } from "../../../shared/hooks/useLikeButton";
 import { useComment } from "../../../shared/hooks";
+import { TargetType } from "../../../components/LikeButton/LikeButton.types";
 
 interface ReplyItemProps {
   // *** Props 인터페이스명 변경 ***
@@ -128,15 +128,6 @@ export default function ReplyItem({
     setIsExpanded(!isExpanded);
   };
 
-  // --- 좋아요 버튼 훅 ---
-  const replyLikeProps = useLikeButton(
-    reply.replyId,
-    "POST_COMMENT", // API가 댓글/답글 구분 없이 ID로 처리한다고 가정
-    reply.isLiked,
-    reply.likeCount,
-    onCommentChange // 좋아요 변경 시 목록 새로고침
-  );
-
   return (
     // *** isReply prop 제거, 기본적으로 답글 스타일 적용 ***
     <View style={[styles.container, styles.replyContainer]}>
@@ -211,7 +202,14 @@ export default function ReplyItem({
 
       {/* --- 푸터 (좋아요, 수정/삭제 버튼) --- */}
       <View style={styles.footer}>
-        <LikeButton {...replyLikeProps} size="small" isVertical={false} />
+        <LikeButton
+          targetId={reply.replyId}
+          targetType="POST_COMMENT" // 대댓글도 POST_COMMENT 사용
+          initialLiked={reply.isLiked ?? false} // 스토어 초기값 제공
+          initialCount={reply.likeCount ?? 0} // 스토어 초기값 제공
+          size="small"
+          isVertical={false}
+        />
         {/* 답글에는 '답글달기' 버튼 없음 */}
         {isAuthor && !isEditing && (
           <>

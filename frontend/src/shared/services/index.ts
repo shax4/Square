@@ -13,14 +13,10 @@ import { CommentService } from "./commentService";
 import { ImageService } from "./imageService";
 
 // 좋아요 관련 서비스
-import { LikeService, toggleLikeAPI } from "./likeService";
+import { LikeService } from "./likeService";
 
 // 추가 서비스들은 여기에 추가
 
-export {
-  PostService,
-  CommentService,
-  ImageService,
-  LikeService,
-  toggleLikeAPI,
-};
+export { PostService, CommentService, ImageService, LikeService };
+
+export * from "./likeService";

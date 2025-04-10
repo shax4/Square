@@ -1,28 +1,17 @@
-import React, { useState } from "react";
+import React, { memo, useEffect, useState, useRef } from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
-import ProfileImage from "../../../components/ProfileImage";
-import LikeButton from "../../../components/LikeButton";
-import { getTimeAgo } from "../../../shared/utils/timeAge/timeAge";
-import { Icons } from "../../../../assets/icons/Icons";
+import ProfileImage from "../../../components/ProfileImage/ProfileImage";
 import PersonalityTag from "../../../components/PersonalityTag/PersonalityTag";
-import { useLikeButton } from "../../../shared/hooks/useLikeButton";
-import Text from '../../../components/Common/Text';
+import LikeButton from "../../../components/LikeButton";
+import { Post } from "../../../shared/types/postTypes";
+import { getTimeAgo } from "../../../shared/utils/timeAge/timeAge";
+import Text from "../../../components/Common/Text";
 import colors from "../../../../assets/colors";
+import { Icons } from "../../../../assets/icons/Icons";
+import { TargetType } from "../../../components/LikeButton/LikeButton.types";
 
-// 게시글 아이템 타입 정의
 interface BoardItemProps {
-  item: {
-    postId: number;
-    title: string;
-    content: string;
-    nickname: string;
-    profileUrl?: string;
-    userType: string | null;
-    createdAt: string;
-    likeCount: number;
-    commentCount: number;
-    isLiked: boolean;
-  };
+  item: Post;
   onPress: () => void;
 }
 
@@ -31,7 +20,7 @@ interface BoardItemProps {
  * @param item - 게시글 데이터 객체
  * @param onPress - 게시글 클릭 시 실행될 함수
  */
-export default function BoardItem({ item, onPress }: BoardItemProps) {
+function BoardItem({ item, onPress }: BoardItemProps) {
   console.log(`BoardItem 렌더링: ID ${item.postId}, 제목: ${item.title}`);
 
   // 필수 데이터 검증
@@ -44,27 +33,12 @@ export default function BoardItem({ item, onPress }: BoardItemProps) {
     );
   }
 
-  // 로컬 상태 추가
-  const [likeCount, setLikeCount] = useState(item.likeCount || 0);
-  const [isLiked, setIsLiked] = useState(item.isLiked || false);
-
   // 게시글 내용을 미리보기 형태로 자름 (최대 100자)
   const contentPreview = item.content
     ? item.content.length > 100
       ? `${item.content.substring(0, 100)}...`
       : item.content
     : "";
-
-  const likeProps = useLikeButton(
-    item.postId,
-    "POST",
-    isLiked,
-    likeCount,
-    (newState) => {
-      setLikeCount(newState.likeCount);
-      setIsLiked(newState.isLiked);
-    }
-  );
 
   return (
     <TouchableOpacity
@@ -74,35 +48,42 @@ export default function BoardItem({ item, onPress }: BoardItemProps) {
     >
       {/* 작성자 정보 영역 */}
       <View style={styles.header}>
-        <ProfileImage imageUrl={item?.profileUrl} variant="medium" />
+        <ProfileImage imageUrl={item.profileUrl} variant="small" />
         <View style={styles.authorInfo}>
           <View style={styles.nameContainer}>
             <Text style={styles.authorName}>{item.nickname}</Text>
             <PersonalityTag
-              personality={item.userType}
-              nickname={item.nickname}
+              personality={item.userType || ""}
+              nickname={item.nickname || ""}
             />
           </View>
-          <Text weight="medium" style={styles.date}>{getTimeAgo(item.createdAt)}</Text>
+          <Text style={styles.date}>{getTimeAgo(item.createdAt)}</Text>
         </View>
       </View>
 
       {/* 게시글 내용 영역 */}
       <View style={styles.content}>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text weight="medium" style={styles.preview} numberOfLines={2}>
-          {contentPreview}
+        <Text style={styles.title} numberOfLines={1}>
+          {item.title}
+        </Text>
+        <Text style={styles.body} numberOfLines={2}>
+          {item.content}
         </Text>
       </View>
 
       {/* 하단 정보 영역 (좋아요 수, 댓글 수) */}
       <View style={styles.footer}>
-        <View style={styles.interactionContainer}>
-          <LikeButton {...likeProps} size="large" isVertical={false} />
-          <View style={styles.commentCountContainer}>
-            <Icons.commentNew />
-            <Text weight="medium" style={styles.commentCountText}>{item.commentCount}</Text>
-          </View>
+        <LikeButton
+          targetId={item.postId}
+          targetType="POST"
+          initialLiked={item.isLiked ?? false}
+          initialCount={item.likeCount ?? 0}
+          size="small"
+          isVertical={false}
+        />
+        <View style={styles.commentInfo}>
+          <Icons.commentNew />
+          <Text style={styles.commentCount}>{item.commentCount}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -127,7 +108,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 12,
-    marginLeft: 1
+    marginLeft: 1,
   },
   authorInfo: {
     marginLeft: 10,
@@ -144,14 +125,13 @@ const styles = StyleSheet.create({
   },
   content: {
     marginBottom: 5,
-    marginLeft: 4
-
+    marginLeft: 4,
   },
   title: {
     fontSize: 17,
     marginBottom: 8,
   },
-  preview: {
+  body: {
     fontSize: 14,
     color: "#444",
     lineHeight: 18,
@@ -161,22 +141,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginTop: 4,
-    
   },
-  stats: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  interactionContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  commentCountContainer: {
+  commentInfo: {
     flexDirection: "row",
     alignItems: "center",
     marginLeft: 16,
   },
-  commentCountText: {
+  commentCount: {
     fontWeight: "bold",
     fontSize: 12,
     color: "gray",
@@ -194,3 +165,5 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
+
+export default memo(BoardItem);
