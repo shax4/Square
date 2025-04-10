@@ -7,6 +7,7 @@ module.exports = {
       '@react-native-firebase/messaging': {},
       '@notifee/react-native': {},
       'react-native-view-shot': {},
+      'react-native-device-info': {},
     },
 };
   
