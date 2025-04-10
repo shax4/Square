@@ -45,7 +45,7 @@ interface PagingCursor {
 export default function OpinionListScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<DebateStackParamList>>();
 
-    const { loggedIn } = useAuthStore();
+    const { loggedIn, user } = useAuthStore();
 
     const route = useRoute<OpinionListScreenRouteProp>();
     const { debateId, showVoteResultModal = false, showSummaryFirst = true } = route.params;
@@ -295,11 +295,7 @@ export default function OpinionListScreen() {
         );
     }
     return (
-        <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={styles.container}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
-        >
+        <View style={styles.container}>
             <SafeAreaView style={styles.container}>
                 <View style={styles.topicView}>
                     <Text style={styles.topicViewText}>{debate!.topic}</Text>
@@ -338,29 +334,30 @@ export default function OpinionListScreen() {
                     </View>
                 )}
 
+                {/* 옵션 양쪽 내용 */}
                 <View style={styles.optionView}>
                     <View style={[styles.optionBox, styles.optionBoxLeft]}>
                         <Image
-                        source={require('../../../assets/images/agree.png')}
-                        style={styles.optionImage}
+                            source={require('../../../assets/images/agree.png')}
+                            style={styles.optionImage}
                         />
                         <Text style={[styles.optionText, styles.optionTextLeft]}>
-                        {debate!.leftOption}
+                            {debate!.leftOption}
                         </Text>
                     </View>
 
                     <View style={[styles.optionBox, styles.optionBoxRight]}>
                         <Image
-                        source={require('../../../assets/images/disagree.png')}
-                        style={styles.optionImage}
+                            source={require('../../../assets/images/disagree.png')}
+                            style={styles.optionImage}
                         />
                         <Text style={[styles.optionText, styles.optionTextRight]}>
-                        {debate!.rightOption}
+                            {debate!.rightOption}
                         </Text>
                     </View>
                 </View>
 
-
+                {/* 의견 리스트 */}
                 <View style={styles.opinionView}>
                     {isSummary ? (
                         <SummaryBoxList data={summaries} />
@@ -381,21 +378,31 @@ export default function OpinionListScreen() {
                 </View>
 
                 <View style={styles.bottomContainer}>
-                    <View style={isSummary ? styles.VoteButtonView : styles.VoteButtonViewSmall}>
+                    <KeyboardAvoidingView
+                        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                        style={isSummary ? styles.VoteButtonView : styles.VoteButtonViewSmall}
+                        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 100}
+                    >
                         <VoteButton
                             debateId={debateId}
                             showVoteResultModal={showVoteResultModal}
                         />
-                    </View>
+                    </KeyboardAvoidingView>
 
                     {isSummary && (
                         <View style={styles.TotalVoteCountView}>
                             <Text>지금까지 {debate!.totalVoteCount}명 참여중</Text>
                         </View>
                     )}
+
+                    {(!isSummary && debate.isLeft == null) && (
+                        <View style={styles.TotalVoteCountView}>
+                            <Text>성향 테스트 및 투표 후 의견 등록 가능합니다.</Text>
+                        </View>
+                    )}
                 </View>
 
-                {!isSummary && (
+                {(!isSummary && debate.isLeft != null && user?.userType != null) && (
                     <CommentInput
                         onChangeText={setCommentText}
                         onSubmit={handleOpinionPosting}
@@ -406,6 +413,7 @@ export default function OpinionListScreen() {
                     />
                 )}
             </SafeAreaView>
-        </KeyboardAvoidingView>
+        </View>
+
     );
 }

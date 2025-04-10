@@ -17,6 +17,7 @@ interface DebateCreateForm {
     topic: string;
     leftOption: string;
     rightOption: string;
+    categoryName: string;
 }
 
 export const createDebate = async (newDebate: DebateCreateForm) => {

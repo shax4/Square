@@ -1,4 +1,4 @@
-export interface SignInRequest{
+export interface SignUpRequest{
     email: string;
     socialType: string;
     nickname: string;
@@ -9,7 +9,7 @@ export interface SignInRequest{
     religion: string;
 }
 
-export interface SignInResponse{
+export interface SignUpResponse{
     isMember: boolean;
     email: string;
     socialType: string;

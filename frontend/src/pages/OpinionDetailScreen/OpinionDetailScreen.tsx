@@ -1,10 +1,12 @@
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import {
-  RouteProp,
-  useNavigation,
-  useRoute,
-  useIsFocused,
-} from "@react-navigation/native";
-import { Text, TouchableOpacity, View, ScrollView, Alert } from "react-native";
+  TouchableOpacity,
+  View,
+  ScrollView,
+  Alert,
+  Modal,
+  TouchableWithoutFeedback,
+} from "react-native";
 import { DebateStackParamList } from "../../shared/page-stack/DebatePageStack";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { Icons } from "../../../assets/icons/Icons";
@@ -17,12 +19,15 @@ import {
   getOpinionDetail,
   createComment,
   likesComment,
+  deleteComment,
 } from "./api/CommentApi";
 import { deleteOpinion } from "../OpinionListScreen/api/OpinionApi";
 import { OpinionsResponse } from "./Components/OpinionsResponse.types";
 import { Comment } from "./Components/Comment.types";
 import { useAuthStore } from "../../shared/stores";
 import { likesOpinion } from "./api/OpinionApi";
+import Text from "../../components/Common/Text";
+
 type OpinionDetailRouteProp = RouteProp<
   DebateStackParamList,
   "OpinionDetailScreen"
@@ -39,7 +44,6 @@ export default function OpinionDetailScreen() {
 
   // 로그인 사용자
   const { user } = useAuthStore();
-
   // 의견 상세페이지 정보
   const [opinionDetail, setOpinionDetail] = useState<OpinionsResponse | null>(
     null
@@ -51,6 +55,54 @@ export default function OpinionDetailScreen() {
 
   // 로딩 여부
   const [loading, setLoading] = useState(true);
+
+  // 삭제 및 수정을 위해 선택한 댓글 및 모달
+  const [selectedCommentId, setSelectedCommentId] = useState<number | null>(
+    null
+  );
+  const [commentModalVisible, setCommentModalVisible] = useState(false);
+
+  const handleLongPressComment = (commentId: number, nickname: string) => {
+    if (nickname === user?.nickname) {
+      setSelectedCommentId(commentId);
+      setCommentModalVisible(true);
+    }
+  };
+
+  const handleEditComment = () => {
+    setCommentModalVisible(false);
+    // TODO: 댓글 수정 페이지 이동 or 모달 내에서 수정 가능하게 만들기
+    Alert.alert("수정 기능 준비 중입니다.");
+  };
+
+  // 수정 삭제 모달
+  const handleDeleteComment = () => {
+    setCommentModalVisible(false);
+    Alert.alert("댓글 삭제", "정말로 삭제하시겠습니까?", [
+      { text: "취소", style: "cancel" },
+      {
+        text: "삭제",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            const response = await deleteComment(selectedCommentId!);
+            setComments((prev) =>
+              prev.filter((comment) => comment.commentId !== selectedCommentId)
+            );
+            navigation.pop(1);
+            navigation.navigate("OpinionDetailScreen", {
+              debateId: debateId,
+              opinionId: opinionId,
+            });
+          } catch (error) {
+            Alert.alert("삭제 실패", "잠시 후 다시 시도해주세요.", [
+              { text: "확인", style: "cancel" },
+            ]);
+          }
+        },
+      },
+    ]);
+  };
 
   // 텍스트 입력할 때 마다 실행
   const onChangeText = (text: string) => {
@@ -65,7 +117,6 @@ export default function OpinionDetailScreen() {
       trimmedComment.length > 150
     ) {
       // 네이티브 모달로 글자 수 보내 경고
-
       return;
     }
 
@@ -173,8 +224,8 @@ export default function OpinionDetailScreen() {
         },
         {
           text: "삭제",
-          onPress: () => {
-            deleteOpinion(opinionId);
+          onPress: async () => {
+            await deleteOpinion(opinionId);
             setTimeout(() => {
               navigation.pop(2);
               navigation.navigate("OpinionListScreen", {
@@ -223,7 +274,9 @@ export default function OpinionDetailScreen() {
 
       {/* 의견 컨텐츠 */}
       <View style={styles.OpinionContentView}>
-        <Text style={styles.OpinionContentText}>{opinionDetail!.content}</Text>
+        <Text weight="medium" style={styles.OpinionContentText}>
+          {opinionDetail!.content}
+        </Text>
       </View>
 
       {/* 좋아요 및 댓글 수 */}
@@ -238,8 +291,10 @@ export default function OpinionDetailScreen() {
         />
 
         <View style={styles.CommentCountButton}>
-          <Icons.comment />
-          <Text style={styles.CountText}>{opinionDetail!.commentCount}</Text>
+          <Icons.commentNew />
+          <Text weight="medium" style={styles.CountText}>
+            {opinionDetail!.commentCount}
+          </Text>
         </View>
       </View>
 
@@ -264,7 +319,19 @@ export default function OpinionDetailScreen() {
                   variant="small"
                 />
                 <View style={styles.CommentTextView}>
-                  <Text style={styles.CommentText}>{comment.content}</Text>
+                  <TouchableOpacity
+                    activeOpacity={0.4}
+                    onLongPress={() =>
+                      handleLongPressComment(
+                        comment.commentId,
+                        comment.nickname
+                      )
+                    }
+                  >
+                    <Text weight="medium" style={styles.CommentText}>
+                      {comment.content}
+                    </Text>
+                  </TouchableOpacity>
                 </View>
               </View>
 
@@ -295,6 +362,34 @@ export default function OpinionDetailScreen() {
         contentMinSize={5}
         contentMaxSize={150}
       />
+
+      <Modal
+        visible={commentModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setCommentModalVisible(false)}
+      >
+        <TouchableWithoutFeedback onPress={() => setCommentModalVisible(false)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback onPress={() => {}}>
+              <View style={styles.modalContent}>
+                {/*
+                                 <TouchableOpacity onPress={handleEditComment} style={styles.modalButton}>
+                                    <Text style={styles.modalButtonText}>수정</Text>
+                                </TouchableOpacity>
+                                 */}
+                <TouchableOpacity
+                  onPress={handleDeleteComment}
+                  style={styles.modalButton}
+                >
+                  <Text style={styles.modalCancelButtonText}>삭제</Text>
+                </TouchableOpacity>
+                <View style={styles.ModalPadding} />
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </View>
   );
 }
