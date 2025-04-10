@@ -2,6 +2,8 @@
 export interface userDetails{
     nickname: string | null;
     userType: string | null;
+    email: string | null;
+    socialType: string | null;
     state: string;
     isMember : boolean;
     accessToken : string | null;

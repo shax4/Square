@@ -10,11 +10,13 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 
 import {StackParamList} from '../../../shared/page-stack/MyPageStack'
+import { useAuth } from "../../../shared/hooks"
 
 // Create a wrapper component to use the context
 const SurveyContent = () => {
     const { selectedOptions } = useSurvey()
     const [questions, setQuestions] = useState<SurveyQuestion[]>([]);
+    const {setUser, user} = useAuth();
 
     const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
 
@@ -79,6 +81,8 @@ const SurveyContent = () => {
         console.log("Survey submitted successfully:", result)
         //Alert.alert("제출이 완료", JSON.stringify(result, null, 2), [{ text: "확인" }]);
         Alert.alert("제출이 완료", "성향 정보가 반영되었습니다.", [{ text: "확인" }]);
+
+        setUser({...user!, userType : result.userType})
   
         navigation.replace('PersonalityResultScreen', { isAfterSurvey : true, givenNickname : result.nickname, typeResult : result})
       } catch (error) {

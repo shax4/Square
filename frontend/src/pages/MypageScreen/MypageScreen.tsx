@@ -56,7 +56,7 @@ const MypageScreen = () => {
           <View style={styles.profileInfo}>
             <ProfileImage variant="large" imageUrl={userInfo?.profileUrl}/>
             <View style={styles.profileDetails}>
-              <PersonalityTag personality={user?.userType || "TEST"} nickname={user?.nickname || "temp_nickname"} />
+              <PersonalityTag personality={user?.userType!} nickname={user?.nickname!} />
               <Text style={styles.nickname}>{user?.nickname}</Text>
             </View>
           </View>

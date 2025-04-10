@@ -1,7 +1,7 @@
 import { NavigationContainer, useNavigationState } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
-
+import { navigationRef } from './NavigationService';
 import BoardHeaderBar from "./stacks/BoardHeaderBar";
 import NotificationHeaderBar from "./stacks/NotificationHeaderBar";
 import MainHeaderBar from "./stacks/MainHeaderBar";
@@ -105,7 +105,7 @@ export default function AppNavigator() {
     }, [user])
 
     return (
-        <NavigationContainer>
+        <NavigationContainer ref={navigationRef}>
             {isUserLoggedIn ? <BottomTabs /> : <LandingScreen />}
         </NavigationContainer>
     );
