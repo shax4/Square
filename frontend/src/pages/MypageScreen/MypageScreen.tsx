@@ -18,7 +18,7 @@ import { getProfileInfos } from "./Api/userAPI"
 import { useAuth } from "../../shared/hooks"
 import { UserInfo } from "../../shared/types/user"
 import Text from '../../components/Common/Text';
-
+import { useAdminMode } from "../../shared/hooks/useAdminMode"
 
 const MypageScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
@@ -35,12 +35,18 @@ const MypageScreen = () => {
   // Sub-sections for Votes
   const [activeVoteSection, setActiveVoteSection] = useState("내가 한 투표")
 
+  const { isAdminMode, setAdminMode } = useAdminMode();
+
   useEffect(() => {
     const getUserInfo = async () => {
       try{
         const userInfo : UserInfo = await getProfileInfos();
 
         setUserInfo(userInfo);
+
+        if( userInfo.userState == "ADMIN") {
+          setAdminMode(true);
+        }
       }catch(error : any){
         console.error("getUserInfo 에러 발생 : ", error);
       }

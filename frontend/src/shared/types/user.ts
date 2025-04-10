@@ -14,4 +14,5 @@ export interface UserInfo{
     profileUrl: string;
     region: string;
     religion: string;
+    userState: string;
 }
