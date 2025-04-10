@@ -60,7 +60,7 @@ const religionOptions = [
   "기타"
 ]
 
-const SignUpScreen = () => {
+const SignUpScreen = ({ onCancel }: { onCancel?: () => void }) => {
   // State for form fields
   const [currentStep, setCurrentStep] = useState<SignUpStep>(SignUpStep.Nickname)
   const [nickname, setNickname] = useState("")
@@ -109,6 +109,9 @@ const SignUpScreen = () => {
       scrollViewRef.current?.scrollTo({ y: 0, animated: true })
     } else {
       // navigation.goBack()
+      if (onCancel) {
+        onCancel()
+      }
     }
   }
 
