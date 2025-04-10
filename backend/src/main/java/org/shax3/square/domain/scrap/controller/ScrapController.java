@@ -37,7 +37,7 @@ public class ScrapController {
     ) {
         switch (request.targetType()) {
             case DEBATE -> debateService.findDebateById(request.targetId());
-//            case POST -> postService.findPostById(request.targetId());
+            case POST -> postService.getPost(request.targetId());
             // 향후 다른 타입들도 추가 가능
             default -> throw new CustomException(ExceptionCode.INVALID_TARGET_TYPE);
         }
