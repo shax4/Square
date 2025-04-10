@@ -141,4 +141,8 @@ public class UserService {
         return userRepository.findByNickname(nickname)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
     }
+
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
 }

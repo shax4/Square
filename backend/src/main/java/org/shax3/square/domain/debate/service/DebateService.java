@@ -15,13 +15,16 @@ import org.shax3.square.domain.debate.model.Debate;
 import org.shax3.square.domain.debate.model.Summary;
 import org.shax3.square.domain.debate.model.Vote;
 import org.shax3.square.domain.debate.repository.DebateRepository;
+import org.shax3.square.domain.notification.event.TodayDebateStartedEvent;
 import org.shax3.square.domain.opinion.dto.OpinionDto;
 import org.shax3.square.domain.opinion.service.OpinionFacadeService;
 import org.shax3.square.domain.proposal.service.ProposalService;
 import org.shax3.square.domain.user.model.State;
 import org.shax3.square.domain.user.model.User;
+import org.shax3.square.domain.user.service.UserService;
 import org.shax3.square.exception.CustomException;
 import org.shax3.square.exception.ExceptionCode;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,6 +47,8 @@ public class DebateService {
     private final ProposalService proposalService;
     private final AiSummaryClient aiSummaryClient;
     private final CategoryService categoryService;
+    private final UserService userService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public Debate findDebateById(Long debateId) {
         return debateRepository.findById(debateId)
@@ -179,6 +184,15 @@ public class DebateService {
         aiSummaryClient.generateSummaries(debate);
 
         proposalService.deleteProposal(request.proposalId());
+
+        List<User> users = userService.findAll();
+        for (User receiver : users) {
+            eventPublisher.publishEvent(new TodayDebateStartedEvent(
+                receiver,
+                debate.getTopic(),
+                debate.getId()
+            ));
+        }
     }
 
 }
