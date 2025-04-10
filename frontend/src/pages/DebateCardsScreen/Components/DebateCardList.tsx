@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, forwardRef, useImperativeHandle, } from 'react';
+import React, { useState, useCallback, useEffect, forwardRef, useImperativeHandle, useRef } from 'react';
 import { View, ActivityIndicator, FlatList, Dimensions, RefreshControl, TouchableOpacity, Text } from 'react-native';
 import DebateCard from './DebateCard';
 import { styles } from './DebateCard.styles';
@@ -16,6 +16,7 @@ const DebateCardList = forwardRef((props, ref) => {
     const [hasMore, setHasMore] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const limit = 3;
+    const flatListRef = useRef<FlatList>(null);
 
     const fetchData = useCallback(async (refresh = false) => {
         if ((loading && !refresh) || (!hasMore && !refresh)) return;
@@ -74,6 +75,7 @@ const DebateCardList = forwardRef((props, ref) => {
     };
 
     const onRefresh = useCallback(() => {
+        flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
         setRefreshing(true);
         setNextCursorId(null);
         fetchData(true);
@@ -87,6 +89,7 @@ const DebateCardList = forwardRef((props, ref) => {
     return (
         <View style={styles.CardListView}>
             <FlatList
+                ref={flatListRef}
                 data={debates}
                 renderItem={({ item }) => <DebateCard {...item} />}
                 keyExtractor={(item) => item.debateId.toString()}

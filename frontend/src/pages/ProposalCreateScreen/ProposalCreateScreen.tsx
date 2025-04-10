@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, StyleSheet, FlatList, TouchableOpacity, ListRenderItem, TextInput, Alert } from "react-native";
+import { Text, View, StyleSheet, FlatList, TouchableOpacity, ListRenderItem, TextInput, Alert, Platform, KeyboardAvoidingView, ScrollView } from "react-native";
 import colors from "../../../assets/colors";
 import { Button } from "../../components";
 import { useNavigation } from "@react-navigation/native";
@@ -12,9 +12,11 @@ import { postProposal } from "./Api/proposalAPI";
 export default function ProposalCreateScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<DebateStackParamList>>();
     const [debateTopic, setDebateTopic] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const confirmCreateProposal = () => {
         // 저장 로직
+        setIsSubmitting(true);
         createProposal(debateTopic);
     }
 
@@ -28,6 +30,7 @@ export default function ProposalCreateScreen() {
                     {
                         text: "확인",
                         onPress: () => {
+                            setIsSubmitting(false);
                             navigation.pop(2);
                             navigation.navigate("ProposalListScreen")
                         },
@@ -41,7 +44,10 @@ export default function ProposalCreateScreen() {
                 "청원 신청 중 문제가 발생했습니다. 잠시후 다시 실행해주세요.",
                 [
                     {
-                        text: "확인"
+                        text: "확인",
+                        onPress: () => {
+                            setIsSubmitting(false);
+                        },
                     }
                 ]
             );
@@ -49,32 +55,43 @@ export default function ProposalCreateScreen() {
     }
 
     return (
-        <View style={styles.Container}>
-            {/* 토론 주제 입력 */}
-            <View style={styles.TopicTypingView}>
-                <TextInput style={styles.TopicTextInput}
-                    placeholder="토론 주제를 입력하세요"
-                    value={debateTopic}
-                    onChangeText={setDebateTopic}
-                    maxLength={100} //토론 주제 최대 길이 제한
-                />
-            </View>
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0} // 헤더 높이에 따라 조정
+        >
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
 
-            <View style={styles.VoteButtonView}>
-                <VoteCreateButtonView />
-            </View>
+                <View style={styles.Container}>
+                    {/* 토론 주제 입력 */}
+                    <View style={styles.TopicTypingView}>
+                        <TextInput style={styles.TopicTextInput}
+                            placeholder="토론 주제를 입력하세요"
+                            value={debateTopic}
+                            onChangeText={setDebateTopic}
+                            maxLength={100} //토론 주제 최대 길이 제한
+                        />
+                    </View>
 
-            <View style={styles.CreateButtonView}>
-                <Button
-                    label="작성하기"
-                    onPress={confirmCreateProposal}
-                />
-            </View>
-            <View style={styles.BottomBlankView}>
+                    <View style={styles.VoteButtonView}>
+                        <VoteCreateButtonView />
+                    </View>
 
-            </View>
+                    <View style={styles.CreateButtonView}>
+                        <Button
+                            label={isSubmitting ? "등록 중..." : "논쟁 등록"}
+                            onPress={confirmCreateProposal}
+                            disabled={isSubmitting}
+                        />
+                    </View>
+                    <View style={styles.BottomBlankView}>
 
-        </View>
+                    </View>
+
+                </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
+
     );
 }
 

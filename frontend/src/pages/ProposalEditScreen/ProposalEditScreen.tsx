@@ -91,7 +91,8 @@ export default function ProposalEditScreen() {
             setIsSubmitting(false); // 등록 실패
             Alert.alert(
                 "등록 실패",
-                "청원 등록 중 문제가 발생했습니다. 잠시후 다시 실행해주세요.",
+                String(error),
+                //"청원 등록 중 문제가 발생했습니다. 잠시후 다시 실행해주세요.",
                 [
                     {
                         text: "확인"
@@ -160,7 +161,7 @@ export default function ProposalEditScreen() {
 
                         <View style={{ alignItems: 'center', marginTop: 10 }}>
                             {warnMessage !== '' && (
-                                <Text style={{ color: 'red', fontSize: 15 }}>{warnMessage}</Text>
+                                <Text style={{ fontSize: 15 }}>{warnMessage}</Text>
                             )}
                         </View>
 
