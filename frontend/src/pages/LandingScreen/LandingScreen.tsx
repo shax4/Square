@@ -98,7 +98,7 @@ const LandingScreen = ({ navigation }: any) => {
         {/* 로그인 버튼들 */}
         <View style={styles.loginButtonsContainer}>
           <TouchableOpacity style={[styles.loginButton, styles.googleButton]} onPress={handleGoogleLogin}>
-            <Image source={{ uri: "https://via.placeholder.com/20" }} style={styles.googleIcon} />
+            <Ionicons name="logo-google" size={20} color="#DB4437" />
             <Text style={styles.googleButtonText}>Google 계정으로 시작하기</Text>
           </TouchableOpacity>
 
