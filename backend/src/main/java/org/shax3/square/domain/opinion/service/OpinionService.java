@@ -87,4 +87,11 @@ public class OpinionService {
     public List<Opinion> findOpinionsByLatest(Long debateId, boolean isLeft, Long nextCursorId, int limit) {
         return opinionRepository.findOpinionsByLatest(debateId, isLeft, nextCursorId, limit);
     }
+
+    public Long findDebateIdByOpinionId(Long opinionId) {
+        return opinionRepository.findById(opinionId)
+                .map(opinion -> opinion.getDebate().getId())
+                .orElseThrow(() -> new CustomException(ExceptionCode.DEBATE_NOT_FOUND));
+    }
+
 }

@@ -15,6 +15,7 @@ public enum ExceptionCode {
 	INVALID_TARGET_TYPE(1005, "유효하지 않은 타겟 타입입니다."),
 	INVALID_ID_TOKEN(1007,"유효하지 않은 ID_TOKEN 입니다."),
 	FIREBASE_INITIALIZE_ERROR(1008,"Firebase 가 초기화하지 못했습니다."),
+	FIREBASE_MESSAGE_ERROR(1009,"FCM에 문제가 생겼습니다."),
 	UNABLE_TO_GET_USER_INFO(2001, "소셜 로그인 공급자로부터 유저 정보를 받아올 수 없습니다."),
 	UNABLE_TO_GET_ACCESS_TOKEN(2002, "소셜 로그인 공급자로부터 인증 토큰을 받아올 수 없습니다."),
 	NICKNAME_BLANK_NOT_ALLOW(2003, "닉네임 및 이름에는 빈칸을 허용하지 않습니다."),
@@ -60,7 +61,11 @@ public enum ExceptionCode {
 	TYPE_QUESTION_DUPLICATION(11002, "같은 질문에 중복 답변이 존재합니다."),
 	TYPE_RESULT_NOT_FOUND(11003, "성향테스트 결과가 존재하지 않습니다."),
 
-	INVALID_PARENT_COMMENT(12001, "유효하지 않은 부모 댓글입니다.")
+	INVALID_PARENT_COMMENT(12001, "유효하지 않은 부모 댓글입니다."),
+
+	NOTIFICATION_NOT_FOUND(13001,"해당 알림이 존재하지 않습니다.")
+
+
 	;
 	private final int code;
 	private final String message;
