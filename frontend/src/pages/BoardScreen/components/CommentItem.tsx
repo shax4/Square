@@ -16,7 +16,7 @@ import { Icons } from "../../../../assets/icons/Icons";
 import { useAuth } from "../../../shared/hooks/useAuth";
 import { getTimeAgo } from "../../../shared/utils/timeAge/timeAge";
 import { useLikeButton } from "../../../shared/hooks/useLikeButton";
-import Text from '../../../components/Common/Text';
+import Text from "../../../components/Common/Text";
 import colors from "../../../../assets/colors";
 
 interface CommentItemProps {
@@ -341,13 +341,17 @@ export default function CommentItem({
                     onPress={handleSavePress}
                     style={[styles.button, styles.saveButton]}
                   >
-                    <Text weight="medium" style={styles.saveButtonText}>저장</Text>
+                    <Text weight="medium" style={styles.saveButtonText}>
+                      저장
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </View>
             ) : (
               <View style={styles.contentRow}>
-                <Text weight="medium" style={styles.contentText}>{comment.content}</Text>
+                <Text weight="medium" style={styles.contentText}>
+                  {comment.content}
+                </Text>
                 {/* 좋아요 버튼 - 내용 안에 배치 */}
                 <View style={styles.replyLikeContainer}>
                   <LikeButton
@@ -365,11 +369,15 @@ export default function CommentItem({
         <View style={styles.footerContainer}>
           {/* 2-1. 왼쪽 그룹 (시간 + 답글 달기) */}
           <View style={styles.leftFooterGroup}>
-            <Text weight="medium" style={styles.time}>{getTimeAgo(comment.createdAt)}</Text>
+            <Text weight="medium" style={styles.time}>
+              {getTimeAgo(comment.createdAt)}
+            </Text>
             {/* 답글 달기 버튼 */}
             {!isEditing && ( // 수정 중 아닐 때만 표시
               <TouchableOpacity onPress={handleReplyPress}>
-                <Text weight="medium" style={styles.replyButtonText}>답글 달기</Text>
+                <Text weight="medium" style={styles.replyButtonText}>
+                  답글 달기
+                </Text>
               </TouchableOpacity>
             )}
           </View>
@@ -378,10 +386,14 @@ export default function CommentItem({
           {isAuthor && !isEditing && (
             <View style={styles.authorButtons}>
               <TouchableOpacity onPress={handleEditPress}>
-                <Text weight="medium" style={styles.actionText}>수정</Text>
+                <Text weight="medium" style={styles.actionText}>
+                  수정
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={handleDeletePress}>
-                <Text weight="medium" style={styles.actionText}>삭제</Text>
+                <Text weight="medium" style={styles.actionText}>
+                  삭제
+                </Text>
               </TouchableOpacity>
             </View>
           )}
@@ -409,7 +421,9 @@ export default function CommentItem({
                 onPress={handleSubmitReply}
                 style={[styles.button, styles.saveButton]}
               >
-                <Text weight="medium" style={styles.saveButtonText}>등록</Text>
+                <Text weight="medium" style={styles.saveButtonText}>
+                  등록
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -455,7 +469,9 @@ export default function CommentItem({
                     onPress={() => handleSaveReply(reply.commentId)}
                     style={[styles.button, styles.saveButton]}
                   >
-                    <Text weight="medium" style={styles.saveButtonText}>저장</Text>
+                    <Text weight="medium" style={styles.saveButtonText}>
+                      저장
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -463,7 +479,9 @@ export default function CommentItem({
               // 대댓글 일반 모드 UI
               <Fragment>
                 <View style={styles.replyContentRow}>
-                  <Text weight="medium" style={styles.contentText}>{reply.content}</Text>
+                  <Text weight="medium" style={styles.contentText}>
+                    {reply.content}
+                  </Text>
                   <View style={styles.replyLikeContainer}>
                     <LikeButton
                       {...getReplyLikeProps(reply)}
@@ -478,17 +496,23 @@ export default function CommentItem({
             {/* 푸터는 수정 중이 아닐 때만 표시 */}
             {editingReplyId !== reply.commentId && (
               <View style={styles.replyFooterContainer}>
-                <Text weight="medium" style={styles.time}>{getTimeAgo(reply.createdAt)}</Text>
+                <Text weight="medium" style={styles.time}>
+                  {getTimeAgo(reply.createdAt)}
+                </Text>
 
                 {user?.nickname === reply.nickname && (
                   <View style={styles.authorButtons}>
                     <TouchableOpacity onPress={() => handleEditReply(reply)}>
-                      <Text weight="medium" style={styles.actionText}>수정</Text>
+                      <Text weight="medium" style={styles.actionText}>
+                        수정
+                      </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       onPress={() => handleDeleteReply(reply.commentId)}
                     >
-                      <Text weight="medium" style={styles.actionText}>삭제</Text>
+                      <Text weight="medium" style={styles.actionText}>
+                        삭제
+                      </Text>
                     </TouchableOpacity>
                   </View>
                 )}
@@ -563,12 +587,14 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   nickname: {
-     marginRight: 6
-   },
+    marginRight: 6,
+  },
   contentText: {
     fontSize: 14,
     lineHeight: 20,
-    marginTop: 2, // 사용자 정보 바로 아래부터 시작
+    marginTop: 2,
+    flex: 1,
+    marginRight: 10,
   },
   editContainer: { marginVertical: 4 },
   textInput: {
@@ -629,8 +655,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: 4,
-    marginLeft: 2
-
+    marginLeft: 2,
   },
   replyFooterContainer: {
     flexDirection: "row",
@@ -667,12 +692,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginRight: 8,
+    alignSelf: "center",
   },
   contentRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: 4,
-    marginLeft: 2
+    marginLeft: 2,
   },
 });
