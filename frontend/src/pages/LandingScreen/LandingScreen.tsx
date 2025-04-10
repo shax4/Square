@@ -78,6 +78,10 @@ const LandingScreen = ({ navigation }: any) => {
         }
   }
 
+  const handleKakaoTalkLogin = () => {
+    setSignUpFlag(true);
+  }
+
   if (signUpFlag) {
     return <SignUpScreen onCancel={() => setSignUpFlag(false)} />
   }
@@ -100,12 +104,12 @@ const LandingScreen = ({ navigation }: any) => {
             <Text style={styles.googleButtonText}>Google 계정으로 시작하기</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.loginButton, styles.kakaoButton]} onPress={handleTempLogin}>
+          <TouchableOpacity style={[styles.loginButton, styles.kakaoButton]} onPress={handleKakaoTalkLogin}>
             <Ionicons name="chatbubble" size={20} color="#000000" />
             <Text style={styles.kakaoButtonText}>카카오로 시작하기</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.loginButton, styles.appleButton]} onPress={() => console.log("애플 로그인")}>
+          <TouchableOpacity style={[styles.loginButton, styles.appleButton]} onPress={handleTempLogin}>
             <Ionicons name="logo-apple" size={20} color="#FFFFFF" />
             <Text style={styles.appleButtonText}>Apple 계정으로 시작하기</Text>
           </TouchableOpacity>
