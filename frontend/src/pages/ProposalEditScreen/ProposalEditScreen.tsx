@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, StyleSheet, TextInput, Alert, Text } from "react-native";
+import { View, KeyboardAvoidingView, ScrollView, Platform, StyleSheet, TextInput, Alert, Text } from "react-native";
 import colors from "../../../assets/colors";
 import { Button } from "../../components";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
@@ -102,73 +102,84 @@ export default function ProposalEditScreen() {
     }
 
     return (
-        <View style={styles.Container}>
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0} // 헤더 높이에 따라 조정
+        >
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                <View style={styles.Container}>
+                    <View style={styles.Container}>
 
-            {/* 카테고리 선택 모달 */}
-            <CategoryDropdown
-                category={category}
-                setCategory={setCategory}
-            />
-
-            {/* 토론 주제 입력 */}
-            <View style={styles.TopicTypingView}>
-                <TextInput style={styles.TopicTextInput}
-                    placeholder="토론 주제를 입력하세요(10 ~ 30글자)"
-                    value={debateTopic}
-                    onChangeText={setDebateTopic}
-                    maxLength={100} //토론 주제 최대 길이 제한
-                />
-            </View>
-
-            {/* 좌 우 의견 작성 */}
-            <View style={styles.VoteButtonView}>
-                <View style={VoteButtonStyle.Container}>
-
-                    <View
-                        style={[
-                            VoteButtonStyle.VoteButtonBase, VoteButtonStyle.VoteNotSelectedLeft]}
-                    >
-                        <TextInput
-                            style={VoteButtonStyle.VoteContents}
-                            value={leftOption}
-                            onChangeText={setLeftOption}
-                            placeholder="3 글자 이내 선택지 입력"
+                        {/* 카테고리 선택 모달 */}
+                        <CategoryDropdown
+                            category={category}
+                            setCategory={setCategory}
                         />
-                    </View>
 
-                    <View
-                        style={[
-                            VoteButtonStyle.VoteButtonBase, VoteButtonStyle.VoteNotSelectedRight]}
-                    >
-                        <TextInput
-                            style={VoteButtonStyle.VoteContents}
-                            value={rightOption}
-                            onChangeText={setRightOption}
-                            placeholder="3 글자 이내 선택지 입력"
-                        />
+                        {/* 토론 주제 입력 */}
+                        <View style={styles.TopicTypingView}>
+                            <TextInput style={styles.TopicTextInput}
+                                placeholder="토론 주제를 입력하세요(10 ~ 30글자)"
+                                value={debateTopic}
+                                onChangeText={setDebateTopic}
+                                maxLength={100} //토론 주제 최대 길이 제한
+                            />
+                        </View>
+
+                        {/* 좌 우 의견 작성 */}
+                        <View style={styles.VoteButtonView}>
+                            <View style={VoteButtonStyle.Container}>
+
+                                <View
+                                    style={[
+                                        VoteButtonStyle.VoteButtonBase, VoteButtonStyle.VoteNotSelectedLeft]}
+                                >
+                                    <TextInput
+                                        style={VoteButtonStyle.VoteContents}
+                                        value={leftOption}
+                                        onChangeText={setLeftOption}
+                                        placeholder="3 글자 이내 선택지 입력"
+                                    />
+                                </View>
+
+                                <View
+                                    style={[
+                                        VoteButtonStyle.VoteButtonBase, VoteButtonStyle.VoteNotSelectedRight]}
+                                >
+                                    <TextInput
+                                        style={VoteButtonStyle.VoteContents}
+                                        value={rightOption}
+                                        onChangeText={setRightOption}
+                                        placeholder="3 글자 이내 선택지 입력"
+                                    />
+
+                                </View>
+                            </View>
+                        </View>
+
+                        <View style={{ alignItems: 'center', marginTop: 10 }}>
+                            {warnMessage !== '' && (
+                                <Text style={{ color: 'red', fontSize: 15 }}>{warnMessage}</Text>
+                            )}
+                        </View>
+
+                        <View style={styles.CreateButtonView}>
+                            <Button
+                                label={isSubmitting ? "등록 중..." : "논쟁 등록"}
+                                onPress={confirmCreateDebate}
+                                disabled={isSubmitting}
+                            />
+                        </View>
+                        <View style={styles.BottomBlankView}>
+
+                        </View>
 
                     </View>
                 </View>
-            </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
 
-            <View style={{ alignItems: 'center', marginTop: 10 }}>
-                {warnMessage !== '' && (
-                    <Text style={{ color: 'red', fontSize: 15 }}>{warnMessage}</Text>
-                )}
-            </View>
-
-            <View style={styles.CreateButtonView}>
-                <Button
-                    label={isSubmitting ? "등록 중..." : "논쟁 등록"}
-                    onPress={confirmCreateDebate}
-                    disabled={isSubmitting}
-                />
-            </View>
-            <View style={styles.BottomBlankView}>
-
-            </View>
-
-        </View>
     );
 }
 
