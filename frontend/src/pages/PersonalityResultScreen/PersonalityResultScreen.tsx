@@ -24,16 +24,6 @@ import UserTypeInfoModal from "./Components/UserTypeInfoModal";
 
 import { captureRef } from "react-native-view-shot";
 
-// 임시 데이터
-const mockResult: TypeResult = {
-  nickname: "DEBUG",
-  userType: "TEST",
-  score1: 3,
-  score2: 3,
-  score3: 3,
-  score4: 3,
-};
-
 const PersonalityResultScreen = () => {
   const route = useRoute<
     RouteProp<
@@ -54,7 +44,8 @@ const PersonalityResultScreen = () => {
   const { user } = useAuth();
   const myNickname = user?.nickname;
 
-  const [userTypeResult, setUserTypeResult] = useState<TypeResult>(mockResult);
+  const [userTypeResult, setUserTypeResult] =
+    useState<TypeResult>();
   const [isMyType, setIsMyType] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -158,6 +149,8 @@ const PersonalityResultScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content} ref={captureViewRef} collapsable={false}>
+      {userTypeResult ? (
+        <>
         <Text style={styles.nicknameText}>
           {userTypeResult.nickname}님의 성향은
         </Text>
@@ -209,6 +202,12 @@ const PersonalityResultScreen = () => {
             </View>
           </View>
         )}
+        </>
+      ):(
+        <View style={styles.noPersonalityContainer}>
+          <Text style={styles.noPersonalityText}>성향이 없습니다</Text>
+        </View>
+      )}
 
         {!isCapturing && (
           <View style={styles.buttonsContainer}>
@@ -346,6 +345,17 @@ const styles = StyleSheet.create({
   buttonContainer: {
     paddingVertical: 5,
   },
+  noPersonalityContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 30,
+  },
+  noPersonalityText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#171719",
+  },
+
 });
 
 export default PersonalityResultScreen;

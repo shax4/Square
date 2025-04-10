@@ -18,6 +18,9 @@ import ProgressBar from "../../components/ProgressBar/ProgressBar"
 import ProfileImage from "../../components/ProfileImage"
 import { useAuth } from "../../shared/hooks"
 import { userDetails } from "../../shared/types/user"
+import { signUp } from "./api/signUpAPI"
+import { SignUpResponse } from "./type/signUpTypes"
+
 // Define steps for the sign-up process
 enum SignUpStep {
   Nickname = 1,
@@ -25,31 +28,37 @@ enum SignUpStep {
   Region = 3,
   Gender = 4,
   Religion = 5,
-  ProfilePhoto = 6,
+  ConfirmSignIn = 6,
 }
 
 // Options for dropdowns
-const genderOptions = ["남성", "여성", "기타"]
+const genderOptions = ["남성", "여성", "알리지 않음"]
 const regionOptions = [
   "서울특별시",
+  "경기도",
+  "인천광역시",
   "부산광역시",
   "대구광역시",
-  "인천광역시",
-  "광주광역시",
   "대전광역시",
+  "광주광역시",
   "울산광역시",
   "세종특별자치시",
-  "경기도",
-  "강원도",
   "충청북도",
   "충청남도",
-  "전라북도",
   "전라남도",
+  "전북특별자치도",
   "경상북도",
   "경상남도",
-  "제주특별자치도",
+  "강원특별자치도",
+  "제주특별자치도"
 ]
-const religionOptions = ["기독교", "천주교", "불교", "이슬람교", "힌두교", "무교", "기타"]
+const religionOptions = [
+  "없음",
+  "기독교",
+  "불교",
+  "천주교",
+  "기타"
+]
 
 const SignUpScreen = () => {
   // State for form fields
@@ -71,7 +80,7 @@ const SignUpScreen = () => {
   const [nicknameError, setNicknameError] = useState("")
   const [birthdateError, setBirthdateError] = useState("")
 
-  const {setUser} = useAuth();
+  const {setUser, user} = useAuth();
 
 
   // Scroll ref for content
@@ -85,7 +94,7 @@ const SignUpScreen = () => {
     }
 
     // Move to next step
-    if (currentStep < SignUpStep.ProfilePhoto) {
+    if (currentStep < SignUpStep.ConfirmSignIn) {
       setCurrentStep(currentStep + 1)
       // Scroll to top when changing steps
       scrollViewRef.current?.scrollTo({ y: 0, animated: true })
@@ -104,34 +113,54 @@ const SignUpScreen = () => {
   }
 
   // Handle complete button press
-  const handleComplete = () => {
-    console.log("회원가입 완료", {
-      nickname,
-      birthdate,
-      region,
-      gender,
-      religion,
-      profileImageUrl,
-    })
+  const handleComplete = async () => {
+    const useremail = user?.email;
+    const usersocialType = user?.socialType;
+    const birth = parseInt(birthdate.slice(0, 4), 10);
+    // const profileData = {
+    //   useremail,
+    //   usersocialType,
+    //   nickname,
+    //   region, 
+    //   gender, 
+    //   birth, 
+    //   religion
+    // };
+  
+    // Alert.alert("입력 정보 확인", JSON.stringify(profileData, null, 2));
 
-    const userDetails : userDetails = {
-      nickname : "Signup_Test",
-      userType: "ABCD",
-      state: "ACTIVE",
-      isMember : true,
-      accessToken : "1234",
-      refreshToken : "1234",
-    } // 실제 데이터로 변경.
+    try{
+      const data : SignUpResponse = await signUp(useremail!, "GOOGLE", nickname, "profile/0c643827-c958-465b-875d-918c8a22fe01.png", region, gender, birth, religion)
 
-    setUser(userDetails)
+      const userDetails : userDetails = {
+        nickname : nickname,
+        userType: data.userType,
+        email: useremail!,
+        socialType: data.socialType,
+        state: "ACTIVE",
+        isMember : true,
+        accessToken : data.accessToken,
+        refreshToken : data.refreshToken,
+      } // 실제 데이터로 변경.
 
-    // Navigate to main app or show success message
-    Alert.alert("회원가입 완료", "회원가입이 성공적으로 완료되었습니다.", [
-      {
-        text: "확인",
-        //onPress: () => navigation.navigate("Profile"),
-      },
-    ])
+      // Alert.alert("회원가입 결과", JSON.stringify(userDetails, null, 2));
+  
+      setUser(userDetails)
+  
+      // Navigate to main app or show success message
+
+      // Alert.alert("회원가입 완료", "회원가입이 성공적으로 완료되었습니다.", [
+      //   {
+      //     text: "확인",
+      //     // onPress: () => navigation.navigate("Profile"),
+      //   },
+      // ]);
+    } catch (error: any) {
+      const errorCode = error?.response?.data?.code;
+      const errorMessage = error?.response?.data?.message ?? error?.message ?? JSON.stringify(error, null, 2);
+    
+      Alert.alert("회원가입 실패", `(${errorCode}) ${errorMessage}`);
+    }
   }
 
   // Validate current step
@@ -172,7 +201,7 @@ const SignUpScreen = () => {
       case SignUpStep.Religion:
         return !!religion.trim()
 
-      case SignUpStep.ProfilePhoto:
+      case SignUpStep.ConfirmSignIn:
         return true
 
       default:
@@ -325,22 +354,16 @@ const SignUpScreen = () => {
           </View>
         )
 
-      case SignUpStep.ProfilePhoto:
+      case SignUpStep.ConfirmSignIn:
         return (
           <View style={styles.stepContainer}>
-            <Text style={styles.stepTitle}>프로필 사진을 선택해 주세요</Text>
-            <View style={styles.profileImageContainer}>
-              <View style={styles.profileImageWrapper}>
-                <ProfileImage imageUrl={profileImageUrl} variant="large" />
-                <TouchableOpacity style={styles.cameraButton} onPress={handleProfileImageChange}>
-                  <View style={styles.cameraIconBackground}>
-                    <Ionicons name="camera" size={24} color={"black"} />
-                  </View>
-                </TouchableOpacity>
-              </View>
-            </View>
-            <Text style={styles.helperText}>프로필 사진을 설정하지 않는 경우, 기본 이미지로 설정됩니다.</Text>
-          </View>
+          <Text style={styles.welcomeTitle}>사각에 오신 걸 환영합니다!</Text>
+          <Text style={styles.welcomeSubtitle}>
+            즐거운 커뮤니티 이용을 위해서{"\n"}
+            성향 테스트가 필요해요!
+          </Text>
+          <Text style={styles.helperText}>약 5~10분 정도 소요돼요</Text>
+        </View>
         )
 
       default:
@@ -365,10 +388,15 @@ const SignUpScreen = () => {
 
       {/* Next/Complete Button */}
       <View style={styles.buttonContainer}>
-        {currentStep < SignUpStep.ProfilePhoto ? (
+        {currentStep < SignUpStep.ConfirmSignIn ? (
           <Button label="다음" onPress={handleNext} />
         ) : (
-          <Button label="완료" onPress={handleComplete} />
+          <>
+            <Button label="테스트 하기" onPress={() => {}} />
+            <TouchableOpacity onPress={handleComplete}>
+              <Text style={styles.nextButton}>다음에</Text>
+            </TouchableOpacity>
+          </>
         )}
       </View>
 
@@ -415,6 +443,24 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
   },
+  welcomeTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  welcomeSubtitle: {
+    fontSize: 18,
+    textAlign: "center",
+    marginBottom: 10,
+    lineHeight: 26,
+  },
+  nextButton: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
+    marginTop: 20,
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -441,6 +487,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#888888",
     marginTop: 8,
+    textAlign: "center",
   },
   previousInfoContainer: {
     marginTop: 24,
