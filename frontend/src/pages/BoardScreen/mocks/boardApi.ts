@@ -21,6 +21,10 @@ export const MockBoardAPI = {
     nextCursorLikes: number | null = null,
     limit: number = 10
   ) => {
+    console.log(
+      `[Mock API] getPosts 호출: sort=${sort}, nextCursorId=${nextCursorId}, limit=${limit}`
+    );
+
     // 정렬 방식에 따라 게시글 정렬
     let sortedPosts = [...mockPosts];
     if (sort === "likes") {
@@ -32,13 +36,45 @@ export const MockBoardAPI = {
       );
     }
 
-    // 커서 기반 페이지네이션 구현 (간단한 구현)
+    console.log(
+      `[Mock API] 전체 게시글 수: ${sortedPosts.length}, 정렬 방식: ${sort}`
+    );
+
+    // 커서 기반 페이지네이션 구현
+    let filteredPosts = sortedPosts;
     if (nextCursorId) {
-      sortedPosts = sortedPosts.filter((post) => post.postId < nextCursorId);
+      filteredPosts = sortedPosts.filter((post) => post.postId < nextCursorId);
+      console.log(
+        `[Mock API] 커서 기준(${nextCursorId}) 이후 게시글 수: ${filteredPosts.length}`
+      );
     }
 
     // 데이터 크기 제한
-    const posts = sortedPosts.slice(0, limit);
+    const posts = filteredPosts.slice(0, limit);
+    console.log(`[Mock API] 반환할 게시글 수: ${posts.length}`);
+
+    // 다음 페이지를 위한 cursorId 계산
+    let nextCursor = null;
+    if (posts.length > 0) {
+      const lastPost = posts[posts.length - 1];
+      // 마지막 게시글 이후에 더 불러올 게시글이 있는지 확인
+      const hasMorePosts = filteredPosts.length > limit;
+
+      if (hasMorePosts) {
+        nextCursor = lastPost.postId;
+        console.log(
+          `[Mock API] 다음 페이지 커서 설정: ${nextCursor}, 더 불러올 게시글 있음`
+        );
+      } else {
+        console.log(`[Mock API] 더 불러올 게시글 없음, 커서 null로 설정`);
+      }
+    }
+
+    // 디버깅용 로그
+    console.log(
+      `[Mock API] 반환된 게시글 ID 목록:`,
+      posts.map((p) => p.postId)
+    );
 
     // API 응답 형식에 맞춰 데이터 반환
     return Promise.resolve({
@@ -46,8 +82,7 @@ export const MockBoardAPI = {
         userType: currentUser.userType,
         popular: mockPopularPosts,
         posts,
-        nextCursorId:
-          posts.length > 0 ? posts[posts.length - 1].postId - 1 : null,
+        nextCursorId: nextCursor,
         nextCursorLikes: null,
       },
       status: 200,

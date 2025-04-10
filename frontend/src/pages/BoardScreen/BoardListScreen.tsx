@@ -17,7 +17,7 @@ import BoardItem from "./components/BoardItem"; // 개별 게시글 항목을 �
 import EmptyBoardList from "./components/EmptyBoardList"; // 게시글이 없을 때 표시하는 컴포넌트
 import { Icons } from "../../../assets/icons/Icons";
 import { BoardStackParamList } from "../../shared/page-stack/BoardPageStack";
-import Text from '../../components/Common/Text';
+import Text from "../../components/Common/Text";
 import colors from "../../../assets/colors";
 
 // 인기 게시글 인터페이스
@@ -98,8 +98,14 @@ export default function BoardListScreen({
 
   // 게시글 목록을 서버에서 가져오는 함수
   const fetchBoards = async (refresh = false) => {
+    if (loading) return; // 이미 로딩 중이면 중복 호출 방지
+
     try {
       setLoading(true); // 로딩 상태를 true로 설정
+      console.log(
+        `fetchBoards 호출: refresh=${refresh}, nextCursorId=${nextCursorId}`
+      );
+
       // 새로고침 시 커서 초기화
       const cursor = refresh ? null : nextCursorId;
       const response = await BoardAPI.getPosts(
@@ -110,6 +116,9 @@ export default function BoardListScreen({
       );
 
       const data = response.data as PostsResponse;
+      console.log(
+        `서버 응답: posts=${data.posts.length}, nextCursorId=${data.nextCursorId}`
+      );
 
       // 새로고침 또는 첫 로드 시 전체 데이터 설정, 그렇지 않으면 중복 제거 후 추가
       if (refresh) {
@@ -122,6 +131,7 @@ export default function BoardListScreen({
               (existingPost) => existingPost.postId === newPost.postId
             )
         );
+        console.log(`중복 제거 후 추가할 게시글 수: ${uniquePosts.length}`);
         setBoards((prev) => [...prev, ...uniquePosts]);
       }
 
@@ -217,11 +227,13 @@ export default function BoardListScreen({
           )}
           keyExtractor={(item) => item.postId.toString()}
           onEndReached={() => {
-            if (nextCursorId || nextCursorLikes) {
+            console.log("onEndReached 호출됨", nextCursorId);
+            if (!loading && nextCursorId) {
+              console.log("추가 데이터 로드 시작");
               fetchBoards();
             }
           }}
-          onEndReachedThreshold={0.1}
+          onEndReachedThreshold={0.5}
           contentContainerStyle={[
             styles.listContent,
             boards.length === 0 && styles.emptyListContent,
@@ -275,7 +287,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     marginBottom: 14,
-    color: colors.warnRed
+    color: colors.warnRed,
   },
   popularPostItem: {
     width: 160,
@@ -284,7 +296,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#eee",
     borderRadius: 8,
-    backgroundColor: colors.background
+    backgroundColor: colors.background,
   },
   popularPostTitle: {
     fontSize: 13,
