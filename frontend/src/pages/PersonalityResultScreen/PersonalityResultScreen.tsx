@@ -120,7 +120,8 @@ const PersonalityResultScreen = () => {
           body: file,
         });
 
-        const baseUrl = "https://shax3-square.s3.ap-northeast-1.amazonaws.com";
+
+        const baseUrl = "https://shax3-square-1.s3.ap-northeast-2.amazonaws.com";
         const imageUrl = `${baseUrl}/${s3Key}`;
         setShareImageUrl(imageUrl);
         setShareModalVisible(true);
