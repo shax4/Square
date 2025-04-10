@@ -87,8 +87,9 @@ const LandingScreen = ({ navigation }: any) => {
         {/* 로고 및 서비스 정보 */}
         <View style={styles.logoContainer}>
           <Image source={require("../../../assets/images/sagak-logo.png")} style={styles.logo} />
-          <Text style={styles.serviceName}>서비스 캐치프레이즈</Text>
-          <Text style={styles.serviceDescription}>서비스 설명 1~2줄</Text>
+          <Text style={styles.serviceName}>생각이 부딪히는 곳</Text>
+          <Text style={styles.serviceDescription}>생각을 말하고,</Text>
+          <Text style={styles.serviceDescription}>마음을 열어보세요</Text>
         </View>
 
         {/* 로그인 버튼들 */}
@@ -98,7 +99,7 @@ const LandingScreen = ({ navigation }: any) => {
             <Text style={styles.googleButtonText}>Google 계정으로 시작하기</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.loginButton, styles.kakaoButton]} onPress={() => console.log("카카오 로그인")}>
+          <TouchableOpacity style={[styles.loginButton, styles.kakaoButton]} onPress={handleTempLogin}>
             <Ionicons name="chatbubble" size={20} color="#000000" />
             <Text style={styles.kakaoButtonText}>카카오로 시작하기</Text>
           </TouchableOpacity>
@@ -107,19 +108,7 @@ const LandingScreen = ({ navigation }: any) => {
             <Ionicons name="logo-apple" size={20} color="#FFFFFF" />
             <Text style={styles.appleButtonText}>Apple 계정으로 시작하기</Text>
           </TouchableOpacity>
-
-          <TouchableOpacity style={[styles.loginButton, styles.appleButton]} onPress={handleTempLogin}>
-            <Text style={styles.appleButtonText}>임시 로그인</Text>
-          </TouchableOpacity>
         </View>
-
-        {/* 응답 출력 디버그 영역 */}
-        {loginResponse && (
-          <View style={styles.debugContainer}>
-            <Text style={styles.debugTitle}>서버 응답:</Text>
-            <Text style={styles.debugText}>{JSON.stringify(loginResponse, null, 2)}</Text>
-          </View>
-        )}
       </ScrollView>
     </SafeAreaView>
   );
