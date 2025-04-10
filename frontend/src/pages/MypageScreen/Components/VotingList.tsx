@@ -135,7 +135,7 @@ const VotingList = ({ type }: Props) => {
             ListEmptyComponent={
                 isEmpty ? (
                     <View style={styles.emptyContainer}>
-                        <Text style={styles.emptyText}>투표가 없습니다.</Text>
+                        <Text style={styles.emptyText}>아직 자료가 없습니다.</Text>
                     </View>
                 ) : null
             }

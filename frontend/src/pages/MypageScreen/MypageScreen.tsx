@@ -81,7 +81,7 @@ const MypageScreen = () => {
               style={styles.actionButton}
             />
             <MypageButton
-              title="기능 테스트"
+              title="더보기"
               onPress={() => navigation.navigate('MypageFeatureTestScreen')}
               variant="secondary"
               style={styles.actionButton}
