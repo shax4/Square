@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, forwardRef, useImperativeHandle, } from 'react';
 import { View, ActivityIndicator, FlatList, Dimensions, RefreshControl, TouchableOpacity, Text } from 'react-native';
 import DebateCard from './DebateCard';
 import { styles } from './DebateCard.styles';
@@ -8,7 +8,7 @@ import { useAuthStore } from '../../../shared/stores/auth';
 
 const { width, height } = Dimensions.get('window');
 
-export default function DebateCardList() {
+const DebateCardList = forwardRef((props, ref) => {
     const { loggedIn } = useAuthStore();
     const { debates, addDebates, clearDebates } = useDebateStore();
     const [nextCursorId, setNextCursorId] = useState<number | null>(null);
@@ -34,6 +34,8 @@ export default function DebateCardList() {
                 // 리프레시 시에는 목록을 초기화하고 새 데이터만 표시
                 if (refresh) {
                     clearDebates();
+                    await new Promise((r) => setTimeout(r, 10));
+
                     addDebates(newData);
                     setHasMore(true);
                 } else {
@@ -77,6 +79,11 @@ export default function DebateCardList() {
         fetchData(true);
     }, [fetchData]);
 
+    // 외부에서 onRefresh를 호출할 수 있도록 노출
+    useImperativeHandle(ref, () => ({
+        onRefresh,
+    }));
+
     return (
         <View style={styles.CardListView}>
             <FlatList
@@ -102,4 +109,5 @@ export default function DebateCardList() {
             />
         </View>
     );
-}
+});
+export default DebateCardList;

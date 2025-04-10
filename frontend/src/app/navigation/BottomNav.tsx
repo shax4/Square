@@ -7,12 +7,13 @@ import NotificationHeaderBar from "./stacks/NotificationHeaderBar";
 import MainHeaderBar from "./stacks/MainHeaderBar";
 import MyPageHeaderBar from "./stacks/MyPageHeaderBar";
 
-import {hideTabBarScreens} from "./NavigationData"
+import { hideTabBarScreens } from "./NavigationData"
 import { useAuthStore } from "../../shared/stores";
 
 import LandingScreen from "../../pages/LandingScreen/LandingScreen";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../shared/hooks";
+import { useDebateTabRefreshStore } from "../../shared/stores/debateTabRefreshStore";
 
 // 하단에 표시되는 탭 이름.
 const boardName = "게시판";
@@ -48,16 +49,16 @@ function BottomTabs() {
                                     ? "chatbox"
                                     : "chatbox-outline"
                                 : route.name === mainName
-                                ? "home"
-                                : route.name === notificationName
-                                ? focused
-                                    ? "notifications"
-                                    : "notifications-outline"
-                                : route.name === mypageName
-                                ? focused
-                                    ? "person"
-                                    : "person-outline"
-                                : "help-circle"
+                                    ? "home"
+                                    : route.name === notificationName
+                                        ? focused
+                                            ? "notifications"
+                                            : "notifications-outline"
+                                        : route.name === mypageName
+                                            ? focused
+                                                ? "person"
+                                                : "person-outline"
+                                            : "help-circle"
                         }
                         size={size}
                         color={color}
@@ -83,8 +84,22 @@ function BottomTabs() {
                 headerShown: false,
             })}
         >
-            
-            <Tab.Screen name={mainName} component={MainHeaderBar} />
+
+            <Tab.Screen
+                name={mainName}
+                component={MainHeaderBar}
+                listeners={({ navigation, route }) => ({
+                    tabPress: (e) => {
+                        const state = navigation.getState();
+                        const currentRoute = state.routes[state.index];
+
+                        // 탭이 이미 포커스된 상태에서 다시 눌렸는지 확인
+                        if (currentRoute.name === route.name) {
+                            useDebateTabRefreshStore.getState().triggerRefresh();
+                        }
+                    },
+                })}
+            />
             <Tab.Screen name={boardName} component={BoardHeaderBar} />
             <Tab.Screen name={notificationName} component={NotificationHeaderBar} />
             <Tab.Screen name={mypageName} component={MyPageHeaderBar} />
@@ -93,12 +108,12 @@ function BottomTabs() {
 }
 
 export default function AppNavigator() {
-    const {user} = useAuth()
+    const { user } = useAuth()
 
     const [isUserLoggedIn, setIsUserLoggedIn] = useState<boolean>(false);
 
     useEffect(() => {
-        if(user?.accessToken)
+        if (user?.accessToken)
             setIsUserLoggedIn(true);
         else
             setIsUserLoggedIn(false);
