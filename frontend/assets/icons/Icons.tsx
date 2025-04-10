@@ -26,6 +26,7 @@ export const Icons = {
     />
   ),
   add: (props: any) => <Octicons name="diff-added" size={24} color="black" />,
+  addwhite: (props: any) => <Octicons name="diff-added" size={24} color="white" />,
   share: (props: any) => (
     <Feather name="share" size={24} color="black" {...props} />
   ),
