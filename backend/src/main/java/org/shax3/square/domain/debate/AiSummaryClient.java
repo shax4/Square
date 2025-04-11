@@ -2,6 +2,7 @@ package org.shax3.square.domain.debate;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.shax3.square.domain.debate.model.Debate;
 import org.shax3.square.domain.debate.service.SummaryService;
@@ -31,7 +32,9 @@ public class AiSummaryClient {
 	}
 
 	private void splitAndSaveSummaries(Debate debate, String result, String leftOption, String rightOption) {
-		String[] parts = result.split(leftOption + ":|"+ rightOption + ":");
+		// String[] parts = result.split(leftOption + ":|"+ rightOption + ":");
+
+		String[] parts = result.split(Pattern.quote(leftOption + ":") + "|" + Pattern.quote(rightOption + ":"));
 
 		String leftPart = parts[1].trim();
 		String rightPart = parts[2].trim();
