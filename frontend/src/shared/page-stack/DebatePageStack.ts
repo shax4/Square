@@ -8,8 +8,30 @@
  * navigation.navigate('OpinionListScreen', { debateId });
  */
 
-export type StackParamList = {
+import { Debate } from "../../pages/DebateCardsScreen/Components";
+import { Proposal } from "../../pages/ProposalListScreen/Type/proposalListType";
+
+export type DebateStackParamList = {
     DebateCardsScreen: undefined;
-    OpinionListScreen: { debateId: number };
-    OpinionDetailScreen: undefined;
+    OpinionListScreen: {
+        debateId: number;
+        showVoteResultModal?: boolean;
+        showSummaryFirst?: boolean;
+    };
+    OpinionDetailScreen: {
+        debateId: number;
+        opinionId: number;
+    };
+    ProposalListScreen: undefined;
+    ProposalCreateScreen: undefined;
+    OpinionEditScreen: {
+        debateId: number;
+        opinionId: number;
+        content: string;
+    };
+    PersonalityResultScreen: { nickname: string };
+    PersonalitySurveyPage: undefined;
+    ProposalEditScreen : {
+        proposal: Proposal;
+    }
 };

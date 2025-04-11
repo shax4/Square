@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { StyleSheet, Text, View, ScrollView, SafeAreaView } from "react-native"
+import { useState, useEffect } from "react"
+import { StyleSheet, View, ScrollView, SafeAreaView } from "react-native"
 import {ProfileImage, PersonalityTag} from "../../components"
 import SectionToggle from "./Components/SectionToggle"
 import TabBar from "./Components/TabBar"
@@ -11,17 +11,20 @@ import MypageContent from "./Components/MypageContent"
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 
-type StackParamList = {
-    NevTestPage1: undefined;
-    NevTestPage2: undefined;
-    NevTestPage3: undefined;
-    UiTestScreen: undefined;
-    PersonalityResultScreen: undefined;
-    ProfileUpdateScreen: undefined;
-};
+import {StackParamList} from '../../shared/page-stack/MyPageStack'
+
+import { getProfileInfos } from "./Api/userAPI"
+
+import { useAuth } from "../../shared/hooks"
+import { UserInfo } from "../../shared/types/user"
+import Text from '../../components/Common/Text';
+import { useAdminMode } from "../../shared/hooks/useAdminMode"
 
 const MypageScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();
+  const { user} = useAuth();
+
+  const [userInfo, setUserInfo] = useState<UserInfo>();
 
   // Main tab toggle (Posts vs Votes)
   const [activeTab, setActiveTab] = useState("게시글")
@@ -32,22 +35,36 @@ const MypageScreen = () => {
   // Sub-sections for Votes
   const [activeVoteSection, setActiveVoteSection] = useState("내가 한 투표")
 
-  // Mock data
-  const userProfile = {
-    nickname: "사용자닉네임",
-    personality: "PNTB",
-    imageUrl: "https://example.com/profile.jpg",
-  }
+  const { isAdminMode, setAdminMode, isAdminState, setAdminState } = useAdminMode();
+
+  useEffect(() => {
+    const getUserInfo = async () => {
+      try{
+        const userInfo : UserInfo = await getProfileInfos();
+
+        setUserInfo(userInfo);
+
+        if( userInfo.userState == "ADMIN") {
+          setAdminState(true);
+          //setAdminMode(true);
+        }
+      }catch(error : any){
+        console.error("getUserInfo 에러 발생 : ", error);
+      }
+    }
+
+    getUserInfo();
+  },[])
 
   return (
     <SafeAreaView style={styles.container}>
         {/* Profile Header */}
         <View style={styles.profileHeader}>
           <View style={styles.profileInfo}>
-            <ProfileImage variant="large" />
+            <ProfileImage variant="large" imageUrl={userInfo?.profileUrl}/>
             <View style={styles.profileDetails}>
-              <PersonalityTag personality={userProfile.personality} onPress={() => navigation.navigate('PersonalityResultScreen')} />
-              <Text style={styles.nickname}>{userProfile.nickname}</Text>
+              <PersonalityTag personality={user?.userType!} nickname={user?.nickname!} />
+              <Text style={styles.nickname}>{user?.nickname}</Text>
             </View>
           </View>
 
@@ -60,10 +77,28 @@ const MypageScreen = () => {
             />
             <MypageButton
               title="내 가치관 정보"
-              onPress={() => navigation.navigate('PersonalityResultScreen')}
+              onPress={() => navigation.navigate('PersonalityResultScreen', { isAfterSurvey : false, givenNickname : user?.nickname!, typeResult : null})}
               variant="secondary"
               style={styles.actionButton}
             />
+            <MypageButton
+              title="더보기"
+              onPress={() => navigation.navigate('MypageFeatureTestScreen')}
+              variant="secondary"
+              style={styles.actionButton}
+            />
+            {/* <MypageButton
+              title="API 테스트"
+              onPress={() => navigation.navigate('SignupTestScreen')}
+              variant="secondary"
+              style={styles.actionButton}
+            />
+            <MypageButton
+              title="ModalTestScreen"
+              onPress={() => navigation.navigate('ModalTestScreen')}
+              variant="secondary"
+              style={styles.actionButton}
+            /> */}
           </View>
         </View>
 
@@ -130,7 +165,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   tabContainer: {
-
   },
   sectionToggleContainer: {
     paddingHorizontal: 16,

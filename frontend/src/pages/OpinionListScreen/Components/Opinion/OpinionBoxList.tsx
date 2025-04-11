@@ -1,19 +1,20 @@
 import React from "react";
 import { FlatList, StyleSheet } from "react-native";
-import { OpinionsResponse } from "./OpinionsResponseProps";
 import OpinionBox from "./OpinionBox";
+import { Opinion } from "./Opinion.types";
 
 interface Props {
-    data: OpinionsResponse;
+    opinions: Opinion[];
+    debateId: number,
     onEndReached?: () => void;
 }
 
-const OpinionBoxList = ({ data, onEndReached }: Props) => {
+const OpinionBoxList = ({ opinions: data, debateId, onEndReached }: Props) => {
     return (
         <FlatList
-            data={data.opinions}
+            data={data}
             keyExtractor={(item) => item.opinionId.toString()}
-            renderItem={({ item }) => <OpinionBox opinion={item} />}
+            renderItem={({ item }) => <OpinionBox debateId={debateId} opinion={item} />}
             contentContainerStyle={styles.listContainer}
             onEndReached={onEndReached}
             onEndReachedThreshold={0.5}

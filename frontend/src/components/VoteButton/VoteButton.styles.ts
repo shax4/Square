@@ -18,6 +18,7 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 15,
+        marginBottom: 15,
     },
     VoteNotSelectedLeft: {
         backgroundColor: colors.yesLight,
@@ -77,7 +78,7 @@ export const styles = StyleSheet.create({
         borderRadius: 15,
     },
     VoteIcon: {
-        fontSize: 35,
+        fontSize: 30,
     },
     VoteContents: {
         flex: 1,
@@ -85,10 +86,30 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
     },
     VoteMainText: {
-        fontSize: 20,
+        fontSize: 18,
     },
     VoteSubText: {
-        fontSize: 13,
-    }
+        fontSize: 12,
+    },
+    VoteTextBeforeLeft: {
+        color: colors.yesDark,
+    },
+    VoteTextBeforeRight: {
+        color: colors.noDark,
+    },
+    VoteTextSelectedLeft: {
+        color: colors.white,
+    },
+    VoteTextSelectedRight: {
+        color: colors.white,
+    },
+    VoteTextNotSelected: {
+        color: colors.grayText,
+    },
+    VoteEmojiImage: {
+        width: 24,
+        height: 24,
+        marginRight: 4,
+    },
 
 });

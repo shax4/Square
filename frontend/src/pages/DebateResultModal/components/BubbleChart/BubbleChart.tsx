@@ -2,15 +2,16 @@
 
 import type React from "react"
 import { useEffect, useState } from "react"
-import { View, Text, StyleSheet, Dimensions, ScrollView } from "react-native"
-import {styles} from "./BubbleChart.styles";
-import {BubbleChartProps, Bubble} from "./BubbleChart.types";
+import { View, StyleSheet, Dimensions, ScrollView } from "react-native"
+import { styles } from "./BubbleChart.styles";
+import { BubbleChartProps, Bubble } from "./BubbleChart.types";
+import Text from '../../../../components/Common/Text';
 
 const colors = ["#00AEFF", "#6541F2", "#F553DA", "#CB59FF", "#FFA500", "#FF4500", "#32CD32", "#8A2BE2"]
 
 const BubbleChart: React.FC<BubbleChartProps> = ({
   data,
-  width = Dimensions.get("window").width,
+  width = Dimensions.get("window").width * 0.7,
   height = 400,
   minRadius = 30,
   maxRadius = 100,
@@ -19,14 +20,31 @@ const BubbleChart: React.FC<BubbleChartProps> = ({
 }) => {
   const [bubbles, setBubbles] = useState<Bubble[]>([])
 
+  function formatBubbleData(data: { value: number; label: string }[]) {
+    // value 기준 내림차순 정렬
+    const sorted = [...data].sort((a, b) => b.value - a.value);
+
+    // 3개 이하면 그대로 반환
+    if (sorted.length <= 3) return sorted;
+
+    const topThree = sorted.slice(0, 3);
+    const otherTotal = sorted.slice(3).reduce((sum, item) => sum + item.value, 0);
+
+    return otherTotal > 0
+      ? [...topThree, { value: otherTotal, label: "기타" }]
+      : topThree;
+  }
+
   // Calculate bubble sizes and positions with collision avoidance
   useEffect(() => {
     if (!data || data.length === 0) return
 
-    const total = data.reduce((sum, item) => sum + item.value, 0)
+    const formattedData = formatBubbleData(data);
+
+    const total = formattedData.reduce((sum, item) => sum + item.value, 0)
 
     // Initial bubble creation with sizes but no positions yet
-    const initialBubbles: Bubble[] = data.map((item, index) => {
+    const initialBubbles: Bubble[] = formattedData.map((item, index) => {
       // Calculate radius based on value percentage
       const percentage = item.value / total
       const radius = minRadius + percentage * (maxRadius - minRadius)
@@ -186,7 +204,9 @@ const BubbleChart: React.FC<BubbleChartProps> = ({
             ]}
           />
           <View style={styles.labelContainer}>
-            <Text style={styles.valueText}>{bubble.data.value}%</Text>
+            <Text style={styles.valueText}>
+              {`${Math.round(bubble.data.value)}%`}
+            </Text>
             <Text style={styles.labelText} numberOfLines={2}>
               {bubble.data.label}
             </Text>

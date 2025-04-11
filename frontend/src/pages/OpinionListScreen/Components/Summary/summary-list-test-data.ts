@@ -1,5 +1,5 @@
-import { SummariesResponse } from "./SummariesResponseProps";
-import { debateData } from '../../../DebateCardsScreen/DebateCard';
+import { SummariesResponse } from "../../api/SummariesResponse.types";
+import { debateData } from '../../../DebateCardsScreen/Components';
 
 export const SummariesResponse1: SummariesResponse = {
     debate: debateData[0],

@@ -1,4 +1,4 @@
 export interface PersonalityTagProps {
-    personality: string;
-    onPress?: () => void;
+    nickname: string;
+    personality: string | null;
 }

@@ -8,16 +8,7 @@ import colors from "../../../assets/colors"
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 
-type StackParamList = {
-    NevTestPage1: undefined;
-    NevTestPage2: undefined;
-    NevTestPage3: undefined;
-    UiTestScreen: undefined;
-    PersonalityResultScreen: undefined;
-    ProfileUpdateScreen: undefined;
-    MypageScreen: undefined;
-    DeleteAccountScreen: undefined;
-};
+import {StackParamList} from '../../shared/page-stack/MyPageStack'
 
 const ProfileUpdateScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<StackParamList>>();

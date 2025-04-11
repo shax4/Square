@@ -1,16 +1,21 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { Icons } from '../../../../assets/icons/Icons';
-
-import NevTestPage3 from '../../../pages/StackSampleScreen/NevTestPage3';
 
 import DebateCardsScreen from '../../../pages/DebateCardsScreen/DebateCardsScreen';
 import OpinionListScreen from '../../../pages/OpinionListScreen/OpinionListScreen';
+import ProposalListScreen from '../../../pages/ProposalListScreen/ProposalListScreen';
+import ProposalCreateScreen from '../../../pages/ProposalCreateScreen/ProposalCreateScreen';
+import OpinionDetailScreen from '../../../pages/OpinionDetailScreen/OpinionDetailScreen';
+import OpinionEditScreen from '../../../pages/OpinionEditScreen/OpinionEditScreen';
+import PersonalityResultScreen from '../../../pages/PersonalityResultScreen/PersonalityResultScreen';
 
-import { StackParamList } from '../../../shared/page-stack/DebatePageStack';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
-const Stack = createNativeStackNavigator<StackParamList>();
+import { DebateStackParamList } from '../../../shared/page-stack/DebatePageStack';
+import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
+import PersonalitySurveyPage from '../../../pages/PersonalitySurveyPage/PersonalitySurveyPage';
+import ProposalEditScreen from '../../../pages/ProposalEditScreen/ProposalEditScreen';
+const Stack = createNativeStackNavigator<DebateStackParamList>();
 
 // 테스트용 예시 사용자 정보(전역 상태관리로 받아오도록 수정 필요)
 const currentUser = {
@@ -24,7 +29,7 @@ const debate = {
 
 // 테스트용 논쟁 의견 작성자자 정보(api에서 받아오도록 수정 필요)
 const opinion = {
-    nickname: '반짝이는하마1',
+    nickname: '반짝이는하마',
 }
 
 // 토론카드 홈 상단 탭
@@ -36,18 +41,8 @@ export default function HeaderBar() {
                 name="DebateCardsScreen"
                 component={DebateCardsScreen}
                 options={{
-                    title: '오늘의 주제',
+                    headerTitle: () => <Text style={styles.headerTitle}>오늘의 주제</Text>,
                     headerBackButtonDisplayMode: 'minimal',
-                    headerRight: () => {
-                        return (
-                            <View style={styles.headerRightItems}>
-                                <TouchableOpacity onPress={() => console.log("주제 청원으로 이동 메서드")}>
-                                    <Icons.add />
-                                </TouchableOpacity>
-                            </View>
-
-                        )
-                    }
                 }}
             />
             {/* 토론 카드 상세(의견 목록) */}
@@ -55,66 +50,114 @@ export default function HeaderBar() {
                 name="OpinionListScreen"
                 component={OpinionListScreen}
                 options={({ route }) => ({
-                    title: `Number ${route.params.debateId}`,
+                    headerTitle: () => <Text style={styles.headerTitle}>논쟁 {route.params.debateId}</Text>,
+
                     headerBackButtonDisplayMode: 'minimal',
-                    headerRight: () => (
-                        <View style={styles.headerRightItems}>
-                            <TouchableOpacity onPress={() => console.log('공유')}>
-                                <Icons.share />
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => console.log('북마크')}>
-                                <Icons.bookmark />
-                            </TouchableOpacity>
-                        </View>
-                    ),
                 })}
             />
             {/* 의견 상세 */}
             <Stack.Screen
                 name="OpinionDetailScreen"
-                component={NevTestPage3}
+                component={OpinionDetailScreen}
+                options={() => {
+                    return {
+                        headerTitle: () => <Text style={styles.headerTitle}>의견 상세</Text>,
+                        headerBackButtonDisplayMode: 'minimal',
+                    };
+                }}
+            />
+            {/* 의견 수정 */}
+            <Stack.Screen
+                name="OpinionEditScreen"
+                component={OpinionEditScreen}
                 options={() => {
                     // 현재 사용자와 작성자 비교해 우측 아이콘 및 기능 변경
                     const isAuthor = currentUser.nickname === opinion.nickname;
 
                     return {
-                        title: '의견 상세',
+                        headerTitle: () => <Text style={styles.headerTitle}>의견 수정</Text>,
                         headerBackButtonDisplayMode: 'minimal',
-                        headerRight: () => <HeaderRightIcons isAuthor={isAuthor} />,
+                        // headerRight: () => <EditOpinionHeaderRightIcon />,
                     };
+                }}
+            />
+
+            {/* 청원 리스트 */}
+            <Stack.Screen
+                name="ProposalListScreen"
+                component={ProposalListScreen}
+                options={() => {
+                    return {
+                        headerTitle: () => <Text style={styles.headerTitle}>새로운 주제 신청 리스트</Text>,
+                        headerBackButtonDisplayMode: 'minimal',
+                    };
+                }}
+            />
+            {/* 청원 작성 */}
+            <Stack.Screen
+                name="ProposalCreateScreen"
+                component={ProposalCreateScreen}
+                options={() => {
+                    return {
+                        headerTitle: () => <Text style={styles.headerTitle}>새로운 주제 작성하기</Text>,
+                        headerBackButtonDisplayMode: 'minimal',
+                    };
+                }}
+            />
+            {/* 관리자 청원 수정 */}
+            <Stack.Screen
+                name="ProposalEditScreen"
+                component={ProposalEditScreen}
+                options={() => {
+                    return {
+                        headerTitle: () => <Text style={styles.headerTitle}>청원 등록하기</Text>,
+                        headerBackButtonDisplayMode: 'minimal',
+                    };
+                }}
+            />
+
+            {/* 성향 타입 그래프 페이지 */}
+            <Stack.Screen
+                name="PersonalityResultScreen"
+                component={PersonalityResultScreen}
+                options={{
+                    headerTitle: () => <Text style={styles.headerTitle}>성향 테스트 확인</Text>,
+                    headerBackButtonDisplayMode: 'minimal',
+                }}
+            />
+            {/* 성향 테스트 */}
+            <Stack.Screen
+                name="PersonalitySurveyPage"
+                component={PersonalitySurveyPage}
+                options={{
+                    headerTitle: () => <Text style={styles.headerTitle}>설문 조사</Text>,
+                    headerBackButtonDisplayMode: "minimal",
                 }}
             />
         </Stack.Navigator>
     );
 }
 
-// 상단 바 우측 아이콘 컴포넌트: 현재 사용자와 글 작성자 여부 확인
-function HeaderRightIcons({ isAuthor }: { isAuthor: boolean }) {
+
+function DebateCardsScreenHeaderRightIcons() {
+    const navigation = useNavigation<NativeStackNavigationProp<DebateStackParamList>>();
     return (
         <View style={styles.headerRightItems}>
-            {isAuthor ? (
-                <>
-                    <TouchableOpacity onPress={() => console.log('수정')}>
-                        <Icons.edit />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => console.log('삭제')}>
-                        <Icons.delete />
-                    </TouchableOpacity>
-                </>
-            ) : (
-                <>
-                    <TouchableOpacity onPress={() => console.log('신고')}>
-                        <Icons.report />
-                    </TouchableOpacity>
-                </>
-            )}
+            <TouchableOpacity onPress={() => { navigation.navigate('ProposalListScreen') }}>
+                <Icons.add />
+            </TouchableOpacity>
         </View>
-    );
+    )
 }
 
 const styles = StyleSheet.create({
     headerRightItems: {
         flexDirection: 'row',
         gap: 12,
+    },
+    headerTitle: {
+        fontSize: 20,
+        fontWeight: "700",
+        color: "#333",
     },
 });

@@ -1,6 +1,8 @@
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native"
+import { StyleSheet, View, TouchableOpacity } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import {ProfileImage, PersonalityTag} from "../../../components"
+import Text from '../../../components/Common/Text';
+import colors from "../../../../assets/colors";
 
 type PostCardProps = {
   profileUrl: string
@@ -60,9 +62,9 @@ const PostCard = ({
         <View style={styles.userInfo}>
           <View style={styles.nameTagContainer}>
             <Text style={styles.nickname}>{nickname}</Text>
-            <PersonalityTag personality={userType} onPress={() => console.log(`${userType} clicked`)} />
+            <PersonalityTag personality={userType} nickname={nickname} />
           </View>
-          <Text style={styles.timeAgo}>{getTimeAgo(createdAt)}</Text>
+          <Text weight="medium" style={styles.timeAgo}>{getTimeAgo(createdAt)}</Text>
         </View>
       </View>
 
@@ -71,7 +73,7 @@ const PostCard = ({
         <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
           {title}
         </Text>
-        <Text style={styles.contentText} numberOfLines={1} ellipsizeMode="tail">
+        <Text weight="medium" style={styles.contentText} numberOfLines={1} ellipsizeMode="tail">
           {content}
         </Text>
       </View>
@@ -80,12 +82,12 @@ const PostCard = ({
       <View style={styles.footer}>
         <TouchableOpacity style={styles.interactionButton} onPress={onLikePress}>
           <Ionicons name={isLiked ? "heart" : "heart-outline"} size={20} color={isLiked ? "#FF3B30" : "#888888"} />
-          <Text style={styles.interactionCount}>{likeCount.toLocaleString()}</Text>
+          <Text weight="medium" style={styles.interactionCount}>{likeCount.toLocaleString()}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.interactionButton} onPress={onCommentPress}>
           <Ionicons name="chatbubble-outline" size={18} color="#888888" />
-          <Text style={styles.interactionCount}>{commentCount}</Text>
+          <Text weight="medium" style={styles.interactionCount}>{commentCount}</Text>
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
@@ -116,12 +118,12 @@ const styles = StyleSheet.create({
   nameTagContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 4,
+    marginBottom: 5,
   },
   nickname: {
     fontSize: 15,
     fontWeight: "600",
-    marginRight: 8,
+    marginRight: 7,
   },
   timeAgo: {
     fontSize: 13,
@@ -131,9 +133,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   title: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "700",
-    marginBottom: 6,
+    marginBottom: 7,
+    marginTop: 3
   },
   contentText: {
     fontSize: 14,
@@ -151,7 +154,7 @@ const styles = StyleSheet.create({
   },
   interactionCount: {
     fontSize: 14,
-    color: "#888888",
+    color: colors.grayText,
     marginLeft: 4,
   },
 })

@@ -1,7 +1,8 @@
 import React from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
-import { Summary } from "./SummaryProps";
+import { View, StyleSheet, Image } from "react-native";
+import { Summary } from "./Summary.types";
 import { styles } from '../ContentBubble.styles';
+import Text from '../../../../components/Common/Text';
 
 import { AntDesign, Feather } from '@expo/vector-icons'; // 하트/댓글 아이콘용
 
