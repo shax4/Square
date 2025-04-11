@@ -1,7 +1,7 @@
 package org.shax3.square.domain.auth;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.shax3.square.domain.auth.annotation.AuthUser;
@@ -14,8 +14,6 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
-
-import java.util.Arrays;
 
 import static org.shax3.square.domain.user.model.State.INACTIVE;
 import static org.shax3.square.domain.user.model.State.LEAVE;
@@ -35,48 +33,34 @@ public class AuthenticationArgumentResolver implements HandlerMethodArgumentReso
     }
 
     @Override
-    public Object resolveArgument(MethodParameter parameter,
+    public Object resolveArgument(@NonNull MethodParameter parameter,
                                   ModelAndViewContainer mavContainer,
                                   NativeWebRequest webRequest,
                                   WebDataBinderFactory binderFactory) {
         HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
 
         if (request == null) {
-            throw new CustomException(FAILED_TO_VALIDATE_TOKEN);
+            throw new CustomException(INVALID_REQUEST);
         }
-
-        String refreshToken = extractRefreshToken(request);
         String accessToken = extractAccessToken(request);
 
-        if (tokenUtil.isTokenValid(accessToken)) {
-            User user = extractUser(accessToken);
-            checkState(user);
-            return user;
+        if (!tokenUtil.isTokenValid(accessToken)) {
+            return null;
         }
 
-        throw new CustomException(FAILED_TO_VALIDATE_TOKEN);
+        User user = extractUser(accessToken);
+        checkState(user);
+        return user;
+
     }
+
 
     private String extractAccessToken(HttpServletRequest request) {
         String authHeader = request.getHeader(AUTHORIZATION);
         if (authHeader == null) {
             throw new CustomException(INVALID_ACCESS_TOKEN);
         }
-        return authHeader.split(" ")[1];
-    }
-
-    private String extractRefreshToken(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-
-        if (cookies == null) {
-            throw new CustomException(INVALID_REFRESH_TOKEN);
-        }
-
-        return Arrays.stream(cookies)
-            .filter(cookie -> cookie.getName().equals("refresh-token"))
-            .findFirst()
-            .orElseThrow(() -> new CustomException(INVALID_REFRESH_TOKEN))
-            .getValue();
+        return authHeader.substring(7);
     }
 
     private User extractUser(String accessToken) {

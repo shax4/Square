@@ -9,26 +9,18 @@ import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.annotation.AuthUser;
 import org.shax3.square.domain.auth.dto.UserLoginDto;
 import org.shax3.square.domain.auth.dto.response.FirebaseLoginResponse;
-import org.shax3.square.domain.user.dto.UserSignUpDto;
 import org.shax3.square.domain.user.dto.request.CheckNicknameRequest;
 import org.shax3.square.domain.user.dto.request.SignUpRequest;
 import org.shax3.square.domain.user.dto.request.UpdateProfileRequest;
 import org.shax3.square.domain.user.dto.response.CheckNicknameResponse;
 import org.shax3.square.domain.user.dto.response.ProfileInfoResponse;
 import org.shax3.square.domain.user.dto.response.ProfileUrlResponse;
-import org.shax3.square.domain.user.dto.response.SignUpUserInfoResponse;
 import org.shax3.square.domain.user.dto.response.UserChoiceResponse;
 import org.shax3.square.domain.user.model.User;
 import org.shax3.square.domain.user.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/users")
@@ -44,16 +36,9 @@ public class UserController {
     )
     @PostMapping
     public ResponseEntity<FirebaseLoginResponse> userSignUp(
-            HttpServletResponse response,
             @Valid @RequestBody SignUpRequest signUpRequest
     ) {
         UserLoginDto userLoginDto = userService.signUp(signUpRequest);
-
-        Cookie cookie = new Cookie("refresh-token", userLoginDto.refreshToken().getToken());
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
-        cookie.setPath("/");
-        response.addCookie(cookie);
 
         return ResponseEntity.ok(FirebaseLoginResponse.member(userLoginDto));
     }
@@ -65,17 +50,9 @@ public class UserController {
     @DeleteMapping
     public ResponseEntity<Void> deleteAccount(
             @AuthUser User user,
-            @CookieValue("refresh-token") String refreshToken,
-            HttpServletResponse response
+            @RequestHeader("Refresh-token") String refreshToken
     ) {
         userService.deleteAccount(user, refreshToken);
-
-        Cookie cookie = new Cookie("refresh-token", null);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(0);
-
-        response.addCookie(cookie);
 
         return ResponseEntity.ok().build();
     }

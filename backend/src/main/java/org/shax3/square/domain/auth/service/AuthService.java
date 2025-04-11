@@ -10,6 +10,7 @@ import org.shax3.square.domain.auth.dto.UserTokenDto;
 import org.shax3.square.domain.auth.repository.RefreshTokenRepository;
 import org.shax3.square.domain.user.model.SocialType;
 import org.shax3.square.domain.user.model.User;
+import org.shax3.square.domain.user.repository.UserDeviceRepository;
 import org.shax3.square.domain.user.repository.UserRepository;
 import org.shax3.square.exception.CustomException;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final TokenUtil tokenUtil;
     private final GoogleAuthService googleAuthService;
+    private final UserDeviceRepository userDeviceRepository;
 
 
     @Transactional
@@ -113,7 +115,8 @@ public class AuthService {
     }
 
     @Transactional
-    public void logout(String refreshToken) {
+    public void logout(User user,String refreshToken) {
+        userDeviceRepository.deleteByUser(user);
         refreshTokenRepository.deleteByToken(refreshToken);
     }
 

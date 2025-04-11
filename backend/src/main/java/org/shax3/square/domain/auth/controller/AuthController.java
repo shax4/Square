@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.shax3.square.domain.auth.TokenUtil;
+import org.shax3.square.domain.auth.annotation.AuthUser;
 import org.shax3.square.domain.auth.dto.UserLoginDto;
 import org.shax3.square.domain.auth.dto.UserTokenDto;
 import org.shax3.square.domain.auth.dto.request.FirebaseLoginRequest;
@@ -16,6 +17,7 @@ import org.shax3.square.domain.auth.dto.response.TestUserInfoResponse;
 import org.shax3.square.domain.auth.dto.response.UserInfoResponse;
 import org.shax3.square.domain.auth.service.AuthService;
 import org.shax3.square.domain.auth.service.FirebaseService;
+import org.shax3.square.domain.user.model.User;
 import org.shax3.square.domain.user.service.UserDeviceService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -31,11 +33,11 @@ import java.nio.charset.StandardCharsets;
 @Tag(name = "Auth", description = "인증 관련 API")
 public class AuthController {
 
-    @Value("${oauth2.google.redirect-uri}")
-    private String googleRedirectUri;
-
-    @Value("${oauth2.google.client-id}")
-    private String googleClientId;
+//    @Value("${oauth2.google.redirect-uri}")
+//    private String googleRedirectUri;
+//
+//    @Value("${oauth2.google.client-id}")
+//    private String googleClientId;
 
     private final AuthService authService;
     private final TokenUtil tokenUtil;
@@ -52,161 +54,47 @@ public class AuthController {
     ) {
         UserLoginDto userLoginDto = authService.loginTest("test@test.com");
 
-        Cookie cookie = new Cookie("refresh-token", userLoginDto.refreshToken().getToken());
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
-        cookie.setPath("/");
-        response.addCookie(cookie);
-
         return ResponseEntity.ok().body(TestUserInfoResponse.from(userLoginDto, userLoginDto.accessToken(), userLoginDto.refreshToken().getToken()));
     }
-
-    @Operation(
-            summary = "임시 로그인 API2",
-            description = "email을 입력하면 Access Token과 Refresh Token을 반환합니다."
-    )
-    @GetMapping("/test2")
-    public ResponseEntity<TestUserInfoResponse> loginTest2(
-            HttpServletResponse response
-    ) {
-        UserLoginDto userLoginDto = authService.loginTest("test2@test.com");
-
-        Cookie cookie = new Cookie("refresh-token", userLoginDto.refreshToken().getToken());
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
-        cookie.setPath("/");
-        response.addCookie(cookie);
-
-        return ResponseEntity.ok().body(TestUserInfoResponse.from(userLoginDto, userLoginDto.accessToken(), userLoginDto.refreshToken().getToken()));
-    }
-
-    @Operation(
-            summary = "임시 로그인 API3",
-            description = "email을 입력하면 Access Token과 Refresh Token을 반환합니다."
-    )
-    @GetMapping("/test3")
-    public ResponseEntity<TestUserInfoResponse> loginTest3(
-            HttpServletResponse response
-    ) {
-        UserLoginDto userLoginDto = authService.loginTest("test3@test.com");
-
-        Cookie cookie = new Cookie("refresh-token", userLoginDto.refreshToken().getToken());
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
-        cookie.setPath("/");
-        response.addCookie(cookie);
-
-        return ResponseEntity.ok().body(TestUserInfoResponse.from(userLoginDto, userLoginDto.accessToken(), userLoginDto.refreshToken().getToken()));
-    }
-
-//    @Operation(
-//            summary = "구글 로그인 API",
-//            description = "구글 로그인으로 연결되는 api입니다."
-//    )
-//    @GetMapping("/google")
-//    public void loginWithGoogle(HttpServletResponse response) throws IOException {
-//        String encodedRedirectUri = URLEncoder.encode(googleRedirectUri, StandardCharsets.UTF_8);
-//        String googleAuthUrl = "https://accounts.google.com/o/oauth2/v2/auth"
-//                + "?client_id=" + googleClientId
-//                + "&redirect_uri=" + encodedRedirectUri
-//                + "&response_type=code"
-//                + "&scope=email"
-//                + "&access_type=offline";
-//
-//        response.sendRedirect(googleAuthUrl);
-//    }
-//
-//    @GetMapping("/callback/google")
-//    public ResponseEntity<UserInfoResponse> redirectGoogle(
-//            @RequestParam("code") String code,
-//            HttpServletResponse response
-//    ) {
-//        UserLoginDto userLoginDto = authService.googleLogin(code);
-//
-//        if (userLoginDto.refreshToken() != null) {
-//            Cookie cookie = new Cookie("refresh-token", userLoginDto.refreshToken().getToken());
-//            cookie.setHttpOnly(true);
-//            cookie.setSecure(false);
-//            cookie.setPath("/");
-//            response.addCookie(cookie);
-//            response.setHeader("Authorization", "Bearer " + userLoginDto.accessToken());
-//
-//            return ResponseEntity.ok().body(UserInfoResponse.from(userLoginDto));
-//        }
-//
-//        String email = userLoginDto.email();
-//        String signUpToken = tokenUtil.createSignUpToken(email, "GOOGLE");
-//
-//        Cookie cookie = new Cookie("sign-up-token", signUpToken);
-//        cookie.setHttpOnly(true);
-//        cookie.setSecure(false);
-//        cookie.setPath("/");
-//        response.addCookie(cookie);
-//
-//        return ResponseEntity.ok().body(UserInfoResponse.from(userLoginDto));
-//    }
 
     @Operation(
             summary = "엑세스 토큰 재발급 api",
-            description = "엑세스 토큰을 재발급해 header에 넣어줍니다."
+            description = "엑세스 토큰과 리프레쉬 토큰을 받아서 만료됐는지 확인합니다."
     )
+    //TODO
     @PostMapping("/reissue")
-    public ResponseEntity<Void> reissueToken(
-            @CookieValue("refresh-token") String refreshToken,
-            @RequestHeader("Authorization") String authHeader,
-            HttpServletResponse response
+    public ResponseEntity<UserTokenDto> reissueToken(
+            @RequestHeader("Refresh-token") String refreshToken,
+            @RequestHeader("Authorization") String authHeader
     ) {
         UserTokenDto tokenDto = authService.reissueTokens(refreshToken, authHeader);
 
-        response.setHeader("Authorization", "Bearer " + tokenDto.accessToken());
-
-        Cookie cookie = new Cookie("refresh-token", tokenDto.refreshToken().getToken());
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
-        cookie.setPath("/");
-        response.addCookie(cookie);
-
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(tokenDto);
     }
 
+    //TODO
     @Operation(
             summary = "로그아웃 api",
-            description = "쿠키를 지워주고 refreshToken을 만료시킵니다."
+            description = "RefreshToken을 만료시킵니다. 프론트엔드에서는 Access-token을 지웁니다."
     )
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(
-            @CookieValue("refresh-token") String refreshToken,
-            HttpServletResponse response
+            @RequestHeader("Refresh-token") String refreshToken,
+            @AuthUser User user
     ) {
-        authService.logout(refreshToken);
-
-        Cookie cookie = new Cookie("refresh-token", null);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(0);
-
-        response.addCookie(cookie);
+        authService.logout(user,refreshToken);
 
         return ResponseEntity.ok().build();
     }
-
+    //TODO
     @PostMapping("/firebase")
     public ResponseEntity<FirebaseLoginResponse> loginWithFirebase(
-            @RequestBody FirebaseLoginRequest request,
-            HttpServletResponse response
+            @RequestBody FirebaseLoginRequest request
     ) {
         FirebaseToken firebaseUser = firebaseService.verifyIdToken(request.idToken());
         UserLoginDto userLoginDto = authService.firebaseLogin(firebaseUser, request);
-        System.out.println(request.idToken());
-        System.out.println(request.fcmToken());
-        if (userLoginDto.isMember()) {
 
-            Cookie cookie = new Cookie("refresh-token", userLoginDto.refreshToken().getToken());
-            cookie.setHttpOnly(true);
-            cookie.setSecure(false);
-            cookie.setPath("/");
-            response.addCookie(cookie);
+        if (userLoginDto.isMember()) {
 
             userDeviceService.registerOrUpdateDevice(
                     userLoginDto.userId(),
@@ -217,9 +105,6 @@ public class AuthController {
 
             return ResponseEntity.ok(FirebaseLoginResponse.member(userLoginDto));
         }
-
-
-
 
         return ResponseEntity.ok(FirebaseLoginResponse.notMember(userLoginDto.email(),userLoginDto.socialType()));
     }
