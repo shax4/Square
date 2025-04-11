@@ -36,6 +36,24 @@ public class AiSummaryClient {
 
 		String[] parts = result.split(Pattern.quote(leftOption + ":") + "|" + Pattern.quote(rightOption + ":"));
 
+		if (parts.length < 3) {
+
+			List<String> defaultLeft = List.of(
+				"대중교통 무료화는 경제적으로 취약한 계층들에게 경제 부담을 덜어주며 사회적 평등을 증진시킬 수 있다",
+				"환경 보호에 기여하여 대기 오염과 교통 체증 문제를 완화시킬 수 있다.",
+				"대중교통 이용 활성화로 자동차 이용을 줄여 에너지 절약과 친환경 교통수단 이용을 촉진시킬 수 있다."
+			);
+
+			List<String> defaultRight = List.of(
+				"대중교통 무료화는 예산 부담이 커져 다른 사회복지 예산이 부족해질 우려가 있다.",
+				"서비스 품질 저하와 혼잡으로 이어져 정상 이용객들에게 불편을 줄 수 있다.",
+				"무료화로 인해 남용하는 사람들이 늘어나 정상적인 이용을 하는 시민들에게 피해를 줄 수 있다."
+			);
+
+			summaryService.saveAll(debate, defaultLeft, defaultRight);
+			return;
+		}
+
 		String leftPart = parts[1].trim();
 		String rightPart = parts[2].trim();
 
