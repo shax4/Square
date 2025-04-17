@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/1c48ea29-8347-4e56-aefc-046b670cecdb" alt="네모흰색배경" width="40%" />
-  <img src="https://github.com/user-attachments/assets/c48742c6-cdad-40e6-a9c1-3fbbfbe9f3ab" alt="네모투명배경" width="40%" />
+  <img src="https://github.com/user-attachments/assets/c48742c6-cdad-40e6-a9c1-3fbbfbe9f3ab" alt="네모투명배경" width="30%" />
+  <img src="https://github.com/user-attachments/assets/1c48ea29-8347-4e56-aefc-046b670cecdb" alt="네모흰색배경" width="30%" />
 </div>
 
 <div>
@@ -56,27 +56,6 @@ SNS에서 벌어지는 생산적인 토론이나 논쟁,
 - 성향 기반 자유게시판 제공 (글 작성, 댓글, 좋아요, 스크랩)
 - 내가 남긴 글/댓글/스크랩/좋아요 내역을 **마이페이지에서 확인**
 
-<br>
-
-
-# 🛠️ 기술적 도전 및 해결
-
-### 📊 통계 및 시각화
-- 사용자 참여 데이터를 바탕으로 **카테고리별 통계 시각화**
-- 찬성/반대 의견의 주요 논리를 **AI가 자동 요약**
-
-### 🚀 성능 최적화
-- 불필요한 리렌더링 방지, 탭 중복 입장 차단 로직 설계
-
-### 📦 로그 수집 및 저장
-- `Redis` 기반 **클릭/행동 로그 수집**
-- `Spring Batch + Scheduler`로 MongoDB에 **비동기 저장**
-
-### 📱 모바일 최적화
-- React Native 기반 모바일 앱 개발
-- 햅틱 피드백, 백그라운드 푸시 알림 등 **네이티브 UX 강화**
-
-<br>
 
 ## 🧩 시스템 아키텍처
 
@@ -132,10 +111,10 @@ SNS에서 벌어지는 생산적인 토론이나 논쟁,
 <a href="https://www.figma.com/design/p0oidbA7tPDQSXds1HuUGv/%EC%82%AC%EA%B0%81-(Square)?node-id=0-1&t=c8fO4fi482lxShFM-0"><img alt="Figma" src ="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white"/></a>
 
 
-### 팀 노션
+### Team Notion
 <a href="https://eenzzi.notion.site/PJT-1a445cc04c9d8002a169d4c64b8ed67b?pvs=4"><img alt="Notion" src ="https://img.shields.io/badge/notion-black.svg?&style=for-the-badge&logo=notion&logoColor=white"/></a>
 
-### 지라
+### Jira
 <a href="https://ssafy.atlassian.net/jira/software/c/projects/S12P21A307/boards/7948?useStoredSettings=true"><img alt="Jira" src ="https://img.shields.io/badge/Jira-0052CC?style=for-the-badge&logo=jira&logoColor=white"/></a>
 
 <br>
