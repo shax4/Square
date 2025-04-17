@@ -102,7 +102,7 @@ SNS에서 벌어지는 생산적인 토론이나 논쟁,
 ## 📜 산출물 
 
 ### ERD
-<img src="/uploads/7ce47f013219186265f693ab9e90cf04/사각_Square___1_.png" alt="네모투명배경" />
+<img src="https://github.com/user-attachments/assets/325a43b6-ab01-490c-bb39-e79643dc10a8" alt="네모투명배경" />
 
 ### API 명세서
 [🔗 API Docs](https://eenzzi.notion.site/API-1a445cc04c9d811895d6df6fad7212c2?pvs=4)
