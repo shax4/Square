@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="/uploads/bc96ee8f7e2d3ddeff27ede48e6afc25/네모투명배경.png" alt="네모투명배경" width="40%" />
-  <img src="/uploads/41b1236fa6adabebd9313caafcc18f07/네모흰색배경.png" alt="네모흰색배경" width="40%" />
+  <img src="https://github.com/user-attachments/assets/1c48ea29-8347-4e56-aefc-046b670cecdb/네모투명배경.png" alt="네모투명배경" width="40%" />
+  <img src="https://github.com/user-attachments/assets/c48742c6-cdad-40e6-a9c1-3fbbfbe9f3ab/네모흰색배경.png" alt="네모흰색배경" width="40%" />
 </div>
 
 <div>
@@ -80,8 +80,7 @@ SNS에서 벌어지는 생산적인 토론이나 논쟁,
 
 ## 🧩 시스템 아키텍처
 
-![시스템아키텍쳐](/uploads/36fc6da6ce1ff5b3fb42055b26621c46/시스템아키텍쳐.png)
-
+![시스템아키텍쳐](https://github.com/user-attachments/assets/325a43b6-ab01-490c-bb39-e79643dc10a8)
 <br>
 <br>
 
