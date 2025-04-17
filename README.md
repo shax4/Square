@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/1c48ea29-8347-4e56-aefc-046b670cecdb/네모투명배경.png" alt="네모투명배경" width="40%" />
-  <img src="https://github.com/user-attachments/assets/c48742c6-cdad-40e6-a9c1-3fbbfbe9f3ab/네모흰색배경.png" alt="네모흰색배경" width="40%" />
+  <img src="https://github.com/user-attachments/assets/1c48ea29-8347-4e56-aefc-046b670cecdb" alt="네모흰색배경" width="40%" />
+  <img src="https://github.com/user-attachments/assets/c48742c6-cdad-40e6-a9c1-3fbbfbe9f3ab" alt="네모투명배경" width="40%" />
 </div>
 
 <div>
