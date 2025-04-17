@@ -59,7 +59,7 @@ SNS에서 벌어지는 생산적인 토론이나 논쟁,
 
 ## 🧩 시스템 아키텍처
 
-![시스템아키텍쳐](https://github.com/user-attachments/assets/325a43b6-ab01-490c-bb39-e79643dc10a8)
+![Image](https://github.com/user-attachments/assets/b32f83f1-0399-42c6-9b39-dfcb80dc1cd1)
 <br>
 <br>
 
